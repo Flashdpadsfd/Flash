@@ -797,9 +797,6 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 }
 .stats {
   display: flex; align-items: center;
-  background: #111; border: 1px solid rgba(255,255,255,.08);
-  border-radius: 12px;
-  overflow: hidden;
   width: 100%; max-width: 680px;
 }
 .stats__item {
