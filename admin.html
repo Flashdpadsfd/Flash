@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nexus — Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/admin.css" />
+</head>
+<body>
+
+  <!-- ─── LOGIN ─── -->
+  <div class="login-screen" id="loginScreen">
+    <div class="login-box">
+      <div class="login-logo">Nexus <span>Admin</span></div>
+      <p class="login-sub">Panneau d'administration</p>
+      <form id="loginForm">
+        <div class="field">
+          <label>Mot de passe</label>
+          <input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password" />
+        </div>
+        <div class="login-error" id="loginError">Mot de passe incorrect.</div>
+        <button type="submit" class="a-btn a-btn--primary" style="width:100%;margin-top:8px;">Se connecter</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ─── APP ─── -->
+  <div class="app" id="app" style="display:none;">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar__logo">Nexus <span>Admin</span></div>
+      <nav class="sidebar__nav">
+        <a class="sidebar__link active" data-page="dashboard" onclick="showPage('dashboard')">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Dashboard
+        </a>
+        <a class="sidebar__link" data-page="products" onclick="showPage('products')">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+          Produits
+        </a>
+        <a class="sidebar__link" data-page="stats" onclick="showPage('stats')">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+          Statistiques
+        </a>
+        <a class="sidebar__link" data-page="settings" onclick="showPage('settings')">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+          Paramètres
+        </a>
+      </nav>
+      <button class="sidebar__logout" onclick="logout()">
+        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+        Déconnexion
+      </button>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+
+      <!-- ─── DASHBOARD ─── -->
+      <div class="page active" id="page-dashboard">
+        <div class="page-header">
+          <h1>Dashboard</h1>
+          <a href="preview.html" target="_blank" class="a-btn a-btn--ghost">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Voir le site
+          </a>
+        </div>
+        <div class="kpi-grid" id="dashKpis"></div>
+        <div class="section-title" style="margin-top:32px;">Produits récents</div>
+        <div class="table-wrap">
+          <table class="a-table" id="dashTable">
+            <thead><tr><th>Produit</th><th>Catégorie</th><th>Prix</th><th>Stock</th><th>Badge</th></tr></thead>
+            <tbody id="dashTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ─── PRODUCTS ─── -->
+      <div class="page" id="page-products">
+        <div class="page-header">
+          <h1>Produits</h1>
+          <button class="a-btn a-btn--primary" onclick="openModal()">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Nouveau produit
+          </button>
+        </div>
+        <div class="table-wrap">
+          <table class="a-table">
+            <thead><tr><th>Produit</th><th>Catégorie</th><th>Prix</th><th>Ancien prix</th><th>Stock</th><th>Badge</th><th>Actions</th></tr></thead>
+            <tbody id="productsTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ─── STATS ─── -->
+      <div class="page" id="page-stats">
+        <div class="page-header"><h1>Statistiques</h1></div>
+        <div class="stats-editor">
+          <div class="field">
+            <label>Note moyenne (Avg. Rating)</label>
+            <input type="text" id="statRating" placeholder="4.96" />
+          </div>
+          <div class="field">
+            <label>Produits vendus (Products Sold)</label>
+            <input type="text" id="statSold" placeholder="4,350" />
+          </div>
+          <div class="field">
+            <label>Clients totaux (Total Customers)</label>
+            <input type="text" id="statCustomers" placeholder="439" />
+          </div>
+          <button class="a-btn a-btn--primary" onclick="saveStats()">Enregistrer les stats</button>
+          <div class="save-msg" id="statsSaveMsg"></div>
+        </div>
+      </div>
+
+      <!-- ─── SETTINGS ─── -->
+      <div class="page" id="page-settings">
+        <div class="page-header"><h1>Paramètres</h1></div>
+        <div class="stats-editor">
+          <div class="field">
+            <label>Nouveau mot de passe admin</label>
+            <input type="password" id="newPass" placeholder="••••••••" />
+          </div>
+          <div class="field">
+            <label>Confirmer le mot de passe</label>
+            <input type="password" id="confirmPass" placeholder="••••••••" />
+          </div>
+          <button class="a-btn a-btn--primary" onclick="changePassword()">Changer le mot de passe</button>
+          <div class="save-msg" id="settingsSaveMsg"></div>
+          <div class="danger-zone">
+            <div class="section-title" style="color:#ff4444;">Zone dangereuse</div>
+            <button class="a-btn a-btn--danger" onclick="resetAll()">Réinitialiser toutes les données</button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ─── MODAL PRODUIT ─── -->
+  <div class="modal-overlay" id="modalOverlay" onclick="closeModal()"></div>
+  <div class="modal" id="modal">
+    <div class="modal__header">
+      <h2 id="modalTitle">Nouveau produit</h2>
+      <button class="btn-close" onclick="closeModal()">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal__body">
+      <input type="hidden" id="editId" />
+      <div class="form-grid">
+        <div class="field">
+          <label>Nom du produit *</label>
+          <input type="text" id="fName" placeholder="Netflix Premium" />
+        </div>
+        <div class="field">
+          <label>Catégorie *</label>
+          <select id="fCat">
+            <option value="streaming">Streaming</option>
+            <option value="gaming">Gaming</option>
+            <option value="software">Software</option>
+            <option value="vpn">VPN</option>
+            <option value="other">Autre</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Prix ($) *</label>
+          <input type="number" id="fPrice" placeholder="9.99" step="0.01" min="0" />
+        </div>
+        <div class="field">
+          <label>Ancien prix ($)</label>
+          <input type="number" id="fOrigPrice" placeholder="19.99" step="0.01" min="0" />
+        </div>
+        <div class="field">
+          <label>Icône (emoji)</label>
+          <input type="text" id="fIcon" placeholder="🎬" maxlength="4" />
+        </div>
+        <div class="field">
+          <label>Stock</label>
+          <input type="number" id="fStock" placeholder="50" min="0" />
+        </div>
+        <div class="field" style="grid-column:1/-1;">
+          <label>Description</label>
+          <input type="text" id="fDesc" placeholder="1 Month · 4K UHD · Shared" />
+        </div>
+        <div class="field">
+          <label>Badge</label>
+          <select id="fBadge">
+            <option value="">Aucun</option>
+            <option value="HOT">HOT</option>
+            <option value="NEW">NEW</option>
+            <option value="SALE">SALE</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Couleur de fond</label>
+          <select id="fGradient">
+            <option value="linear-gradient(135deg,#1a1a2e,#16213e)">Bleu nuit</option>
+            <option value="linear-gradient(135deg,#1e3a5f,#0a1628)">Bleu profond</option>
+            <option value="linear-gradient(135deg,#2d1b69,#11053b)">Violet</option>
+            <option value="linear-gradient(135deg,#1a3a1a,#0d1f0d)">Vert</option>
+            <option value="linear-gradient(135deg,#3a1a1a,#1f0d0d)">Rouge</option>
+            <option value="linear-gradient(135deg,#1a2a3a,#0d1520)">Bleu gris</option>
+            <option value="linear-gradient(135deg,#2a1a0a,#150d05)">Brun</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal__footer">
+      <button class="a-btn a-btn--ghost" onclick="closeModal()">Annuler</button>
+      <button class="a-btn a-btn--primary" onclick="saveProduct()">Enregistrer</button>
+    </div>
+  </div>
+
+  <!-- ─── MODAL STOCK ─── -->
+  <div class="modal-overlay" id="stockOverlay" onclick="closeStockModal()"></div>
+  <div class="modal" id="stockModal" style="max-width:360px;">
+    <div class="modal__header">
+      <h2>Modifier le stock</h2>
+      <button class="btn-close" onclick="closeStockModal()">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal__body">
+      <input type="hidden" id="stockEditId" />
+      <p id="stockProductName" style="color:rgba(255,255,255,.5);margin-bottom:16px;font-size:13px;"></p>
+      <div class="field">
+        <label>Nouveau stock</label>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button class="stock-btn" onclick="adjustStock(-10)">-10</button>
+          <button class="stock-btn" onclick="adjustStock(-1)">-1</button>
+          <input type="number" id="stockValue" min="0" style="text-align:center;font-size:20px;font-weight:600;" />
+          <button class="stock-btn" onclick="adjustStock(1)">+1</button>
+          <button class="stock-btn" onclick="adjustStock(10)">+10</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal__footer">
+      <button class="a-btn a-btn--ghost" onclick="closeStockModal()">Annuler</button>
+      <button class="a-btn a-btn--primary" onclick="saveStock()">Enregistrer</button>
+    </div>
+  </div>
+
+  <!-- ─── TOAST ─── -->
+  <div id="adminToast" class="admin-toast"></div>
+
+  <script src="assets/admin.js"></script>
+</body>
+</html>

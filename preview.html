@@ -101,17 +101,17 @@
   <div class="stats-wrap">
     <div class="stats reveal">
       <div class="stats__item">
-        <span class="stats__value">4.96</span>
+        <span class="stats__value" id="statRating">4.96</span>
         <span class="stats__label" data-i18n="stats.rating">Avg. Rating</span>
       </div>
       <div class="stats__divider"></div>
       <div class="stats__item">
-        <span class="stats__value">4,350</span>
+        <span class="stats__value" id="statSold">4,350</span>
         <span class="stats__label" data-i18n="stats.sold">Products Sold</span>
       </div>
       <div class="stats__divider"></div>
       <div class="stats__item">
-        <span class="stats__value">439</span>
+        <span class="stats__value" id="statCustomers">439</span>
         <span class="stats__label" data-i18n="stats.customers">Total Customers</span>
       </div>
     </div>
@@ -219,5 +219,17 @@
   </script>
 
   <script src="assets/main.js?v=7"></script>
+  <script>
+  (function() {
+    try {
+      var s = JSON.parse(localStorage.getItem('nexus_stats'));
+      if (s) {
+        if (s.rating) document.getElementById('statRating').textContent = s.rating;
+        if (s.sold) document.getElementById('statSold').textContent = s.sold;
+        if (s.customers) document.getElementById('statCustomers').textContent = s.customers;
+      }
+    } catch(e) {}
+  })();
+  </script>
 </body>
 </html>
