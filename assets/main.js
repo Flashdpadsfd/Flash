@@ -37,24 +37,24 @@
     navbar.classList[window.scrollY > 20 ? 'add' : 'remove']('scrolled');
   }, { passive: true });
 
-  /* ─── SellAuth Checkout ─── */
-  document.querySelectorAll('.btn-buy').forEach(function (btn) {
-    btn.addEventListener('click', function (e) {
-      e.stopPropagation();
-      var card = btn.closest('.product-card');
-      if (!card) return;
-      var productId = parseInt(card.dataset.productId || '0', 10);
-      if (window._nexusOpenCheckout) { window._nexusOpenCheckout(productId); return; }
-      if (!window.sellAuthEmbed) {
-        console.warn('[Nexus] sellauth-embed-2.js not loaded — check your SHOP_ID and script tag');
-        return;
-      }
-      var variantId = parseInt(card.dataset.variantId || '0', 10);
-      window.sellAuthEmbed.checkout(btn, {
-        cart: [{ productId: productId, variantId: variantId, quantity: 1 }],
-        shopId: window.NEXUS_SHOP_ID || 0,
-        modal: true
-      });
+  /* ─── SellAuth Checkout (délégation pour cartes créées dynamiquement) ─── */
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('.btn-buy');
+    if (!btn) return;
+    e.stopPropagation();
+    var card = btn.closest('.product-card');
+    if (!card) return;
+    var productId = parseInt(card.dataset.productId || '0', 10);
+    if (window._nexusOpenCheckout) { window._nexusOpenCheckout(productId); return; }
+    if (!window.sellAuthEmbed) {
+      console.warn('[Nexus] sellauth-embed-2.js not loaded — check your SHOP_ID and script tag');
+      return;
+    }
+    var variantId = parseInt(card.dataset.variantId || '0', 10);
+    window.sellAuthEmbed.checkout(btn, {
+      cart: [{ productId: productId, variantId: variantId, quantity: 1 }],
+      shopId: window.NEXUS_SHOP_ID || 0,
+      modal: true
     });
   });
 
