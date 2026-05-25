@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Lancelot&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/style.css?v=8" />
+  <link rel="stylesheet" href="assets/style.css?v=9" />
 </head>
 <body>
 
@@ -86,9 +86,9 @@
     <div class="pd-hero__inner">
 
       <nav class="pd-breadcrumb">
-        <a href="preview-products.html">Products</a>
+        <a href="preview.html">Home</a>
         <span class="pd-breadcrumb__sep">›</span>
-        <a href="preview-products.html" id="pdBreadCat">Category</a>
+        <a href="preview-products.html" id="pdBreadCat">Products</a>
         <span class="pd-breadcrumb__sep">›</span>
         <span class="pd-breadcrumb__cur" id="pdBreadName">Product</span>
       </nav>
@@ -103,7 +103,7 @@
         <div class="pd-hero__price-row">
           <span class="pd-hero__orig" id="pdOrigPrice" style="display:none;"></span>
           <span class="pd-hero__price" id="pdPrice">—</span>
-          <span class="pd-hero__per">PER EACH</span>
+          <span class="pd-hero__per">per unit</span>
         </div>
       </div>
 
@@ -122,16 +122,68 @@
         <div class="pd-section__body" id="pdDesc">—</div>
       </div>
 
-      <!-- Specs -->
+      <!-- Specs (two-col grid inside section card) -->
       <div class="pd-section">
         <div class="pd-specs">
           <div class="pd-spec-col">
-            <div class="pd-spec-col__title">System Specs</div>
+            <div class="pd-spec-col__title">Product Details</div>
             <div id="pdSpecsLeft"></div>
           </div>
           <div class="pd-spec-col">
-            <div class="pd-spec-col__title">Service Guarantee</div>
+            <div class="pd-spec-col__title">Service Info</div>
             <div id="pdSpecsRight"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- What's Included -->
+      <div class="pd-section">
+        <div class="pd-section__hdr">What's Included</div>
+        <div class="pd-section__body">
+          <div class="pd-guarantee-grid">
+            <div class="pd-guarantee-card">
+              <span class="pd-guarantee-card__icon">⚡</span>
+              <div>
+                <b>Instant Delivery</b>
+                <p>Receive your product immediately after purchase, no waiting.</p>
+              </div>
+            </div>
+            <div class="pd-guarantee-card">
+              <span class="pd-guarantee-card__icon">🔒</span>
+              <div>
+                <b>Secure Checkout</b>
+                <p>SSL encrypted payment — your data is completely safe.</p>
+              </div>
+            </div>
+            <div class="pd-guarantee-card">
+              <span class="pd-guarantee-card__icon">✅</span>
+              <div>
+                <b>Working Guarantee</b>
+                <p>Every product is tested and guaranteed to work on delivery.</p>
+              </div>
+            </div>
+            <div class="pd-guarantee-card">
+              <span class="pd-guarantee-card__icon">💬</span>
+              <div>
+                <b>24/7 Support</b>
+                <p>Get help anytime via Discord or Telegram.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reviews -->
+      <div class="pd-section">
+        <div class="pd-section__hdr">Customer Reviews</div>
+        <div class="pd-section__body">
+          <div id="pdReviewsSummary" class="pd-rev-summary" style="display:none;">
+            <div class="pd-rev-stars" id="pdRevStars">★★★★★</div>
+            <div class="pd-rev-score" id="pdRevScore">5.0</div>
+            <div class="pd-rev-count" id="pdRevCount">(0 reviews)</div>
+          </div>
+          <div id="pdReviewsList">
+            <div style="color:rgba(255,255,255,.32);font-size:13px;padding:4px 0;">No reviews yet for this product.</div>
           </div>
         </div>
       </div>
@@ -148,7 +200,7 @@
     <aside>
       <div class="pd-checkout">
 
-        <div class="pd-checkout__hdr">Product Details</div>
+        <div class="pd-checkout__hdr">Complete Your Order</div>
 
         <div class="pd-checkout__product">
           <div class="pd-checkout__thumb" id="pdSideThumb">📦</div>
@@ -159,15 +211,24 @@
           <div class="pd-checkout__prod-price" id="pdSidePrice">—</div>
         </div>
 
-        <div class="pd-checkout__summary" id="pdSummary">
-          <div class="pd-sum-row"><span class="pd-sum-row__k">Subtotal</span><span class="pd-sum-row__v" id="pdSubtotal">—</span></div>
-          <div class="pd-sum-row"><span class="pd-sum-row__k">Tax</span><span class="pd-sum-row__v">$0.00</span></div>
-          <div class="pd-sum-row pd-sum-row--total"><span class="pd-sum-row__k">Total</span><span class="pd-sum-row__v" id="pdTotal">—</span></div>
+        <div class="pd-checkout__summary">
+          <div class="pd-sum-row">
+            <span class="pd-sum-row__k">Subtotal</span>
+            <span class="pd-sum-row__v" id="pdSubtotal">—</span>
+          </div>
+          <div class="pd-sum-row">
+            <span class="pd-sum-row__k">Tax</span>
+            <span class="pd-sum-row__v">€0.00</span>
+          </div>
+          <div class="pd-sum-row pd-sum-row--total">
+            <span class="pd-sum-row__k">Total</span>
+            <span class="pd-sum-row__v" id="pdTotal">—</span>
+          </div>
         </div>
 
         <div class="pd-checkout__secure">
           <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          Secure payment · SSL 256-bit encryption
+          Secure checkout · SSL 256-bit encryption
         </div>
 
         <div class="pd-checkout__qty">
@@ -180,11 +241,13 @@
         </div>
 
         <div class="pd-checkout__actions">
+          <button class="pd-btn-buynow" id="pdBuyNow">
+            Buy Now — <span id="pdBuyPrice">—</span>
+          </button>
           <button class="pd-btn-cart" id="pdAddCart">
             <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
             Add to Cart
           </button>
-          <button class="pd-btn-buynow" id="pdBuyNow">Buy Now</button>
         </div>
 
       </div>
@@ -214,7 +277,7 @@
   <!-- ─── CART INLINE FALLBACK ─── -->
   <script>
   (function() {
-    var PANEL_STYLE = 'position:fixed!important;top:0!important;right:0!important;bottom:0!important;width:360px!important;max-width:100vw!important;background:#0d0d0d!important;border-left:1px solid rgba(255,255,255,.12)!important;box-shadow:-20px 0 40px rgba(0,0,0,.6)!important;z-index:9999!important;display:flex!important;flex-direction:column!important;transform:none!important;';
+    var PANEL_STYLE = 'position:fixed!important;top:0!important;right:0!important;bottom:0!important;width:360px!important;max-width:100vw!important;background:#060606!important;border-left:1px solid rgba(255,255,255,.09)!important;box-shadow:-24px 0 48px rgba(0,0,0,.5)!important;z-index:9999!important;display:flex!important;flex-direction:column!important;transform:none!important;';
     var OVERLAY_STYLE = 'position:fixed!important;top:0!important;left:0!important;right:0!important;bottom:0!important;background:rgba(0,0,0,.6)!important;z-index:9998!important;display:block!important;';
     function openCart() {
       var p = document.getElementById('cartPanel'), o = document.getElementById('cartOverlay');
@@ -243,18 +306,18 @@
   })();
   </script>
 
-  <script src="assets/main.js?v=8"></script>
+  <script src="assets/main.js?v=9"></script>
 
   <!-- ─── PRODUCT DETAIL SCRIPT ─── -->
   <script>
   (function() {
     var DEFAULT_PRODUCTS = [
-      { id:1, name:'Netflix Premium',        category:'streaming', price:4.99,  origPrice:null,  icon:'🎬', desc:'1 Month · 4K UHD · Shared',  badge:'',     gradient:'linear-gradient(135deg,#1a1a2e,#16213e)', currency:'EUR', stock:50, deliverables:[] },
-      { id:2, name:'Spotify Premium',        category:'streaming', price:8.99,  origPrice:null,  icon:'🎵', desc:'3 Months · Family Plan',       badge:'HOT',  gradient:'linear-gradient(135deg,#1e3a5f,#0a1628)', currency:'EUR', stock:32, deliverables:[] },
-      { id:3, name:'Xbox Game Pass',         category:'gaming',    price:6.99,  origPrice:null,  icon:'🎮', desc:'1 Month · Ultimate',           badge:'NEW',  gradient:'linear-gradient(135deg,#2d1b69,#11053b)', currency:'EUR', stock:18, deliverables:[] },
-      { id:4, name:'NordVPN',                category:'vpn',       price:12.99, origPrice:24.99, icon:'🔒', desc:'6 Months · Premium',           badge:'',     gradient:'linear-gradient(135deg,#1a3a1a,#0d1f0d)', currency:'EUR', stock:7,  deliverables:[] },
-      { id:5, name:'Disney+',               category:'streaming', price:3.99,  origPrice:null,  icon:'📺', desc:'1 Month · 4K · Shared',        badge:'SALE', gradient:'linear-gradient(135deg,#3a1a1a,#1f0d0d)', currency:'EUR', stock:45, deliverables:[] },
-      { id:6, name:'Adobe Creative Cloud',   category:'software',  price:19.99, origPrice:null,  icon:'🎨', desc:'1 Month · All Apps',           badge:'',     gradient:'linear-gradient(135deg,#1a2a3a,#0d1520)', currency:'EUR', stock:0,  deliverables:[] }
+      { id:1, name:'Netflix Premium',      category:'streaming', price:4.99,  origPrice:null,  icon:'🎬', desc:'1 Month · 4K UHD · Shared account. Works on all devices.',  badge:'',     gradient:'linear-gradient(135deg,#1a1a2e,#16213e)', currency:'EUR', stock:50, deliverables:[] },
+      { id:2, name:'Spotify Premium',      category:'streaming', price:8.99,  origPrice:null,  icon:'🎵', desc:'3 Months · Family Plan · Up to 6 accounts.',               badge:'HOT',  gradient:'linear-gradient(135deg,#1e3a5f,#0a1628)', currency:'EUR', stock:32, deliverables:[] },
+      { id:3, name:'Xbox Game Pass',       category:'gaming',    price:6.99,  origPrice:null,  icon:'🎮', desc:'1 Month · Ultimate · Cloud gaming included.',              badge:'NEW',  gradient:'linear-gradient(135deg,#2d1b69,#11053b)', currency:'EUR', stock:18, deliverables:[] },
+      { id:4, name:'NordVPN',              category:'vpn',       price:12.99, origPrice:24.99, icon:'🔒', desc:'6 Months · Premium · 5 devices simultaneously.',          badge:'',     gradient:'linear-gradient(135deg,#1a3a1a,#0d1f0d)', currency:'EUR', stock:7,  deliverables:[] },
+      { id:5, name:'Disney+',             category:'streaming', price:3.99,  origPrice:null,  icon:'📺', desc:'1 Month · 4K · Shared. All Disney, Marvel & Star Wars.',  badge:'SALE', gradient:'linear-gradient(135deg,#3a1a1a,#1f0d0d)', currency:'EUR', stock:45, deliverables:[] },
+      { id:6, name:'Adobe Creative Cloud', category:'software',  price:19.99, origPrice:null,  icon:'🎨', desc:'1 Month · All Apps · Full suite, all platforms.',          badge:'',     gradient:'linear-gradient(135deg,#1a2a3a,#0d1520)', currency:'EUR', stock:0,  deliverables:[] }
     ];
     function getProds() { try { return JSON.parse(localStorage.getItem('nexus_products')) || DEFAULT_PRODUCTS; } catch(e) { return DEFAULT_PRODUCTS; } }
     function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -267,57 +330,54 @@
     var p = getProds().find(function(x) { return x.id === pid; });
     if (!p) { window.location.href = 'preview-products.html'; return; }
 
-    var sym = SYM[p.currency] || '$';
+    var sym = SYM[p.currency] || '€';
     var qty = 1;
 
-    /* Title */
     document.title = 'Nexus — ' + p.name;
 
-    /* Hero background */
+    /* ── Hero background ── */
     var heroBg = document.getElementById('pdHeroBg');
     if (p.image) {
-      heroBg.style.cssText = 'background-image:url('+p.image+');background-size:cover;background-position:center;';
+      heroBg.style.cssText = 'background-image:url(' + p.image + ');background-size:cover;background-position:center;';
     } else {
       document.getElementById('pdHero').style.background = p.gradient || 'linear-gradient(135deg,#1a1a2e,#16213e)';
     }
 
-    /* Breadcrumb */
+    /* ── Breadcrumb ── */
     var catEl = document.getElementById('pdBreadCat');
     catEl.textContent = cap(p.category || 'Products');
-    catEl.href = 'preview-products.html';
     document.getElementById('pdBreadName').textContent = p.name;
 
-    /* Tags */
+    /* ── Tags ── */
     var tagItems = [
       { icon:'⚡', text:'Instant Delivery' },
       { icon:'🌐', text:'Worldwide' },
       { icon: p.icon || '📦', text: cap(p.category || 'Digital') }
     ];
     document.getElementById('pdTags').innerHTML = tagItems.map(function(t) {
-      return '<span class="pd-tag">'+t.icon+' '+esc(t.text)+'</span>';
+      return '<span class="pd-tag">' + t.icon + ' ' + esc(t.text) + '</span>';
     }).join('');
 
-    /* Stock */
-    var avail = (p.deliverables||[]).length || (p.stock || 0);
+    /* ── Stock ── */
+    var avail = (p.deliverables || []).length || (p.stock || 0);
     var stockEl = document.getElementById('pdStock');
     if (avail > 0) {
-      stockEl.textContent = 'IN STOCK (' + avail + ' AVAILABLE)';
+      stockEl.textContent = 'IN STOCK · ' + avail + ' available';
     } else {
       stockEl.textContent = 'OUT OF STOCK';
       stockEl.classList.add('out');
     }
 
-    /* Rating from reviews */
-    try {
-      var reviews = JSON.parse(localStorage.getItem('nexus_reviews')) || [];
-      var pr = reviews.filter(function(r) { return r.productId === pid; });
-      if (pr.length) {
-        var avg = pr.reduce(function(s,r){ return s+(r.rating||5); }, 0) / pr.length;
-        document.getElementById('pdRating').textContent = '⭐ ' + avg.toFixed(1) + ' (' + pr.length + ' reviews)';
-      }
-    } catch(e) {}
+    /* ── Rating (from reviews) ── */
+    var allReviews = [];
+    try { allReviews = JSON.parse(localStorage.getItem('nexus_reviews')) || []; } catch(e) {}
+    var pr = allReviews.filter(function(r) { return r.productId === pid; });
+    if (pr.length) {
+      var avg = pr.reduce(function(s,r){ return s + (r.rating || 5); }, 0) / pr.length;
+      document.getElementById('pdRating').textContent = '⭐ ' + avg.toFixed(1) + ' (' + pr.length + ' review' + (pr.length !== 1 ? 's' : '') + ')';
+    }
 
-    /* Name + price */
+    /* ── Name + price ── */
     document.getElementById('pdName').textContent = p.name;
     document.getElementById('pdPrice').textContent = sym + Number(p.price).toFixed(2);
     if (p.origPrice) {
@@ -326,40 +386,75 @@
       origEl.style.display = '';
     }
 
-    /* Description */
-    document.getElementById('pdDesc').textContent = p.desc || 'No description available.';
+    /* ── Description ── */
+    document.getElementById('pdDesc').innerHTML = esc(p.desc || 'No description available.').replace(/\n/g, '<br>');
 
-    /* Specs */
+    /* ── Specs ── */
     var specsL = [
-      { k:'Category',  v: cap(p.category || 'Digital') },
-      { k:'Delivery',  v: 'Instant Digital' },
-      { k:'Format',    v: 'Digital Account' }
+      { k: 'Category', v: cap(p.category || 'Digital') },
+      { k: 'Delivery',  v: 'Instant Digital' },
+      { k: 'Format',    v: 'Digital Account' },
+      { k: 'Stock',     v: avail > 0 ? avail + ' units' : 'Out of stock' }
     ];
     var specsR = [
-      { k:'Guarantee', v: 'On Delivery' },
-      { k:'Available', v: avail > 0 ? avail + ' units' : 'Contact us' },
-      { k:'Support',   v: 'Discord / Telegram' }
+      { k: 'Guarantee', v: 'On Delivery' },
+      { k: 'Support',   v: 'Discord / Telegram' },
+      { k: 'Delivery',  v: 'Automated' },
+      { k: 'Refund',    v: 'On valid issues' }
     ];
     function renderSpecs(id, specs) {
       document.getElementById(id).innerHTML = specs.map(function(s) {
-        return '<div class="pd-spec-row"><span class="pd-spec-key">'+esc(s.k)+'</span><span class="pd-spec-val">'+esc(String(s.v))+'</span></div>';
+        return '<div class="pd-spec-row"><span class="pd-spec-key">' + esc(s.k) + '</span><span class="pd-spec-val">' + esc(String(s.v)) + '</span></div>';
       }).join('');
     }
     renderSpecs('pdSpecsLeft', specsL);
     renderSpecs('pdSpecsRight', specsR);
 
-    /* Sidebar product */
+    /* ── Reviews section ── */
+    if (pr.length) {
+      var avg2 = pr.reduce(function(s,r){ return s + (r.rating || 5); }, 0) / pr.length;
+      var fullStars = Math.round(avg2);
+      var starsStr = '★'.repeat(fullStars) + '☆'.repeat(5 - fullStars);
+      document.getElementById('pdRevStars').textContent = starsStr;
+      document.getElementById('pdRevScore').textContent = avg2.toFixed(1);
+      document.getElementById('pdRevCount').textContent = '(' + pr.length + ' review' + (pr.length !== 1 ? 's' : '') + ')';
+      document.getElementById('pdReviewsSummary').style.display = '';
+
+      document.getElementById('pdReviewsList').innerHTML = pr.slice(0, 8).map(function(r) {
+        var initial = (r.name || 'A').charAt(0).toUpperCase();
+        var rStars = '★'.repeat(r.rating || 5) + '☆'.repeat(5 - (r.rating || 5));
+        var dateStr = '';
+        try { dateStr = r.date ? new Date(r.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ''; } catch(e) {}
+        return '<div class="pd-review">' +
+          '<div class="pd-review__avatar">' + initial + '</div>' +
+          '<div class="pd-review__info">' +
+            '<div class="pd-review__header">' +
+              '<div>' +
+                '<div class="pd-review__name">' + esc(r.name || 'Customer') + '</div>' +
+                (dateStr ? '<div class="pd-review__date">' + esc(dateStr) + '</div>' : '') +
+              '</div>' +
+              '<span class="pd-review__stars">' + rStars + '</span>' +
+            '</div>' +
+            '<div class="pd-review__body">' + esc(r.text || r.comment || '') + '</div>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+    }
+
+    /* ── Sidebar ── */
     document.getElementById('pdSideThumb').textContent = p.icon || '📦';
     document.getElementById('pdSideName').textContent = p.name;
-    document.getElementById('pdSideDesc').textContent = p.desc || '';
+    document.getElementById('pdSideDesc').textContent = p.desc ? p.desc.split('·')[0].trim() : '';
     document.getElementById('pdSidePrice').textContent = sym + Number(p.price).toFixed(2);
 
-    /* Qty + summary */
+    /* ── Qty + summary ── */
     function updateSummary() {
       var sub = p.price * qty;
       document.getElementById('pdQtyVal').textContent = qty;
       document.getElementById('pdSubtotal').textContent = sym + sub.toFixed(2);
       document.getElementById('pdTotal').textContent = sym + sub.toFixed(2);
+      var bp = document.getElementById('pdBuyPrice');
+      if (bp) bp.textContent = sym + sub.toFixed(2);
     }
     updateSummary();
 
@@ -370,20 +465,23 @@
       if (qty < 99) { qty++; updateSummary(); }
     });
 
-    /* Buy Now */
+    /* ── Buy Now ── */
     var buyBtn = document.getElementById('pdBuyNow');
-    if (avail <= 0) { buyBtn.disabled = true; buyBtn.textContent = 'Out of Stock'; }
+    if (avail <= 0) {
+      buyBtn.disabled = true;
+      buyBtn.textContent = 'Out of Stock';
+    }
     buyBtn.addEventListener('click', function() {
       if (window._nexusOpenCheckout) window._nexusOpenCheckout(pid);
     });
 
-    /* Add to Cart */
+    /* ── Add to Cart ── */
     document.getElementById('pdAddCart').addEventListener('click', function() {
       var cart = [];
       try { cart = JSON.parse(localStorage.getItem('nexus_cart')) || []; } catch(e) {}
       var ex = cart.find(function(i){ return i.id === pid; });
       if (ex) { ex.qty += qty; } else {
-        cart.push({ id:pid, name:p.name, icon:p.icon||'📦', price:p.price, currency:p.currency||'EUR', qty:qty });
+        cart.push({ id: pid, name: p.name, icon: p.icon || '📦', price: p.price, currency: p.currency || 'EUR', qty: qty });
       }
       localStorage.setItem('nexus_cart', JSON.stringify(cart));
       if (window._nexusUpdateCartCount) window._nexusUpdateCartCount();
@@ -391,13 +489,13 @@
       if (window._openCart) window._openCart();
     });
 
-    /* Apply saved content (site name) */
+    /* ── Apply site name ── */
     try {
       var c = JSON.parse(localStorage.getItem('nexus_content')) || {};
       if (c.siteName) document.querySelectorAll('.nav__logo,.drawer__logo').forEach(function(el){ el.textContent = c.siteName; });
     } catch(e) {}
 
-    /* Apply links */
+    /* ── Apply links ── */
     try {
       var l = JSON.parse(localStorage.getItem('nexus_links')) || {};
       document.querySelectorAll('[data-link]').forEach(function(el) {
