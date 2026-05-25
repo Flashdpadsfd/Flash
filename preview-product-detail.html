@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Product — Nexus</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lancelot&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/style.css?v=7" />
+</head>
+<body>
+
+  <!-- ─── NAVIGATION ─── -->
+  <nav class="nav" id="navbar">
+    <div class="nav__inner">
+      <a href="preview.html" class="nav__logo">Nexus</a>
+      <ul class="nav__links" id="navLinks">
+        <li><a href="preview.html" data-i18n="nav.home">Home</a></li>
+        <li><a href="preview-products.html" class="active" data-i18n="nav.shop">Products</a></li>
+        <li><a href="#" data-i18n="nav.reviews">Feedback</a></li>
+      </ul>
+      <div class="nav__actions">
+        <button class="nav__lang" id="langToggle" aria-label="Language">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="opacity:.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>
+          <span id="langLabel">EN</span>
+          <svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="opacity:.35"><path d="M6 9l6 6 6-6"/></svg>
+          <div class="lang-dropdown" id="langDropdown">
+            <div class="lang-option selected" data-lang="EN">🇬🇧 English</div>
+            <div class="lang-option" data-lang="FR">🇫🇷 Français</div>
+            <div class="lang-option" data-lang="ES">🇪🇸 Español</div>
+            <div class="lang-option" data-lang="DE">🇩🇪 Deutsch</div>
+            <div class="lang-option" data-lang="IT">🇮🇹 Italiano</div>
+            <div class="lang-option" data-lang="PT">🇵🇹 Português</div>
+            <div class="lang-option" data-lang="AR">🇸🇦 العربية</div>
+          </div>
+        </button>
+        <button class="nav__login" data-i18n="nav.login">
+          <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Sign In
+        </button>
+        <div class="nav__cart-wrap">
+          <button class="btn-icon" id="cartBtn" aria-label="Cart" onclick="window._openCart && window._openCart()">
+            <svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+          </button>
+          <span class="nav__cart-count" id="cartCount">0</span>
+        </div>
+        <button class="btn-icon nav__hamburger" id="hamburger" aria-label="Menu">
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ─── MOBILE DRAWER ─── -->
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+  <div class="drawer" id="drawer">
+    <div class="drawer__header">
+      <span class="drawer__logo">Nexus</span>
+      <button class="btn-icon" id="drawerClose" aria-label="Close">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <ul class="drawer__links">
+      <li><a href="preview.html" class="drawer-link" data-i18n="nav.home">Home</a></li>
+      <li><a href="preview-products.html" class="drawer-link active" data-i18n="nav.shop">Shop</a></li>
+      <li><a href="#" class="drawer-link" data-i18n="nav.reviews">Reviews</a></li>
+    </ul>
+    <div style="margin-top:auto;padding-top:32px;display:flex;flex-direction:column;gap:8px;">
+      <button class="btn-primary btn-primary--lg" style="width:100%;border-radius:6px;" data-i18n="nav.login">Sign In</button>
+      <button class="btn-ghost" style="width:100%;" data-i18n="nav.register">Create Account</button>
+    </div>
+  </div>
+
+  <!-- ─── PAGE CONTENT ─── -->
+  <div class="pd-wrap">
+
+    <!-- Breadcrumb -->
+    <nav class="pd-breadcrumb">
+      <a href="preview-products.html">Products</a>
+      <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      <a href="preview-products.html" id="pdBreadCat">Category</a>
+      <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      <span id="pdBreadName">Product</span>
+    </nav>
+
+    <div class="pd-layout">
+
+      <!-- ── MAIN ── -->
+      <div class="pd-main">
+
+        <!-- Hero -->
+        <div class="pd-hero" id="pdHero">
+          <div class="pd-hero__bg-text" id="pdHeroBgText"></div>
+          <div class="pd-hero__icon" id="pdHeroIcon"></div>
+          <div class="pd-hero__badges" id="pdBadges">
+            <span class="pd-badge">
+              <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              Livraison numérique instantanée
+            </span>
+            <span class="pd-badge">
+              <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20"/></svg>
+              Mondial
+            </span>
+            <span class="pd-badge pd-badge--cat" id="pdBadgeCat"></span>
+          </div>
+        </div>
+
+        <!-- Product header -->
+        <div class="pd-header">
+          <div class="pd-header__left">
+            <div class="pd-meta">
+              <span class="pd-stock">● EN STOCK (58 DISPONIBLES)</span>
+              <span class="pd-rating">
+                <span style="color:#f59e0b;">★</span> 4.7
+                <span class="pd-rating-count">(13)</span>
+              </span>
+            </div>
+            <h1 class="pd-title" id="pdTitle">Product Name</h1>
+          </div>
+          <div class="pd-header__right">
+            <div class="pd-per-each">PER EACH</div>
+            <div class="pd-price" id="pdPrice">$0.00</div>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="pd-section">
+          <div class="pd-section-label"><span class="pd-section-sq"></span> DESCRIPTION</div>
+          <div class="pd-desc-box" id="pdDesc">Premium digital account with instant delivery. Private access — only you have access to this account. Full digital delivery within minutes of purchase.</div>
+        </div>
+
+        <!-- Specs + Guarantee -->
+        <div class="pd-two-col">
+
+          <div class="pd-specs">
+            <div class="pd-section-label"><span class="pd-section-sq"></span> SYSTEM SPECS</div>
+            <div class="pd-spec-row">
+              <span class="pd-spec-label">
+                <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+                Catégorie
+              </span>
+              <span class="pd-spec-val" id="pdSpecCat">—</span>
+            </div>
+            <div class="pd-spec-row">
+              <span class="pd-spec-label">
+                <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                Méthode de livraison
+              </span>
+              <span class="pd-spec-val">Livraison numérique instantanée</span>
+            </div>
+            <div class="pd-spec-row">
+              <span class="pd-spec-label">
+                <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20"/></svg>
+                Région
+              </span>
+              <span class="pd-spec-val">Mondial</span>
+            </div>
+            <div class="pd-spec-row">
+              <span class="pd-spec-label">
+                <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+                Stock
+              </span>
+              <span class="pd-spec-val pd-spec-val--green">En stock (58 disponibles)</span>
+            </div>
+          </div>
+
+          <div class="pd-guarantee">
+            <div class="pd-section-label"><span class="pd-section-sq"></span> SERVICE GUARANTEE</div>
+            <div class="pd-guarantee-grid">
+              <div class="pd-guarantee-card">
+                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                <div><b>Instant Delivery</b><p>Immediate access</p></div>
+              </div>
+              <div class="pd-guarantee-card">
+                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                <div><b>Secure</b><p>Encrypted checkout</p></div>
+              </div>
+              <div class="pd-guarantee-card">
+                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                <div><b>24/7 Support</b><p>Via Discord</p></div>
+              </div>
+              <div class="pd-guarantee-card">
+                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 013.51 15"/></svg>
+                <div><b>Replacement</b><p>If invalid</p></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Reviews -->
+        <div class="pd-reviews">
+          <h2 class="pd-reviews-title">Customer Reviews</h2>
+          <div class="pd-reviews-summary">
+            <span class="pd-stars">★★★★★</span>
+            <span class="pd-reviews-score">4.7</span>
+            <span class="pd-reviews-count">(13 reviews)</span>
+          </div>
+          <div class="pd-review-list">
+            <div class="pd-review">
+              <div class="pd-review-header">
+                <div class="pd-review-avatar">T</div>
+                <div>
+                  <div class="pd-review-name">Thea48</div>
+                  <div class="pd-review-date">18/04/2026</div>
+                </div>
+                <div class="pd-review-stars">★★★★★</div>
+              </div>
+              <div class="pd-review-body">great service everything was legit</div>
+            </div>
+            <div class="pd-review">
+              <div class="pd-review-header">
+                <div class="pd-review-avatar">L</div>
+                <div>
+                  <div class="pd-review-name">Lavon.Crooks47</div>
+                  <div class="pd-review-date">12/04/2026</div>
+                </div>
+                <div class="pd-review-stars">★★★★<span style="opacity:.3">★</span></div>
+              </div>
+              <div class="pd-review-body">so glad i found this store</div>
+            </div>
+            <div class="pd-review">
+              <div class="pd-review-header">
+                <div class="pd-review-avatar">M</div>
+                <div>
+                  <div class="pd-review-name">Manuela.Emard</div>
+                  <div class="pd-review-date">02/04/2026</div>
+                </div>
+                <div class="pd-review-stars">★★★★★</div>
+              </div>
+              <div class="pd-review-body">legit and fast delivery love it</div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- end pd-main -->
+
+      <!-- ── RIGHT PANEL ── -->
+      <aside class="pd-panel">
+
+        <div class="pd-panel-title">DÉTAILS DU PRODUIT</div>
+
+        <div class="pd-panel-product">
+          <div class="pd-panel-thumb" id="pdPanelThumb">📦</div>
+          <div class="pd-panel-info">
+            <div class="pd-panel-name" id="pdPanelName">Product Name</div>
+            <div class="pd-panel-qty-label">Quantity: <span id="pdPanelQty">1</span></div>
+          </div>
+          <div class="pd-panel-item-price" id="pdPanelItemPrice">$0.00</div>
+        </div>
+
+        <div class="pd-panel-totals">
+          <div class="pd-total-row"><span>Subtotal</span><span id="pdSubtotal">$0.00</span></div>
+          <div class="pd-total-row"><span>Tax</span><span>$0.00</span></div>
+          <div class="pd-total-row pd-total-row--bold"><span>Total</span><span id="pdTotal">$0.00</span></div>
+        </div>
+
+        <div class="pd-panel-ssl">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Paiement sécurisé avec cryptage SSL 256 bits
+        </div>
+
+        <div class="pd-panel-section">
+          <div class="pd-panel-section-title">VOLUME PRICING</div>
+          <div class="pd-volume-tiers">
+            <div class="pd-tier"><div class="pd-tier-pct">5%</div><div class="pd-tier-qty">10+</div></div>
+            <div class="pd-tier"><div class="pd-tier-pct">10%</div><div class="pd-tier-qty">30+</div></div>
+            <div class="pd-tier"><div class="pd-tier-pct">15%</div><div class="pd-tier-qty">250+</div></div>
+            <div class="pd-tier"><div class="pd-tier-pct">25%</div><div class="pd-tier-qty">500+</div></div>
+            <div class="pd-tier"><div class="pd-tier-pct">50%</div><div class="pd-tier-qty">1000+</div></div>
+          </div>
+          <div class="pd-volume-track-wrap">
+            <div class="pd-volume-track">
+              <div class="pd-volume-dot" id="pdVolumeDot"></div>
+            </div>
+          </div>
+          <div class="pd-volume-hint" id="pdVolumeHint">Buy <b>9 more</b> to unlock <b>5% off</b></div>
+        </div>
+
+        <div class="pd-panel-section">
+          <div class="pd-panel-section-title">QUANTITÉ</div>
+          <div class="pd-qty-controls">
+            <button class="pd-qty-btn" id="pdQtyMinus">−</button>
+            <span class="pd-qty-val" id="pdQtyVal">1</span>
+            <button class="pd-qty-btn" id="pdQtyPlus">+</button>
+          </div>
+        </div>
+
+        <button class="pd-add-cart" id="pdAddCart">
+          <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+          Ajouter au panier
+        </button>
+        <button class="pd-buy-now">Commander maintenant</button>
+
+      </aside>
+
+    </div><!-- end pd-layout -->
+  </div><!-- end pd-wrap -->
+
+  <!-- ─── FOOTER ─── -->
+  <div class="footer-wrap">
+    <div class="footer">
+      <div class="footer__top reveal">
+        <div>
+          <div class="footer__logo">Nexus</div>
+          <p class="footer__desc" data-i18n-html="footer.desc">Premium streaming accounts,<br>delivered instantly.</p>
+        </div>
+        <div>
+          <div class="footer__col-title" data-i18n="footer.nav">Navigation</div>
+          <ul class="footer__col-links">
+            <li><a href="preview.html" data-i18n="footer.home">Home</a></li>
+            <li><a href="preview-products.html" data-i18n="footer.products">Products</a></li>
+            <li><a href="#" data-i18n="footer.feedback">Feedback</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="footer__col-title" data-i18n="footer.legal">Legal</div>
+          <ul class="footer__col-links">
+            <li><a href="#" data-i18n="footer.tos">Terms of Service</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="footer__col-title" data-i18n="footer.socials">Socials</div>
+          <ul class="footer__col-links">
+            <li><a href="#">Discord</a></li>
+            <li><a href="#">Telegram</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <div class="footer__copy" data-i18n="footer.copy">© 2026 Nexus. All rights reserved.</div>
+        <div style="display:flex;gap:16px;align-items:center;">
+          <a href="#" style="font-size:13px;color:rgba(255,255,255,.35);transition:color 200ms ease;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.35)'">Terms</a>
+          <span style="color:rgba(255,255,255,.15);font-size:13px;">/</span>
+          <a href="#" style="font-size:13px;color:rgba(255,255,255,.35);transition:color 200ms ease;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.35)'">Privacy</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── CART PANEL ─── -->
+  <div class="cart-overlay" id="cartOverlay"></div>
+  <div class="cart-panel" id="cartPanel">
+    <div class="cart-panel__header">
+      <div>
+        <span class="cart-panel__title">Your Cart</span>
+        <span class="cart-panel__count" id="cartPanelCount"></span>
+      </div>
+      <button class="btn-icon" id="cartPanelClose" aria-label="Close cart">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="cart-panel__body" id="cartBody"></div>
+    <div class="cart-panel__footer" id="cartFooter"></div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Cart inline fallback -->
+  <script>
+  (function() {
+    var PANEL_STYLE = 'position:fixed!important;top:0!important;right:0!important;bottom:0!important;width:360px!important;max-width:100vw!important;background:#0d0d0d!important;border-left:1px solid rgba(255,255,255,.12)!important;box-shadow:-20px 0 40px rgba(0,0,0,.6)!important;z-index:9999!important;display:flex!important;flex-direction:column!important;transform:none!important;';
+    var OVERLAY_STYLE = 'position:fixed!important;top:0!important;left:0!important;right:0!important;bottom:0!important;background:rgba(0,0,0,.6)!important;z-index:9998!important;display:block!important;';
+    function openCart() {
+      var p = document.getElementById('cartPanel'), o = document.getElementById('cartOverlay');
+      if (p) { p.setAttribute('style', PANEL_STYLE); p.classList.add('open'); }
+      if (o) { o.setAttribute('style', OVERLAY_STYLE); o.classList.add('open'); }
+      document.body.style.overflow = 'hidden';
+      try { if (window._renderCartPanel) window._renderCartPanel(); } catch(e) {}
+    }
+    function closeCart() {
+      var p = document.getElementById('cartPanel'), o = document.getElementById('cartOverlay');
+      if (p) { p.removeAttribute('style'); p.classList.remove('open'); }
+      if (o) { o.removeAttribute('style'); o.classList.remove('open'); }
+      document.body.style.overflow = '';
+    }
+    window._openCart = openCart; window._closeCart = closeCart;
+    document.addEventListener('click', function(e) {
+      var t = e.target;
+      for (var i = 0; i < 12 && t && t !== document; i++) {
+        if (t.id === 'cartBtn') { openCart(); return; }
+        if (t.id === 'cartPanelClose') { closeCart(); return; }
+        if (t.id === 'cartOverlay') { closeCart(); return; }
+        t = t.parentNode;
+      }
+    }, true);
+  })();
+  </script>
+
+  <script src="assets/main.js?v=7"></script>
+
+  <!-- Product detail logic -->
+  <script>
+  (function() {
+    var params = new URLSearchParams(window.location.search);
+    var name  = params.get('name')  || 'Product';
+    var price = parseFloat(params.get('price') || '0');
+    var cat   = params.get('cat')   || 'streaming';
+    var icon  = params.get('icon')  || '📦';
+    var desc  = params.get('desc')  || '';
+    var catLabel = cat.charAt(0).toUpperCase() + cat.slice(1);
+
+    document.title = name + ' — Nexus';
+
+    var el = function(id) { return document.getElementById(id); };
+
+    // Breadcrumb
+    var bc = el('pdBreadCat');
+    if (bc) { bc.textContent = catLabel; bc.href = 'preview-products.html'; }
+    if (el('pdBreadName')) el('pdBreadName').textContent = name;
+
+    // Hero
+    if (el('pdHeroBgText')) el('pdHeroBgText').textContent = name;
+    if (el('pdHeroIcon'))   el('pdHeroIcon').textContent   = icon;
+    if (el('pdBadgeCat'))   el('pdBadgeCat').textContent   = catLabel;
+
+    // Title / price
+    if (el('pdTitle')) el('pdTitle').textContent = name;
+    if (el('pdPrice')) el('pdPrice').textContent = '$' + price.toFixed(2);
+
+    // Description
+    if (desc && el('pdDesc')) el('pdDesc').textContent = desc;
+
+    // Spec cat — category name, not product name
+    if (el('pdSpecCat')) el('pdSpecCat').textContent = catLabel;
+
+    // Panel
+    if (el('pdPanelThumb')) el('pdPanelThumb').textContent = icon;
+    if (el('pdPanelName'))  el('pdPanelName').textContent  = name;
+
+    // Volume pricing tiers
+    var TIERS    = [10, 30, 250, 500, 1000];
+    var DISCOUNTS = ['5%', '10%', '15%', '25%', '50%'];
+
+    // Quantity
+    var qty = 1;
+
+    function updatePrices() {
+      var total = (qty * price).toFixed(2);
+      if (el('pdSubtotal'))       el('pdSubtotal').textContent       = '$' + total;
+      if (el('pdTotal'))          el('pdTotal').textContent          = '$' + total;
+      if (el('pdQtyVal'))         el('pdQtyVal').textContent         = qty;
+      if (el('pdPanelQty'))       el('pdPanelQty').textContent       = qty;
+      if (el('pdPanelItemPrice')) el('pdPanelItemPrice').textContent = '$' + total;
+
+      // Volume pricing dot position (0–94%)
+      var dotPct = Math.min(qty / 1000 * 94, 94);
+      var dotEl = el('pdVolumeDot');
+      if (dotEl) dotEl.style.left = dotPct.toFixed(1) + '%';
+
+      // Volume hint: find next tier
+      var nextTier = -1;
+      for (var ti = 0; ti < TIERS.length; ti++) {
+        if (qty < TIERS[ti]) { nextTier = ti; break; }
+      }
+      var hintEl = el('pdVolumeHint');
+      if (hintEl) {
+        if (nextTier === -1) {
+          hintEl.innerHTML = 'Max discount unlocked: <b>' + DISCOUNTS[DISCOUNTS.length - 1] + ' off</b>';
+        } else {
+          var need = TIERS[nextTier] - qty;
+          hintEl.innerHTML = 'Buy <b>' + need + ' more</b> to unlock <b>' + DISCOUNTS[nextTier] + ' off</b>';
+        }
+      }
+    }
+    updatePrices();
+
+    if (el('pdQtyMinus')) el('pdQtyMinus').addEventListener('click', function() { if (qty > 1) { qty--; updatePrices(); } });
+    if (el('pdQtyPlus'))  el('pdQtyPlus').addEventListener('click',  function() { qty++; updatePrices(); });
+
+    // Add to cart — delegates to main.js _addToCart so the in-memory cart stays in sync
+    if (el('pdAddCart')) {
+      el('pdAddCart').addEventListener('click', function() {
+        if (window._addToCart) {
+          window._addToCart({ name: name, price: price, icon: icon, cat: cat, desc: desc, qty: qty });
+        } else {
+          // fallback: write directly and open panel
+          var c = [];
+          try { c = JSON.parse(localStorage.getItem('nexus-cart') || '[]'); } catch(e) {}
+          var found = false;
+          for (var i = 0; i < c.length; i++) { if (c[i].name === name) { c[i].qty += qty; found = true; break; } }
+          if (!found) c.push({ name: name, price: price, icon: icon, qty: qty, cat: cat, desc: desc });
+          localStorage.setItem('nexus-cart', JSON.stringify(c));
+        }
+        if (window._openCart) window._openCart();
+      });
+    }
+  })();
+  </script>
+
+</body>
+</html>

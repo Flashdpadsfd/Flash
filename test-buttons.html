@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Nexus – Button Tests</title>
+  <style>
+    body { font-family: monospace; background: #111; color: #fff; padding: 24px; }
+    h1 { margin-bottom: 16px; font-size: 18px; }
+    .test { padding: 8px 12px; margin: 4px 0; border-radius: 4px; font-size: 13px; }
+    .pass { background: #1a3a1a; color: #4caf50; }
+    .fail { background: #3a1a1a; color: #f44336; }
+    .pending { background: #1a2a3a; color: #90caf9; }
+    button { margin: 6px; padding: 8px 14px; background: #333; color: #fff; border: 1px solid #555; border-radius: 4px; cursor: pointer; font-size: 13px; }
+    button:hover { background: #444; }
+    #log { margin-top: 20px; }
+    hr { border-color: #333; margin: 16px 0; }
+    #cartPanel, #cartOverlay { display:none; }
+    #cartPanel.open { display:flex; flex-direction:column; position:fixed; right:0; top:0; bottom:0; width:300px; background:#1a1a1a; border-left:1px solid #333; z-index:999; }
+    #cartOverlay.open { display:block; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:998; }
+  </style>
+</head>
+<body>
+
+<h1>Nexus — Test des boutons (v4)</h1>
+<div id="log"></div>
+<hr>
+
+<!-- Minimal DOM needed by main.js -->
+<nav class="nav">
+  <div class="nav__inner"><div class="nav__actions">
+    <button id="langToggle"><span id="langLabel">EN</span>
+      <div class="lang-dropdown" id="langDropdown">
+        <div class="lang-option selected" data-lang="EN">EN</div>
+      </div>
+    </button>
+    <div class="nav__cart-wrap">
+      <button class="btn-icon" id="cartBtn" style="padding:8px;background:#222;border:1px solid #444;border-radius:4px;color:#fff;cursor:pointer;">🛒 Panier</button>
+      <span class="nav__cart-count" id="cartCount" style="display:none;background:#fff;color:#000;border-radius:50%;padding:2px 5px;font-size:11px;margin-left:4px;">0</span>
+    </div>
+    <button id="hamburger" style="display:none;">☰</button>
+  </div></div>
+</nav>
+
+<div class="drawer-overlay" id="drawerOverlay" style="display:none;"></div>
+<div class="drawer" id="drawer" style="display:none;">
+  <button id="drawerClose">X</button>
+  <ul><li><a class="drawer-link" href="#hero">Home</a></li></ul>
+</div>
+
+<div class="cart-overlay" id="cartOverlay"></div>
+<div class="cart-panel" id="cartPanel">
+  <div class="cart-panel__header" style="padding:12px;border-bottom:1px solid #333;display:flex;justify-content:space-between;align-items:center;">
+    <span class="cart-panel__title" style="font-weight:bold;">Panier</span>
+    <span id="cartPanelCount" style="color:#888;"></span>
+    <button id="cartPanelClose" style="background:none;border:none;color:#fff;cursor:pointer;font-size:18px;">✕</button>
+  </div>
+  <div id="cartBody" style="flex:1;padding:12px;overflow:auto;"></div>
+  <div id="cartFooter" style="padding:12px;border-top:1px solid #333;"></div>
+</div>
+
+<div class="product-grid" id="productGrid">
+  <div class="product-card" data-name="Netflix Premium" data-cat="streaming" data-price="4.99" data-icon="🎬" data-desc="Test product" style="display:inline-block;padding:12px;background:#222;border-radius:8px;margin:8px;">
+    <div>Netflix Premium — $4.99</div>
+    <button class="btn-buy" style="margin-top:8px;padding:6px 12px;background:#fff;color:#000;border:none;border-radius:4px;cursor:pointer;">Buy Now</button>
+  </div>
+</div>
+
+<select id="sortSelect"><option value="default">Popular</option></select>
+<input id="searchInput" style="display:none;" />
+<span id="resultsCount" style="display:none;">1 products</span>
+<h2 id="pageTitle" style="display:none;">All</h2>
+<div class="sidebar__item active" data-cat="all" data-label="All Products" style="display:none;">All</div>
+<div class="sidebar__item" data-cat="streaming" data-label="Streaming" style="display:none;">Streaming</div>
+<div class="toast-container" id="toastContainer" style="position:fixed;bottom:24px;right:24px;z-index:1000;display:flex;flex-direction:column;gap:8px;"></div>
+
+<hr>
+<div><strong>Tests manuels :</strong></div>
+<button onclick="runTest('cartBtn','Ouvre le panier')">Cliquer sur le bouton Panier</button>
+<button onclick="runTest('cartPanelClose','Ferme le panier')">Fermer le panier</button>
+<button onclick="document.querySelector('.btn-buy').click(); log('Buy Now cliqué')">Cliquer Buy Now</button>
+<button onclick="localStorage.clear(); log('localStorage vidé')">Vider localStorage</button>
+
+<script>
+var log = function(msg, ok) {
+  var d = document.createElement('div');
+  d.className = 'test ' + (ok === true ? 'pass' : ok === false ? 'fail' : 'pending');
+  d.textContent = (ok === true ? '✓ PASS  ' : ok === false ? '✗ FAIL  ' : '● INFO  ') + msg;
+  document.getElementById('log').appendChild(d);
+};
+
+function runTest(id, label) {
+  var el = document.getElementById(id);
+  if (!el) { log(label + ' — élément #' + id + ' introuvable', false); return; }
+  el.click();
+  log(label + ' → #' + id + ' cliqué', true);
+}
+
+window.onerror = function(msg, src, line) {
+  log('ERREUR JS: ' + msg + ' (ligne ' + line + ')', false);
+};
+</script>
+
+<script src="assets/main.js?v=4"></script>
+
+<script>
+// Auto-tests after main.js loads
+(function() {
+  var js_version = '/* Nexus Theme – v4 */';
+  log('Page chargée avec main.js?v=4', true);
+
+  // Test 1: cartBtn exists
+  log('cartBtn dans le DOM: ' + (document.getElementById('cartBtn') ? 'OUI' : 'NON'),
+      !!document.getElementById('cartBtn'));
+
+  // Test 2: cartPanel exists
+  log('cartPanel dans le DOM: ' + (document.getElementById('cartPanel') ? 'OUI' : 'NON'),
+      !!document.getElementById('cartPanel'));
+
+  // Test 3: cartOverlay exists
+  log('cartOverlay dans le DOM: ' + (document.getElementById('cartOverlay') ? 'OUI' : 'NON'),
+      !!document.getElementById('cartOverlay'));
+
+  // Test 4: simulate cartBtn click
+  setTimeout(function() {
+    document.getElementById('cartBtn').click();
+    var open = document.getElementById('cartPanel').classList.contains('open');
+    log('Clic sur cartBtn → panel.classList.contains("open"): ' + open, open);
+
+    // Close it
+    document.getElementById('cartPanelClose').click();
+    var closed = !document.getElementById('cartPanel').classList.contains('open');
+    log('Clic sur cartPanelClose → panel fermé: ' + closed, closed);
+
+    // Test Buy Now
+    var buyBtn = document.querySelector('.btn-buy');
+    if (buyBtn) {
+      buyBtn.click();
+      var cart = [];
+      try { cart = JSON.parse(localStorage.getItem('nexus-cart') || '[]'); } catch(e) {}
+      log('Clic Buy Now → ' + cart.length + ' article(s) dans le panier', cart.length > 0);
+
+      // Open cart to see items
+      document.getElementById('cartBtn').click();
+      var body = document.getElementById('cartBody');
+      var hasItems = body && body.querySelector('.cart-item') !== null;
+      log('Panel panier affiche les articles: ' + hasItems, hasItems);
+    }
+  }, 300);
+})();
+</script>
+</body>
+</html>

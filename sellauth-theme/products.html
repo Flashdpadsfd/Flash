@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nexus — Products</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lancelot&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+
+  <!-- ─── NAVIGATION ─── -->
+  <nav class="nav">
+    <div class="nav__inner">
+
+      <a href="index.html" class="nav__logo">Nexus</a>
+
+      <ul class="nav__links">
+        <li><a href="index.html" data-i18n="nav.home">Home</a></li>
+        <li><a href="products.html" class="active" data-i18n="nav.shop">Products</a></li>
+        <li><a href="#" data-i18n="nav.reviews">Feedback</a></li>
+      </ul>
+
+      <div class="nav__actions">
+
+        <button class="nav__lang" id="langToggle" aria-label="Language">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="opacity:.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>
+          <span id="langLabel">EN</span>
+          <svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="opacity:.35"><path d="M6 9l6 6 6-6"/></svg>
+          <div class="lang-dropdown" id="langDropdown">
+            <div class="lang-option selected" data-lang="EN">🇬🇧 English</div>
+            <div class="lang-option" data-lang="FR">🇫🇷 Français</div>
+            <div class="lang-option" data-lang="ES">🇪🇸 Español</div>
+            <div class="lang-option" data-lang="DE">🇩🇪 Deutsch</div>
+            <div class="lang-option" data-lang="IT">🇮🇹 Italiano</div>
+            <div class="lang-option" data-lang="PT">🇵🇹 Português</div>
+            <div class="lang-option" data-lang="AR">🇸🇦 العربية</div>
+          </div>
+        </button>
+
+        <button class="nav__login" data-i18n="nav.login">
+          <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Sign In
+        </button>
+
+        <button class="btn-icon nav__hamburger" id="hamburger" aria-label="Menu">
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+
+      </div>
+    </div>
+  </nav>
+
+  <!-- ─── MOBILE DRAWER ─── -->
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+  <div class="drawer" id="drawer">
+    <div class="drawer__header">
+      <span class="drawer__logo">Nexus</span>
+      <button class="btn-icon" id="drawerClose" aria-label="Close">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <ul class="drawer__links">
+      <li><a href="index.html" class="drawer-link" data-i18n="nav.home">Home</a></li>
+      <li><a href="products.html" class="drawer-link active" data-i18n="nav.shop">Shop</a></li>
+      <li><a href="#" class="drawer-link" data-i18n="nav.reviews">Reviews</a></li>
+    </ul>
+    <div style="margin-top:auto;padding-top:32px;display:flex;flex-direction:column;gap:8px;">
+      <button class="btn-primary btn-primary--lg" style="width:100%;border-radius:6px;" data-i18n="nav.login">Sign In</button>
+      <button class="btn-ghost" style="width:100%;" data-i18n="nav.register">Create Account</button>
+    </div>
+  </div>
+
+  <!-- ─── SHOP LAYOUT ─── -->
+  <div class="shop-layout">
+
+    <!-- ── SIDEBAR ── -->
+    <aside class="sidebar" id="sidebar">
+
+      <div class="sidebar__search">
+        <svg class="sidebar__search-icon" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input class="sidebar__search-input" id="searchInput" type="text" placeholder="Search products…" autocomplete="off" />
+        <span class="sidebar__search-kbd">⌘K</span>
+      </div>
+
+      <div class="sidebar__section">
+        <div class="sidebar__section-header" onclick="toggleSection('catSection')">
+          <span class="sidebar__section-title">
+            <span class="sidebar__dot"></span>
+            Categories
+          </span>
+          <svg class="sidebar__section-arrow" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+        </div>
+        <div class="sidebar__section-body" id="catSection">
+          <!--
+            Adaptez les data-cat pour correspondre aux data-cat de vos .product-card
+            Adaptez les data-label pour l'affichage du titre de page
+          -->
+          <div class="sidebar__item active" data-cat="all" data-label="All Products">
+            <span class="sidebar__item-icon" style="background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);">🌐</span>
+            All Products
+          </div>
+          <div class="sidebar__item" data-cat="streaming" data-label="Streaming">
+            <span class="sidebar__item-icon" style="background:rgba(229,9,20,.15);color:#e50914;">▶</span>
+            Streaming
+          </div>
+          <div class="sidebar__item" data-cat="gaming" data-label="Gaming">
+            <span class="sidebar__item-icon" style="background:rgba(100,200,100,.1);color:#64c864;">🎮</span>
+            Gaming
+          </div>
+          <div class="sidebar__item" data-cat="software" data-label="Software">
+            <span class="sidebar__item-icon" style="background:rgba(100,149,237,.1);color:#6495ed;">💻</span>
+            Software
+          </div>
+          <div class="sidebar__item" data-cat="vpn" data-label="VPN">
+            <span class="sidebar__item-icon" style="background:rgba(255,160,30,.1);color:#ffa01e;">🔒</span>
+            VPN
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- ── MAIN ── -->
+    <main class="shop-main">
+
+      <div class="shop-topbar">
+        <h1 class="shop-topbar__title" id="pageTitle">All Products</h1>
+        <div class="shop-topbar__right">
+          <span class="results-count" id="resultsCount"></span>
+          <select class="sort-select" id="sortSelect">
+            <option value="default">Popular</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+            <option value="name">Name A–Z</option>
+          </select>
+        </div>
+      </div>
+
+      <!--
+        ════════════════════════════════════════════
+          PRODUITS — CONFIGURATION SELLAUTH
+
+          Pour chaque .product-card :
+            • data-product-id  → ID du produit dans votre dashboard SellAuth
+            • data-variant-id  → ID de variante (laissez "0" si pas de variante)
+            • data-name        → Nom affiché (utilisé pour la recherche & le tri)
+            • data-cat         → Catégorie (doit correspondre aux data-cat de la sidebar)
+            • data-price       → Prix numérique (pour le tri par prix)
+
+          Le bouton .btn-buy déclenche automatiquement la modal SellAuth.
+        ════════════════════════════════════════════
+      -->
+      <div class="product-grid" id="productGrid">
+
+        <!-- ── Produit 1 — Remplacez data-product-id par votre vrai ID SellAuth ── -->
+        <div class="product-card"
+             data-product-id="1001"
+             data-variant-id="0"
+             data-name="Netflix Premium"
+             data-cat="streaming"
+             data-price="4.99">
+          <div class="product-card__img" style="background:linear-gradient(135deg,#1a1a2e,#16213e);">
+            <span class="product-card__img-icon">🎬</span>
+          </div>
+          <div class="product-card__body">
+            <div class="product-card__cat">Streaming</div>
+            <div class="product-card__name">Netflix Premium</div>
+            <div class="product-card__desc">1 Month · 4K UHD · Shared</div>
+          </div>
+          <div class="product-card__footer">
+            <span class="product-card__price">$4.99</span>
+            <button class="btn-buy">Buy Now</button>
+          </div>
+        </div>
+
+        <!-- ── Produit 2 ── -->
+        <div class="product-card"
+             data-product-id="1002"
+             data-variant-id="0"
+             data-name="Spotify Premium"
+             data-cat="streaming"
+             data-price="8.99">
+          <div class="product-card__img" style="background:linear-gradient(135deg,#1e3a5f,#0a1628);">
+            <span class="product-card__img-icon">🎵</span>
+            <div class="product-card__badges">
+              <span class="badge badge--hot">HOT</span>
+            </div>
+          </div>
+          <div class="product-card__body">
+            <div class="product-card__cat">Streaming</div>
+            <div class="product-card__name">Spotify Premium</div>
+            <div class="product-card__desc">3 Months · Family Plan</div>
+          </div>
+          <div class="product-card__footer">
+            <span class="product-card__price">$8.99</span>
+            <button class="btn-buy">Buy Now</button>
+          </div>
+        </div>
+
+        <!-- ── Produit 3 ── -->
+        <div class="product-card"
+             data-product-id="1003"
+             data-variant-id="0"
+             data-name="Xbox Game Pass"
+             data-cat="gaming"
+             data-price="6.99">
+          <div class="product-card__img" style="background:linear-gradient(135deg,#2d1b69,#11053b);">
+            <span class="product-card__img-icon">🎮</span>
+            <div class="product-card__badges">
+              <span class="badge badge--new">NEW</span>
+            </div>
+          </div>
+          <div class="product-card__body">
+            <div class="product-card__cat">Gaming</div>
+            <div class="product-card__name">Xbox Game Pass</div>
+            <div class="product-card__desc">1 Month · Ultimate</div>
+          </div>
+          <div class="product-card__footer">
+            <span class="product-card__price">$6.99</span>
+            <button class="btn-buy">Buy Now</button>
+          </div>
+        </div>
+
+        <!-- ── Produit 4 ── -->
+        <div class="product-card"
+             data-product-id="1004"
+             data-variant-id="0"
+             data-name="NordVPN"
+             data-cat="vpn"
+             data-price="12.99">
+          <div class="product-card__img" style="background:linear-gradient(135deg,#1a3a1a,#0d1f0d);">
+            <span class="product-card__img-icon">🔒</span>
+          </div>
+          <div class="product-card__body">
+            <div class="product-card__cat">VPN</div>
+            <div class="product-card__name">NordVPN</div>
+            <div class="product-card__desc">6 Months · Premium</div>
+          </div>
+          <div class="product-card__footer">
+            <div>
+              <span class="product-card__price-orig">$24.99</span>
+              <span class="product-card__price">$12.99</span>
+            </div>
+            <button class="btn-buy">Buy Now</button>
+          </div>
+        </div>
+
+        <!-- ── Produit 5 ── -->
+        <div class="product-card"
+             data-product-id="1005"
+             data-variant-id="0"
+             data-name="Disney+"
+             data-cat="streaming"
+             data-price="3.99">
+          <div class="product-card__img" style="background:linear-gradient(135deg,#3a1a1a,#1f0d0d);">
+            <span class="product-card__img-icon">📺</span>
+            <div class="product-card__badges">
+              <span class="badge badge--sale">SALE</span>
+            </div>
+          </div>
+          <div class="product-card__body">
+            <div class="product-card__cat">Streaming</div>
+            <div class="product-card__name">Disney+</div>
+            <div class="product-card__desc">1 Month · 4K · Shared</div>
+          </div>
+          <div class="product-card__footer">
+            <span class="product-card__price">$3.99</span>
+            <button class="btn-buy">Buy Now</button>
+          </div>
+        </div>
+
+        <!-- ── Produit 6 ── -->
+        <div class="product-card"
+             data-product-id="1006"
+             data-variant-id="0"
+             data-name="Adobe Creative Cloud"
+             data-cat="software"
+             data-price="19.99">
+          <div class="product-card__img" style="background:linear-gradient(135deg,#1a2a3a,#0d1520);">
+            <span class="product-card__img-icon">🎨</span>
+          </div>
+          <div class="product-card__body">
+            <div class="product-card__cat">Software</div>
+            <div class="product-card__name">Adobe Creative Cloud</div>
+            <div class="product-card__desc">1 Month · All Apps</div>
+          </div>
+          <div class="product-card__footer">
+            <span class="product-card__price">$19.99</span>
+            <button class="btn-buy">Buy Now</button>
+          </div>
+        </div>
+
+        <!--
+          ── AJOUTER UN NOUVEAU PRODUIT ──
+          Copiez ce bloc et remplissez vos valeurs :
+
+          <div class="product-card"
+               data-product-id="VOTRE_ID_SELLAUTH"
+               data-variant-id="0"
+               data-name="Nom du Produit"
+               data-cat="streaming|gaming|software|vpn"
+               data-price="9.99">
+            <div class="product-card__img" style="background:linear-gradient(135deg,#1a1a2e,#16213e);">
+              <span class="product-card__img-icon">🎬</span>
+            </div>
+            <div class="product-card__body">
+              <div class="product-card__cat">Catégorie</div>
+              <div class="product-card__name">Nom du Produit</div>
+              <div class="product-card__desc">Description courte</div>
+            </div>
+            <div class="product-card__footer">
+              <span class="product-card__price">$9.99</span>
+              <button class="btn-buy">Buy Now</button>
+            </div>
+          </div>
+        -->
+
+      </div>
+
+      <div class="pagination">
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+        <button class="page-btn">→</button>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ─── FOOTER ─── -->
+  <div class="footer-wrap">
+    <div class="footer">
+      <div class="footer__top reveal">
+
+        <div>
+          <div class="footer__logo">Nexus</div>
+          <p class="footer__desc" data-i18n-html="footer.desc">Premium streaming accounts,<br>delivered instantly.</p>
+        </div>
+
+        <div>
+          <div class="footer__col-title" data-i18n="footer.nav">Navigation</div>
+          <ul class="footer__col-links">
+            <li><a href="index.html" data-i18n="footer.home">Home</a></li>
+            <li><a href="products.html" data-i18n="footer.products">Products</a></li>
+            <li><a href="#" data-i18n="footer.feedback">Feedback</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="footer__col-title" data-i18n="footer.legal">Legal</div>
+          <ul class="footer__col-links">
+            <li><a href="#" data-i18n="footer.tos">Terms of Service</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="footer__col-title" data-i18n="footer.socials">Socials</div>
+          <ul class="footer__col-links">
+            <li><a href="#">Discord</a></li>
+            <li><a href="#">Telegram</a></li>
+          </ul>
+        </div>
+
+      </div>
+      <div class="footer__bottom">
+        <div class="footer__copy" data-i18n="footer.copy">© 2026 Nexus. All rights reserved.</div>
+        <div style="display:flex;gap:16px;align-items:center;">
+          <a href="#" data-i18n="footer.terms" style="font-size:13px;color:rgba(255,255,255,.35);transition:color 200ms ease;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.35)'">Terms</a>
+          <span style="color:rgba(255,255,255,.15);font-size:13px;">/</span>
+          <a href="#" data-i18n="footer.privacy" style="font-size:13px;color:rgba(255,255,255,.35);transition:color 200ms ease;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.35)'">Privacy</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!--
+    ════════════════════════════════════════════
+      CONFIGURATION SELLAUTH
+      1. Remplacez 0 par votre vrai Shop ID SellAuth
+      2. data-shop-id doit correspondre à NEXUS_SHOP_ID
+    ════════════════════════════════════════════
+  -->
+  <script>window.NEXUS_SHOP_ID = 0; /* ← Remplacez par votre Shop ID SellAuth */</script>
+  <script src="https://cdn.sellauth.com/sellauth-embed-2.js" data-shop-id="0" async></script>
+  <script src="assets/main.js"></script>
+</body>
+</html>
