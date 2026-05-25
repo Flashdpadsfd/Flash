@@ -12,6 +12,20 @@
     { id: 6, name: 'Adobe Creative Cloud', category: 'software', price: 19.99, origPrice: null, icon: '🎨', desc: '1 Month · All Apps', badge: '', stock: 0, deliverables: [], gradient: 'linear-gradient(135deg,#1a2a3a,#0d1520)' }
   ];
   var DEFAULT_STATS = { rating: '4.96', sold: '4,350', customers: '439' };
+  var DEFAULT_REVIEWS = [
+    { id: 1,  name: 'Alex L.',    initials: 'AL', color: '#e50914', date: 'May 2025',      product: 'Netflix',      productIcon: '📺', text: 'Got my Netflix credentials within seconds. Works perfectly on all my devices. Crazy value for the price, will definitely order again.' },
+    { id: 2,  name: 'Sarah K.',   initials: 'SK', color: '#1db954', date: 'May 2025',      product: 'Spotify',      productIcon: '🎵', text: 'Been using Spotify Premium from Nexus for 3 months straight. Not a single issue. Support is also super responsive. 10/10.' },
+    { id: 3,  name: 'Lucas R.',   initials: 'LR', color: '#6495ed', date: 'April 2025',    product: 'Gaming',       productIcon: '🎮', text: 'Legit service. Fast delivery, great price. I recommended it to my whole friend group and they all ordered too.' },
+    { id: 4,  name: 'Marie T.',   initials: 'MT', color: '#ffa01e', date: 'April 2025',    product: 'Disney+',      productIcon: '🎬', text: 'Best purchase I\'ve made online in a while. Received access instantly and everything works without any issues. Very satisfied.' },
+    { id: 5,  name: 'Jordan B.',  initials: 'JB', color: '#9b59b6', date: 'April 2025',    product: 'Netflix',      productIcon: '📺', text: 'I was skeptical at first but everything went smooth. Got access in under 2 minutes. Will 100% be coming back for more.' },
+    { id: 6,  name: 'Emma W.',    initials: 'EW', color: '#1abc9c', date: 'March 2025',    product: 'Prime Video',  productIcon: '🎬', text: 'Super fast and incredibly affordable. Way better than paying full price every month. The service speaks for itself.' },
+    { id: 7,  name: 'Thomas D.',  initials: 'TD', color: '#e74c3c', date: 'March 2025',    product: 'Gaming',       productIcon: '🎮', text: 'Bought a gaming account and it worked immediately. Great deal. Customer support helped me set it up in minutes. Zero issues.' },
+    { id: 8,  name: 'Lena M.',    initials: 'LM', color: '#3498db', date: 'February 2025', product: 'VPN',          productIcon: '🔒', text: 'The VPN works perfectly on all my devices. Was worried it might be sketchy but nope, totally legit. Happy customer here.' },
+    { id: 9,  name: 'Ryan S.',    initials: 'RS', color: '#f39c12', date: 'February 2025', product: 'Spotify',      productIcon: '🎵', text: 'Incredible value for money. I\'ve been a customer for 4 months now. Everything always works. No complaints whatsoever.' },
+    { id: 10, name: 'Chris J.',   initials: 'CJ', color: '#e50914', date: 'January 2025',  product: 'Netflix',      productIcon: '📺', text: 'Ordered Netflix Premium, received it instantly. No setup headaches, just works. This is honestly the best way to do it.' },
+    { id: 11, name: 'Amira P.',   initials: 'AP', color: '#00b4d8', date: 'January 2025',  product: 'Disney+',      productIcon: '🎬', text: 'Honestly impressed. The checkout was seamless and I had my account details in seconds. Great shop, will recommend to friends.' },
+    { id: 12, name: 'Marco V.',   initials: 'MV', color: '#64c864', date: 'December 2024', product: 'Software',     productIcon: '💻', text: 'Top notch. Bought two different products and both worked perfectly. The prices are unbeatable. Keep it up!' }
+  ];
   var DEFAULT_CATEGORIES = [
     { id: 'streaming', name: 'Streaming', icon: '▶', color: '#e50914' },
     { id: 'gaming',    name: 'Gaming',    icon: '🎮', color: '#64c864' },
@@ -35,6 +49,11 @@
     try { return JSON.parse(localStorage.getItem('nexus_links')) || {}; } catch(e) { return {}; }
   }
   function setLinks(l) { localStorage.setItem('nexus_links', JSON.stringify(l)); }
+  function getReviews() {
+    try { return JSON.parse(localStorage.getItem('nexus_reviews')) || DEFAULT_REVIEWS; } catch(e) { return DEFAULT_REVIEWS; }
+  }
+  function setReviews(r) { localStorage.setItem('nexus_reviews', JSON.stringify(r)); }
+
   function getCategories() {
     try { return JSON.parse(localStorage.getItem('nexus_categories')) || DEFAULT_CATEGORIES; } catch(e) { return DEFAULT_CATEGORIES; }
   }
@@ -91,6 +110,7 @@
     if (name === 'dashboard') renderDashboard();
     if (name === 'products') renderProducts();
     if (name === 'categories') renderCategories();
+    if (name === 'reviews') renderReviews();
     if (name === 'stats') loadStatsForm();
     if (name === 'links') loadLinksForm();
   };
@@ -508,6 +528,121 @@
     toast('Catégorie supprimée.');
   };
 
+  /* ── Reviews ── */
+  var STAR_SVG = '<svg width="12" height="12" viewBox="0 0 24 24" fill="#f5a623"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
+
+  function renderReviews() {
+    var reviews = getReviews();
+    var tbody = document.getElementById('reviewsTbody');
+    if (!tbody) return;
+    if (!reviews.length) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:rgba(255,255,255,.3);padding:24px;">Aucun avis.</td></tr>';
+    } else {
+      tbody.innerHTML = reviews.map(function(r) {
+        var stars = STAR_SVG + STAR_SVG + STAR_SVG + STAR_SVG + STAR_SVG;
+        var shortText = esc(r.text).length > 80 ? esc(r.text).slice(0, 80) + '…' : esc(r.text);
+        return '<tr>' +
+          '<td><div style="display:flex;align-items:center;gap:10px;">' +
+            '<div style="width:32px;height:32px;border-radius:50%;background:' + esc(r.color) + ';display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;">' + esc(r.initials) + '</div>' +
+            '<span>' + esc(r.name) + '</span>' +
+          '</div></td>' +
+          '<td><span style="display:flex;align-items:center;gap:5px;">' + esc(r.productIcon || '') + ' ' + esc(r.product || '') + '</span></td>' +
+          '<td style="color:rgba(255,255,255,.45);font-size:13px;">' + esc(r.date) + '</td>' +
+          '<td style="max-width:260px;"><div style="display:flex;gap:2px;margin-bottom:4px;">' + stars + '</div><span style="font-size:13px;color:rgba(255,255,255,.6);">' + shortText + '</span></td>' +
+          '<td><div class="action-group">' +
+            '<button class="a-btn a-btn--icon" onclick="editReview(' + r.id + ')" title="Modifier">✏️</button>' +
+            '<button class="a-btn a-btn--icon" onclick="deleteReview(' + r.id + ')" style="color:#ff5555;" title="Supprimer">🗑</button>' +
+          '</div></td>' +
+          '</tr>';
+      }).join('');
+    }
+    cancelEditReview();
+  }
+
+  window.autoInitials = function() {
+    var name = document.getElementById('rvName').value.trim();
+    var parts = name.split(/\s+/).filter(Boolean);
+    var initials = parts.map(function(p) { return p[0].toUpperCase(); }).join('').slice(0, 2);
+    document.getElementById('rvInitials').value = initials;
+  };
+
+  window.editReview = function(id) {
+    var r = getReviews().find(function(x) { return x.id === id; });
+    if (!r) return;
+    document.getElementById('rvEditId').value      = id;
+    document.getElementById('rvName').value        = r.name;
+    document.getElementById('rvInitials').value    = r.initials;
+    document.getElementById('rvColor').value       = r.color;
+    document.getElementById('rvDate').value        = r.date;
+    document.getElementById('rvProduct').value     = r.product;
+    document.getElementById('rvProductIcon').value = r.productIcon;
+    document.getElementById('rvText').value        = r.text;
+    var btn = document.getElementById('rvSubmitBtn');
+    btn.innerHTML = '<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg> Modifier';
+    document.getElementById('rvCancelBtn').style.display = '';
+    document.getElementById('rvSaveMsg').textContent = '';
+    document.getElementById('rvName').focus();
+    document.getElementById('rvName').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
+
+  window.cancelEditReview = function() {
+    document.getElementById('rvEditId').value      = '';
+    document.getElementById('rvName').value        = '';
+    document.getElementById('rvInitials').value    = '';
+    document.getElementById('rvColor').value       = '#e50914';
+    document.getElementById('rvDate').value        = '';
+    document.getElementById('rvProduct').value     = '';
+    document.getElementById('rvProductIcon').value = '';
+    document.getElementById('rvText').value        = '';
+    var btn = document.getElementById('rvSubmitBtn');
+    if (btn) btn.innerHTML = '<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Ajouter';
+    var cancel = document.getElementById('rvCancelBtn');
+    if (cancel) cancel.style.display = 'none';
+    var msg = document.getElementById('rvSaveMsg');
+    if (msg) msg.textContent = '';
+  };
+
+  window.saveReview = function() {
+    var name    = document.getElementById('rvName').value.trim();
+    var text    = document.getElementById('rvText').value.trim();
+    var msg     = document.getElementById('rvSaveMsg');
+    var editId  = parseInt(document.getElementById('rvEditId').value, 10);
+    if (!name) { toast('Nom requis.'); return; }
+    if (!text)  { toast('Texte requis.'); return; }
+    var reviews = getReviews();
+    var updated = {
+      name:        name,
+      initials:    document.getElementById('rvInitials').value.trim() || name.split(/\s+/).map(function(p){return p[0];}).join('').slice(0,2).toUpperCase(),
+      color:       document.getElementById('rvColor').value,
+      date:        document.getElementById('rvDate').value.trim() || 'May 2025',
+      product:     document.getElementById('rvProduct').value.trim(),
+      productIcon: document.getElementById('rvProductIcon').value.trim() || '⭐',
+      text:        text
+    };
+    if (editId) {
+      var idx = reviews.findIndex(function(r) { return r.id === editId; });
+      if (idx !== -1) reviews[idx] = Object.assign({}, reviews[idx], updated);
+      setReviews(reviews);
+      renderReviews();
+      msg.textContent = 'Avis modifié ✓'; msg.style.color = '#3cc864';
+      toast('Avis modifié ✓');
+    } else {
+      var newId = reviews.reduce(function(max, r) { return Math.max(max, r.id); }, 0) + 1;
+      reviews.push(Object.assign({ id: newId }, updated));
+      setReviews(reviews);
+      renderReviews();
+      msg.textContent = 'Avis ajouté ✓'; msg.style.color = '#3cc864';
+      toast('Avis ajouté ✓');
+    }
+  };
+
+  window.deleteReview = function(id) {
+    if (!confirm('Supprimer cet avis ?')) return;
+    setReviews(getReviews().filter(function(r) { return r.id !== id; }));
+    renderReviews();
+    toast('Avis supprimé.');
+  };
+
   /* ── Links ── */
   function loadLinksForm() {
     var l = getLinks();
@@ -551,6 +686,7 @@
     localStorage.removeItem('nexus_stats');
     localStorage.removeItem('nexus_links');
     localStorage.removeItem('nexus_categories');
+    localStorage.removeItem('nexus_reviews');
     toast('Données réinitialisées.');
     renderProducts();
     loadStatsForm();
