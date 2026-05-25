@@ -233,9 +233,12 @@
         ? '<div><span class="product-card__price-orig">' + sym + Number(p.origPrice).toFixed(2) + '</span><span class="product-card__price">' + sym + Number(p.price).toFixed(2) + '</span></div>'
         : '<span class="product-card__price">' + sym + Number(p.price).toFixed(2) + '</span>';
       var gradient = p.gradient || 'linear-gradient(135deg,#1a1a2e,#16213e)';
+      var cardBg = p.image
+        ? 'background-image:url(' + p.image + ');background-size:cover;background-position:center;'
+        : 'background:' + gradient + ';';
       var icon = p.icon || '📦';
       return '<div class="product-card" data-name="' + esc(p.name) + '" data-cat="' + esc(p.category) + '" data-price="' + p.price + '">' +
-        '<div class="product-card__img" style="background:' + gradient + ';">' +
+        '<div class="product-card__img" style="' + cardBg + '">' +
           '<span class="product-card__img-icon">' + icon + '</span>' +
           badge +
         '</div>' +

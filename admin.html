@@ -183,7 +183,7 @@
           </div>
         </div>
         <div class="field">
-          <label>Couleur de fond</label>
+          <label>Couleur de fond <span class="f-optional">(fond si pas d'image)</span></label>
           <select id="fGradient">
             <option value="linear-gradient(135deg,#1a1a2e,#16213e)">🌑 Bleu nuit</option>
             <option value="linear-gradient(135deg,#1e3a5f,#0a1628)">🔵 Bleu profond</option>
@@ -193,6 +193,20 @@
             <option value="linear-gradient(135deg,#1a2a3a,#0d1520)">🩶 Bleu gris</option>
             <option value="linear-gradient(135deg,#2a1a0a,#150d05)">🟤 Brun</option>
           </select>
+        </div>
+        <div class="field">
+          <label>Image du produit <span class="f-optional">(optionnel — remplace le fond coloré)</span></label>
+          <div class="image-upload-zone" id="imageUploadZone" onclick="document.getElementById('fImageInput').click()">
+            <div id="imageUploadEmpty" class="image-upload-empty">
+              <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              <span>Cliquez pour ajouter une image</span>
+              <span class="image-upload-hint">PNG, JPG, WEBP</span>
+            </div>
+            <img id="imagePreview" class="image-upload-preview" alt="" />
+            <button type="button" class="image-upload-remove" id="imageRemoveBtn" onclick="removeProductImage(event)" title="Supprimer l'image">×</button>
+          </div>
+          <input type="file" id="fImageInput" accept="image/png,image/jpeg,image/webp" style="display:none;" onchange="handleImageUpload(this)" />
+          <input type="hidden" id="fImage" />
         </div>
       </div>
 
@@ -238,40 +252,31 @@
         </div>
       </div>
 
-      <!-- ── Stock ── -->
+      <!-- ── Stock / Livrables ── -->
       <div class="form-section">
         <div class="form-section__header">
           <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
-          Stock
+          Stock &amp; Livrables
         </div>
         <div class="stock-indicator" id="modalStockIndicator">
           <span class="stock-indicator__icon">📦</span>
           <div style="flex:1;">
-            <div class="stock-indicator__title" id="modalStockTitle">Aucun stock disponible</div>
-            <div class="stock-indicator__sub" id="modalStockSub">Définissez une quantité ci-dessous</div>
+            <div class="stock-indicator__title" id="modalStockTitle">Aucun livrable</div>
+            <div class="stock-indicator__sub" id="modalStockSub">Stock actuel : 0</div>
           </div>
           <span class="stock-pill stock-pill--out" id="modalStockPill">0</span>
         </div>
+        <div class="deliverable-tabs" id="deliverableTabs">
+          <button type="button" class="deliverable-tab active" data-mode="add">Ajouter</button>
+          <button type="button" class="deliverable-tab" data-mode="update">Mettre à jour</button>
+        </div>
         <div class="field">
-          <label>Quantité</label>
-          <div class="stock-input-row">
-            <button type="button" class="stock-btn" onclick="adjustModalStock(-10)">−10</button>
-            <button type="button" class="stock-btn" onclick="adjustModalStock(-1)">−1</button>
-            <input type="number" id="fStock" min="0" placeholder="0" style="text-align:center;font-size:16px;font-weight:600;" oninput="updateModalStockIndicator()" />
-            <button type="button" class="stock-btn" onclick="adjustModalStock(1)">+1</button>
-            <button type="button" class="stock-btn" onclick="adjustModalStock(10)">+10</button>
-          </div>
+          <label id="fDeliverableLabel">Nouveaux livrables</label>
+          <textarea id="fDeliverables" rows="5" placeholder="Un livrable par ligne&#10;email:motdepasse&#10;abc@gmail.com:pass123"></textarea>
+          <div class="deliverable-hint">Entrez un livrable par ligne. Lors d'un achat, la dernière ligne est livrée au client.</div>
         </div>
-        <div class="form-row">
-          <div class="field">
-            <label>Quantité min <span class="f-optional">(optionnel)</span></label>
-            <input type="number" id="fMinQty" min="1" placeholder="1" />
-          </div>
-          <div class="field">
-            <label>Quantité max <span class="f-optional">(optionnel)</span></label>
-            <input type="number" id="fMaxQty" min="1" placeholder="10" />
-          </div>
-        </div>
+        <input type="hidden" id="fDeliverableMode" value="add" />
+        <input type="hidden" id="fExistingDeliverables" value="[]" />
       </div>
 
       <!-- ── Statut ── -->
@@ -310,30 +315,42 @@
 
   <!-- ─── MODAL STOCK ─── -->
   <div class="modal-overlay" id="stockOverlay" onclick="closeStockModal()"></div>
-  <div class="modal" id="stockModal" style="max-width:360px;">
+  <div class="modal" id="stockModal" style="max-width:460px;">
     <div class="modal__header">
-      <h2>Modifier le stock</h2>
+      <h2>Définir le stock</h2>
       <button class="btn-close" onclick="closeStockModal()">
         <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
     <div class="modal__body">
       <input type="hidden" id="stockEditId" />
-      <p id="stockProductName" style="color:rgba(255,255,255,.5);margin-bottom:16px;font-size:13px;"></p>
-      <div class="field">
-        <label>Nouveau stock</label>
-        <div style="display:flex;gap:8px;align-items:center;">
-          <button class="stock-btn" onclick="adjustStock(-10)">-10</button>
-          <button class="stock-btn" onclick="adjustStock(-1)">-1</button>
-          <input type="number" id="stockValue" min="0" style="text-align:center;font-size:20px;font-weight:600;" />
-          <button class="stock-btn" onclick="adjustStock(1)">+1</button>
-          <button class="stock-btn" onclick="adjustStock(10)">+10</button>
+      <p id="stockProductName" style="color:rgba(255,255,255,.45);margin-bottom:14px;font-size:13px;font-weight:500;"></p>
+      <div class="stock-indicator" id="stockModalIndicator" style="margin-bottom:14px;">
+        <span class="stock-indicator__icon">📦</span>
+        <div style="flex:1;">
+          <div class="stock-indicator__title" id="stockModalTitle">Aucun livrable</div>
+          <div class="stock-indicator__sub" id="stockModalSub">Stock actuel</div>
         </div>
+        <span class="stock-pill stock-pill--out" id="stockModalPill">0</span>
       </div>
+      <div class="deliverable-tabs" id="stockDeliverableTabs">
+        <button type="button" class="deliverable-tab active" data-mode="add">Ajouter</button>
+        <button type="button" class="deliverable-tab" data-mode="update">Mettre à jour</button>
+      </div>
+      <div class="field">
+        <label id="stockDeliverableLabel">Nouveaux livrables</label>
+        <textarea id="stockDeliverables" rows="7" placeholder="Un livrable par ligne&#10;email:motdepasse&#10;abc@gmail.com:pass123"></textarea>
+        <div class="deliverable-hint">Entrez un livrable par ligne. Lors d'un achat, la dernière ligne est livrée au client.</div>
+      </div>
+      <input type="hidden" id="fStockDeliverableMode" value="add" />
+      <input type="hidden" id="stockExistingDeliverables" value="[]" />
     </div>
     <div class="modal__footer">
       <button class="a-btn a-btn--ghost" onclick="closeStockModal()">Annuler</button>
-      <button class="a-btn a-btn--primary" onclick="saveStock()">Enregistrer</button>
+      <button class="a-btn a-btn--primary" onclick="saveStock()">
+        <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Enregistrer
+      </button>
     </div>
   </div>
 

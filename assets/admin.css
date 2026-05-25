@@ -353,6 +353,50 @@ input, select, button { font-family: inherit; }
 .status-dot.active { border-color: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,.15); }
 .status-dot--none { background: rgba(255,255,255,.1); }
 
+/* ── IMAGE UPLOAD ── */
+.image-upload-zone {
+  border: 2px dashed rgba(255,255,255,.12);
+  border-radius: 12px; padding: 20px;
+  cursor: pointer; position: relative;
+  display: flex; align-items: center; justify-content: center;
+  min-height: 112px; background: rgba(255,255,255,.02);
+  overflow: hidden; transition: border-color 200ms, background 200ms;
+}
+.image-upload-zone:hover { border-color: rgba(255,255,255,.28); background: rgba(255,255,255,.04); }
+.image-upload-empty {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  color: rgba(255,255,255,.28); text-align: center; pointer-events: none;
+}
+.image-upload-empty span { font-size: 13px; }
+.image-upload-hint { font-size: 11px !important; color: rgba(255,255,255,.18) !important; }
+.image-upload-preview {
+  width: 100%; max-height: 160px;
+  object-fit: cover; border-radius: 10px; display: none;
+}
+.image-upload-remove {
+  position: absolute; top: 8px; right: 8px;
+  width: 24px; height: 24px; border-radius: 50%;
+  background: rgba(0,0,0,.75); color: #fff; border: none;
+  cursor: pointer; font-size: 15px; font-weight: 700; line-height: 1;
+  display: none; align-items: center; justify-content: center; z-index: 2;
+  transition: background 150ms;
+}
+.image-upload-remove:hover { background: rgba(200,0,0,.85); }
+
+/* ── DELIVERABLE TABS ── */
+.deliverable-tabs {
+  display: flex; border: 1px solid rgba(255,255,255,.1);
+  border-radius: 8px; overflow: hidden; margin-bottom: 12px;
+}
+.deliverable-tab {
+  flex: 1; padding: 8px 16px; background: none; border: none;
+  color: rgba(255,255,255,.4); font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all 150ms; font-family: inherit;
+}
+.deliverable-tab:hover { color: rgba(255,255,255,.7); background: rgba(255,255,255,.05); }
+.deliverable-tab.active { background: #5b4de0; color: #fff; }
+.deliverable-hint { font-size: 11px; color: rgba(255,255,255,.3); margin-top: 6px; line-height: 1.5; }
+
 /* ── RESPONSIVE ── */
 @media (max-width: 1024px) {
   .kpi-grid { grid-template-columns: repeat(2, 1fr); }
