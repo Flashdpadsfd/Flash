@@ -234,9 +234,9 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   HERO
 ──────────────────────────────────────────────*/
 .hero {
-  min-height: 100vh;
+  min-height: 70vh;
   display: flex; align-items: center; justify-content: center; text-align: center;
-  padding: 120px 80px 100px;
+  padding: 120px 80px 80px;
   position: relative; overflow: hidden;
 }
 .hero::before {
@@ -793,7 +793,8 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 ──────────────────────────────────────────────*/
 .stats-wrap {
   display: flex; justify-content: center;
-  padding: 40px 80px 56px;
+  padding: 0 80px 56px;
+  margin-top: -32px;
 }
 .stats {
   display: flex; align-items: center;
