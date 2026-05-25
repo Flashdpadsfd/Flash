@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Lancelot&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/style.css?v=9" />
+  <link rel="stylesheet" href="assets/style.css?v=10" />
 </head>
 <body>
 
@@ -80,179 +80,186 @@
     </div>
   </div>
 
-  <!-- ─── PRODUCT HERO ─── -->
-  <div class="pd-hero" id="pdHero">
-    <div class="pd-hero__bg" id="pdHeroBg"></div>
-    <div class="pd-hero__inner">
+  <!-- ─── PAGE ─── -->
+  <div class="pd-page">
 
-      <nav class="pd-breadcrumb">
-        <a href="preview.html">Home</a>
-        <span class="pd-breadcrumb__sep">›</span>
-        <a href="preview-products.html" id="pdBreadCat">Products</a>
-        <span class="pd-breadcrumb__sep">›</span>
-        <span class="pd-breadcrumb__cur" id="pdBreadName">Product</span>
-      </nav>
+    <!-- Breadcrumb -->
+    <nav class="pd-breadcrumb-bar">
+      <a href="preview.html">Home</a>
+      <span class="pd-breadcrumb-bar__sep">›</span>
+      <a href="preview-products.html" id="pdBreadCat">Products</a>
+      <span class="pd-breadcrumb-bar__sep">›</span>
+      <span class="pd-breadcrumb-bar__cur" id="pdBreadName">Product</span>
+    </nav>
 
-      <div class="pd-hero__content">
-        <div class="pd-tags" id="pdTags"></div>
-        <div class="pd-hero__meta">
-          <span class="pd-stock" id="pdStock">IN STOCK</span>
-          <span class="pd-rating-badge" id="pdRating"></span>
+    <!-- Three-col layout -->
+    <div class="pd-three-col">
+
+      <!-- ── Left: Category sidebar ── -->
+      <aside class="pd-cat-nav">
+        <div class="pd-cat-nav__hdr">Categories</div>
+        <div id="pdCatList"></div>
+      </aside>
+
+      <!-- ── Center: Main content ── -->
+      <main class="pd-main">
+
+        <!-- Product header card -->
+        <div class="pd-header-card">
+          <div class="pd-header-card__img" id="pdHeaderIcon">📦</div>
+          <div class="pd-header-card__body">
+            <div class="pd-header-card__badges">
+              <span class="pd-stock" id="pdStock">IN STOCK</span>
+              <span class="pd-rating-badge" id="pdRating"></span>
+            </div>
+            <h1 class="pd-header-card__name" id="pdName">Loading…</h1>
+            <div class="pd-header-card__short-desc" id="pdShortDesc"></div>
+            <div class="pd-header-card__price-row">
+              <span class="pd-header-card__orig" id="pdOrigPrice" style="display:none;"></span>
+              <span class="pd-header-card__price" id="pdPrice">—</span>
+              <span class="pd-header-card__per">per unit</span>
+            </div>
+          </div>
         </div>
-        <h1 class="pd-hero__title" id="pdName">Loading…</h1>
-        <div class="pd-hero__price-row">
-          <span class="pd-hero__orig" id="pdOrigPrice" style="display:none;"></span>
-          <span class="pd-hero__price" id="pdPrice">—</span>
-          <span class="pd-hero__per">per unit</span>
+
+        <!-- Description -->
+        <div class="pd-section">
+          <div class="pd-section__hdr">Description</div>
+          <div class="pd-section__body" id="pdDesc">—</div>
         </div>
-      </div>
+
+        <!-- Specs -->
+        <div class="pd-section">
+          <div class="pd-specs">
+            <div class="pd-spec-col">
+              <div class="pd-spec-col__title">Product Details</div>
+              <div id="pdSpecsLeft"></div>
+            </div>
+            <div class="pd-spec-col">
+              <div class="pd-spec-col__title">Service Info</div>
+              <div id="pdSpecsRight"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Volume pricing -->
+        <div class="pd-section">
+          <div class="pd-section__hdr">Volume Pricing</div>
+          <div id="pdVolTiers"></div>
+        </div>
+
+        <!-- Guarantee badges -->
+        <div class="pd-section">
+          <div class="pd-section__hdr">What's Included</div>
+          <div class="pd-section__body">
+            <div class="pd-guarantee-badges">
+              <div class="pd-guarantee-badge">
+                <span class="pd-guarantee-badge__icon">⚡</span>
+                <div class="pd-guarantee-badge__title">Instant Delivery</div>
+                <div class="pd-guarantee-badge__desc">Receive your product immediately after payment</div>
+              </div>
+              <div class="pd-guarantee-badge">
+                <span class="pd-guarantee-badge__icon">🔒</span>
+                <div class="pd-guarantee-badge__title">Secure Checkout</div>
+                <div class="pd-guarantee-badge__desc">SSL encrypted. Your data is fully protected</div>
+              </div>
+              <div class="pd-guarantee-badge">
+                <span class="pd-guarantee-badge__icon">✅</span>
+                <div class="pd-guarantee-badge__title">Working Guarantee</div>
+                <div class="pd-guarantee-badge__desc">Every product is tested before delivery</div>
+              </div>
+              <div class="pd-guarantee-badge">
+                <span class="pd-guarantee-badge__icon">💬</span>
+                <div class="pd-guarantee-badge__title">24/7 Support</div>
+                <div class="pd-guarantee-badge__desc">Discord &amp; Telegram, anytime you need help</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Customer Reviews -->
+        <div class="pd-section">
+          <div class="pd-section__hdr">Customer Reviews</div>
+          <div class="pd-section__body">
+            <div id="pdReviewsSummary" class="pd-rev-summary" style="display:none;">
+              <div class="pd-rev-stars" id="pdRevStars">★★★★★</div>
+              <div class="pd-rev-score" id="pdRevScore">5.0</div>
+              <div class="pd-rev-count" id="pdRevCount">(0 reviews)</div>
+            </div>
+            <div id="pdReviewsList">
+              <div style="color:rgba(255,255,255,.32);font-size:13px;padding:4px 0;">No reviews yet for this product.</div>
+            </div>
+          </div>
+        </div>
+
+        <a href="preview-products.html" class="pd-back">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          Back to Products
+        </a>
+
+      </main>
+
+      <!-- ── Right: Checkout sidebar ── -->
+      <aside>
+        <div class="pd-checkout">
+
+          <div class="pd-checkout__hdr">Complete Your Order</div>
+
+          <div class="pd-checkout__product">
+            <div class="pd-checkout__thumb" id="pdSideThumb">📦</div>
+            <div class="pd-checkout__prod-info">
+              <div class="pd-checkout__prod-name" id="pdSideName">—</div>
+              <div class="pd-checkout__prod-desc" id="pdSideDesc"></div>
+            </div>
+            <div class="pd-checkout__prod-price" id="pdSidePrice">—</div>
+          </div>
+
+          <div class="pd-checkout__summary">
+            <div class="pd-sum-row">
+              <span class="pd-sum-row__k">Subtotal</span>
+              <span class="pd-sum-row__v" id="pdSubtotal">—</span>
+            </div>
+            <div class="pd-sum-row">
+              <span class="pd-sum-row__k">Tax</span>
+              <span class="pd-sum-row__v">€0.00</span>
+            </div>
+            <div class="pd-sum-row pd-sum-row--total">
+              <span class="pd-sum-row__k">Total</span>
+              <span class="pd-sum-row__v" id="pdTotal">—</span>
+            </div>
+          </div>
+
+          <div class="pd-checkout__secure">
+            <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Secure checkout · SSL 256-bit encryption
+          </div>
+
+          <!-- Volume discount indicator -->
+          <div id="pdDiscBadge" style="display:none;margin:0 20px 0;padding:8px 12px;border-radius:8px;background:rgba(60,200,100,.08);border:1px solid rgba(60,200,100,.18);font-size:12px;color:#3cc864;font-weight:600;text-align:center;"></div>
+
+          <div class="pd-checkout__qty">
+            <span class="pd-checkout__qty-lbl">Quantity</span>
+            <div class="pd-qty-ctrl">
+              <button class="pd-qty-btn" id="pdQtyMinus">−</button>
+              <div class="pd-qty-val" id="pdQtyVal">1</div>
+              <button class="pd-qty-btn" id="pdQtyPlus">+</button>
+            </div>
+          </div>
+
+          <div class="pd-checkout__actions">
+            <button class="pd-btn-buynow" id="pdBuyNow">
+              Buy Now — <span id="pdBuyPrice">—</span>
+            </button>
+            <button class="pd-btn-cart" id="pdAddCart">
+              <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+              Add to Cart
+            </button>
+          </div>
+
+        </div>
+      </aside>
 
     </div>
-  </div>
-
-  <!-- ─── CONTENT + SIDEBAR ─── -->
-  <div class="pd-layout">
-
-    <!-- Main content -->
-    <main class="pd-main">
-
-      <!-- Description -->
-      <div class="pd-section">
-        <div class="pd-section__hdr">Description</div>
-        <div class="pd-section__body" id="pdDesc">—</div>
-      </div>
-
-      <!-- Specs (two-col grid inside section card) -->
-      <div class="pd-section">
-        <div class="pd-specs">
-          <div class="pd-spec-col">
-            <div class="pd-spec-col__title">Product Details</div>
-            <div id="pdSpecsLeft"></div>
-          </div>
-          <div class="pd-spec-col">
-            <div class="pd-spec-col__title">Service Info</div>
-            <div id="pdSpecsRight"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- What's Included -->
-      <div class="pd-section">
-        <div class="pd-section__hdr">What's Included</div>
-        <div class="pd-section__body">
-          <div class="pd-guarantee-grid">
-            <div class="pd-guarantee-card">
-              <span class="pd-guarantee-card__icon">⚡</span>
-              <div>
-                <b>Instant Delivery</b>
-                <p>Receive your product immediately after purchase, no waiting.</p>
-              </div>
-            </div>
-            <div class="pd-guarantee-card">
-              <span class="pd-guarantee-card__icon">🔒</span>
-              <div>
-                <b>Secure Checkout</b>
-                <p>SSL encrypted payment — your data is completely safe.</p>
-              </div>
-            </div>
-            <div class="pd-guarantee-card">
-              <span class="pd-guarantee-card__icon">✅</span>
-              <div>
-                <b>Working Guarantee</b>
-                <p>Every product is tested and guaranteed to work on delivery.</p>
-              </div>
-            </div>
-            <div class="pd-guarantee-card">
-              <span class="pd-guarantee-card__icon">💬</span>
-              <div>
-                <b>24/7 Support</b>
-                <p>Get help anytime via Discord or Telegram.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Reviews -->
-      <div class="pd-section">
-        <div class="pd-section__hdr">Customer Reviews</div>
-        <div class="pd-section__body">
-          <div id="pdReviewsSummary" class="pd-rev-summary" style="display:none;">
-            <div class="pd-rev-stars" id="pdRevStars">★★★★★</div>
-            <div class="pd-rev-score" id="pdRevScore">5.0</div>
-            <div class="pd-rev-count" id="pdRevCount">(0 reviews)</div>
-          </div>
-          <div id="pdReviewsList">
-            <div style="color:rgba(255,255,255,.32);font-size:13px;padding:4px 0;">No reviews yet for this product.</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Back link -->
-      <a href="preview-products.html" class="pd-back">
-        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-        Back to Products
-      </a>
-
-    </main>
-
-    <!-- Checkout sidebar -->
-    <aside>
-      <div class="pd-checkout">
-
-        <div class="pd-checkout__hdr">Complete Your Order</div>
-
-        <div class="pd-checkout__product">
-          <div class="pd-checkout__thumb" id="pdSideThumb">📦</div>
-          <div class="pd-checkout__prod-info">
-            <div class="pd-checkout__prod-name" id="pdSideName">—</div>
-            <div class="pd-checkout__prod-desc" id="pdSideDesc"></div>
-          </div>
-          <div class="pd-checkout__prod-price" id="pdSidePrice">—</div>
-        </div>
-
-        <div class="pd-checkout__summary">
-          <div class="pd-sum-row">
-            <span class="pd-sum-row__k">Subtotal</span>
-            <span class="pd-sum-row__v" id="pdSubtotal">—</span>
-          </div>
-          <div class="pd-sum-row">
-            <span class="pd-sum-row__k">Tax</span>
-            <span class="pd-sum-row__v">€0.00</span>
-          </div>
-          <div class="pd-sum-row pd-sum-row--total">
-            <span class="pd-sum-row__k">Total</span>
-            <span class="pd-sum-row__v" id="pdTotal">—</span>
-          </div>
-        </div>
-
-        <div class="pd-checkout__secure">
-          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          Secure checkout · SSL 256-bit encryption
-        </div>
-
-        <div class="pd-checkout__qty">
-          <span class="pd-checkout__qty-lbl">Quantity</span>
-          <div class="pd-qty-ctrl">
-            <button class="pd-qty-btn" id="pdQtyMinus">−</button>
-            <div class="pd-qty-val" id="pdQtyVal">1</div>
-            <button class="pd-qty-btn" id="pdQtyPlus">+</button>
-          </div>
-        </div>
-
-        <div class="pd-checkout__actions">
-          <button class="pd-btn-buynow" id="pdBuyNow">
-            Buy Now — <span id="pdBuyPrice">—</span>
-          </button>
-          <button class="pd-btn-cart" id="pdAddCart">
-            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-            Add to Cart
-          </button>
-        </div>
-
-      </div>
-    </aside>
-
   </div>
 
   <!-- ─── CART PANEL ─── -->
@@ -306,28 +313,48 @@
   })();
   </script>
 
-  <script src="assets/main.js?v=9"></script>
+  <script src="assets/main.js?v=10"></script>
 
   <!-- ─── PRODUCT DETAIL SCRIPT ─── -->
   <script>
   (function() {
     var DEFAULT_PRODUCTS = [
-      { id:1, name:'Netflix Premium',      category:'streaming', price:4.99,  origPrice:null,  icon:'🎬', desc:'1 Month · 4K UHD · Shared account. Works on all devices.',  badge:'',     gradient:'linear-gradient(135deg,#1a1a2e,#16213e)', currency:'EUR', stock:50, deliverables:[] },
-      { id:2, name:'Spotify Premium',      category:'streaming', price:8.99,  origPrice:null,  icon:'🎵', desc:'3 Months · Family Plan · Up to 6 accounts.',               badge:'HOT',  gradient:'linear-gradient(135deg,#1e3a5f,#0a1628)', currency:'EUR', stock:32, deliverables:[] },
-      { id:3, name:'Xbox Game Pass',       category:'gaming',    price:6.99,  origPrice:null,  icon:'🎮', desc:'1 Month · Ultimate · Cloud gaming included.',              badge:'NEW',  gradient:'linear-gradient(135deg,#2d1b69,#11053b)', currency:'EUR', stock:18, deliverables:[] },
-      { id:4, name:'NordVPN',              category:'vpn',       price:12.99, origPrice:24.99, icon:'🔒', desc:'6 Months · Premium · 5 devices simultaneously.',          badge:'',     gradient:'linear-gradient(135deg,#1a3a1a,#0d1f0d)', currency:'EUR', stock:7,  deliverables:[] },
-      { id:5, name:'Disney+',             category:'streaming', price:3.99,  origPrice:null,  icon:'📺', desc:'1 Month · 4K · Shared. All Disney, Marvel & Star Wars.',  badge:'SALE', gradient:'linear-gradient(135deg,#3a1a1a,#1f0d0d)', currency:'EUR', stock:45, deliverables:[] },
-      { id:6, name:'Adobe Creative Cloud', category:'software',  price:19.99, origPrice:null,  icon:'🎨', desc:'1 Month · All Apps · Full suite, all platforms.',          badge:'',     gradient:'linear-gradient(135deg,#1a2a3a,#0d1520)', currency:'EUR', stock:0,  deliverables:[] }
+      { id:1, name:'Netflix Premium',       category:'streaming', price:4.99,  origPrice:null,  icon:'🎬', desc:'1 Month · 4K UHD · Shared account. Works on all devices. Ultra-high quality streaming experience.',    badge:'',     gradient:'linear-gradient(135deg,#1a1a2e,#16213e)', currency:'EUR', stock:50, deliverables:[] },
+      { id:2, name:'Spotify Premium',       category:'music',     price:8.99,  origPrice:null,  icon:'🎵', desc:'3 Months · Family Plan · Up to 6 accounts. Ad-free music on any device, anywhere.',                   badge:'HOT',  gradient:'linear-gradient(135deg,#1e3a5f,#0a1628)', currency:'EUR', stock:32, deliverables:[] },
+      { id:3, name:'Xbox Game Pass',        category:'gaming',    price:6.99,  origPrice:null,  icon:'🎮', desc:'1 Month · Ultimate · Cloud gaming included. Access 100+ high-quality games across console, PC, mobile.', badge:'NEW', gradient:'linear-gradient(135deg,#2d1b69,#11053b)', currency:'EUR', stock:18, deliverables:[] },
+      { id:4, name:'NordVPN',               category:'vpn',       price:12.99, origPrice:24.99, icon:'🔒', desc:'6 Months · Premium · 5 devices simultaneously. Military-grade encryption, no-logs policy.',             badge:'',     gradient:'linear-gradient(135deg,#1a3a1a,#0d1f0d)', currency:'EUR', stock:7,  deliverables:[] },
+      { id:5, name:'Disney+',              category:'streaming', price:3.99,  origPrice:null,  icon:'📺', desc:'1 Month · 4K · Shared. All Disney, Marvel & Star Wars content in one place.',                          badge:'SALE', gradient:'linear-gradient(135deg,#3a1a1a,#1f0d0d)', currency:'EUR', stock:45, deliverables:[] },
+      { id:6, name:'Adobe Creative Cloud',  category:'software',  price:19.99, origPrice:null,  icon:'🎨', desc:'1 Month · All Apps · Full suite, all platforms. Photoshop, Illustrator, Premiere Pro and more.',        badge:'',     gradient:'linear-gradient(135deg,#1a2a3a,#0d1520)', currency:'EUR', stock:0,  deliverables:[] }
     ];
+
     function getProds() { try { return JSON.parse(localStorage.getItem('nexus_products')) || DEFAULT_PRODUCTS; } catch(e) { return DEFAULT_PRODUCTS; } }
     function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
     function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
 
     var SYM = { EUR:'€', USD:'$', GBP:'£' };
 
+    var TIERS = [
+      { min: 1,   max: 9,   disc: 0,    label: '1 – 9 units' },
+      { min: 10,  max: 24,  disc: 0.05, label: '10 – 24 units' },
+      { min: 25,  max: 49,  disc: 0.10, label: '25 – 49 units' },
+      { min: 50,  max: 99,  disc: 0.20, label: '50 – 99 units' },
+      { min: 100, max: null, disc: 0.30, label: '100+ units' }
+    ];
+
+    function getActiveTier(qty) {
+      var active = TIERS[0];
+      for (var i = TIERS.length - 1; i >= 0; i--) {
+        if (qty >= TIERS[i].min) { active = TIERS[i]; break; }
+      }
+      return active;
+    }
+
+    var CAT_ICONS = { streaming:'🎬', gaming:'🎮', vpn:'🔒', software:'💻', music:'🎵', other:'📦' };
+
     var params = new URLSearchParams(window.location.search);
     var pid = parseInt(params.get('id') || '0', 10);
-    var p = getProds().find(function(x) { return x.id === pid; });
+    var allProds = getProds();
+    var p = allProds.find(function(x) { return x.id === pid; });
     if (!p) { window.location.href = 'preview-products.html'; return; }
 
     var sym = SYM[p.currency] || '€';
@@ -335,28 +362,29 @@
 
     document.title = 'Nexus — ' + p.name;
 
-    /* ── Hero background ── */
-    var heroBg = document.getElementById('pdHeroBg');
-    if (p.image) {
-      heroBg.style.cssText = 'background-image:url(' + p.image + ');background-size:cover;background-position:center;';
-    } else {
-      document.getElementById('pdHero').style.background = p.gradient || 'linear-gradient(135deg,#1a1a2e,#16213e)';
+    /* ── Category sidebar ── */
+    var cats = {};
+    allProds.forEach(function(prod) {
+      var cat = prod.category || 'other';
+      cats[cat] = (cats[cat] || 0) + 1;
+    });
+    var catListEl = document.getElementById('pdCatList');
+    if (catListEl) {
+      catListEl.innerHTML = Object.keys(cats).map(function(cat) {
+        var isActive = cat === (p.category || 'other');
+        return '<a href="preview-products.html?cat=' + esc(cat) + '" class="pd-cat-item' + (isActive ? ' active' : '') + '">' +
+          '<div class="pd-cat-item__left">' +
+            '<span class="pd-cat-item__icon">' + (CAT_ICONS[cat] || '📦') + '</span>' +
+            '<span>' + esc(cap(cat)) + '</span>' +
+          '</div>' +
+          '<span class="pd-cat-item__count">' + cats[cat] + '</span>' +
+        '</a>';
+      }).join('');
     }
 
     /* ── Breadcrumb ── */
-    var catEl = document.getElementById('pdBreadCat');
-    catEl.textContent = cap(p.category || 'Products');
+    document.getElementById('pdBreadCat').textContent = cap(p.category || 'Products');
     document.getElementById('pdBreadName').textContent = p.name;
-
-    /* ── Tags ── */
-    var tagItems = [
-      { icon:'⚡', text:'Instant Delivery' },
-      { icon:'🌐', text:'Worldwide' },
-      { icon: p.icon || '📦', text: cap(p.category || 'Digital') }
-    ];
-    document.getElementById('pdTags').innerHTML = tagItems.map(function(t) {
-      return '<span class="pd-tag">' + t.icon + ' ' + esc(t.text) + '</span>';
-    }).join('');
 
     /* ── Stock ── */
     var avail = (p.deliverables || []).length || (p.stock || 0);
@@ -368,7 +396,7 @@
       stockEl.classList.add('out');
     }
 
-    /* ── Rating (from reviews) ── */
+    /* ── Rating ── */
     var allReviews = [];
     try { allReviews = JSON.parse(localStorage.getItem('nexus_reviews')) || []; } catch(e) {}
     var pr = allReviews.filter(function(r) { return r.productId === pid; });
@@ -377,8 +405,10 @@
       document.getElementById('pdRating').textContent = '⭐ ' + avg.toFixed(1) + ' (' + pr.length + ' review' + (pr.length !== 1 ? 's' : '') + ')';
     }
 
-    /* ── Name + price ── */
+    /* ── Header card ── */
+    document.getElementById('pdHeaderIcon').textContent = p.icon || '📦';
     document.getElementById('pdName').textContent = p.name;
+    document.getElementById('pdShortDesc').textContent = p.desc ? p.desc.split('·')[0].trim() : '';
     document.getElementById('pdPrice').textContent = sym + Number(p.price).toFixed(2);
     if (p.origPrice) {
       var origEl = document.getElementById('pdOrigPrice');
@@ -410,16 +440,24 @@
     renderSpecs('pdSpecsLeft', specsL);
     renderSpecs('pdSpecsRight', specsR);
 
+    /* ── Volume pricing tiers ── */
+    document.getElementById('pdVolTiers').innerHTML = TIERS.map(function(tier) {
+      var tierPrice = p.price * (1 - tier.disc);
+      return '<div class="pd-vol__row' + (tier.disc === 0 ? ' pd-vol__row--base' : '') + '" data-min="' + tier.min + '">' +
+        '<span class="pd-vol__row__qty">' + tier.label + '</span>' +
+        '<span class="pd-vol__row__price">' + sym + tierPrice.toFixed(2) + ' each</span>' +
+        (tier.disc > 0 ? '<span class="pd-vol__row__disc">-' + (tier.disc * 100) + '%</span>' : '<span style="margin-left:10px;font-size:11px;color:rgba(255,255,255,.25);">Base</span>') +
+      '</div>';
+    }).join('');
+
     /* ── Reviews section ── */
     if (pr.length) {
       var avg2 = pr.reduce(function(s,r){ return s + (r.rating || 5); }, 0) / pr.length;
       var fullStars = Math.round(avg2);
-      var starsStr = '★'.repeat(fullStars) + '☆'.repeat(5 - fullStars);
-      document.getElementById('pdRevStars').textContent = starsStr;
+      document.getElementById('pdRevStars').textContent = '★'.repeat(fullStars) + '☆'.repeat(5 - fullStars);
       document.getElementById('pdRevScore').textContent = avg2.toFixed(1);
       document.getElementById('pdRevCount').textContent = '(' + pr.length + ' review' + (pr.length !== 1 ? 's' : '') + ')';
       document.getElementById('pdReviewsSummary').style.display = '';
-
       document.getElementById('pdReviewsList').innerHTML = pr.slice(0, 8).map(function(r) {
         var initial = (r.name || 'A').charAt(0).toUpperCase();
         var rStars = '★'.repeat(r.rating || 5) + '☆'.repeat(5 - (r.rating || 5));
@@ -445,16 +483,38 @@
     document.getElementById('pdSideThumb').textContent = p.icon || '📦';
     document.getElementById('pdSideName').textContent = p.name;
     document.getElementById('pdSideDesc').textContent = p.desc ? p.desc.split('·')[0].trim() : '';
-    document.getElementById('pdSidePrice').textContent = sym + Number(p.price).toFixed(2);
 
-    /* ── Qty + summary ── */
+    /* ── Qty + summary with volume discount ── */
     function updateSummary() {
-      var sub = p.price * qty;
+      var tier = getActiveTier(qty);
+      var unitPrice = p.price * (1 - tier.disc);
+      var sub = unitPrice * qty;
+
       document.getElementById('pdQtyVal').textContent = qty;
+      document.getElementById('pdSidePrice').textContent = sym + unitPrice.toFixed(2);
       document.getElementById('pdSubtotal').textContent = sym + sub.toFixed(2);
       document.getElementById('pdTotal').textContent = sym + sub.toFixed(2);
       var bp = document.getElementById('pdBuyPrice');
       if (bp) bp.textContent = sym + sub.toFixed(2);
+
+      /* Highlight active tier row */
+      document.querySelectorAll('.pd-vol__row').forEach(function(row) {
+        row.classList.remove('pd-vol__row--active');
+        if (parseInt(row.getAttribute('data-min'), 10) === tier.min) {
+          row.classList.add('pd-vol__row--active');
+        }
+      });
+
+      /* Discount badge in sidebar */
+      var discBadge = document.getElementById('pdDiscBadge');
+      if (tier.disc > 0) {
+        discBadge.textContent = '🎉 ' + (tier.disc * 100) + '% volume discount applied!';
+        discBadge.style.display = '';
+        discBadge.style.marginBottom = '0';
+        discBadge.style.marginTop = '12px';
+      } else {
+        discBadge.style.display = 'none';
+      }
     }
     updateSummary();
 
@@ -462,7 +522,7 @@
       if (qty > 1) { qty--; updateSummary(); }
     });
     document.getElementById('pdQtyPlus').addEventListener('click', function() {
-      if (qty < 99) { qty++; updateSummary(); }
+      if (qty < 999) { qty++; updateSummary(); }
     });
 
     /* ── Buy Now ── */
