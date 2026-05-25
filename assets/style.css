@@ -265,15 +265,7 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   display: flex; align-items: center; justify-content: center;
   gap: 12px; flex-wrap: wrap;
 }
-.hero__scroll {
-  position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%);
-  color: rgba(255,255,255,.30);
-  animation: hero-bounce 2.4s ease-in-out infinite;
-}
-@keyframes hero-bounce {
-  0%, 100% { transform: translateX(-50%) translateY(0); }
-  50%       { transform: translateX(-50%) translateY(8px); }
-}
+.hero__scroll { display: none; }
 
 /*──────────────────────────────────────────────
   STATS BAR
