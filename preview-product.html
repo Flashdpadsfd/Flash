@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nexus — Product</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lancelot&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/style.css?v=8" />
+</head>
+<body>
+
+  <!-- ─── NAVIGATION ─── -->
+  <nav class="nav" id="navbar">
+    <div class="nav__inner">
+
+      <a href="preview.html" class="nav__logo">Nexus</a>
+
+      <ul class="nav__links" id="navLinks">
+        <li><a href="preview.html" data-i18n="nav.home">Home</a></li>
+        <li><a href="preview-products.html" class="active" data-i18n="nav.shop">Products</a></li>
+        <li><a href="preview-feedback.html" data-i18n="nav.reviews">Reviews</a></li>
+      </ul>
+
+      <div class="nav__actions">
+
+        <button class="nav__lang" id="langToggle" aria-label="Language">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="opacity:.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>
+          <span id="langLabel">EN</span>
+          <svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="opacity:.35"><path d="M6 9l6 6 6-6"/></svg>
+          <div class="lang-dropdown" id="langDropdown">
+            <div class="lang-option selected" data-lang="EN">🇬🇧 English</div>
+            <div class="lang-option" data-lang="FR">🇫🇷 Français</div>
+            <div class="lang-option" data-lang="ES">🇪🇸 Español</div>
+            <div class="lang-option" data-lang="DE">🇩🇪 Deutsch</div>
+            <div class="lang-option" data-lang="IT">🇮🇹 Italiano</div>
+            <div class="lang-option" data-lang="PT">🇵🇹 Português</div>
+            <div class="lang-option" data-lang="AR">🇸🇦 العربية</div>
+          </div>
+        </button>
+
+        <button class="nav__login" data-i18n="nav.login">
+          <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Sign In
+        </button>
+
+        <div class="nav__cart-wrap">
+          <button class="btn-icon" id="cartBtn" aria-label="Cart" onclick="window._openCart && window._openCart()">
+            <svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+          </button>
+          <span class="nav__cart-count" id="cartCount">0</span>
+        </div>
+
+        <button class="btn-icon nav__hamburger" id="hamburger" aria-label="Menu">
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+
+      </div>
+    </div>
+  </nav>
+
+  <!-- ─── MOBILE DRAWER ─── -->
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+  <div class="drawer" id="drawer">
+    <div class="drawer__header">
+      <span class="drawer__logo">Nexus</span>
+      <button class="btn-icon" id="drawerClose" aria-label="Close">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <ul class="drawer__links">
+      <li><a href="preview.html" class="drawer-link" data-i18n="nav.home">Home</a></li>
+      <li><a href="preview-products.html" class="drawer-link active" data-i18n="nav.shop">Shop</a></li>
+      <li><a href="preview-feedback.html" class="drawer-link" data-i18n="nav.reviews">Reviews</a></li>
+    </ul>
+    <div style="margin-top:auto;padding-top:32px;display:flex;flex-direction:column;gap:8px;">
+      <button class="btn-primary btn-primary--lg" style="width:100%;border-radius:6px;" data-i18n="nav.login">Sign In</button>
+      <button class="btn-ghost" style="width:100%;" data-i18n="nav.register">Create Account</button>
+    </div>
+  </div>
+
+  <!-- ─── PRODUCT HERO ─── -->
+  <div class="pd-hero" id="pdHero">
+    <div class="pd-hero__bg" id="pdHeroBg"></div>
+    <div class="pd-hero__inner">
+
+      <nav class="pd-breadcrumb">
+        <a href="preview-products.html">Products</a>
+        <span class="pd-breadcrumb__sep">›</span>
+        <a href="preview-products.html" id="pdBreadCat">Category</a>
+        <span class="pd-breadcrumb__sep">›</span>
+        <span class="pd-breadcrumb__cur" id="pdBreadName">Product</span>
+      </nav>
+
+      <div class="pd-hero__content">
+        <div class="pd-tags" id="pdTags"></div>
+        <div class="pd-hero__meta">
+          <span class="pd-stock" id="pdStock">IN STOCK</span>
+          <span class="pd-rating-badge" id="pdRating"></span>
+        </div>
+        <h1 class="pd-hero__title" id="pdName">Loading…</h1>
+        <div class="pd-hero__price-row">
+          <span class="pd-hero__orig" id="pdOrigPrice" style="display:none;"></span>
+          <span class="pd-hero__price" id="pdPrice">—</span>
+          <span class="pd-hero__per">PER EACH</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ─── CONTENT + SIDEBAR ─── -->
+  <div class="pd-layout">
+
+    <!-- Main content -->
+    <main class="pd-main">
+
+      <!-- Description -->
+      <div class="pd-section">
+        <div class="pd-section__hdr">Description</div>
+        <div class="pd-section__body" id="pdDesc">—</div>
+      </div>
+
+      <!-- Specs -->
+      <div class="pd-section">
+        <div class="pd-specs">
+          <div class="pd-spec-col">
+            <div class="pd-spec-col__title">System Specs</div>
+            <div id="pdSpecsLeft"></div>
+          </div>
+          <div class="pd-spec-col">
+            <div class="pd-spec-col__title">Service Guarantee</div>
+            <div id="pdSpecsRight"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Back link -->
+      <a href="preview-products.html" class="pd-back">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        Back to Products
+      </a>
+
+    </main>
+
+    <!-- Checkout sidebar -->
+    <aside>
+      <div class="pd-checkout">
+
+        <div class="pd-checkout__hdr">Product Details</div>
+
+        <div class="pd-checkout__product">
+          <div class="pd-checkout__thumb" id="pdSideThumb">📦</div>
+          <div class="pd-checkout__prod-info">
+            <div class="pd-checkout__prod-name" id="pdSideName">—</div>
+            <div class="pd-checkout__prod-desc" id="pdSideDesc"></div>
+          </div>
+          <div class="pd-checkout__prod-price" id="pdSidePrice">—</div>
+        </div>
+
+        <div class="pd-checkout__summary" id="pdSummary">
+          <div class="pd-sum-row"><span class="pd-sum-row__k">Subtotal</span><span class="pd-sum-row__v" id="pdSubtotal">—</span></div>
+          <div class="pd-sum-row"><span class="pd-sum-row__k">Tax</span><span class="pd-sum-row__v">$0.00</span></div>
+          <div class="pd-sum-row pd-sum-row--total"><span class="pd-sum-row__k">Total</span><span class="pd-sum-row__v" id="pdTotal">—</span></div>
+        </div>
+
+        <div class="pd-checkout__secure">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Secure payment · SSL 256-bit encryption
+        </div>
+
+        <div class="pd-checkout__qty">
+          <span class="pd-checkout__qty-lbl">Quantity</span>
+          <div class="pd-qty-ctrl">
+            <button class="pd-qty-btn" id="pdQtyMinus">−</button>
+            <div class="pd-qty-val" id="pdQtyVal">1</div>
+            <button class="pd-qty-btn" id="pdQtyPlus">+</button>
+          </div>
+        </div>
+
+        <div class="pd-checkout__actions">
+          <button class="pd-btn-cart" id="pdAddCart">
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+            Add to Cart
+          </button>
+          <button class="pd-btn-buynow" id="pdBuyNow">Buy Now</button>
+        </div>
+
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- ─── CART PANEL ─── -->
+  <div class="cart-overlay" id="cartOverlay"></div>
+  <div class="cart-panel" id="cartPanel">
+    <div class="cart-panel__header">
+      <div>
+        <span class="cart-panel__title">Your Cart</span>
+        <span class="cart-panel__count" id="cartPanelCount"></span>
+      </div>
+      <button class="btn-icon" id="cartPanelClose" aria-label="Close cart">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="cart-panel__body" id="cartBody"></div>
+    <div class="cart-panel__footer" id="cartFooter"></div>
+  </div>
+
+  <!-- ─── TOAST ─── -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ─── CART INLINE FALLBACK ─── -->
+  <script>
+  (function() {
+    var PANEL_STYLE = 'position:fixed!important;top:0!important;right:0!important;bottom:0!important;width:360px!important;max-width:100vw!important;background:#0d0d0d!important;border-left:1px solid rgba(255,255,255,.12)!important;box-shadow:-20px 0 40px rgba(0,0,0,.6)!important;z-index:9999!important;display:flex!important;flex-direction:column!important;transform:none!important;';
+    var OVERLAY_STYLE = 'position:fixed!important;top:0!important;left:0!important;right:0!important;bottom:0!important;background:rgba(0,0,0,.6)!important;z-index:9998!important;display:block!important;';
+    function openCart() {
+      var p = document.getElementById('cartPanel'), o = document.getElementById('cartOverlay');
+      if (p) { p.setAttribute('style', PANEL_STYLE); p.classList.add('open'); }
+      if (o) { o.setAttribute('style', OVERLAY_STYLE); o.classList.add('open'); }
+      document.body.style.overflow = 'hidden';
+      try { if (window._renderCartPanel) window._renderCartPanel(); } catch(e) {}
+    }
+    function closeCart() {
+      var p = document.getElementById('cartPanel'), o = document.getElementById('cartOverlay');
+      if (p) { p.removeAttribute('style'); p.classList.remove('open'); }
+      if (o) { o.removeAttribute('style'); o.classList.remove('open'); }
+      document.body.style.overflow = '';
+    }
+    window._openCart  = openCart;
+    window._closeCart = closeCart;
+    document.addEventListener('click', function(e) {
+      var t = e.target;
+      for (var i = 0; i < 12 && t && t !== document; i++) {
+        if (t.id === 'cartBtn')        { openCart();  return; }
+        if (t.id === 'cartPanelClose') { closeCart(); return; }
+        if (t.id === 'cartOverlay')    { closeCart(); return; }
+        t = t.parentNode;
+      }
+    }, true);
+  })();
+  </script>
+
+  <script src="assets/main.js?v=8"></script>
+
+  <!-- ─── PRODUCT DETAIL SCRIPT ─── -->
+  <script>
+  (function() {
+    var DEFAULT_PRODUCTS = [
+      { id:1, name:'Netflix Premium',        category:'streaming', price:4.99,  origPrice:null,  icon:'🎬', desc:'1 Month · 4K UHD · Shared',  badge:'',     gradient:'linear-gradient(135deg,#1a1a2e,#16213e)', currency:'EUR', stock:50, deliverables:[] },
+      { id:2, name:'Spotify Premium',        category:'streaming', price:8.99,  origPrice:null,  icon:'🎵', desc:'3 Months · Family Plan',       badge:'HOT',  gradient:'linear-gradient(135deg,#1e3a5f,#0a1628)', currency:'EUR', stock:32, deliverables:[] },
+      { id:3, name:'Xbox Game Pass',         category:'gaming',    price:6.99,  origPrice:null,  icon:'🎮', desc:'1 Month · Ultimate',           badge:'NEW',  gradient:'linear-gradient(135deg,#2d1b69,#11053b)', currency:'EUR', stock:18, deliverables:[] },
+      { id:4, name:'NordVPN',                category:'vpn',       price:12.99, origPrice:24.99, icon:'🔒', desc:'6 Months · Premium',           badge:'',     gradient:'linear-gradient(135deg,#1a3a1a,#0d1f0d)', currency:'EUR', stock:7,  deliverables:[] },
+      { id:5, name:'Disney+',               category:'streaming', price:3.99,  origPrice:null,  icon:'📺', desc:'1 Month · 4K · Shared',        badge:'SALE', gradient:'linear-gradient(135deg,#3a1a1a,#1f0d0d)', currency:'EUR', stock:45, deliverables:[] },
+      { id:6, name:'Adobe Creative Cloud',   category:'software',  price:19.99, origPrice:null,  icon:'🎨', desc:'1 Month · All Apps',           badge:'',     gradient:'linear-gradient(135deg,#1a2a3a,#0d1520)', currency:'EUR', stock:0,  deliverables:[] }
+    ];
+    function getProds() { try { return JSON.parse(localStorage.getItem('nexus_products')) || DEFAULT_PRODUCTS; } catch(e) { return DEFAULT_PRODUCTS; } }
+    function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
+
+    var SYM = { EUR:'€', USD:'$', GBP:'£' };
+
+    var params = new URLSearchParams(window.location.search);
+    var pid = parseInt(params.get('id') || '0', 10);
+    var p = getProds().find(function(x) { return x.id === pid; });
+    if (!p) { window.location.href = 'preview-products.html'; return; }
+
+    var sym = SYM[p.currency] || '$';
+    var qty = 1;
+
+    /* Title */
+    document.title = 'Nexus — ' + p.name;
+
+    /* Hero background */
+    var heroBg = document.getElementById('pdHeroBg');
+    if (p.image) {
+      heroBg.style.cssText = 'background-image:url('+p.image+');background-size:cover;background-position:center;';
+    } else {
+      document.getElementById('pdHero').style.background = p.gradient || 'linear-gradient(135deg,#1a1a2e,#16213e)';
+    }
+
+    /* Breadcrumb */
+    var catEl = document.getElementById('pdBreadCat');
+    catEl.textContent = cap(p.category || 'Products');
+    catEl.href = 'preview-products.html';
+    document.getElementById('pdBreadName').textContent = p.name;
+
+    /* Tags */
+    var tagItems = [
+      { icon:'⚡', text:'Instant Delivery' },
+      { icon:'🌐', text:'Worldwide' },
+      { icon: p.icon || '📦', text: cap(p.category || 'Digital') }
+    ];
+    document.getElementById('pdTags').innerHTML = tagItems.map(function(t) {
+      return '<span class="pd-tag">'+t.icon+' '+esc(t.text)+'</span>';
+    }).join('');
+
+    /* Stock */
+    var avail = (p.deliverables||[]).length || (p.stock || 0);
+    var stockEl = document.getElementById('pdStock');
+    if (avail > 0) {
+      stockEl.textContent = 'IN STOCK (' + avail + ' AVAILABLE)';
+    } else {
+      stockEl.textContent = 'OUT OF STOCK';
+      stockEl.classList.add('out');
+    }
+
+    /* Rating from reviews */
+    try {
+      var reviews = JSON.parse(localStorage.getItem('nexus_reviews')) || [];
+      var pr = reviews.filter(function(r) { return r.productId === pid; });
+      if (pr.length) {
+        var avg = pr.reduce(function(s,r){ return s+(r.rating||5); }, 0) / pr.length;
+        document.getElementById('pdRating').textContent = '⭐ ' + avg.toFixed(1) + ' (' + pr.length + ' reviews)';
+      }
+    } catch(e) {}
+
+    /* Name + price */
+    document.getElementById('pdName').textContent = p.name;
+    document.getElementById('pdPrice').textContent = sym + Number(p.price).toFixed(2);
+    if (p.origPrice) {
+      var origEl = document.getElementById('pdOrigPrice');
+      origEl.textContent = sym + Number(p.origPrice).toFixed(2);
+      origEl.style.display = '';
+    }
+
+    /* Description */
+    document.getElementById('pdDesc').textContent = p.desc || 'No description available.';
+
+    /* Specs */
+    var specsL = [
+      { k:'Category',  v: cap(p.category || 'Digital') },
+      { k:'Delivery',  v: 'Instant Digital' },
+      { k:'Format',    v: 'Digital Account' }
+    ];
+    var specsR = [
+      { k:'Guarantee', v: 'On Delivery' },
+      { k:'Available', v: avail > 0 ? avail + ' units' : 'Contact us' },
+      { k:'Support',   v: 'Discord / Telegram' }
+    ];
+    function renderSpecs(id, specs) {
+      document.getElementById(id).innerHTML = specs.map(function(s) {
+        return '<div class="pd-spec-row"><span class="pd-spec-key">'+esc(s.k)+'</span><span class="pd-spec-val">'+esc(String(s.v))+'</span></div>';
+      }).join('');
+    }
+    renderSpecs('pdSpecsLeft', specsL);
+    renderSpecs('pdSpecsRight', specsR);
+
+    /* Sidebar product */
+    document.getElementById('pdSideThumb').textContent = p.icon || '📦';
+    document.getElementById('pdSideName').textContent = p.name;
+    document.getElementById('pdSideDesc').textContent = p.desc || '';
+    document.getElementById('pdSidePrice').textContent = sym + Number(p.price).toFixed(2);
+
+    /* Qty + summary */
+    function updateSummary() {
+      var sub = p.price * qty;
+      document.getElementById('pdQtyVal').textContent = qty;
+      document.getElementById('pdSubtotal').textContent = sym + sub.toFixed(2);
+      document.getElementById('pdTotal').textContent = sym + sub.toFixed(2);
+    }
+    updateSummary();
+
+    document.getElementById('pdQtyMinus').addEventListener('click', function() {
+      if (qty > 1) { qty--; updateSummary(); }
+    });
+    document.getElementById('pdQtyPlus').addEventListener('click', function() {
+      if (qty < 99) { qty++; updateSummary(); }
+    });
+
+    /* Buy Now */
+    var buyBtn = document.getElementById('pdBuyNow');
+    if (avail <= 0) { buyBtn.disabled = true; buyBtn.textContent = 'Out of Stock'; }
+    buyBtn.addEventListener('click', function() {
+      if (window._nexusOpenCheckout) window._nexusOpenCheckout(pid);
+    });
+
+    /* Add to Cart */
+    document.getElementById('pdAddCart').addEventListener('click', function() {
+      var cart = [];
+      try { cart = JSON.parse(localStorage.getItem('nexus_cart')) || []; } catch(e) {}
+      var ex = cart.find(function(i){ return i.id === pid; });
+      if (ex) { ex.qty += qty; } else {
+        cart.push({ id:pid, name:p.name, icon:p.icon||'📦', price:p.price, currency:p.currency||'EUR', qty:qty });
+      }
+      localStorage.setItem('nexus_cart', JSON.stringify(cart));
+      if (window._nexusUpdateCartCount) window._nexusUpdateCartCount();
+      if (window._nexusToast) window._nexusToast('Added to cart!', '🛒');
+      if (window._openCart) window._openCart();
+    });
+
+    /* Apply saved content (site name) */
+    try {
+      var c = JSON.parse(localStorage.getItem('nexus_content')) || {};
+      if (c.siteName) document.querySelectorAll('.nav__logo,.drawer__logo').forEach(function(el){ el.textContent = c.siteName; });
+    } catch(e) {}
+
+    /* Apply links */
+    try {
+      var l = JSON.parse(localStorage.getItem('nexus_links')) || {};
+      document.querySelectorAll('[data-link]').forEach(function(el) {
+        var key = el.getAttribute('data-link');
+        if (l[key]) el.href = l[key];
+      });
+    } catch(e) {}
+
+  })();
+  </script>
+
+</body>
+</html>
