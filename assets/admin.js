@@ -98,6 +98,26 @@
     }).catch(function() {});
   }
 
+  function discordLog(type, data) {
+    var w = getWebhooks();
+    if (!w.url) return;
+    var d = data || {};
+    var sym = CURRENCY_SYMBOLS[d.currency] || '€';
+    var stock = d.deliverables ? d.deliverables.length : (d.stock || 0);
+    var pLabel = (d.icon || '📦') + ' ' + (d.name || '—');
+    var embed = null;
+    if      (type === 'PRODUCT_ADD'    && w.onProductAdd)    embed = { title:'📦 Produit ajouté',    color:0x22c55e, fields:[{name:'Produit',value:pLabel,inline:true},{name:'Prix',value:sym+Number(d.price||0).toFixed(2),inline:true},{name:'Catégorie',value:d.category||'—',inline:true}] };
+    else if (type === 'PRODUCT_UPDATE' && w.onProductUpdate) embed = { title:'✏️ Produit modifié',  color:0x3b82f6, fields:[{name:'Produit',value:pLabel,inline:true},{name:'Prix',value:sym+Number(d.price||0).toFixed(2),inline:true},{name:'Stock',value:String(stock)+' unités',inline:true}] };
+    else if (type === 'PRODUCT_DELETE' && w.onProductDelete) embed = { title:'🗑️ Produit supprimé', color:0xef4444, fields:[{name:'Produit',value:pLabel,inline:true},{name:'ID',value:String(d.id||'—'),inline:true}] };
+    else if (type === 'STOCK_UPDATE'   && w.onStockUpdate)   embed = { title:'📊 Stock mis à jour',  color:0x0ea5e9, fields:[{name:'Produit',value:pLabel,inline:true},{name:'Nouveau stock',value:String(stock)+' unités',inline:true},{name:'Mode',value:d.mode==='add'?'Ajout':'Remplacement',inline:true}] };
+    else if (type === 'LOW_STOCK'      && w.onLowStock)      embed = { title:'⚠️ Stock faible',      color:0xf97316, fields:[{name:'Produit',value:pLabel,inline:true},{name:'Stock restant',value:String(stock)+' unités',inline:true}] };
+    else if (type === 'ADMIN_LOGIN'    && w.onAdminLogin)    embed = { title:'🔐 Connexion admin',   color:0x6366f1, description:'Une session admin a été ouverte.', fields:[{name:'Heure',value:new Date().toLocaleString('fr-FR'),inline:true}] };
+    if (!embed) return;
+    embed.footer = { text:'Nexus Store' };
+    embed.timestamp = new Date().toISOString();
+    sendDiscordWebhook(w.url, embed);
+  }
+
   /* ── Toast ── */
   function toast(msg) {
     var t = document.getElementById('adminToast');
@@ -126,6 +146,7 @@
       loginError.classList.remove('show');
       loginScreen.style.display = 'none';
       app.style.display = 'flex';
+      discordLog('ADMIN_LOGIN', {});
       init();
     } else {
       loginError.classList.add('show');
@@ -397,14 +418,17 @@
     closeModal();
     renderProducts();
     toast(editId ? 'Produit modifié ✓' : 'Produit ajouté ✓');
+    discordLog(editId ? 'PRODUCT_UPDATE' : 'PRODUCT_ADD', product);
   };
 
   window.deleteProduct = function (id) {
     if (!confirm('Supprimer ce produit ?')) return;
-    var products = getProducts().filter(function (p) { return p.id !== id; });
-    setProducts(products);
+    var all = getProducts();
+    var deleted = all.find(function(p) { return p.id === id; });
+    setProducts(all.filter(function (p) { return p.id !== id; }));
     renderProducts();
     toast('Produit supprimé.');
+    if (deleted) discordLog('PRODUCT_DELETE', deleted);
   };
 
   /* ── Modal stock / Livrables ── */
@@ -446,6 +470,9 @@
       products[idx].deliverables = mode === 'add' ? existing.concat(newLines) : newLines;
       products[idx].stock = products[idx].deliverables.length;
       setProducts(products);
+      var updated = products[idx];
+      discordLog('STOCK_UPDATE', Object.assign({ mode: mode }, updated));
+      if (updated.stock > 0 && updated.stock < 5) discordLog('LOW_STOCK', updated);
     }
     closeStockModal();
     renderProducts();
@@ -753,21 +780,55 @@
   /* ── Webhooks ── */
   function loadWebhooksForm() {
     var w = getWebhooks();
-    document.getElementById('whkUrl').value = w.url || '';
-    document.getElementById('whkOnOrder').checked = !!w.onOrder;
-    document.getElementById('whkOnRefund').checked = !!w.onRefund;
+    document.getElementById('whkUrl').value             = w.url             || '';
+    document.getElementById('whkOnOrder').checked        = !!w.onOrder;
+    document.getElementById('whkOnRefund').checked       = !!w.onRefund;
+    document.getElementById('whkOnProductAdd').checked   = !!w.onProductAdd;
+    document.getElementById('whkOnProductUpdate').checked= !!w.onProductUpdate;
+    document.getElementById('whkOnProductDelete').checked= !!w.onProductDelete;
+    document.getElementById('whkOnStockUpdate').checked  = !!w.onStockUpdate;
+    document.getElementById('whkOnLowStock').checked     = !!w.onLowStock;
+    document.getElementById('whkOnAdminLogin').checked   = !!w.onAdminLogin;
+    document.getElementById('whkOnBug').checked          = !!w.onBug;
     document.getElementById('whkSaveMsg').textContent = '';
+    document.getElementById('changelogMsg').textContent = '';
   }
 
   window.saveWebhooks = function() {
     setWebhooks({
-      url:      document.getElementById('whkUrl').value.trim(),
-      onOrder:  document.getElementById('whkOnOrder').checked,
-      onRefund: document.getElementById('whkOnRefund').checked
+      url:             document.getElementById('whkUrl').value.trim(),
+      onOrder:         document.getElementById('whkOnOrder').checked,
+      onRefund:        document.getElementById('whkOnRefund').checked,
+      onProductAdd:    document.getElementById('whkOnProductAdd').checked,
+      onProductUpdate: document.getElementById('whkOnProductUpdate').checked,
+      onProductDelete: document.getElementById('whkOnProductDelete').checked,
+      onStockUpdate:   document.getElementById('whkOnStockUpdate').checked,
+      onLowStock:      document.getElementById('whkOnLowStock').checked,
+      onAdminLogin:    document.getElementById('whkOnAdminLogin').checked,
+      onBug:           document.getElementById('whkOnBug').checked
     });
     var msg = document.getElementById('whkSaveMsg');
     msg.textContent = 'Enregistré ✓'; msg.style.color = '#3cc864';
     toast('Webhooks Discord enregistrés ✓');
+  };
+
+  window.sendChangelog = function() {
+    var url = getWebhooks().url;
+    var text = document.getElementById('whkChangelog').value.trim();
+    var msgEl = document.getElementById('changelogMsg');
+    if (!url)  { msgEl.textContent = 'URL webhook manquante.'; msgEl.style.color = '#ff5555'; return; }
+    if (!text) { msgEl.textContent = 'Message vide.'; msgEl.style.color = '#ff5555'; return; }
+    msgEl.textContent = 'Envoi…'; msgEl.style.color = 'rgba(255,255,255,.4)';
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ embeds: [{ title:'📋 Changelog — Nexus Store', color:0xa78bfa, description:text, footer:{text:'Nexus Store'}, timestamp:new Date().toISOString() }] })
+    }).then(function(r) {
+      if (r.ok || r.status === 204) {
+        msgEl.textContent = 'Publié ✓'; msgEl.style.color = '#3cc864';
+        document.getElementById('whkChangelog').value = '';
+      } else { msgEl.textContent = 'Erreur ' + r.status; msgEl.style.color = '#ff5555'; }
+    }).catch(function() { msgEl.textContent = 'Erreur réseau.'; msgEl.style.color = '#ff5555'; });
   };
 
   window.testWebhook = function() {

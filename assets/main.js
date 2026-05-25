@@ -533,4 +533,40 @@
       setTimeout(function () { document.getElementById('coEmail').focus(); }, 150);
     };
   }());
+
+  /* ─── Bug Reporter → Discord ─── */
+  (function() {
+    var _lastBug = 0;
+    function reportBug(msg, src, line) {
+      var now = Date.now();
+      if (now - _lastBug < 30000) return; // max 1 report per 30s
+      _lastBug = now;
+      try {
+        var w = JSON.parse(localStorage.getItem('nexus_webhooks') || '{}');
+        if (!w.url || !w.onBug) return;
+        fetch(w.url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ embeds: [{
+            title: '🐛 Erreur JavaScript — Nexus Store',
+            color: 0xef4444,
+            fields: [
+              { name: 'Message', value: String(msg || '—').substring(0, 256), inline: false },
+              { name: 'Source',  value: String(src  || '—').substring(0, 100).replace(window.location.origin, ''), inline: true },
+              { name: 'Ligne',   value: String(line || '—'), inline: true },
+              { name: 'Page',    value: window.location.pathname, inline: true }
+            ],
+            footer: { text: 'Nexus Store' },
+            timestamp: new Date().toISOString()
+          }] })
+        }).catch(function() {});
+      } catch(e) {}
+    }
+    window.addEventListener('error', function(e) {
+      reportBug(e.message, e.filename, e.lineno);
+    });
+    window.addEventListener('unhandledrejection', function(e) {
+      reportBug(String(e.reason), window.location.href, null);
+    });
+  }());
 }());

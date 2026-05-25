@@ -405,14 +405,42 @@
           </div>
           <div class="field" style="margin-bottom:0;">
             <label>Déclencher pour</label>
-            <div style="display:flex;flex-wrap:wrap;gap:20px;margin-top:8px;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 28px;margin-top:8px;">
               <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:400;color:rgba(255,255,255,.7);">
                 <input type="checkbox" id="whkOnOrder" style="accent-color:#3b82f6;width:15px;height:15px;" />
-                Nouvelle commande
+                🛍️ Nouvelle commande
               </label>
               <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:400;color:rgba(255,255,255,.7);">
                 <input type="checkbox" id="whkOnRefund" style="accent-color:#3b82f6;width:15px;height:15px;" />
-                Remboursement
+                ↩️ Remboursement
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:400;color:rgba(255,255,255,.7);">
+                <input type="checkbox" id="whkOnProductAdd" style="accent-color:#3b82f6;width:15px;height:15px;" />
+                📦 Produit ajouté
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:400;color:rgba(255,255,255,.7);">
+                <input type="checkbox" id="whkOnProductUpdate" style="accent-color:#3b82f6;width:15px;height:15px;" />
+                ✏️ Produit modifié
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:400;color:rgba(255,255,255,.7);">
+                <input type="checkbox" id="whkOnProductDelete" style="accent-color:#3b82f6;width:15px;height:15px;" />
+                🗑️ Produit supprimé
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:400;color:rgba(255,255,255,.7);">
+                <input type="checkbox" id="whkOnStockUpdate" style="accent-color:#3b82f6;width:15px;height:15px;" />
+                📊 Mise à jour stock
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:400;color:rgba(255,255,255,.7);">
+                <input type="checkbox" id="whkOnLowStock" style="accent-color:#3b82f6;width:15px;height:15px;" />
+                ⚠️ Stock faible (&lt;5)
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:400;color:rgba(255,255,255,.7);">
+                <input type="checkbox" id="whkOnAdminLogin" style="accent-color:#3b82f6;width:15px;height:15px;" />
+                🔐 Connexion admin
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:400;color:rgba(255,255,255,.7);">
+                <input type="checkbox" id="whkOnBug" style="accent-color:#3b82f6;width:15px;height:15px;" />
+                🐛 Erreurs JavaScript
               </label>
             </div>
           </div>
@@ -420,6 +448,16 @@
             <button class="a-btn a-btn--primary" onclick="saveWebhooks()">Enregistrer</button>
             <button class="a-btn a-btn--ghost" onclick="testWebhook()">Envoyer un test</button>
             <span class="save-msg" id="whkSaveMsg"></span>
+          </div>
+          <!-- Changelog manuel -->
+          <div style="margin-top:20px;border-top:1px solid rgba(255,255,255,.07);padding-top:18px;">
+            <div style="font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:10px;">📋 Changelog Manuel</div>
+            <p style="font-size:13px;color:rgba(255,255,255,.35);margin:0 0 12px;">Envoyez une note de mise à jour directement dans votre salon Discord.</p>
+            <textarea id="whkChangelog" rows="3" placeholder="v1.2 — Nouvelle fonctionnalité : système de logs Discord ajouté…" style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:#fff;font-family:inherit;font-size:13px;padding:10px 14px;resize:vertical;outline:none;box-sizing:border-box;"></textarea>
+            <div style="margin-top:10px;display:flex;align-items:center;gap:10px;">
+              <button class="a-btn a-btn--ghost" onclick="sendChangelog()">📤 Publier le changelog</button>
+              <span id="changelogMsg" style="font-size:13px;color:rgba(255,255,255,.4);"></span>
+            </div>
           </div>
         </div>
 

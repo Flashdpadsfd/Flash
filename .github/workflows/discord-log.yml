@@ -1,0 +1,52 @@
+name: Discord — Deploy Log
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Send Discord deploy notification
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          if [ -z "$DISCORD_WEBHOOK" ]; then
+            echo "DISCORD_WEBHOOK secret not set — skipping."
+            exit 0
+          fi
+
+          COMMIT_HASH=$(git log -1 --pretty=%h)
+          COMMIT_MSG=$(git log -1 --pretty=%s)
+          COMMIT_AUTHOR=$(git log -1 --pretty=%an)
+          COMMIT_DATE=$(git log -1 --pretty="%cd" --date=format:"%d/%m/%Y %H:%M")
+          CHANGED=$(git diff --name-only HEAD~1 HEAD 2>/dev/null | head -8 | tr '\n' '\n' | sed 's/^/• /' | tr '\n' '\n')
+          CHANGED_COUNT=$(git diff --name-only HEAD~1 HEAD 2>/dev/null | wc -l | tr -d ' ')
+
+          PAYLOAD=$(cat <<EOF
+          {
+            "embeds": [{
+              "title": "🚀 Déploiement — Nexus Store",
+              "color": 440020,
+              "fields": [
+                { "name": "Commit", "value": "\`${COMMIT_HASH}\` ${COMMIT_MSG}", "inline": false },
+                { "name": "Auteur", "value": "${COMMIT_AUTHOR}", "inline": true },
+                { "name": "Date",   "value": "${COMMIT_DATE}", "inline": true },
+                { "name": "Fichiers modifiés", "value": "${CHANGED_COUNT} fichier(s)", "inline": true }
+              ],
+              "footer": { "text": "Nexus Store · Vercel · master" },
+              "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            }]
+          }
+          EOF
+          )
+
+          curl -s -o /dev/null -w "%{http_code}" \
+            -X POST "$DISCORD_WEBHOOK" \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD"
