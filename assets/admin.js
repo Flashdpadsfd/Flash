@@ -89,18 +89,25 @@
   }
   function setWebhooks(w) { localStorage.setItem('nexus_webhooks', JSON.stringify(w)); }
 
-  function sendDiscordWebhook(url, embed) {
+  function sendDiscordWebhook(url, embed, content) {
     if (!url) return;
+    var body = { embeds: [embed] };
+    if (content) body.content = content;
     fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ embeds: [embed] })
+      body: JSON.stringify(body)
     }).catch(function() {});
   }
 
+  function getWebhookFor(type) {
+    var all = getWebhooks();
+    return all[type] || { url: '', msg: '' };
+  }
+
   function discordLog(type, data) {
-    var url = getWebhooks().url;
-    if (!url) return;
+    var cfg = getWebhookFor(type);
+    if (!cfg.url) return;
     var d = data || {};
     var sym = CURRENCY_SYMBOLS[d.currency] || '€';
     var stock = d.deliverables ? d.deliverables.length : (d.stock || 0);
@@ -115,7 +122,7 @@
     else return;
     embed.footer = { text:'Nexus Store' };
     embed.timestamp = new Date().toISOString();
-    sendDiscordWebhook(url, embed);
+    sendDiscordWebhook(cfg.url, embed, cfg.msg);
   }
 
   /* ── Toast ── */
@@ -778,64 +785,77 @@
   };
 
   /* ── Webhooks ── */
+  var WHK_EVENTS = ['ORDER_CREATE','REFUND','PRODUCT_ADD','PRODUCT_UPDATE','PRODUCT_DELETE','STOCK_UPDATE','LOW_STOCK','ADMIN_LOGIN','BUG','CHANGELOG'];
+
   function loadWebhooksForm() {
-    var w = getWebhooks();
-    document.getElementById('whkUrl').value = w.url || '';
+    var all = getWebhooks();
+    WHK_EVENTS.forEach(function(type) {
+      var cfg = all[type] || {};
+      var enEl  = document.getElementById('en-'  + type);
+      var urlEl = document.getElementById('url-' + type);
+      var msgEl = document.getElementById('msg-' + type);
+      var expEl = document.getElementById('expand-' + type);
+      if (!enEl) return;
+      var enabled = !!(cfg.url);
+      enEl.checked = enabled;
+      if (urlEl) urlEl.value = cfg.url || '';
+      if (msgEl) msgEl.value = cfg.msg || '';
+      if (expEl) expEl.classList[enabled ? 'add' : 'remove']('open');
+    });
     document.getElementById('whkSaveMsg').textContent = '';
     document.getElementById('changelogMsg').textContent = '';
   }
 
+  window.toggleWebhookCard = function(type) {
+    var checked = document.getElementById('en-' + type).checked;
+    var expEl = document.getElementById('expand-' + type);
+    if (expEl) expEl.classList[checked ? 'add' : 'remove']('open');
+  };
+
   window.saveWebhooks = function() {
-    setWebhooks({ url: document.getElementById('whkUrl').value.trim() });
-    var msg = document.getElementById('whkSaveMsg');
-    msg.textContent = 'Enregistré ✓'; msg.style.color = '#3cc864';
-    toast('Webhook Discord enregistré ✓');
+    var all = {};
+    WHK_EVENTS.forEach(function(type) {
+      var urlEl = document.getElementById('url-' + type);
+      var msgEl = document.getElementById('msg-' + type);
+      var url = urlEl ? urlEl.value.trim() : '';
+      var msg = msgEl ? msgEl.value.trim() : '';
+      if (url) all[type] = { url: url, msg: msg };
+    });
+    setWebhooks(all);
+    var el = document.getElementById('whkSaveMsg');
+    el.textContent = 'Enregistré ✓'; el.style.color = '#3cc864';
+    toast('Webhooks Discord enregistrés ✓');
+  };
+
+  window.testWebhookCard = function(type) {
+    var urlEl = document.getElementById('url-' + type);
+    var url = urlEl ? urlEl.value.trim() : '';
+    var statusEl = document.getElementById('test-' + type);
+    if (!url) { if (statusEl) { statusEl.textContent = 'URL manquante.'; statusEl.style.color = '#ff5555'; } return; }
+    if (statusEl) { statusEl.textContent = 'Envoi…'; statusEl.style.color = 'rgba(255,255,255,.4)'; }
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ embeds: [{ title:'🔔 Test — ' + type, description:'Webhook configuré et fonctionnel.', color:0x5865f2, fields:[{name:'Store',value:'Nexus',inline:true},{name:'Statut',value:'✅ Actif',inline:true}], footer:{text:'Nexus Store'}, timestamp:new Date().toISOString() }] })
+    }).then(function(r) {
+      if (statusEl) { statusEl.textContent = (r.ok||r.status===204) ? '✓ OK' : 'Erreur '+r.status; statusEl.style.color = (r.ok||r.status===204) ? '#3cc864' : '#ff5555'; }
+    }).catch(function() { if (statusEl) { statusEl.textContent = 'Erreur réseau.'; statusEl.style.color = '#ff5555'; } });
   };
 
   window.sendChangelog = function() {
-    var url = getWebhooks().url;
+    var cfg = getWebhookFor('CHANGELOG');
     var text = document.getElementById('whkChangelog').value.trim();
     var msgEl = document.getElementById('changelogMsg');
-    if (!url)  { msgEl.textContent = 'URL webhook manquante.'; msgEl.style.color = '#ff5555'; return; }
-    if (!text) { msgEl.textContent = 'Message vide.'; msgEl.style.color = '#ff5555'; return; }
+    if (!cfg.url) { msgEl.textContent = 'Configurez le webhook Changelog ci-dessus.'; msgEl.style.color = '#ff5555'; return; }
+    if (!text)    { msgEl.textContent = 'Message vide.'; msgEl.style.color = '#ff5555'; return; }
     msgEl.textContent = 'Envoi…'; msgEl.style.color = 'rgba(255,255,255,.4)';
-    fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ embeds: [{ title:'📋 Changelog — Nexus Store', color:0xa78bfa, description:text, footer:{text:'Nexus Store'}, timestamp:new Date().toISOString() }] })
-    }).then(function(r) {
-      if (r.ok || r.status === 204) {
-        msgEl.textContent = 'Publié ✓'; msgEl.style.color = '#3cc864';
-        document.getElementById('whkChangelog').value = '';
-      } else { msgEl.textContent = 'Erreur ' + r.status; msgEl.style.color = '#ff5555'; }
-    }).catch(function() { msgEl.textContent = 'Erreur réseau.'; msgEl.style.color = '#ff5555'; });
-  };
-
-  window.testWebhook = function() {
-    var url = document.getElementById('whkUrl').value.trim();
-    var msg = document.getElementById('whkSaveMsg');
-    if (!url) { msg.textContent = 'URL manquante.'; msg.style.color = '#ff5555'; return; }
-    msg.textContent = 'Envoi…'; msg.style.color = 'rgba(255,255,255,.4)';
-    fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ embeds: [{
-        title: '🔔 Test — Nexus Admin',
-        description: 'Votre webhook Discord est correctement configuré et fonctionnel.',
-        color: 3447003,
-        fields: [{ name: 'Store', value: 'Nexus', inline: true }, { name: 'Statut', value: '✅ Actif', inline: true }],
-        footer: { text: 'Nexus Store' },
-        timestamp: new Date().toISOString()
-      }] })
-    }).then(function(r) {
-      if (r.ok || r.status === 204) {
-        msg.textContent = 'Test envoyé ✓'; msg.style.color = '#3cc864';
-      } else {
-        msg.textContent = 'Erreur ' + r.status; msg.style.color = '#ff5555';
-      }
-    }).catch(function() {
-      msg.textContent = 'Erreur réseau (CORS?).'; msg.style.color = '#ff5555';
-    });
+    var body = { embeds: [{ title:'📋 Changelog — Nexus Store', color:0xa78bfa, description:text, footer:{text:'Nexus Store'}, timestamp:new Date().toISOString() }] };
+    if (cfg.msg) body.content = cfg.msg;
+    fetch(cfg.url, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) })
+      .then(function(r) {
+        if (r.ok || r.status === 204) { msgEl.textContent = 'Publié ✓'; msgEl.style.color = '#3cc864'; document.getElementById('whkChangelog').value = ''; }
+        else { msgEl.textContent = 'Erreur ' + r.status; msgEl.style.color = '#ff5555'; }
+      }).catch(function() { msgEl.textContent = 'Erreur réseau.'; msgEl.style.color = '#ff5555'; });
   };
 
   /* ── Orders ── */
@@ -886,10 +906,10 @@
     o.status = 'refunded';
     setOrders(orders);
     renderOrders(document.getElementById('ordersSearch').value);
-    var w = getWebhooks();
-    if (w.url) {
+    var cfg = getWebhookFor('REFUND');
+    if (cfg.url) {
       var sym = CURRENCY_SYMBOLS[o.currency] || '€';
-      sendDiscordWebhook(w.url, {
+      sendDiscordWebhook(cfg.url, {
         title: '↩️ Remboursement effectué',
         color: 15158332,
         fields: [
@@ -900,7 +920,7 @@
         ],
         footer: { text: 'Nexus Store' },
         timestamp: new Date().toISOString()
-      });
+      }, cfg.msg);
     }
     toast('Commande marquée remboursée.');
   };

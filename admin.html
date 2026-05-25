@@ -393,38 +393,239 @@
         <div class="page-header"><h1>Paramètres</h1></div>
 
         <!-- Webhooks Discord -->
-        <div class="stats-editor" style="margin-bottom:20px;">
-          <div class="section-title" style="margin-bottom:6px;">🔔 Webhook Discord</div>
+        <div style="margin-bottom:28px;">
+          <div class="section-title" style="margin-bottom:6px;">🔔 Notifications Discord</div>
           <p style="font-size:13px;color:rgba(255,255,255,.4);margin:0 0 18px;line-height:1.65;">
-            Collez votre URL de webhook — tous les événements lui seront envoyés automatiquement.<br>
+            Configurez un webhook Discord par événement — chaque notification peut aller dans un salon différent.<br>
             Créez un webhook : <strong style="color:rgba(255,255,255,.6);">Paramètres serveur → Intégrations → Webhooks → Créer un webhook</strong>.
           </p>
-          <div class="field">
-            <label>URL du Webhook Discord</label>
-            <input type="url" id="whkUrl" placeholder="https://discord.com/api/webhooks/…" />
-          </div>
-          <!-- Events hint (read-only display) -->
-          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;">
-            <span style="font-size:11px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:3px 10px;color:rgba(255,255,255,.45);">🛍️ Commande</span>
-            <span style="font-size:11px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:3px 10px;color:rgba(255,255,255,.45);">↩️ Remboursement</span>
-            <span style="font-size:11px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:3px 10px;color:rgba(255,255,255,.45);">📦 Produit ajouté</span>
-            <span style="font-size:11px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:3px 10px;color:rgba(255,255,255,.45);">✏️ Produit modifié</span>
-            <span style="font-size:11px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:3px 10px;color:rgba(255,255,255,.45);">🗑️ Produit supprimé</span>
-            <span style="font-size:11px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:3px 10px;color:rgba(255,255,255,.45);">📊 Stock</span>
-            <span style="font-size:11px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:3px 10px;color:rgba(255,255,255,.45);">⚠️ Stock faible</span>
-            <span style="font-size:11px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:3px 10px;color:rgba(255,255,255,.45);">🔐 Login admin</span>
-            <span style="font-size:11px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:3px 10px;color:rgba(255,255,255,.45);">🐛 Erreurs JS</span>
-          </div>
-          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-            <button class="a-btn a-btn--primary" onclick="saveWebhooks()">Enregistrer</button>
-            <button class="a-btn a-btn--ghost" onclick="testWebhook()">Envoyer un test</button>
+
+          <!-- Grille de cartes par événement -->
+          <div class="whk-grid">
+
+            <!-- Commande créée -->
+            <div class="whk-card">
+              <div class="whk-card__head">
+                <div class="whk-card__icon" style="background:rgba(59,130,246,.15);">🛍️</div>
+                <div><div class="whk-card__title">Commande créée</div><div class="whk-card__desc">Notification quand une nouvelle commande est passée.</div></div>
+              </div>
+              <div class="whk-channel">
+                <div class="whk-disc-badge"><svg viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.014.01.028.021.037a19.953 19.953 0 0 0 5.993 3.03.077.077 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.201 13.201 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg></div>
+                <span class="whk-channel__label">Discord</span>
+                <label class="whk-toggle"><input type="checkbox" id="en-ORDER_CREATE" onchange="toggleWebhookCard('ORDER_CREATE')"><span class="whk-toggle-track"></span></label>
+              </div>
+              <div class="whk-expand" id="expand-ORDER_CREATE">
+                <div class="field"><label>Webhook URL <span style="color:#ff5555;">*</span></label><input type="url" id="url-ORDER_CREATE" placeholder="https://discord.com/api/webhooks/…"/></div>
+                <div class="field"><label>Message additionnel <span style="color:rgba(255,255,255,.3);font-weight:400;">(ex: @everyone)</span></label><input type="text" id="msg-ORDER_CREATE" placeholder="@everyone (optionnel)"/></div>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:12px;">
+                  <button class="a-btn a-btn--ghost" style="font-size:12px;padding:5px 12px;" onclick="testWebhookCard('ORDER_CREATE')">Tester</button>
+                  <span id="test-ORDER_CREATE" style="font-size:12px;"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Remboursement -->
+            <div class="whk-card">
+              <div class="whk-card__head">
+                <div class="whk-card__icon" style="background:rgba(249,115,22,.15);">↩️</div>
+                <div><div class="whk-card__title">Remboursement</div><div class="whk-card__desc">Notification quand une commande est remboursée.</div></div>
+              </div>
+              <div class="whk-channel">
+                <div class="whk-disc-badge"><svg viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.014.01.028.021.037a19.953 19.953 0 0 0 5.993 3.03.077.077 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.201 13.201 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg></div>
+                <span class="whk-channel__label">Discord</span>
+                <label class="whk-toggle"><input type="checkbox" id="en-REFUND" onchange="toggleWebhookCard('REFUND')"><span class="whk-toggle-track"></span></label>
+              </div>
+              <div class="whk-expand" id="expand-REFUND">
+                <div class="field"><label>Webhook URL <span style="color:#ff5555;">*</span></label><input type="url" id="url-REFUND" placeholder="https://discord.com/api/webhooks/…"/></div>
+                <div class="field"><label>Message additionnel <span style="color:rgba(255,255,255,.3);font-weight:400;">(ex: @here)</span></label><input type="text" id="msg-REFUND" placeholder="@here (optionnel)"/></div>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:12px;">
+                  <button class="a-btn a-btn--ghost" style="font-size:12px;padding:5px 12px;" onclick="testWebhookCard('REFUND')">Tester</button>
+                  <span id="test-REFUND" style="font-size:12px;"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Produit ajouté -->
+            <div class="whk-card">
+              <div class="whk-card__head">
+                <div class="whk-card__icon" style="background:rgba(34,197,94,.15);">📦</div>
+                <div><div class="whk-card__title">Produit ajouté</div><div class="whk-card__desc">Notification quand un nouveau produit est créé.</div></div>
+              </div>
+              <div class="whk-channel">
+                <div class="whk-disc-badge"><svg viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.014.01.028.021.037a19.953 19.953 0 0 0 5.993 3.03.077.077 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.201 13.201 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg></div>
+                <span class="whk-channel__label">Discord</span>
+                <label class="whk-toggle"><input type="checkbox" id="en-PRODUCT_ADD" onchange="toggleWebhookCard('PRODUCT_ADD')"><span class="whk-toggle-track"></span></label>
+              </div>
+              <div class="whk-expand" id="expand-PRODUCT_ADD">
+                <div class="field"><label>Webhook URL <span style="color:#ff5555;">*</span></label><input type="url" id="url-PRODUCT_ADD" placeholder="https://discord.com/api/webhooks/…"/></div>
+                <div class="field"><label>Message additionnel <span style="color:rgba(255,255,255,.3);font-weight:400;">(optionnel)</span></label><input type="text" id="msg-PRODUCT_ADD" placeholder="(optionnel)"/></div>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:12px;">
+                  <button class="a-btn a-btn--ghost" style="font-size:12px;padding:5px 12px;" onclick="testWebhookCard('PRODUCT_ADD')">Tester</button>
+                  <span id="test-PRODUCT_ADD" style="font-size:12px;"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Produit modifié -->
+            <div class="whk-card">
+              <div class="whk-card__head">
+                <div class="whk-card__icon" style="background:rgba(59,130,246,.15);">✏️</div>
+                <div><div class="whk-card__title">Produit modifié</div><div class="whk-card__desc">Notification quand un produit est mis à jour.</div></div>
+              </div>
+              <div class="whk-channel">
+                <div class="whk-disc-badge"><svg viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.014.01.028.021.037a19.953 19.953 0 0 0 5.993 3.03.077.077 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.201 13.201 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg></div>
+                <span class="whk-channel__label">Discord</span>
+                <label class="whk-toggle"><input type="checkbox" id="en-PRODUCT_UPDATE" onchange="toggleWebhookCard('PRODUCT_UPDATE')"><span class="whk-toggle-track"></span></label>
+              </div>
+              <div class="whk-expand" id="expand-PRODUCT_UPDATE">
+                <div class="field"><label>Webhook URL <span style="color:#ff5555;">*</span></label><input type="url" id="url-PRODUCT_UPDATE" placeholder="https://discord.com/api/webhooks/…"/></div>
+                <div class="field"><label>Message additionnel <span style="color:rgba(255,255,255,.3);font-weight:400;">(optionnel)</span></label><input type="text" id="msg-PRODUCT_UPDATE" placeholder="(optionnel)"/></div>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:12px;">
+                  <button class="a-btn a-btn--ghost" style="font-size:12px;padding:5px 12px;" onclick="testWebhookCard('PRODUCT_UPDATE')">Tester</button>
+                  <span id="test-PRODUCT_UPDATE" style="font-size:12px;"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Produit supprimé -->
+            <div class="whk-card">
+              <div class="whk-card__head">
+                <div class="whk-card__icon" style="background:rgba(239,68,68,.15);">🗑️</div>
+                <div><div class="whk-card__title">Produit supprimé</div><div class="whk-card__desc">Notification quand un produit est supprimé.</div></div>
+              </div>
+              <div class="whk-channel">
+                <div class="whk-disc-badge"><svg viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.014.01.028.021.037a19.953 19.953 0 0 0 5.993 3.03.077.077 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.201 13.201 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg></div>
+                <span class="whk-channel__label">Discord</span>
+                <label class="whk-toggle"><input type="checkbox" id="en-PRODUCT_DELETE" onchange="toggleWebhookCard('PRODUCT_DELETE')"><span class="whk-toggle-track"></span></label>
+              </div>
+              <div class="whk-expand" id="expand-PRODUCT_DELETE">
+                <div class="field"><label>Webhook URL <span style="color:#ff5555;">*</span></label><input type="url" id="url-PRODUCT_DELETE" placeholder="https://discord.com/api/webhooks/…"/></div>
+                <div class="field"><label>Message additionnel <span style="color:rgba(255,255,255,.3);font-weight:400;">(optionnel)</span></label><input type="text" id="msg-PRODUCT_DELETE" placeholder="(optionnel)"/></div>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:12px;">
+                  <button class="a-btn a-btn--ghost" style="font-size:12px;padding:5px 12px;" onclick="testWebhookCard('PRODUCT_DELETE')">Tester</button>
+                  <span id="test-PRODUCT_DELETE" style="font-size:12px;"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stock mis à jour -->
+            <div class="whk-card">
+              <div class="whk-card__head">
+                <div class="whk-card__icon" style="background:rgba(14,165,233,.15);">📊</div>
+                <div><div class="whk-card__title">Stock mis à jour</div><div class="whk-card__desc">Notification quand le stock d'un produit est modifié.</div></div>
+              </div>
+              <div class="whk-channel">
+                <div class="whk-disc-badge"><svg viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.014.01.028.021.037a19.953 19.953 0 0 0 5.993 3.03.077.077 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.201 13.201 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg></div>
+                <span class="whk-channel__label">Discord</span>
+                <label class="whk-toggle"><input type="checkbox" id="en-STOCK_UPDATE" onchange="toggleWebhookCard('STOCK_UPDATE')"><span class="whk-toggle-track"></span></label>
+              </div>
+              <div class="whk-expand" id="expand-STOCK_UPDATE">
+                <div class="field"><label>Webhook URL <span style="color:#ff5555;">*</span></label><input type="url" id="url-STOCK_UPDATE" placeholder="https://discord.com/api/webhooks/…"/></div>
+                <div class="field"><label>Message additionnel <span style="color:rgba(255,255,255,.3);font-weight:400;">(optionnel)</span></label><input type="text" id="msg-STOCK_UPDATE" placeholder="(optionnel)"/></div>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:12px;">
+                  <button class="a-btn a-btn--ghost" style="font-size:12px;padding:5px 12px;" onclick="testWebhookCard('STOCK_UPDATE')">Tester</button>
+                  <span id="test-STOCK_UPDATE" style="font-size:12px;"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stock faible -->
+            <div class="whk-card">
+              <div class="whk-card__head">
+                <div class="whk-card__icon" style="background:rgba(234,179,8,.15);">⚠️</div>
+                <div><div class="whk-card__title">Stock faible</div><div class="whk-card__desc">Alerte quand le stock passe sous 5 unités.</div></div>
+              </div>
+              <div class="whk-channel">
+                <div class="whk-disc-badge"><svg viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.014.01.028.021.037a19.953 19.953 0 0 0 5.993 3.03.077.077 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.201 13.201 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg></div>
+                <span class="whk-channel__label">Discord</span>
+                <label class="whk-toggle"><input type="checkbox" id="en-LOW_STOCK" onchange="toggleWebhookCard('LOW_STOCK')"><span class="whk-toggle-track"></span></label>
+              </div>
+              <div class="whk-expand" id="expand-LOW_STOCK">
+                <div class="field"><label>Webhook URL <span style="color:#ff5555;">*</span></label><input type="url" id="url-LOW_STOCK" placeholder="https://discord.com/api/webhooks/…"/></div>
+                <div class="field"><label>Message additionnel <span style="color:rgba(255,255,255,.3);font-weight:400;">(ex: @here)</span></label><input type="text" id="msg-LOW_STOCK" placeholder="@here (optionnel)"/></div>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:12px;">
+                  <button class="a-btn a-btn--ghost" style="font-size:12px;padding:5px 12px;" onclick="testWebhookCard('LOW_STOCK')">Tester</button>
+                  <span id="test-LOW_STOCK" style="font-size:12px;"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Connexion admin -->
+            <div class="whk-card">
+              <div class="whk-card__head">
+                <div class="whk-card__icon" style="background:rgba(99,102,241,.15);">🔐</div>
+                <div><div class="whk-card__title">Connexion admin</div><div class="whk-card__desc">Notification quand l'admin ouvre une session.</div></div>
+              </div>
+              <div class="whk-channel">
+                <div class="whk-disc-badge"><svg viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.014.01.028.021.037a19.953 19.953 0 0 0 5.993 3.03.077.077 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.201 13.201 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg></div>
+                <span class="whk-channel__label">Discord</span>
+                <label class="whk-toggle"><input type="checkbox" id="en-ADMIN_LOGIN" onchange="toggleWebhookCard('ADMIN_LOGIN')"><span class="whk-toggle-track"></span></label>
+              </div>
+              <div class="whk-expand" id="expand-ADMIN_LOGIN">
+                <div class="field"><label>Webhook URL <span style="color:#ff5555;">*</span></label><input type="url" id="url-ADMIN_LOGIN" placeholder="https://discord.com/api/webhooks/…"/></div>
+                <div class="field"><label>Message additionnel <span style="color:rgba(255,255,255,.3);font-weight:400;">(optionnel)</span></label><input type="text" id="msg-ADMIN_LOGIN" placeholder="(optionnel)"/></div>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:12px;">
+                  <button class="a-btn a-btn--ghost" style="font-size:12px;padding:5px 12px;" onclick="testWebhookCard('ADMIN_LOGIN')">Tester</button>
+                  <span id="test-ADMIN_LOGIN" style="font-size:12px;"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Erreur JavaScript -->
+            <div class="whk-card">
+              <div class="whk-card__head">
+                <div class="whk-card__icon" style="background:rgba(239,68,68,.12);">🐛</div>
+                <div><div class="whk-card__title">Erreur JavaScript</div><div class="whk-card__desc">Notification en cas d'erreur JS côté client (max 1/30s).</div></div>
+              </div>
+              <div class="whk-channel">
+                <div class="whk-disc-badge"><svg viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.014.01.028.021.037a19.953 19.953 0 0 0 5.993 3.03.077.077 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.201 13.201 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg></div>
+                <span class="whk-channel__label">Discord</span>
+                <label class="whk-toggle"><input type="checkbox" id="en-BUG" onchange="toggleWebhookCard('BUG')"><span class="whk-toggle-track"></span></label>
+              </div>
+              <div class="whk-expand" id="expand-BUG">
+                <div class="field"><label>Webhook URL <span style="color:#ff5555;">*</span></label><input type="url" id="url-BUG" placeholder="https://discord.com/api/webhooks/…"/></div>
+                <div class="field"><label>Message additionnel <span style="color:rgba(255,255,255,.3);font-weight:400;">(optionnel)</span></label><input type="text" id="msg-BUG" placeholder="(optionnel)"/></div>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:12px;">
+                  <button class="a-btn a-btn--ghost" style="font-size:12px;padding:5px 12px;" onclick="testWebhookCard('BUG')">Tester</button>
+                  <span id="test-BUG" style="font-size:12px;"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Changelog -->
+            <div class="whk-card">
+              <div class="whk-card__head">
+                <div class="whk-card__icon" style="background:rgba(167,139,250,.15);">📋</div>
+                <div><div class="whk-card__title">Changelog</div><div class="whk-card__desc">Salon où envoyer les notes de mise à jour manuelles.</div></div>
+              </div>
+              <div class="whk-channel">
+                <div class="whk-disc-badge"><svg viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.014.01.028.021.037a19.953 19.953 0 0 0 5.993 3.03.077.077 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.201 13.201 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg></div>
+                <span class="whk-channel__label">Discord</span>
+                <label class="whk-toggle"><input type="checkbox" id="en-CHANGELOG" onchange="toggleWebhookCard('CHANGELOG')"><span class="whk-toggle-track"></span></label>
+              </div>
+              <div class="whk-expand" id="expand-CHANGELOG">
+                <div class="field"><label>Webhook URL <span style="color:#ff5555;">*</span></label><input type="url" id="url-CHANGELOG" placeholder="https://discord.com/api/webhooks/…"/></div>
+                <div class="field"><label>Message additionnel <span style="color:rgba(255,255,255,.3);font-weight:400;">(optionnel)</span></label><input type="text" id="msg-CHANGELOG" placeholder="@everyone (optionnel)"/></div>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:12px;">
+                  <button class="a-btn a-btn--ghost" style="font-size:12px;padding:5px 12px;" onclick="testWebhookCard('CHANGELOG')">Tester</button>
+                  <span id="test-CHANGELOG" style="font-size:12px;"></span>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /whk-grid -->
+
+          <!-- Bouton save global -->
+          <div style="margin-top:16px;display:flex;align-items:center;gap:12px;max-width:860px;">
+            <button class="a-btn a-btn--primary" onclick="saveWebhooks()">Enregistrer tout</button>
             <span class="save-msg" id="whkSaveMsg"></span>
           </div>
+
           <!-- Changelog manuel -->
-          <div style="margin-top:20px;border-top:1px solid rgba(255,255,255,.07);padding-top:18px;">
-            <div style="font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:10px;">📋 Changelog Manuel</div>
-            <p style="font-size:13px;color:rgba(255,255,255,.35);margin:0 0 12px;">Envoyez une note de mise à jour directement dans votre salon Discord.</p>
-            <textarea id="whkChangelog" rows="3" placeholder="v1.2 — Nouvelle fonctionnalité : système de logs Discord ajouté…" style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:#fff;font-family:inherit;font-size:13px;padding:10px 14px;resize:vertical;outline:none;box-sizing:border-box;"></textarea>
+          <div style="margin-top:24px;border-top:1px solid rgba(255,255,255,.07);padding-top:20px;max-width:860px;">
+            <div style="font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:10px;">📤 Publier un changelog</div>
+            <p style="font-size:13px;color:rgba(255,255,255,.35);margin:0 0 12px;">Envoyez une note de mise à jour dans le salon configuré pour le Changelog ci-dessus.</p>
+            <textarea id="whkChangelog" rows="3" placeholder="v1.2 — Nouvelle fonctionnalité : système de logs Discord avec webhooks par événement…" style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:#fff;font-family:inherit;font-size:13px;padding:10px 14px;resize:vertical;outline:none;box-sizing:border-box;"></textarea>
             <div style="margin-top:10px;display:flex;align-items:center;gap:10px;">
               <button class="a-btn a-btn--ghost" onclick="sendChangelog()">📤 Publier le changelog</button>
               <span id="changelogMsg" style="font-size:13px;color:rgba(255,255,255,.4);"></span>

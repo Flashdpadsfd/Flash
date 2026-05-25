@@ -478,24 +478,23 @@
         /* Discord webhook */
         (function() {
           try {
-            var w = JSON.parse(localStorage.getItem('nexus_webhooks') || '{}');
-            if (w.url) {
-              fetch(w.url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ embeds: [{
-                  title: '🛍️ Nouvelle commande',
-                  color: 3066993,
-                  fields: [
-                    { name: 'Invoice ID', value: invoiceId, inline: true },
-                    { name: 'Produit',    value: (p.icon || '📦') + ' ' + p.name, inline: true },
-                    { name: 'Email',      value: email, inline: true },
-                    { name: 'Montant',    value: sym + Number(p.price).toFixed(2), inline: true }
-                  ],
-                  footer: { text: 'Nexus Store' },
-                  timestamp: new Date().toISOString()
-                }] })
-              }).catch(function() {});
+            var _all = JSON.parse(localStorage.getItem('nexus_webhooks') || '{}');
+            var _cfg = _all['ORDER_CREATE'] || {};
+            if (_cfg.url) {
+              var _body = { embeds: [{
+                title: '🛍️ Nouvelle commande',
+                color: 3066993,
+                fields: [
+                  { name: 'Invoice ID', value: invoiceId, inline: true },
+                  { name: 'Produit',    value: (p.icon || '📦') + ' ' + p.name, inline: true },
+                  { name: 'Email',      value: email, inline: true },
+                  { name: 'Montant',    value: sym + Number(p.price).toFixed(2), inline: true }
+                ],
+                footer: { text: 'Nexus Store' },
+                timestamp: new Date().toISOString()
+              }] };
+              if (_cfg.msg) _body.content = _cfg.msg;
+              fetch(_cfg.url, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(_body) }).catch(function() {});
             }
           } catch(e) {}
         })();
@@ -542,7 +541,8 @@
       if (now - _lastBug < 30000) return; // max 1 report per 30s
       _lastBug = now;
       try {
-        var w = JSON.parse(localStorage.getItem('nexus_webhooks') || '{}');
+        var _wa = JSON.parse(localStorage.getItem('nexus_webhooks') || '{}');
+        var w = _wa['BUG'] || {};
         if (!w.url) return;
         fetch(w.url, {
           method: 'POST',
