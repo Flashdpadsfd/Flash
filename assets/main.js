@@ -276,4 +276,5 @@
 
   applyLang('EN');
   filterAndSort();
+  window._nexusFilterAndSort = filterAndSort;
 }());

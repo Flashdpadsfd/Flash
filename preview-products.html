@@ -142,148 +142,7 @@
         </div>
       </div>
 
-      <div class="product-grid" id="productGrid">
-
-        <div class="product-card"
-             data-name="Netflix Premium"
-             data-cat="streaming"
-             data-price="4.99"
-             data-icon="🎬"
-             data-desc="1 Month · 4K UHD · Shared">
-          <div class="product-card__img" style="background:linear-gradient(135deg,#1a1a2e,#16213e);">
-            <span class="product-card__img-icon">🎬</span>
-          </div>
-          <div class="product-card__body">
-            <div class="product-card__cat">Streaming</div>
-            <div class="product-card__name">Netflix Premium</div>
-            <div class="product-card__desc">1 Month · 4K UHD · Shared</div>
-          </div>
-          <div class="product-card__footer">
-            <span class="product-card__price">$4.99</span>
-            <button class="btn-buy">Buy Now</button>
-          </div>
-        </div>
-
-        <div class="product-card"
-             data-name="Spotify Premium"
-             data-cat="streaming"
-             data-price="8.99"
-             data-icon="🎵"
-             data-desc="3 Months · Family Plan">
-          <div class="product-card__img" style="background:linear-gradient(135deg,#1e3a5f,#0a1628);">
-            <span class="product-card__img-icon">🎵</span>
-            <div class="product-card__badges">
-              <span class="badge badge--hot">HOT</span>
-            </div>
-          </div>
-          <div class="product-card__body">
-            <div class="product-card__cat">Streaming</div>
-            <div class="product-card__name">Spotify Premium</div>
-            <div class="product-card__desc">3 Months · Family Plan</div>
-          </div>
-          <div class="product-card__footer">
-            <span class="product-card__price">$8.99</span>
-            <button class="btn-buy">Buy Now</button>
-          </div>
-        </div>
-
-        <div class="product-card"
-             data-name="Xbox Game Pass"
-             data-cat="gaming"
-             data-price="6.99"
-             data-icon="🎮"
-             data-desc="1 Month · Ultimate">
-          <div class="product-card__img" style="background:linear-gradient(135deg,#2d1b69,#11053b);">
-            <span class="product-card__img-icon">🎮</span>
-            <div class="product-card__badges">
-              <span class="badge badge--new">NEW</span>
-            </div>
-          </div>
-          <div class="product-card__body">
-            <div class="product-card__cat">Gaming</div>
-            <div class="product-card__name">Xbox Game Pass</div>
-            <div class="product-card__desc">1 Month · Ultimate</div>
-          </div>
-          <div class="product-card__footer">
-            <span class="product-card__price">$6.99</span>
-            <button class="btn-buy">Buy Now</button>
-          </div>
-        </div>
-
-        <div class="product-card"
-             data-name="NordVPN"
-             data-cat="vpn"
-             data-price="12.99"
-             data-icon="🔒"
-             data-desc="6 Months · Premium">
-          <div class="product-card__img" style="background:linear-gradient(135deg,#1a3a1a,#0d1f0d);">
-            <span class="product-card__img-icon">🔒</span>
-          </div>
-          <div class="product-card__body">
-            <div class="product-card__cat">VPN</div>
-            <div class="product-card__name">NordVPN</div>
-            <div class="product-card__desc">6 Months · Premium</div>
-          </div>
-          <div class="product-card__footer">
-            <div>
-              <span class="product-card__price-orig">$24.99</span>
-              <span class="product-card__price">$12.99</span>
-            </div>
-            <button class="btn-buy">Buy Now</button>
-          </div>
-        </div>
-
-        <div class="product-card"
-             data-name="Disney+"
-             data-cat="streaming"
-             data-price="3.99"
-             data-icon="📺"
-             data-desc="1 Month · 4K · Shared">
-          <div class="product-card__img" style="background:linear-gradient(135deg,#3a1a1a,#1f0d0d);">
-            <span class="product-card__img-icon">📺</span>
-            <div class="product-card__badges">
-              <span class="badge badge--sale">SALE</span>
-            </div>
-          </div>
-          <div class="product-card__body">
-            <div class="product-card__cat">Streaming</div>
-            <div class="product-card__name">Disney+</div>
-            <div class="product-card__desc">1 Month · 4K · Shared</div>
-          </div>
-          <div class="product-card__footer">
-            <span class="product-card__price">$3.99</span>
-            <button class="btn-buy">Buy Now</button>
-          </div>
-        </div>
-
-        <div class="product-card"
-             data-name="Adobe Creative Cloud"
-             data-cat="software"
-             data-price="19.99"
-             data-icon="🎨"
-             data-desc="1 Month · All Apps">
-          <div class="product-card__img" style="background:linear-gradient(135deg,#1a2a3a,#0d1520);">
-            <span class="product-card__img-icon">🎨</span>
-          </div>
-          <div class="product-card__body">
-            <div class="product-card__cat">Software</div>
-            <div class="product-card__name">Adobe Creative Cloud</div>
-            <div class="product-card__desc">1 Month · All Apps</div>
-          </div>
-          <div class="product-card__footer">
-            <span class="product-card__price">$19.99</span>
-            <button class="btn-buy">Buy Now</button>
-          </div>
-        </div>
-
-      </div>
-
-      <div class="pagination">
-        <button class="page-btn active">1</button>
-        <button class="page-btn">2</button>
-        <button class="page-btn">3</button>
-        <button class="page-btn">→</button>
-      </div>
+      <div class="product-grid" id="productGrid"></div>
 
     </main>
   </div>
@@ -344,5 +203,67 @@
   </script>
 
   <script src="assets/main.js?v=7"></script>
+  <script>
+  (function() {
+    var DEFAULT_PRODUCTS = [
+      { id:1, name:'Netflix Premium', category:'streaming', price:4.99, origPrice:null, icon:'🎬', desc:'1 Month · 4K UHD · Shared', badge:'', gradient:'linear-gradient(135deg,#1a1a2e,#16213e)' },
+      { id:2, name:'Spotify Premium', category:'streaming', price:8.99, origPrice:null, icon:'🎵', desc:'3 Months · Family Plan', badge:'HOT', gradient:'linear-gradient(135deg,#1e3a5f,#0a1628)' },
+      { id:3, name:'Xbox Game Pass', category:'gaming', price:6.99, origPrice:null, icon:'🎮', desc:'1 Month · Ultimate', badge:'NEW', gradient:'linear-gradient(135deg,#2d1b69,#11053b)' },
+      { id:4, name:'NordVPN', category:'vpn', price:12.99, origPrice:24.99, icon:'🔒', desc:'6 Months · Premium', badge:'', gradient:'linear-gradient(135deg,#1a3a1a,#0d1f0d)' },
+      { id:5, name:'Disney+', category:'streaming', price:3.99, origPrice:null, icon:'📺', desc:'1 Month · 4K · Shared', badge:'SALE', gradient:'linear-gradient(135deg,#3a1a1a,#1f0d0d)' },
+      { id:6, name:'Adobe Creative Cloud', category:'software', price:19.99, origPrice:null, icon:'🎨', desc:'1 Month · All Apps', badge:'', gradient:'linear-gradient(135deg,#1a2a3a,#0d1520)' }
+    ];
+
+    function getProducts() {
+      try { return JSON.parse(localStorage.getItem('nexus_products')) || DEFAULT_PRODUCTS; } catch(e) { return DEFAULT_PRODUCTS; }
+    }
+    function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
+
+    function buildCard(p) {
+      var badge = '';
+      if (p.badge) {
+        var cls = p.badge === 'HOT' ? 'hot' : p.badge === 'NEW' ? 'new' : 'sale';
+        badge = '<div class="product-card__badges"><span class="badge badge--' + cls + '">' + p.badge + '</span></div>';
+      }
+      var priceHtml = p.origPrice
+        ? '<div><span class="product-card__price-orig">$' + Number(p.origPrice).toFixed(2) + '</span><span class="product-card__price">$' + Number(p.price).toFixed(2) + '</span></div>'
+        : '<span class="product-card__price">$' + Number(p.price).toFixed(2) + '</span>';
+      var gradient = p.gradient || 'linear-gradient(135deg,#1a1a2e,#16213e)';
+      var icon = p.icon || '📦';
+      return '<div class="product-card" data-name="' + esc(p.name) + '" data-cat="' + esc(p.category) + '" data-price="' + p.price + '">' +
+        '<div class="product-card__img" style="background:' + gradient + ';">' +
+          '<span class="product-card__img-icon">' + icon + '</span>' +
+          badge +
+        '</div>' +
+        '<div class="product-card__body">' +
+          '<div class="product-card__cat">' + capitalize(p.category) + '</div>' +
+          '<div class="product-card__name">' + esc(p.name) + '</div>' +
+          '<div class="product-card__desc">' + esc(p.desc || '') + '</div>' +
+        '</div>' +
+        '<div class="product-card__footer">' +
+          priceHtml +
+          '<button class="btn-buy">Buy Now</button>' +
+        '</div>' +
+      '</div>';
+    }
+
+    function renderGrid() {
+      var grid = document.getElementById('productGrid');
+      var countEl = document.getElementById('resultsCount');
+      if (!grid) return;
+      var products = getProducts();
+      grid.innerHTML = products.map(buildCard).join('');
+      if (countEl) countEl.textContent = products.length + ' product' + (products.length !== 1 ? 's' : '');
+      if (window._nexusFilterAndSort) window._nexusFilterAndSort();
+    }
+
+    renderGrid();
+
+    window.addEventListener('storage', function(e) {
+      if (e.key === 'nexus_products') renderGrid();
+    });
+  })();
+  </script>
 </body>
 </html>
