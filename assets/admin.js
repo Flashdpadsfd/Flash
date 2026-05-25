@@ -12,6 +12,12 @@
     { id: 6, name: 'Adobe Creative Cloud', category: 'software', price: 19.99, origPrice: null, icon: '🎨', desc: '1 Month · All Apps', badge: '', stock: 0, deliverables: [], gradient: 'linear-gradient(135deg,#1a2a3a,#0d1520)' }
   ];
   var DEFAULT_STATS = { rating: '4.96', sold: '4,350', customers: '439' };
+  var DEFAULT_CATEGORIES = [
+    { id: 'streaming', name: 'Streaming', icon: '▶', color: '#e50914' },
+    { id: 'gaming',    name: 'Gaming',    icon: '🎮', color: '#64c864' },
+    { id: 'software',  name: 'Software',  icon: '💻', color: '#6495ed' },
+    { id: 'vpn',       name: 'VPN',       icon: '🔒', color: '#ffa01e' }
+  ];
   var CURRENCY_SYMBOLS = { EUR: '€', USD: '$', GBP: '£' };
 
   /* ── Storage helpers ── */
@@ -25,6 +31,14 @@
   function setStats(s) { localStorage.setItem('nexus_stats', JSON.stringify(s)); }
   function getPass() { return localStorage.getItem('nexus_admin_pass') || DEFAULT_PASS; }
   function setPass(p) { localStorage.setItem('nexus_admin_pass', p); }
+  function getLinks() {
+    try { return JSON.parse(localStorage.getItem('nexus_links')) || {}; } catch(e) { return {}; }
+  }
+  function setLinks(l) { localStorage.setItem('nexus_links', JSON.stringify(l)); }
+  function getCategories() {
+    try { return JSON.parse(localStorage.getItem('nexus_categories')) || DEFAULT_CATEGORIES; } catch(e) { return DEFAULT_CATEGORIES; }
+  }
+  function setCategories(c) { localStorage.setItem('nexus_categories', JSON.stringify(c)); }
 
   /* ── Toast ── */
   function toast(msg) {
@@ -76,7 +90,9 @@
     document.querySelector('[data-page="' + name + '"]').classList.add('active');
     if (name === 'dashboard') renderDashboard();
     if (name === 'products') renderProducts();
+    if (name === 'categories') renderCategories();
     if (name === 'stats') loadStatsForm();
+    if (name === 'links') loadLinksForm();
   };
 
   /* ── Stock helper (supports legacy numeric stock + new deliverables) ── */
@@ -151,8 +167,8 @@
     var p = id ? getProducts().find(function (x) { return x.id === id; }) : null;
     document.getElementById('modalTitle').textContent = p ? 'Modifier le produit' : 'Nouveau produit';
 
+    populateCatSelect(p ? p.category : null);
     document.getElementById('fName').value        = p ? p.name : '';
-    document.getElementById('fCat').value         = p ? p.category : 'streaming';
     document.getElementById('fPrice').value       = p ? p.price : '';
     document.getElementById('fOrigPrice').value   = p && p.origPrice ? p.origPrice : '';
     document.getElementById('fIcon').value        = p ? (p.icon || '') : '';
@@ -391,6 +407,130 @@
     toast('Stats mises à jour ✓');
   };
 
+  /* ── Categories ── */
+  function slugify(name) {
+    return name.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+  }
+
+  function populateCatSelect(currentVal) {
+    var cats = getCategories();
+    var select = document.getElementById('fCat');
+    if (!select) return;
+    select.innerHTML = cats.map(function(c) {
+      return '<option value="' + esc(c.id) + '">' + esc(c.name) + '</option>';
+    }).join('');
+    if (currentVal) select.value = currentVal;
+  }
+
+  function renderCategories() {
+    var cats = getCategories();
+    var tbody = document.getElementById('categoriesTbody');
+    if (!tbody) return;
+    if (!cats.length) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:rgba(255,255,255,.3);padding:24px;">Aucune catégorie.</td></tr>';
+    } else {
+      tbody.innerHTML = cats.map(function(c) {
+        return '<tr>' +
+          '<td style="font-size:18px;">' + (c.icon || '📦') + '</td>' +
+          '<td>' + esc(c.name) + '</td>' +
+          '<td><span style="font-size:12px;color:rgba(255,255,255,.4);font-family:monospace;">' + esc(c.id) + '</span></td>' +
+          '<td><span style="display:inline-flex;align-items:center;gap:6px;"><span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:' + esc(c.color) + ';flex-shrink:0;"></span>' + esc(c.color) + '</span></td>' +
+          '<td><div class="action-group">' +
+            '<button class="a-btn a-btn--icon" onclick="editCategory(\'' + esc(c.id) + '\')" title="Modifier">✏️</button>' +
+            '<button class="a-btn a-btn--icon" onclick="deleteCategory(\'' + esc(c.id) + '\')" style="color:#ff5555;" title="Supprimer">🗑</button>' +
+          '</div></td>' +
+          '</tr>';
+      }).join('');
+    }
+    cancelEditCategory();
+    populateCatSelect();
+  }
+
+  window.editCategory = function(id) {
+    var c = getCategories().find(function(x) { return x.id === id; });
+    if (!c) return;
+    document.getElementById('catEditId').value   = id;
+    document.getElementById('catName').value     = c.name;
+    document.getElementById('catIcon').value     = c.icon || '';
+    document.getElementById('catColor').value    = c.color || '#6495ed';
+    var btn = document.getElementById('catSubmitBtn');
+    btn.innerHTML = '<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg> Modifier';
+    document.getElementById('catCancelBtn').style.display = '';
+    document.getElementById('catSaveMsg').textContent = '';
+    document.getElementById('catName').focus();
+  };
+
+  window.cancelEditCategory = function() {
+    document.getElementById('catEditId').value = '';
+    document.getElementById('catName').value   = '';
+    document.getElementById('catIcon').value   = '';
+    document.getElementById('catColor').value  = '#6495ed';
+    var btn = document.getElementById('catSubmitBtn');
+    if (btn) btn.innerHTML = '<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Ajouter';
+    var cancel = document.getElementById('catCancelBtn');
+    if (cancel) cancel.style.display = 'none';
+    var msg = document.getElementById('catSaveMsg');
+    if (msg) msg.textContent = '';
+  };
+
+  window.saveCategory = function() {
+    var name    = document.getElementById('catName').value.trim();
+    var msg     = document.getElementById('catSaveMsg');
+    var editId  = document.getElementById('catEditId').value;
+    if (!name) { toast('Nom requis.'); return; }
+    var cats = getCategories();
+    var updated = { icon: document.getElementById('catIcon').value.trim() || '📦', color: document.getElementById('catColor').value, name: name };
+    if (editId) {
+      var idx = cats.findIndex(function(c) { return c.id === editId; });
+      if (idx !== -1) { cats[idx] = Object.assign({}, cats[idx], updated); }
+      setCategories(cats);
+      renderCategories();
+      msg.textContent = 'Catégorie modifiée ✓'; msg.style.color = '#3cc864';
+      toast('Catégorie modifiée ✓');
+    } else {
+      var slug = slugify(name);
+      if (!slug) { msg.textContent = 'Nom invalide.'; msg.style.color = '#ff5555'; return; }
+      if (cats.find(function(c) { return c.id === slug; })) {
+        msg.textContent = 'Cette catégorie existe déjà.'; msg.style.color = '#ff5555'; return;
+      }
+      cats.push(Object.assign({ id: slug }, updated));
+      setCategories(cats);
+      renderCategories();
+      msg.textContent = 'Catégorie ajoutée ✓'; msg.style.color = '#3cc864';
+      toast('Catégorie ajoutée ✓');
+    }
+  };
+
+  window.deleteCategory = function(id) {
+    if (!confirm('Supprimer cette catégorie ? Les produits associés garderont leur slug.')) return;
+    setCategories(getCategories().filter(function(c) { return c.id !== id; }));
+    renderCategories();
+    toast('Catégorie supprimée.');
+  };
+
+  /* ── Links ── */
+  function loadLinksForm() {
+    var l = getLinks();
+    document.getElementById('linkDiscord').value  = l.discord  || '';
+    document.getElementById('linkTelegram').value = l.telegram || '';
+    document.getElementById('linkTos').value      = l.tos      || '';
+    document.getElementById('linkPrivacy').value  = l.privacy  || '';
+    document.getElementById('linkFeedback').value = l.feedback || '';
+    document.getElementById('linksSaveMsg').textContent = '';
+  }
+
+  window.saveLinks = function () {
+    setLinks({
+      discord:  document.getElementById('linkDiscord').value.trim(),
+      telegram: document.getElementById('linkTelegram').value.trim(),
+      tos:      document.getElementById('linkTos').value.trim(),
+      privacy:  document.getElementById('linkPrivacy').value.trim(),
+      feedback: document.getElementById('linkFeedback').value.trim()
+    });
+    document.getElementById('linksSaveMsg').textContent = 'Liens enregistrés ✓';
+    toast('Liens mis à jour ✓');
+  };
+
   /* ── Settings ── */
   window.changePassword = function () {
     var np  = document.getElementById('newPass').value;
@@ -409,6 +549,8 @@
     if (!confirm('Supprimer tous les produits et réinitialiser les stats ?')) return;
     localStorage.removeItem('nexus_products');
     localStorage.removeItem('nexus_stats');
+    localStorage.removeItem('nexus_links');
+    localStorage.removeItem('nexus_categories');
     toast('Données réinitialisées.');
     renderProducts();
     loadStatsForm();
@@ -434,6 +576,7 @@
   /* ── Init ── */
   function init() {
     renderDashboard();
+    populateCatSelect();
     initModalPickers();
   }
 

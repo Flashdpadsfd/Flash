@@ -20,7 +20,7 @@
       <ul class="nav__links" id="navLinks">
         <li><a href="preview.html" class="active" data-i18n="nav.home">Home</a></li>
         <li><a href="preview-products.html" data-i18n="nav.shop">Products</a></li>
-        <li><a href="#" data-i18n="nav.reviews">Feedback</a></li>
+        <li><a href="#" data-i18n="nav.reviews" data-link="feedback">Feedback</a></li>
       </ul>
 
       <div class="nav__actions">
@@ -72,7 +72,7 @@
     <ul class="drawer__links">
       <li><a href="preview.html" class="drawer-link active" data-i18n="nav.home">Home</a></li>
       <li><a href="preview-products.html" class="drawer-link" data-i18n="nav.shop">Shop</a></li>
-      <li><a href="#" class="drawer-link" data-i18n="nav.reviews">Reviews</a></li>
+      <li><a href="#" class="drawer-link" data-i18n="nav.reviews" data-link="feedback">Reviews</a></li>
     </ul>
     <div style="margin-top:auto;padding-top:32px;display:flex;flex-direction:column;gap:8px;">
       <button class="btn-primary btn-primary--lg" style="width:100%;border-radius:6px;" data-i18n="nav.login">Sign In</button>
@@ -92,7 +92,7 @@
       <p class="hero__sub" data-i18n="hero.sub">Paying full price for a streaming service you use three times a week is a bad deal. We sell the same thing for less, no catch.</p>
       <div class="hero__cta">
         <a href="preview-products.html" class="btn-primary btn-primary--lg" data-i18n="hero.cta1">Explore Products</a>
-        <a href="#" class="btn-pill" data-i18n="hero.cta2">Join Discord →</a>
+        <a href="#" class="btn-pill" data-i18n="hero.cta2" data-link="discord">Join Discord →</a>
       </div>
     </div>
   </section>
@@ -132,22 +132,22 @@
           <ul class="footer__col-links">
             <li><a href="preview.html" data-i18n="footer.home">Home</a></li>
             <li><a href="preview-products.html" data-i18n="footer.products">Products</a></li>
-            <li><a href="#" data-i18n="footer.feedback">Feedback</a></li>
+            <li><a href="#" data-i18n="footer.feedback" data-link="feedback">Feedback</a></li>
           </ul>
         </div>
 
         <div>
           <div class="footer__col-title" data-i18n="footer.legal">Legal</div>
           <ul class="footer__col-links">
-            <li><a href="#" data-i18n="footer.tos">Terms of Service</a></li>
+            <li><a href="#" data-i18n="footer.tos" data-link="tos">Terms of Service</a></li>
           </ul>
         </div>
 
         <div>
           <div class="footer__col-title" data-i18n="footer.socials">Socials</div>
           <ul class="footer__col-links">
-            <li><a href="#">Discord</a></li>
-            <li><a href="#">Telegram</a></li>
+            <li><a href="#" data-link="discord">Discord</a></li>
+            <li><a href="#" data-link="telegram">Telegram</a></li>
           </ul>
         </div>
 
@@ -155,9 +155,9 @@
       <div class="footer__bottom">
         <div class="footer__copy" data-i18n="footer.copy">© 2026 Nexus. All rights reserved.</div>
         <div style="display:flex;gap:16px;align-items:center;">
-          <a href="#" data-i18n="footer.terms" style="font-size:13px;color:rgba(255,255,255,.35);transition:color 200ms ease;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.35)'">Terms</a>
+          <a href="#" data-i18n="footer.terms" data-link="tos" style="font-size:13px;color:rgba(255,255,255,.35);transition:color 200ms ease;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.35)'">Terms</a>
           <span style="color:rgba(255,255,255,.15);font-size:13px;">/</span>
-          <a href="#" data-i18n="footer.privacy" style="font-size:13px;color:rgba(255,255,255,.35);transition:color 200ms ease;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.35)'">Privacy</a>
+          <a href="#" data-i18n="footer.privacy" data-link="privacy" style="font-size:13px;color:rgba(255,255,255,.35);transition:color 200ms ease;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.35)'">Privacy</a>
         </div>
       </div>
     </div>
@@ -219,6 +219,21 @@
   </script>
 
   <script src="assets/main.js?v=7"></script>
+  <script>
+  (function() {
+    function applyLinks(l) {
+      if (!l) return;
+      document.querySelectorAll('[data-link]').forEach(function(el) {
+        var key = el.getAttribute('data-link');
+        if (l[key]) el.href = l[key];
+      });
+    }
+    try { applyLinks(JSON.parse(localStorage.getItem('nexus_links'))); } catch(e) {}
+    window.addEventListener('storage', function(e) {
+      if (e.key === 'nexus_links') { try { applyLinks(JSON.parse(e.newValue)); } catch(e) {} }
+    });
+  })();
+  </script>
   <script>
   (function() {
     function applyStats(s) {
