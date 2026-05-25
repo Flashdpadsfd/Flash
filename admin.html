@@ -49,6 +49,10 @@
           <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
           Avis
         </a>
+        <a class="sidebar__link" data-page="content" onclick="showPage('content')">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          Contenu
+        </a>
         <a class="sidebar__link" data-page="stats" onclick="showPage('stats')">
           <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
           Statistiques
@@ -197,6 +201,107 @@
             <tbody id="reviewsTbody"></tbody>
           </table>
         </div>
+      </div>
+
+      <!-- ─── CONTENU ─── -->
+      <div class="page" id="page-content">
+        <div class="page-header">
+          <h1>Éditeur de contenu</h1>
+          <div style="display:flex;gap:8px;">
+            <a href="preview.html" target="_blank" class="a-btn a-btn--ghost" style="font-size:12px;gap:5px;">
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              Accueil
+            </a>
+            <a href="preview-products.html" target="_blank" class="a-btn a-btn--ghost" style="font-size:12px;gap:5px;">
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              Produits
+            </a>
+            <a href="preview-feedback.html" target="_blank" class="a-btn a-btn--ghost" style="font-size:12px;gap:5px;">
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              Avis
+            </a>
+          </div>
+        </div>
+
+        <!-- Site global -->
+        <div class="stats-editor" style="margin-bottom:20px;">
+          <div class="section-title" style="margin-bottom:16px;">🌐 Site global</div>
+          <div class="field">
+            <label>Nom du site <span class="f-optional">(logo nav, drawer, footer)</span></label>
+            <input type="text" id="cSiteName" placeholder="Nexus" />
+          </div>
+          <div class="field">
+            <label>Description footer <span class="f-optional">(HTML accepté : &lt;br&gt; pour saut de ligne)</span></label>
+            <textarea id="cFooterDesc" rows="2" placeholder="Premium streaming accounts,&#10;delivered instantly." style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:#fff;font-family:inherit;font-size:14px;padding:10px 14px;resize:vertical;outline:none;box-sizing:border-box;"></textarea>
+          </div>
+          <div class="field" style="margin-bottom:0;">
+            <label>Copyright</label>
+            <input type="text" id="cFooterCopy" placeholder="© 2026 Nexus. All rights reserved." />
+          </div>
+        </div>
+
+        <!-- Page Accueil -->
+        <div class="stats-editor" style="margin-bottom:20px;">
+          <div class="section-title" style="margin-bottom:16px;">🏠 Page Accueil</div>
+          <div class="field">
+            <label>Texte accroche <span class="f-optional">(petite étiquette au-dessus du titre)</span></label>
+            <input type="text" id="cHomeEyebrow" placeholder="Digital Products Store" />
+          </div>
+          <div class="field">
+            <label>Titre <span class="f-optional">(HTML accepté : &lt;br&gt; pour saut de ligne)</span></label>
+            <input type="text" id="cHomeTitle" placeholder="Premium. Curated.&lt;br&gt;Digital." />
+          </div>
+          <div class="field">
+            <label>Sous-titre</label>
+            <textarea id="cHomeSub" rows="3" placeholder="Paying full price for a streaming service..." style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:#fff;font-family:inherit;font-size:14px;padding:10px 14px;resize:vertical;outline:none;box-sizing:border-box;"></textarea>
+          </div>
+          <div class="form-row">
+            <div class="field" style="margin-bottom:0;">
+              <label>Bouton principal</label>
+              <input type="text" id="cHomeCta1" placeholder="Explore Products" />
+            </div>
+            <div class="field" style="margin-bottom:0;">
+              <label>Bouton secondaire</label>
+              <input type="text" id="cHomeCta2" placeholder="Join Discord →" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Page Produits -->
+        <div class="stats-editor" style="margin-bottom:20px;">
+          <div class="section-title" style="margin-bottom:16px;">🛍 Page Produits</div>
+          <div class="field" style="margin-bottom:0;">
+            <label>Titre de la boutique</label>
+            <input type="text" id="cProductsTitle" placeholder="All Products" />
+          </div>
+        </div>
+
+        <!-- Page Avis -->
+        <div class="stats-editor" style="margin-bottom:20px;">
+          <div class="section-title" style="margin-bottom:16px;">⭐ Page Avis</div>
+          <div class="field">
+            <label>Texte accroche</label>
+            <input type="text" id="cReviewsEyebrow" placeholder="Verified Customers" />
+          </div>
+          <div class="field">
+            <label>Titre</label>
+            <input type="text" id="cReviewsTitle" placeholder="What Our Customers Say" />
+          </div>
+          <div class="field">
+            <label>Sous-titre</label>
+            <textarea id="cReviewsSub" rows="2" placeholder="Real reviews from real customers..." style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:#fff;font-family:inherit;font-size:14px;padding:10px 14px;resize:vertical;outline:none;box-sizing:border-box;"></textarea>
+          </div>
+          <div class="field" style="margin-bottom:0;">
+            <label>Note affichée <span class="f-optional">(ex: 4.96 — visible dans le résumé)</span></label>
+            <input type="text" id="cReviewsRating" placeholder="4.96" />
+          </div>
+        </div>
+
+        <button class="a-btn a-btn--primary" onclick="saveContent()">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Enregistrer tout
+        </button>
+        <div class="save-msg" id="contentSaveMsg" style="margin-top:12px;"></div>
       </div>
 
       <!-- ─── STATS ─── -->

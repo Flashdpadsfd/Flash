@@ -32,6 +32,21 @@
     { id: 'software',  name: 'Software',  icon: '💻', color: '#6495ed' },
     { id: 'vpn',       name: 'VPN',       icon: '🔒', color: '#ffa01e' }
   ];
+  var DEFAULT_CONTENT = {
+    siteName:       'Nexus',
+    homeEyebrow:    'Digital Products Store',
+    homeTitle:      'Premium. Curated.<br>Digital.',
+    homeSub:        'Paying full price for a streaming service you use three times a week is a bad deal. We sell the same thing for less, no catch.',
+    homeCta1:       'Explore Products',
+    homeCta2:       'Join Discord →',
+    productsTitle:  'All Products',
+    reviewsEyebrow: 'Verified Customers',
+    reviewsTitle:   'What Our Customers Say',
+    reviewsSub:     'Real reviews from real customers. Every review below is verified and 5-star rated.',
+    reviewsRating:  '4.96',
+    footerDesc:     'Premium streaming accounts,<br>delivered instantly.',
+    footerCopy:     '© 2026 Nexus. All rights reserved.'
+  };
   var CURRENCY_SYMBOLS = { EUR: '€', USD: '$', GBP: '£' };
 
   /* ── Storage helpers ── */
@@ -58,6 +73,11 @@
     try { return JSON.parse(localStorage.getItem('nexus_categories')) || DEFAULT_CATEGORIES; } catch(e) { return DEFAULT_CATEGORIES; }
   }
   function setCategories(c) { localStorage.setItem('nexus_categories', JSON.stringify(c)); }
+
+  function getContent() {
+    try { return Object.assign({}, DEFAULT_CONTENT, JSON.parse(localStorage.getItem('nexus_content') || '{}')); } catch(e) { return DEFAULT_CONTENT; }
+  }
+  function setContent(c) { localStorage.setItem('nexus_content', JSON.stringify(c)); }
 
   /* ── Toast ── */
   function toast(msg) {
@@ -111,6 +131,7 @@
     if (name === 'products') renderProducts();
     if (name === 'categories') renderCategories();
     if (name === 'reviews') renderReviews();
+    if (name === 'content') loadContentForm();
     if (name === 'stats') loadStatsForm();
     if (name === 'links') loadLinksForm();
   };
@@ -643,6 +664,49 @@
     toast('Avis supprimé.');
   };
 
+  /* ── Content editor ── */
+  function loadContentForm() {
+    var c = getContent();
+    document.getElementById('cSiteName').value      = c.siteName      || '';
+    document.getElementById('cFooterDesc').value    = c.footerDesc    || '';
+    document.getElementById('cFooterCopy').value    = c.footerCopy    || '';
+    document.getElementById('cHomeEyebrow').value   = c.homeEyebrow   || '';
+    document.getElementById('cHomeTitle').value     = c.homeTitle     || '';
+    document.getElementById('cHomeSub').value       = c.homeSub       || '';
+    document.getElementById('cHomeCta1').value      = c.homeCta1      || '';
+    document.getElementById('cHomeCta2').value      = c.homeCta2      || '';
+    document.getElementById('cProductsTitle').value = c.productsTitle || '';
+    document.getElementById('cReviewsEyebrow').value = c.reviewsEyebrow || '';
+    document.getElementById('cReviewsTitle').value  = c.reviewsTitle  || '';
+    document.getElementById('cReviewsSub').value    = c.reviewsSub    || '';
+    document.getElementById('cReviewsRating').value = c.reviewsRating || '';
+    document.getElementById('contentSaveMsg').textContent = '';
+  }
+
+  window.saveContent = function() {
+    var c = {
+      siteName:       document.getElementById('cSiteName').value.trim(),
+      footerDesc:     document.getElementById('cFooterDesc').value.trim(),
+      footerCopy:     document.getElementById('cFooterCopy').value.trim(),
+      homeEyebrow:    document.getElementById('cHomeEyebrow').value.trim(),
+      homeTitle:      document.getElementById('cHomeTitle').value.trim(),
+      homeSub:        document.getElementById('cHomeSub').value.trim(),
+      homeCta1:       document.getElementById('cHomeCta1').value.trim(),
+      homeCta2:       document.getElementById('cHomeCta2').value.trim(),
+      productsTitle:  document.getElementById('cProductsTitle').value.trim(),
+      reviewsEyebrow: document.getElementById('cReviewsEyebrow').value.trim(),
+      reviewsTitle:   document.getElementById('cReviewsTitle').value.trim(),
+      reviewsSub:     document.getElementById('cReviewsSub').value.trim(),
+      reviewsRating:  document.getElementById('cReviewsRating').value.trim()
+    };
+    /* Remove empty keys so defaults still show for unset fields */
+    Object.keys(c).forEach(function(k) { if (!c[k]) delete c[k]; });
+    setContent(c);
+    var msg = document.getElementById('contentSaveMsg');
+    msg.textContent = 'Contenu enregistré ✓'; msg.style.color = '#3cc864';
+    toast('Contenu mis à jour ✓');
+  };
+
   /* ── Links ── */
   function loadLinksForm() {
     var l = getLinks();
@@ -687,6 +751,7 @@
     localStorage.removeItem('nexus_links');
     localStorage.removeItem('nexus_categories');
     localStorage.removeItem('nexus_reviews');
+    localStorage.removeItem('nexus_content');
     toast('Données réinitialisées.');
     renderProducts();
     loadStatsForm();
