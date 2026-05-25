@@ -7,24 +7,20 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Lancelot&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/style.css?v=10" />
+  <link rel="stylesheet" href="assets/style.css?v=11" />
 </head>
 <body>
 
   <!-- ─── NAVIGATION ─── -->
   <nav class="nav" id="navbar">
     <div class="nav__inner">
-
       <a href="preview.html" class="nav__logo">Nexus</a>
-
       <ul class="nav__links" id="navLinks">
         <li><a href="preview.html" data-i18n="nav.home">Home</a></li>
         <li><a href="preview-products.html" class="active" data-i18n="nav.shop">Products</a></li>
         <li><a href="preview-feedback.html" data-i18n="nav.reviews">Reviews</a></li>
       </ul>
-
       <div class="nav__actions">
-
         <button class="nav__lang" id="langToggle" aria-label="Language">
           <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="opacity:.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>
           <span id="langLabel">EN</span>
@@ -39,23 +35,19 @@
             <div class="lang-option" data-lang="AR">🇸🇦 العربية</div>
           </div>
         </button>
-
         <button class="nav__login" data-i18n="nav.login">
           <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           Sign In
         </button>
-
         <div class="nav__cart-wrap">
           <button class="btn-icon" id="cartBtn" aria-label="Cart" onclick="window._openCart && window._openCart()">
             <svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
           </button>
           <span class="nav__cart-count" id="cartCount">0</span>
         </div>
-
         <button class="btn-icon nav__hamburger" id="hamburger" aria-label="Menu">
           <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
-
       </div>
     </div>
   </nav>
@@ -81,114 +73,107 @@
   </div>
 
   <!-- ─── PAGE ─── -->
-  <div class="pd-page">
+  <div class="pdv3-page">
 
-    <!-- Breadcrumb -->
-    <nav class="pd-breadcrumb-bar">
-      <a href="preview.html">Home</a>
-      <span class="pd-breadcrumb-bar__sep">›</span>
-      <a href="preview-products.html" id="pdBreadCat">Products</a>
-      <span class="pd-breadcrumb-bar__sep">›</span>
-      <span class="pd-breadcrumb-bar__cur" id="pdBreadName">Product</span>
-    </nav>
+    <!-- ── HERO BANNER ── -->
+    <div class="pdv3-hero">
+      <div class="pdv3-hero__bg-text" id="pdHeroBgText"></div>
+      <div class="pdv3-hero__inner">
+        <div class="pdv3-hero__icon" id="pdHeroIcon">📦</div>
+      </div>
+      <div class="pdv3-hero__pills">
+        <span class="pdv3-pill">
+          <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          Instant Digital Delivery
+        </span>
+        <span class="pdv3-pill">
+          <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>
+          Global
+        </span>
+        <span class="pdv3-pill" id="pdHeroCatPill">📦 Digital</span>
+      </div>
+    </div>
 
-    <!-- Three-col layout -->
-    <div class="pd-three-col">
+    <!-- ── TWO-COL BODY ── -->
+    <div class="pdv3-body">
 
-      <!-- ── Left: Category sidebar ── -->
-      <aside class="pd-cat-nav">
-        <div class="pd-cat-nav__hdr">Categories</div>
-        <div id="pdCatList"></div>
-      </aside>
+      <!-- ── MAIN CONTENT ── -->
+      <main class="pdv3-main">
 
-      <!-- ── Center: Main content ── -->
-      <main class="pd-main">
-
-        <!-- Product header card -->
-        <div class="pd-header-card">
-          <div class="pd-header-card__img" id="pdHeaderIcon">📦</div>
-          <div class="pd-header-card__body">
-            <div class="pd-header-card__badges">
-              <span class="pd-stock" id="pdStock">IN STOCK</span>
-              <span class="pd-rating-badge" id="pdRating"></span>
+        <!-- Product name + price header -->
+        <div class="pdv3-product-hdr">
+          <div class="pdv3-product-hdr__left">
+            <div class="pdv3-badges">
+              <span class="pdv3-badge-stock" id="pdStock">IN STOCK</span>
+              <span class="pdv3-badge-rating" id="pdRating" style="display:none;"></span>
             </div>
-            <h1 class="pd-header-card__name" id="pdName">Loading…</h1>
-            <div class="pd-header-card__short-desc" id="pdShortDesc"></div>
-            <div class="pd-header-card__price-row">
-              <span class="pd-header-card__orig" id="pdOrigPrice" style="display:none;"></span>
-              <span class="pd-header-card__price" id="pdPrice">—</span>
-              <span class="pd-header-card__per">per unit</span>
-            </div>
+            <h1 class="pdv3-name" id="pdName">Loading…</h1>
+          </div>
+          <div class="pdv3-product-hdr__right">
+            <div class="pdv3-per-each">PER EACH</div>
+            <div class="pdv3-price" id="pdPrice">—</div>
           </div>
         </div>
+
+        <div class="pdv3-sep"></div>
 
         <!-- Description -->
-        <div class="pd-section">
-          <div class="pd-section__hdr">Description</div>
-          <div class="pd-section__body" id="pdDesc">—</div>
+        <div>
+          <div class="pdv3-shdr">Description</div>
+          <div class="pdv3-desc-card" id="pdDesc">—</div>
         </div>
 
-        <!-- Specs -->
-        <div class="pd-section">
-          <div class="pd-specs">
-            <div class="pd-spec-col">
-              <div class="pd-spec-col__title">Product Details</div>
-              <div id="pdSpecsLeft"></div>
-            </div>
-            <div class="pd-spec-col">
-              <div class="pd-spec-col__title">Service Info</div>
-              <div id="pdSpecsRight"></div>
-            </div>
+        <!-- Specs + Service Guarantee -->
+        <div class="pdv3-specs-wrap">
+          <div class="pdv3-specs-col">
+            <div class="pdv3-shdr">System Specs</div>
+            <div id="pdSpecsLeft"></div>
           </div>
-        </div>
-
-        <!-- Volume pricing -->
-        <div class="pd-section">
-          <div class="pd-section__hdr">Volume Pricing</div>
-          <div id="pdVolTiers"></div>
-        </div>
-
-        <!-- Guarantee badges -->
-        <div class="pd-section">
-          <div class="pd-section__hdr">What's Included</div>
-          <div class="pd-section__body">
-            <div class="pd-guarantee-badges">
-              <div class="pd-guarantee-badge">
-                <span class="pd-guarantee-badge__icon">⚡</span>
-                <div class="pd-guarantee-badge__title">Instant Delivery</div>
-                <div class="pd-guarantee-badge__desc">Receive your product immediately after payment</div>
+          <div class="pdv3-guarantee-col">
+            <div class="pdv3-shdr">Service Guarantee</div>
+            <div class="pdv3-guarantee-grid">
+              <div class="pdv3-gcard">
+                <div class="pdv3-gcard__icon">
+                  <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                </div>
+                <div class="pdv3-gcard__title">Instant Delivery</div>
+                <div class="pdv3-gcard__desc">Immediate access</div>
               </div>
-              <div class="pd-guarantee-badge">
-                <span class="pd-guarantee-badge__icon">🔒</span>
-                <div class="pd-guarantee-badge__title">Secure Checkout</div>
-                <div class="pd-guarantee-badge__desc">SSL encrypted. Your data is fully protected</div>
+              <div class="pdv3-gcard">
+                <div class="pdv3-gcard__icon">
+                  <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                </div>
+                <div class="pdv3-gcard__title">Secure</div>
+                <div class="pdv3-gcard__desc">Encrypted checkout</div>
               </div>
-              <div class="pd-guarantee-badge">
-                <span class="pd-guarantee-badge__icon">✅</span>
-                <div class="pd-guarantee-badge__title">Working Guarantee</div>
-                <div class="pd-guarantee-badge__desc">Every product is tested before delivery</div>
+              <div class="pdv3-gcard">
+                <div class="pdv3-gcard__icon">
+                  <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                </div>
+                <div class="pdv3-gcard__title">24/7 Support</div>
+                <div class="pdv3-gcard__desc">Via Discord</div>
               </div>
-              <div class="pd-guarantee-badge">
-                <span class="pd-guarantee-badge__icon">💬</span>
-                <div class="pd-guarantee-badge__title">24/7 Support</div>
-                <div class="pd-guarantee-badge__desc">Discord &amp; Telegram, anytime you need help</div>
+              <div class="pdv3-gcard">
+                <div class="pdv3-gcard__icon">
+                  <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+                </div>
+                <div class="pdv3-gcard__title">Replacement</div>
+                <div class="pdv3-gcard__desc">If invalid</div>
               </div>
             </div>
           </div>
         </div>
 
         <!-- Customer Reviews -->
-        <div class="pd-section">
-          <div class="pd-section__hdr">Customer Reviews</div>
-          <div class="pd-section__body">
-            <div id="pdReviewsSummary" class="pd-rev-summary" style="display:none;">
-              <div class="pd-rev-stars" id="pdRevStars">★★★★★</div>
-              <div class="pd-rev-score" id="pdRevScore">5.0</div>
-              <div class="pd-rev-count" id="pdRevCount">(0 reviews)</div>
-            </div>
-            <div id="pdReviewsList">
-              <div style="color:rgba(255,255,255,.32);font-size:13px;padding:4px 0;">No reviews yet for this product.</div>
-            </div>
+        <div>
+          <div class="pdv3-shdr">Customer Reviews</div>
+          <div id="pdReviewsSummary" class="pd-rev-summary" style="display:none;">
+            <div class="pd-rev-stars" id="pdRevStars">★★★★★</div>
+            <div class="pd-rev-score" id="pdRevScore">5.0</div>
+            <div class="pd-rev-count" id="pdRevCount">(0 reviews)</div>
+          </div>
+          <div id="pdReviewsList">
+            <div style="color:rgba(255,255,255,.32);font-size:13px;padding:4px 0;">No reviews yet for this product.</div>
           </div>
         </div>
 
@@ -199,64 +184,69 @@
 
       </main>
 
-      <!-- ── Right: Checkout sidebar ── -->
-      <aside>
-        <div class="pd-checkout">
+      <!-- ── RIGHT SIDEBAR ── -->
+      <aside class="pdv3-sidebar">
 
-          <div class="pd-checkout__hdr">Complete Your Order</div>
+        <div class="pdv3-sidebar__hdr">PRODUCT DETAILS</div>
 
-          <div class="pd-checkout__product">
-            <div class="pd-checkout__thumb" id="pdSideThumb">📦</div>
-            <div class="pd-checkout__prod-info">
-              <div class="pd-checkout__prod-name" id="pdSideName">—</div>
-              <div class="pd-checkout__prod-desc" id="pdSideDesc"></div>
-            </div>
-            <div class="pd-checkout__prod-price" id="pdSidePrice">—</div>
+        <!-- Product card -->
+        <div class="pdv3-side-product">
+          <div class="pdv3-side-thumb" id="pdSideThumb">📦</div>
+          <div class="pdv3-side-info">
+            <div class="pdv3-side-name" id="pdSideName">—</div>
+            <div class="pdv3-side-qty-txt">Quantity: <span id="pdQtyDisplay">1</span></div>
           </div>
-
-          <div class="pd-checkout__summary">
-            <div class="pd-sum-row">
-              <span class="pd-sum-row__k">Subtotal</span>
-              <span class="pd-sum-row__v" id="pdSubtotal">—</span>
-            </div>
-            <div class="pd-sum-row">
-              <span class="pd-sum-row__k">Tax</span>
-              <span class="pd-sum-row__v">€0.00</span>
-            </div>
-            <div class="pd-sum-row pd-sum-row--total">
-              <span class="pd-sum-row__k">Total</span>
-              <span class="pd-sum-row__v" id="pdTotal">—</span>
-            </div>
-          </div>
-
-          <div class="pd-checkout__secure">
-            <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            Secure checkout · SSL 256-bit encryption
-          </div>
-
-          <!-- Volume discount indicator -->
-          <div id="pdDiscBadge" style="display:none;margin:0 20px 0;padding:8px 12px;border-radius:8px;background:rgba(60,200,100,.08);border:1px solid rgba(60,200,100,.18);font-size:12px;color:#3cc864;font-weight:600;text-align:center;"></div>
-
-          <div class="pd-checkout__qty">
-            <span class="pd-checkout__qty-lbl">Quantity</span>
-            <div class="pd-qty-ctrl">
-              <button class="pd-qty-btn" id="pdQtyMinus">−</button>
-              <div class="pd-qty-val" id="pdQtyVal">1</div>
-              <button class="pd-qty-btn" id="pdQtyPlus">+</button>
-            </div>
-          </div>
-
-          <div class="pd-checkout__actions">
-            <button class="pd-btn-buynow" id="pdBuyNow">
-              Buy Now — <span id="pdBuyPrice">—</span>
-            </button>
-            <button class="pd-btn-cart" id="pdAddCart">
-              <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-              Add to Cart
-            </button>
-          </div>
-
+          <div class="pdv3-side-price" id="pdSidePrice">—</div>
         </div>
+
+        <div class="pdv3-sep" style="margin:0 20px;"></div>
+
+        <!-- Subtotal / Tax / Total -->
+        <div class="pdv3-sum-rows">
+          <div class="pdv3-sum-row"><span>Subtotal</span><span id="pdSubtotal">—</span></div>
+          <div class="pdv3-sum-row"><span>Tax</span><span>$0.00</span></div>
+          <div class="pdv3-sum-row pdv3-sum-row--total"><span>Total</span><span id="pdTotal">—</span></div>
+        </div>
+
+        <!-- Secure badge -->
+        <div style="padding:0 20px 16px;">
+          <div class="pdv3-secure-badge">
+            <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="flex-shrink:0;opacity:.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Secure checkout with 256-bit SSL encryption
+          </div>
+        </div>
+
+        <div class="pdv3-sep" style="margin:0 20px;"></div>
+
+        <!-- Volume pricing -->
+        <div class="pdv3-vol-section">
+          <div class="pdv3-vol-hdr">VOLUME PRICING</div>
+          <div class="pdv3-vol-pills" id="pdVolPills"></div>
+          <div class="pdv3-vol-progress">
+            <div class="pdv3-vol-progress-fill" id="pdVolFill" style="width:0%"></div>
+          </div>
+          <div class="pdv3-vol-hint" id="pdVolHint"></div>
+        </div>
+
+        <!-- Quantity -->
+        <div class="pdv3-qty-section">
+          <div class="pdv3-qty-lbl">QUANTITY</div>
+          <div class="pdv3-qty-ctrl">
+            <button class="pdv3-qty-btn" id="pdQtyMinus">−</button>
+            <div class="pdv3-qty-val" id="pdQtyVal">1</div>
+            <button class="pdv3-qty-btn" id="pdQtyPlus">+</button>
+          </div>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="pdv3-side-actions">
+          <button class="pdv3-btn-cart" id="pdAddCart">
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+            Add to Cart
+          </button>
+          <button class="pdv3-btn-checkout" id="pdBuyNow">Checkout Now</button>
+        </div>
+
       </aside>
 
     </div>
@@ -313,7 +303,7 @@
   })();
   </script>
 
-  <script src="assets/main.js?v=10"></script>
+  <script src="assets/main.js?v=11"></script>
 
   <!-- ─── PRODUCT DETAIL SCRIPT ─── -->
   <script>
@@ -334,22 +324,16 @@
     var SYM = { EUR:'€', USD:'$', GBP:'£' };
 
     var TIERS = [
-      { min: 1,   max: 9,   disc: 0,    label: '1 – 9 units' },
-      { min: 10,  max: 24,  disc: 0.05, label: '10 – 24 units' },
-      { min: 25,  max: 49,  disc: 0.10, label: '25 – 49 units' },
-      { min: 50,  max: 99,  disc: 0.20, label: '50 – 99 units' },
-      { min: 100, max: null, disc: 0.30, label: '100+ units' }
+      { min: 1,    max: 9,    disc: 0 },
+      { min: 10,   max: 29,   disc: 0.05 },
+      { min: 30,   max: 249,  disc: 0.10 },
+      { min: 250,  max: 499,  disc: 0.15 },
+      { min: 500,  max: 999,  disc: 0.25 },
+      { min: 1000, max: null, disc: 0.50 }
     ];
 
-    function getActiveTier(qty) {
-      var active = TIERS[0];
-      for (var i = TIERS.length - 1; i >= 0; i--) {
-        if (qty >= TIERS[i].min) { active = TIERS[i]; break; }
-      }
-      return active;
-    }
-
     var CAT_ICONS = { streaming:'🎬', gaming:'🎮', vpn:'🔒', software:'💻', music:'🎵', other:'📦' };
+    var CAT_LABELS = { streaming:'Streaming', gaming:'Gaming', vpn:'VPN', software:'Software', music:'Music', other:'Digital' };
 
     var params = new URLSearchParams(window.location.search);
     var pid = parseInt(params.get('id') || '0', 10);
@@ -362,35 +346,17 @@
 
     document.title = 'Nexus — ' + p.name;
 
-    /* ── Category sidebar ── */
-    var cats = {};
-    allProds.forEach(function(prod) {
-      var cat = prod.category || 'other';
-      cats[cat] = (cats[cat] || 0) + 1;
-    });
-    var catListEl = document.getElementById('pdCatList');
-    if (catListEl) {
-      catListEl.innerHTML = Object.keys(cats).map(function(cat) {
-        var isActive = cat === (p.category || 'other');
-        return '<a href="preview-products.html?cat=' + esc(cat) + '" class="pd-cat-item' + (isActive ? ' active' : '') + '">' +
-          '<div class="pd-cat-item__left">' +
-            '<span class="pd-cat-item__icon">' + (CAT_ICONS[cat] || '📦') + '</span>' +
-            '<span>' + esc(cap(cat)) + '</span>' +
-          '</div>' +
-          '<span class="pd-cat-item__count">' + cats[cat] + '</span>' +
-        '</a>';
-      }).join('');
-    }
-
-    /* ── Breadcrumb ── */
-    document.getElementById('pdBreadCat').textContent = cap(p.category || 'Products');
-    document.getElementById('pdBreadName').textContent = p.name;
+    /* ── Hero ── */
+    document.getElementById('pdHeroBgText').textContent = p.name;
+    document.getElementById('pdHeroIcon').textContent = p.icon || '📦';
+    var catKey = p.category || 'other';
+    document.getElementById('pdHeroCatPill').textContent = (CAT_ICONS[catKey] || '📦') + ' ' + (CAT_LABELS[catKey] || cap(catKey));
 
     /* ── Stock ── */
     var avail = (p.deliverables || []).length || (p.stock || 0);
     var stockEl = document.getElementById('pdStock');
     if (avail > 0) {
-      stockEl.textContent = 'IN STOCK · ' + avail + ' available';
+      stockEl.innerHTML = 'IN STOCK <span style="opacity:.6;font-weight:500;">(' + avail + ' available)</span>';
     } else {
       stockEl.textContent = 'OUT OF STOCK';
       stockEl.classList.add('out');
@@ -400,57 +366,125 @@
     var allReviews = [];
     try { allReviews = JSON.parse(localStorage.getItem('nexus_reviews')) || []; } catch(e) {}
     var pr = allReviews.filter(function(r) { return r.productId === pid; });
+    var ratingEl = document.getElementById('pdRating');
     if (pr.length) {
       var avg = pr.reduce(function(s,r){ return s + (r.rating || 5); }, 0) / pr.length;
-      document.getElementById('pdRating').textContent = '⭐ ' + avg.toFixed(1) + ' (' + pr.length + ' review' + (pr.length !== 1 ? 's' : '') + ')';
+      ratingEl.textContent = '★ ' + avg.toFixed(1) + ' (' + pr.length + ')';
+      ratingEl.style.display = '';
     }
 
-    /* ── Header card ── */
-    document.getElementById('pdHeaderIcon').textContent = p.icon || '📦';
+    /* ── Name + price ── */
     document.getElementById('pdName').textContent = p.name;
-    document.getElementById('pdShortDesc').textContent = p.desc ? p.desc.split('·')[0].trim() : '';
     document.getElementById('pdPrice').textContent = sym + Number(p.price).toFixed(2);
-    if (p.origPrice) {
-      var origEl = document.getElementById('pdOrigPrice');
-      origEl.textContent = sym + Number(p.origPrice).toFixed(2);
-      origEl.style.display = '';
-    }
 
     /* ── Description ── */
     document.getElementById('pdDesc').innerHTML = esc(p.desc || 'No description available.').replace(/\n/g, '<br>');
 
-    /* ── Specs ── */
-    var specsL = [
-      { k: 'Category', v: cap(p.category || 'Digital') },
-      { k: 'Delivery',  v: 'Instant Digital' },
-      { k: 'Format',    v: 'Digital Account' },
-      { k: 'Stock',     v: avail > 0 ? avail + ' units' : 'Out of stock' }
+    /* ── System specs ── */
+    var specsData = [
+      { icon: '<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 10h16M4 14h16M4 18h7"/></svg>', k: 'Category', v: cap(catKey), green: false },
+      { icon: '<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>', k: 'Delivery Method', v: 'Instant Digital Delivery', green: false },
+      { icon: '<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20"/></svg>', k: 'Region', v: 'Global', green: false },
+      { icon: '<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>', k: 'Stock', v: avail > 0 ? 'In Stock (' + avail + ' available)' : 'Out of Stock', green: avail > 0 }
     ];
-    var specsR = [
-      { k: 'Guarantee', v: 'On Delivery' },
-      { k: 'Support',   v: 'Discord / Telegram' },
-      { k: 'Delivery',  v: 'Automated' },
-      { k: 'Refund',    v: 'On valid issues' }
-    ];
-    function renderSpecs(id, specs) {
-      document.getElementById(id).innerHTML = specs.map(function(s) {
-        return '<div class="pd-spec-row"><span class="pd-spec-key">' + esc(s.k) + '</span><span class="pd-spec-val">' + esc(String(s.v)) + '</span></div>';
-      }).join('');
-    }
-    renderSpecs('pdSpecsLeft', specsL);
-    renderSpecs('pdSpecsRight', specsR);
-
-    /* ── Volume pricing tiers ── */
-    document.getElementById('pdVolTiers').innerHTML = TIERS.map(function(tier) {
-      var tierPrice = p.price * (1 - tier.disc);
-      return '<div class="pd-vol__row' + (tier.disc === 0 ? ' pd-vol__row--base' : '') + '" data-min="' + tier.min + '">' +
-        '<span class="pd-vol__row__qty">' + tier.label + '</span>' +
-        '<span class="pd-vol__row__price">' + sym + tierPrice.toFixed(2) + ' each</span>' +
-        (tier.disc > 0 ? '<span class="pd-vol__row__disc">-' + (tier.disc * 100) + '%</span>' : '<span style="margin-left:10px;font-size:11px;color:rgba(255,255,255,.25);">Base</span>') +
+    document.getElementById('pdSpecsLeft').innerHTML = specsData.map(function(s) {
+      return '<div class="pdv3-spec-row">' +
+        '<span class="pdv3-spec-key">' + s.icon + esc(s.k) + '</span>' +
+        '<span class="pdv3-spec-val' + (s.green ? ' pdv3-spec-val--green' : '') + '">' + esc(String(s.v)) + '</span>' +
       '</div>';
     }).join('');
 
-    /* ── Reviews section ── */
+    /* ── Sidebar product thumb ── */
+    document.getElementById('pdSideThumb').textContent = p.icon || '📦';
+    document.getElementById('pdSideName').textContent = p.name;
+
+    /* ── Volume pricing pills ── */
+    var discTiers = TIERS.filter(function(t) { return t.disc > 0; });
+    document.getElementById('pdVolPills').innerHTML = discTiers.map(function(t) {
+      return '<div class="pdv3-vol-pill" data-min="' + t.min + '">' +
+        '<span class="pdv3-vol-pill__disc">' + Math.round(t.disc * 100) + '%</span>' +
+        '<span class="pdv3-vol-pill__min">' + t.min + '+</span>' +
+      '</div>';
+    }).join('');
+
+    /* ── Qty + summary ── */
+    function getActiveTier(q) {
+      var active = TIERS[0];
+      for (var i = TIERS.length - 1; i >= 0; i--) {
+        if (q >= TIERS[i].min) { active = TIERS[i]; break; }
+      }
+      return active;
+    }
+
+    function updateSummary() {
+      var tier = getActiveTier(qty);
+      var unitPrice = p.price * (1 - tier.disc);
+      var sub = unitPrice * qty;
+
+      document.getElementById('pdQtyVal').textContent = qty;
+      document.getElementById('pdQtyDisplay').textContent = qty;
+      document.getElementById('pdSidePrice').textContent = sym + unitPrice.toFixed(2);
+      document.getElementById('pdSubtotal').textContent = sym + sub.toFixed(2);
+      document.getElementById('pdTotal').textContent = sym + sub.toFixed(2);
+
+      /* Pills active state */
+      document.querySelectorAll('.pdv3-vol-pill').forEach(function(pill) {
+        pill.classList.toggle('pdv3-vol-pill--active', qty >= parseInt(pill.getAttribute('data-min'), 10));
+      });
+
+      /* Progress bar */
+      var tierIdx = TIERS.indexOf(tier);
+      var nextTier = tierIdx + 1 < TIERS.length ? TIERS[tierIdx + 1] : null;
+      var fill = 0, hint = '';
+      if (!nextTier) {
+        fill = 100;
+        hint = 'Maximum volume discount applied!';
+      } else {
+        var range = nextTier.min - tier.min;
+        fill = Math.min(99, Math.round(((qty - tier.min) / range) * 100));
+        var need = nextTier.min - qty;
+        hint = 'Buy ' + need + ' more to unlock ' + Math.round(nextTier.disc * 100) + '% off';
+      }
+      document.getElementById('pdVolFill').style.width = fill + '%';
+      document.getElementById('pdVolHint').textContent = hint;
+    }
+
+    updateSummary();
+
+    document.getElementById('pdQtyMinus').addEventListener('click', function() {
+      if (qty > 1) { qty--; updateSummary(); }
+    });
+    document.getElementById('pdQtyPlus').addEventListener('click', function() {
+      if (qty < 9999) { qty++; updateSummary(); }
+    });
+
+    /* ── Buy Now ── */
+    var buyBtn = document.getElementById('pdBuyNow');
+    if (avail <= 0) {
+      buyBtn.disabled = true;
+      buyBtn.textContent = 'Out of Stock';
+    }
+    buyBtn.addEventListener('click', function() {
+      if (window._nexusOpenCheckout) window._nexusOpenCheckout(pid);
+    });
+
+    /* ── Add to Cart ── */
+    var cartBtn2 = document.getElementById('pdAddCart');
+    if (avail <= 0) cartBtn2.disabled = true;
+    cartBtn2.addEventListener('click', function() {
+      var cart = [];
+      try { cart = JSON.parse(localStorage.getItem('nexus_cart')) || []; } catch(e) {}
+      var ex = cart.find(function(i){ return i.id === pid; });
+      if (ex) { ex.qty += qty; } else {
+        cart.push({ id: pid, name: p.name, icon: p.icon || '📦', price: p.price, currency: p.currency || 'EUR', qty: qty });
+      }
+      localStorage.setItem('nexus_cart', JSON.stringify(cart));
+      if (window._nexusUpdateCartCount) window._nexusUpdateCartCount();
+      if (window._nexusToast) window._nexusToast('Added to cart!', '🛒');
+      if (window._openCart) window._openCart();
+    });
+
+    /* ── Reviews ── */
     if (pr.length) {
       var avg2 = pr.reduce(function(s,r){ return s + (r.rating || 5); }, 0) / pr.length;
       var fullStars = Math.round(avg2);
@@ -479,89 +513,10 @@
       }).join('');
     }
 
-    /* ── Sidebar ── */
-    document.getElementById('pdSideThumb').textContent = p.icon || '📦';
-    document.getElementById('pdSideName').textContent = p.name;
-    document.getElementById('pdSideDesc').textContent = p.desc ? p.desc.split('·')[0].trim() : '';
-
-    /* ── Qty + summary with volume discount ── */
-    function updateSummary() {
-      var tier = getActiveTier(qty);
-      var unitPrice = p.price * (1 - tier.disc);
-      var sub = unitPrice * qty;
-
-      document.getElementById('pdQtyVal').textContent = qty;
-      document.getElementById('pdSidePrice').textContent = sym + unitPrice.toFixed(2);
-      document.getElementById('pdSubtotal').textContent = sym + sub.toFixed(2);
-      document.getElementById('pdTotal').textContent = sym + sub.toFixed(2);
-      var bp = document.getElementById('pdBuyPrice');
-      if (bp) bp.textContent = sym + sub.toFixed(2);
-
-      /* Highlight active tier row */
-      document.querySelectorAll('.pd-vol__row').forEach(function(row) {
-        row.classList.remove('pd-vol__row--active');
-        if (parseInt(row.getAttribute('data-min'), 10) === tier.min) {
-          row.classList.add('pd-vol__row--active');
-        }
-      });
-
-      /* Discount badge in sidebar */
-      var discBadge = document.getElementById('pdDiscBadge');
-      if (tier.disc > 0) {
-        discBadge.textContent = '🎉 ' + (tier.disc * 100) + '% volume discount applied!';
-        discBadge.style.display = '';
-        discBadge.style.marginBottom = '0';
-        discBadge.style.marginTop = '12px';
-      } else {
-        discBadge.style.display = 'none';
-      }
-    }
-    updateSummary();
-
-    document.getElementById('pdQtyMinus').addEventListener('click', function() {
-      if (qty > 1) { qty--; updateSummary(); }
-    });
-    document.getElementById('pdQtyPlus').addEventListener('click', function() {
-      if (qty < 999) { qty++; updateSummary(); }
-    });
-
-    /* ── Buy Now ── */
-    var buyBtn = document.getElementById('pdBuyNow');
-    if (avail <= 0) {
-      buyBtn.disabled = true;
-      buyBtn.textContent = 'Out of Stock';
-    }
-    buyBtn.addEventListener('click', function() {
-      if (window._nexusOpenCheckout) window._nexusOpenCheckout(pid);
-    });
-
-    /* ── Add to Cart ── */
-    document.getElementById('pdAddCart').addEventListener('click', function() {
-      var cart = [];
-      try { cart = JSON.parse(localStorage.getItem('nexus_cart')) || []; } catch(e) {}
-      var ex = cart.find(function(i){ return i.id === pid; });
-      if (ex) { ex.qty += qty; } else {
-        cart.push({ id: pid, name: p.name, icon: p.icon || '📦', price: p.price, currency: p.currency || 'EUR', qty: qty });
-      }
-      localStorage.setItem('nexus_cart', JSON.stringify(cart));
-      if (window._nexusUpdateCartCount) window._nexusUpdateCartCount();
-      if (window._nexusToast) window._nexusToast('Added to cart!', '🛒');
-      if (window._openCart) window._openCart();
-    });
-
     /* ── Apply site name ── */
     try {
       var c = JSON.parse(localStorage.getItem('nexus_content')) || {};
       if (c.siteName) document.querySelectorAll('.nav__logo,.drawer__logo').forEach(function(el){ el.textContent = c.siteName; });
-    } catch(e) {}
-
-    /* ── Apply links ── */
-    try {
-      var l = JSON.parse(localStorage.getItem('nexus_links')) || {};
-      document.querySelectorAll('[data-link]').forEach(function(el) {
-        var key = el.getAttribute('data-link');
-        if (l[key]) el.href = l[key];
-      });
     } catch(e) {}
 
   })();
