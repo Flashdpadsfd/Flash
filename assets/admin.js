@@ -99,23 +99,23 @@
   }
 
   function discordLog(type, data) {
-    var w = getWebhooks();
-    if (!w.url) return;
+    var url = getWebhooks().url;
+    if (!url) return;
     var d = data || {};
     var sym = CURRENCY_SYMBOLS[d.currency] || '€';
     var stock = d.deliverables ? d.deliverables.length : (d.stock || 0);
     var pLabel = (d.icon || '📦') + ' ' + (d.name || '—');
-    var embed = null;
-    if      (type === 'PRODUCT_ADD'    && w.onProductAdd)    embed = { title:'📦 Produit ajouté',    color:0x22c55e, fields:[{name:'Produit',value:pLabel,inline:true},{name:'Prix',value:sym+Number(d.price||0).toFixed(2),inline:true},{name:'Catégorie',value:d.category||'—',inline:true}] };
-    else if (type === 'PRODUCT_UPDATE' && w.onProductUpdate) embed = { title:'✏️ Produit modifié',  color:0x3b82f6, fields:[{name:'Produit',value:pLabel,inline:true},{name:'Prix',value:sym+Number(d.price||0).toFixed(2),inline:true},{name:'Stock',value:String(stock)+' unités',inline:true}] };
-    else if (type === 'PRODUCT_DELETE' && w.onProductDelete) embed = { title:'🗑️ Produit supprimé', color:0xef4444, fields:[{name:'Produit',value:pLabel,inline:true},{name:'ID',value:String(d.id||'—'),inline:true}] };
-    else if (type === 'STOCK_UPDATE'   && w.onStockUpdate)   embed = { title:'📊 Stock mis à jour',  color:0x0ea5e9, fields:[{name:'Produit',value:pLabel,inline:true},{name:'Nouveau stock',value:String(stock)+' unités',inline:true},{name:'Mode',value:d.mode==='add'?'Ajout':'Remplacement',inline:true}] };
-    else if (type === 'LOW_STOCK'      && w.onLowStock)      embed = { title:'⚠️ Stock faible',      color:0xf97316, fields:[{name:'Produit',value:pLabel,inline:true},{name:'Stock restant',value:String(stock)+' unités',inline:true}] };
-    else if (type === 'ADMIN_LOGIN'    && w.onAdminLogin)    embed = { title:'🔐 Connexion admin',   color:0x6366f1, description:'Une session admin a été ouverte.', fields:[{name:'Heure',value:new Date().toLocaleString('fr-FR'),inline:true}] };
-    if (!embed) return;
+    var embed;
+    if      (type === 'PRODUCT_ADD')    embed = { title:'📦 Produit ajouté',    color:0x22c55e, fields:[{name:'Produit',value:pLabel,inline:true},{name:'Prix',value:sym+Number(d.price||0).toFixed(2),inline:true},{name:'Catégorie',value:d.category||'—',inline:true}] };
+    else if (type === 'PRODUCT_UPDATE') embed = { title:'✏️ Produit modifié',  color:0x3b82f6, fields:[{name:'Produit',value:pLabel,inline:true},{name:'Prix',value:sym+Number(d.price||0).toFixed(2),inline:true},{name:'Stock',value:String(stock)+' unités',inline:true}] };
+    else if (type === 'PRODUCT_DELETE') embed = { title:'🗑️ Produit supprimé', color:0xef4444, fields:[{name:'Produit',value:pLabel,inline:true},{name:'ID',value:String(d.id||'—'),inline:true}] };
+    else if (type === 'STOCK_UPDATE')   embed = { title:'📊 Stock mis à jour',  color:0x0ea5e9, fields:[{name:'Produit',value:pLabel,inline:true},{name:'Nouveau stock',value:String(stock)+' unités',inline:true},{name:'Mode',value:d.mode==='add'?'Ajout':'Remplacement',inline:true}] };
+    else if (type === 'LOW_STOCK')      embed = { title:'⚠️ Stock faible',      color:0xf97316, fields:[{name:'Produit',value:pLabel,inline:true},{name:'Stock restant',value:String(stock)+' unités',inline:true}] };
+    else if (type === 'ADMIN_LOGIN')    embed = { title:'🔐 Connexion admin',   color:0x6366f1, description:'Une session admin a été ouverte.', fields:[{name:'Heure',value:new Date().toLocaleString('fr-FR'),inline:true}] };
+    else return;
     embed.footer = { text:'Nexus Store' };
     embed.timestamp = new Date().toISOString();
-    sendDiscordWebhook(w.url, embed);
+    sendDiscordWebhook(url, embed);
   }
 
   /* ── Toast ── */
@@ -780,36 +780,16 @@
   /* ── Webhooks ── */
   function loadWebhooksForm() {
     var w = getWebhooks();
-    document.getElementById('whkUrl').value             = w.url             || '';
-    document.getElementById('whkOnOrder').checked        = !!w.onOrder;
-    document.getElementById('whkOnRefund').checked       = !!w.onRefund;
-    document.getElementById('whkOnProductAdd').checked   = !!w.onProductAdd;
-    document.getElementById('whkOnProductUpdate').checked= !!w.onProductUpdate;
-    document.getElementById('whkOnProductDelete').checked= !!w.onProductDelete;
-    document.getElementById('whkOnStockUpdate').checked  = !!w.onStockUpdate;
-    document.getElementById('whkOnLowStock').checked     = !!w.onLowStock;
-    document.getElementById('whkOnAdminLogin').checked   = !!w.onAdminLogin;
-    document.getElementById('whkOnBug').checked          = !!w.onBug;
+    document.getElementById('whkUrl').value = w.url || '';
     document.getElementById('whkSaveMsg').textContent = '';
     document.getElementById('changelogMsg').textContent = '';
   }
 
   window.saveWebhooks = function() {
-    setWebhooks({
-      url:             document.getElementById('whkUrl').value.trim(),
-      onOrder:         document.getElementById('whkOnOrder').checked,
-      onRefund:        document.getElementById('whkOnRefund').checked,
-      onProductAdd:    document.getElementById('whkOnProductAdd').checked,
-      onProductUpdate: document.getElementById('whkOnProductUpdate').checked,
-      onProductDelete: document.getElementById('whkOnProductDelete').checked,
-      onStockUpdate:   document.getElementById('whkOnStockUpdate').checked,
-      onLowStock:      document.getElementById('whkOnLowStock').checked,
-      onAdminLogin:    document.getElementById('whkOnAdminLogin').checked,
-      onBug:           document.getElementById('whkOnBug').checked
-    });
+    setWebhooks({ url: document.getElementById('whkUrl').value.trim() });
     var msg = document.getElementById('whkSaveMsg');
     msg.textContent = 'Enregistré ✓'; msg.style.color = '#3cc864';
-    toast('Webhooks Discord enregistrés ✓');
+    toast('Webhook Discord enregistré ✓');
   };
 
   window.sendChangelog = function() {
@@ -907,7 +887,7 @@
     setOrders(orders);
     renderOrders(document.getElementById('ordersSearch').value);
     var w = getWebhooks();
-    if (w.url && w.onRefund) {
+    if (w.url) {
       var sym = CURRENCY_SYMBOLS[o.currency] || '€';
       sendDiscordWebhook(w.url, {
         title: '↩️ Remboursement effectué',

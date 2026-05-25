@@ -394,57 +394,28 @@
 
         <!-- Webhooks Discord -->
         <div class="stats-editor" style="margin-bottom:20px;">
-          <div class="section-title" style="margin-bottom:6px;">🔔 Webhooks Discord</div>
+          <div class="section-title" style="margin-bottom:6px;">🔔 Webhook Discord</div>
           <p style="font-size:13px;color:rgba(255,255,255,.4);margin:0 0 18px;line-height:1.65;">
-            Recevez une notification dans un salon Discord à chaque événement choisi.<br>
+            Collez votre URL de webhook — tous les événements lui seront envoyés automatiquement.<br>
             Créez un webhook : <strong style="color:rgba(255,255,255,.6);">Paramètres serveur → Intégrations → Webhooks → Créer un webhook</strong>.
           </p>
           <div class="field">
             <label>URL du Webhook Discord</label>
             <input type="url" id="whkUrl" placeholder="https://discord.com/api/webhooks/…" />
           </div>
-          <div class="field" style="margin-bottom:0;">
-            <label>Déclencher pour</label>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 28px;margin-top:8px;">
-              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:400;color:rgba(255,255,255,.7);">
-                <input type="checkbox" id="whkOnOrder" style="accent-color:#3b82f6;width:15px;height:15px;" />
-                🛍️ Nouvelle commande
-              </label>
-              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:400;color:rgba(255,255,255,.7);">
-                <input type="checkbox" id="whkOnRefund" style="accent-color:#3b82f6;width:15px;height:15px;" />
-                ↩️ Remboursement
-              </label>
-              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:400;color:rgba(255,255,255,.7);">
-                <input type="checkbox" id="whkOnProductAdd" style="accent-color:#3b82f6;width:15px;height:15px;" />
-                📦 Produit ajouté
-              </label>
-              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:400;color:rgba(255,255,255,.7);">
-                <input type="checkbox" id="whkOnProductUpdate" style="accent-color:#3b82f6;width:15px;height:15px;" />
-                ✏️ Produit modifié
-              </label>
-              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:400;color:rgba(255,255,255,.7);">
-                <input type="checkbox" id="whkOnProductDelete" style="accent-color:#3b82f6;width:15px;height:15px;" />
-                🗑️ Produit supprimé
-              </label>
-              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:400;color:rgba(255,255,255,.7);">
-                <input type="checkbox" id="whkOnStockUpdate" style="accent-color:#3b82f6;width:15px;height:15px;" />
-                📊 Mise à jour stock
-              </label>
-              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:400;color:rgba(255,255,255,.7);">
-                <input type="checkbox" id="whkOnLowStock" style="accent-color:#3b82f6;width:15px;height:15px;" />
-                ⚠️ Stock faible (&lt;5)
-              </label>
-              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:400;color:rgba(255,255,255,.7);">
-                <input type="checkbox" id="whkOnAdminLogin" style="accent-color:#3b82f6;width:15px;height:15px;" />
-                🔐 Connexion admin
-              </label>
-              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:400;color:rgba(255,255,255,.7);">
-                <input type="checkbox" id="whkOnBug" style="accent-color:#3b82f6;width:15px;height:15px;" />
-                🐛 Erreurs JavaScript
-              </label>
-            </div>
+          <!-- Events hint (read-only display) -->
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;">
+            <span style="font-size:11px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:3px 10px;color:rgba(255,255,255,.45);">🛍️ Commande</span>
+            <span style="font-size:11px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:3px 10px;color:rgba(255,255,255,.45);">↩️ Remboursement</span>
+            <span style="font-size:11px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:3px 10px;color:rgba(255,255,255,.45);">📦 Produit ajouté</span>
+            <span style="font-size:11px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:3px 10px;color:rgba(255,255,255,.45);">✏️ Produit modifié</span>
+            <span style="font-size:11px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:3px 10px;color:rgba(255,255,255,.45);">🗑️ Produit supprimé</span>
+            <span style="font-size:11px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:3px 10px;color:rgba(255,255,255,.45);">📊 Stock</span>
+            <span style="font-size:11px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:3px 10px;color:rgba(255,255,255,.45);">⚠️ Stock faible</span>
+            <span style="font-size:11px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:3px 10px;color:rgba(255,255,255,.45);">🔐 Login admin</span>
+            <span style="font-size:11px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:3px 10px;color:rgba(255,255,255,.45);">🐛 Erreurs JS</span>
           </div>
-          <div style="margin-top:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
             <button class="a-btn a-btn--primary" onclick="saveWebhooks()">Enregistrer</button>
             <button class="a-btn a-btn--ghost" onclick="testWebhook()">Envoyer un test</button>
             <span class="save-msg" id="whkSaveMsg"></span>

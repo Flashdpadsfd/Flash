@@ -479,7 +479,7 @@
         (function() {
           try {
             var w = JSON.parse(localStorage.getItem('nexus_webhooks') || '{}');
-            if (w.url && w.onOrder) {
+            if (w.url) {
               fetch(w.url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -543,7 +543,7 @@
       _lastBug = now;
       try {
         var w = JSON.parse(localStorage.getItem('nexus_webhooks') || '{}');
-        if (!w.url || !w.onBug) return;
+        if (!w.url) return;
         fetch(w.url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
