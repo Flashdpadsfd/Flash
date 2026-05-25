@@ -130,6 +130,7 @@
       'hero.title':'Premium. Curated.<br>Digital.',
       'hero.sub':'Paying full price for a streaming service you use three times a week is a bad deal. We sell the same thing for less, no catch.',
       'hero.cta1':'Explore Products','hero.cta2':'Join Discord →',
+      'stats.rating':'Avg. Rating','stats.sold':'Products Sold','stats.customers':'Total Customers',
       'footer.desc':'Premium streaming accounts,<br>delivered instantly.',
       'footer.nav':'Navigation','footer.home':'Home','footer.products':'Products','footer.feedback':'Feedback',
       'footer.legal':'Legal','footer.tos':'Terms of Service',
@@ -144,8 +145,9 @@
       'hero.title':'Premium. Soigné.<br>Digital.',
       'hero.sub':'Payer plein tarif pour un service de streaming que vous utilisez trois fois par semaine est une mauvaise affaire. Nous vendons la même chose moins cher, sans prise de tête.',
       'hero.cta1':'Explorer les produits','hero.cta2':'Rejoindre Discord →',
+      'stats.rating':'Note Moyenne','stats.sold':'Produits Vendus','stats.customers':'Clients Totaux',
       'footer.desc':'Comptes streaming premium,<br>livrés instantanément.',
-      'footer.nav':'Navigation','footer.home':'Accueil','footer.products':'Produits','footer.feedback':'Retours',
+      'footer.nav':'Navigation','footer.home':'Accueil','footer.products':'Produits','footer.feedback':'Avis',
       'footer.legal':'Légal','footer.tos':'Conditions d\'utilisation',
       'footer.socials':'Réseaux sociaux',
       'footer.copy':'© 2026 Nexus. Tous droits réservés.',
@@ -158,8 +160,9 @@
       'hero.title':'Premium. Curado.<br>Digital.',
       'hero.sub':'Pagar el precio completo por un servicio de streaming que usas tres veces por semana es un mal trato. Vendemos lo mismo por menos, sin trampa.',
       'hero.cta1':'Explorar productos','hero.cta2':'Unirse a Discord →',
+      'stats.rating':'Valoración Media','stats.sold':'Productos Vendidos','stats.customers':'Clientes Totales',
       'footer.desc':'Cuentas de streaming premium,<br>entregadas al instante.',
-      'footer.nav':'Navegación','footer.home':'Inicio','footer.products':'Productos','footer.feedback':'Opiniones',
+      'footer.nav':'Navegación','footer.home':'Inicio','footer.products':'Productos','footer.feedback':'Reseñas',
       'footer.legal':'Legal','footer.tos':'Términos de servicio',
       'footer.socials':'Redes sociales',
       'footer.copy':'© 2026 Nexus. Todos los derechos reservados.',
@@ -172,8 +175,9 @@
       'hero.title':'Premium. Kuratiert.<br>Digital.',
       'hero.sub':'Den vollen Preis für einen Streaming-Dienst zu zahlen, den du dreimal pro Woche nutzt, ist kein guter Deal. Wir verkaufen dasselbe für weniger – ohne Haken.',
       'hero.cta1':'Produkte erkunden','hero.cta2':'Discord beitreten →',
+      'stats.rating':'Ø Bewertung','stats.sold':'Verkaufte Produkte','stats.customers':'Kunden gesamt',
       'footer.desc':'Premium-Streaming-Konten,<br>sofort geliefert.',
-      'footer.nav':'Navigation','footer.home':'Startseite','footer.products':'Produkte','footer.feedback':'Feedback',
+      'footer.nav':'Navigation','footer.home':'Startseite','footer.products':'Produkte','footer.feedback':'Bewertungen',
       'footer.legal':'Rechtliches','footer.tos':'Nutzungsbedingungen',
       'footer.socials':'Soziale Netzwerke',
       'footer.copy':'© 2026 Nexus. Alle Rechte vorbehalten.',
@@ -186,8 +190,9 @@
       'hero.title':'Premium. Curato.<br>Digitale.',
       'hero.sub':'Pagare il prezzo pieno per un servizio di streaming che usi tre volte a settimana è un cattivo affare. Vendiamo la stessa cosa a meno, senza trucchi.',
       'hero.cta1':'Esplora prodotti','hero.cta2':'Unisciti a Discord →',
+      'stats.rating':'Voto Medio','stats.sold':'Prodotti Venduti','stats.customers':'Clienti Totali',
       'footer.desc':'Account streaming premium,<br>consegnati istantaneamente.',
-      'footer.nav':'Navigazione','footer.home':'Home','footer.products':'Prodotti','footer.feedback':'Feedback',
+      'footer.nav':'Navigazione','footer.home':'Home','footer.products':'Prodotti','footer.feedback':'Recensioni',
       'footer.legal':'Legale','footer.tos':'Termini di servizio',
       'footer.socials':'Social',
       'footer.copy':'© 2026 Nexus. Tutti i diritti riservati.',
@@ -200,8 +205,9 @@
       'hero.title':'Premium. Curado.<br>Digital.',
       'hero.sub':'Pagar o preço cheio por um serviço de streaming que você usa três vezes por semana é um mau negócio. Vendemos a mesma coisa por menos, sem pegadinhas.',
       'hero.cta1':'Explorar produtos','hero.cta2':'Entrar no Discord →',
+      'stats.rating':'Avaliação Média','stats.sold':'Produtos Vendidos','stats.customers':'Clientes Totais',
       'footer.desc':'Contas de streaming premium,<br>entregues instantaneamente.',
-      'footer.nav':'Navegação','footer.home':'Início','footer.products':'Produtos','footer.feedback':'Feedback',
+      'footer.nav':'Navegação','footer.home':'Início','footer.products':'Produtos','footer.feedback':'Avaliações',
       'footer.legal':'Legal','footer.tos':'Termos de serviço',
       'footer.socials':'Redes sociais',
       'footer.copy':'© 2026 Nexus. Todos os direitos reservados.',
@@ -214,8 +220,9 @@
       'hero.title':'متميز. منتقى.<br>رقمي.',
       'hero.sub':'دفع السعر الكامل لخدمة بث تستخدمها ثلاث مرات في الأسبوع أمر غير مجدٍ. نحن نبيع نفس الشيء بأقل، بدون أي مقابل خفي.',
       'hero.cta1':'استكشف المنتجات','hero.cta2':'انضم إلى Discord →',
+      'stats.rating':'متوسط التقييم','stats.sold':'المنتجات المباعة','stats.customers':'إجمالي العملاء',
       'footer.desc':'حسابات بث متميزة،<br>تُسلَّم فوراً.',
-      'footer.nav':'التنقل','footer.home':'الرئيسية','footer.products':'المنتجات','footer.feedback':'التعليقات',
+      'footer.nav':'التنقل','footer.home':'الرئيسية','footer.products':'المنتجات','footer.feedback':'التقييمات',
       'footer.legal':'القانوني','footer.tos':'شروط الخدمة',
       'footer.socials':'التواصل الاجتماعي',
       'footer.copy':'© 2026 Nexus. جميع الحقوق محفوظة.',
@@ -240,6 +247,7 @@
         if (ll) ll.textContent = lang;
         ld.querySelectorAll('.lang-option').forEach(function (o) { o.classList[o === opt ? 'add' : 'remove']('selected'); });
         ld.classList.remove('open');
+        try { localStorage.setItem('nexus_lang', lang); } catch(e2) {}
         applyLang(lang);
       });
     });
@@ -262,7 +270,17 @@
     });
   });
 
-  applyLang('EN');
+  /* Restore saved language on every page load */
+  (function () {
+    var saved = 'EN';
+    try { saved = localStorage.getItem('nexus_lang') || 'EN'; } catch(e) {}
+    if (!TRANSLATIONS[saved]) saved = 'EN';
+    if (ll) ll.textContent = saved;
+    if (ld) ld.querySelectorAll('.lang-option').forEach(function (o) {
+      o.classList[o.dataset.lang === saved ? 'add' : 'remove']('selected');
+    });
+    applyLang(saved);
+  })();
   filterAndSort();
   window._nexusFilterAndSort = filterAndSort;
 
