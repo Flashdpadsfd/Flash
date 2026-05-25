@@ -44,11 +44,12 @@
       var card = btn.closest('.product-card');
       if (!card) return;
       var productId = parseInt(card.dataset.productId || '0', 10);
-      var variantId = parseInt(card.dataset.variantId || '0', 10);
+      if (window._nexusOpenCheckout) { window._nexusOpenCheckout(productId); return; }
       if (!window.sellAuthEmbed) {
         console.warn('[Nexus] sellauth-embed-2.js not loaded — check your SHOP_ID and script tag');
         return;
       }
+      var variantId = parseInt(card.dataset.variantId || '0', 10);
       window.sellAuthEmbed.checkout(btn, {
         cart: [{ productId: productId, variantId: variantId, quantity: 1 }],
         shopId: window.NEXUS_SHOP_ID || 0,
@@ -277,4 +278,181 @@
   applyLang('EN');
   filterAndSort();
   window._nexusFilterAndSort = filterAndSort;
+
+  /* ─── Invoice / Checkout system ─── */
+  (function () {
+    var SYM = { EUR: '€', USD: '$', GBP: '£' };
+    function escH(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    function generateId() {
+      var c = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', id = 'NX-';
+      for (var i = 0; i < 8; i++) id += c[Math.floor(Math.random() * c.length)];
+      return id;
+    }
+    function getProds() {
+      var D = [
+        {id:1,name:'Netflix Premium',price:4.99,icon:'🎬',desc:'1 Month · 4K UHD · Shared',deliverables:[],stock:50,currency:'EUR'},
+        {id:2,name:'Spotify Premium',price:8.99,icon:'🎵',desc:'3 Months · Family Plan',deliverables:[],stock:32,currency:'EUR'},
+        {id:3,name:'Xbox Game Pass',price:6.99,icon:'🎮',desc:'1 Month · Ultimate',deliverables:[],stock:18,currency:'EUR'},
+        {id:4,name:'NordVPN',price:12.99,icon:'🔒',desc:'6 Months · Premium',deliverables:[],stock:7,currency:'EUR'},
+        {id:5,name:'Disney+',price:3.99,icon:'📺',desc:'1 Month · 4K · Shared',deliverables:[],stock:45,currency:'EUR'},
+        {id:6,name:'Adobe Creative Cloud',price:19.99,icon:'🎨',desc:'1 Month · All Apps',deliverables:[],stock:0,currency:'EUR'}
+      ];
+      try { return JSON.parse(localStorage.getItem('nexus_products')) || D; } catch(e) { return D; }
+    }
+    function saveProds(p) { localStorage.setItem('nexus_products', JSON.stringify(p)); }
+    function getOrders() { try { return JSON.parse(localStorage.getItem('nexus_orders')) || []; } catch(e) { return []; } }
+    function addOrder(o) { var a = getOrders(); a.unshift(o); localStorage.setItem('nexus_orders', JSON.stringify(a)); }
+
+    /* inject modal HTML */
+    var _html = '<div class="co-overlay" id="coOverlay"></div>' +
+      '<div class="co-modal" id="coModal">' +
+        '<div id="coFormState">' +
+          '<div class="co-modal__hdr"><span class="co-modal__title">Complete Order</span><button class="co-x" id="coXBtn">✕</button></div>' +
+          '<div class="co-product-row" id="coProductRow"></div>' +
+          '<div class="co-field"><label>Email address</label><input type="email" id="coEmail" placeholder="you@example.com" autocomplete="email" /></div>' +
+          '<button class="co-submit" id="coSubmitBtn">Complete Purchase</button>' +
+          '<div class="co-secure">🔒 Instant delivery · Secure checkout</div>' +
+          '<div class="co-err" id="coErr"></div>' +
+        '</div>' +
+        '<div id="coSuccessState" style="display:none;">' +
+          '<div class="co-success">' +
+            '<div class="co-success__check">✓</div>' +
+            '<div class="co-success__title">Order Complete!</div>' +
+            '<div class="co-success__sub" id="coSuccessSub">Your product is ready below.</div>' +
+            '<div class="co-id-box"><div class="co-id-box__meta"><div class="co-id-box__lbl">Invoice ID</div><div class="co-id-box__val" id="coInvId"></div></div><button class="co-copy" id="coCopyBtn">Copy</button></div>' +
+            '<div class="co-deliv-box"><div class="co-deliv-box__lbl">Your Product</div><div class="co-deliv-box__val" id="coDelivVal"></div><button class="co-reveal" id="coRevealBtn">👁 Click to reveal</button></div>' +
+            '<div class="co-actions"><a class="co-view-inv" id="coViewInv" href="#">🧾 View Full Invoice</a><button class="co-back" id="coBackBtn">← Back to Shop</button></div>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    document.body.insertAdjacentHTML('beforeend', _html);
+
+    var _pid = null;
+
+    function closeModal() {
+      document.getElementById('coOverlay').classList.remove('open');
+      document.getElementById('coModal').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    document.getElementById('coXBtn').addEventListener('click', closeModal);
+    document.getElementById('coOverlay').addEventListener('click', closeModal);
+    document.getElementById('coBackBtn').addEventListener('click', function () { window.location.href = 'preview-products.html'; });
+
+    document.getElementById('coCopyBtn').addEventListener('click', function () {
+      var id = document.getElementById('coInvId').textContent;
+      var btn = document.getElementById('coCopyBtn');
+      try {
+        navigator.clipboard.writeText(id).then(function () {
+          btn.textContent = 'Copied!';
+          setTimeout(function () { btn.textContent = 'Copy'; }, 2000);
+        });
+      } catch(e) {
+        var r = document.createRange(); r.selectNode(document.getElementById('coInvId'));
+        window.getSelection().removeAllRanges(); window.getSelection().addRange(r);
+      }
+    });
+
+    document.getElementById('coRevealBtn').addEventListener('click', function () {
+      var v = document.getElementById('coDelivVal');
+      var shown = v.classList.toggle('shown');
+      document.getElementById('coRevealBtn').textContent = shown ? '🔒 Hide' : '👁 Click to reveal';
+    });
+
+    document.getElementById('coSubmitBtn').addEventListener('click', function () {
+      var email = document.getElementById('coEmail').value.trim();
+      var inp = document.getElementById('coEmail');
+      var errEl = document.getElementById('coErr');
+      inp.classList.remove('co-input-err');
+      errEl.textContent = '';
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        inp.classList.add('co-input-err');
+        errEl.textContent = 'Please enter a valid email address.';
+        return;
+      }
+      var prods = getProds();
+      var p = prods.find(function (x) { return x.id === _pid; });
+      if (!p) { errEl.textContent = 'Product not found.'; return; }
+      var delivs = p.deliverables || [];
+      var hasStock = delivs.length > 0 || (p.stock || 0) > 0;
+      if (!hasStock) { errEl.textContent = 'This product is currently out of stock.'; return; }
+
+      var btn = document.getElementById('coSubmitBtn');
+      btn.disabled = true; btn.textContent = 'Processing…';
+
+      setTimeout(function () {
+        var invoiceId = generateId();
+        var deliverable = '';
+        if (delivs.length > 0) {
+          deliverable = delivs[0];
+          p.deliverables = delivs.slice(1);
+        } else {
+          deliverable = '(Contact support with your invoice ID to receive your product)';
+          if (p.stock > 0) p.stock--;
+        }
+        var idx = prods.findIndex(function (x) { return x.id === p.id; });
+        if (idx !== -1) prods[idx] = p;
+        saveProds(prods);
+
+        var sym = SYM[p.currency] || '€';
+        addOrder({ id: invoiceId, date: new Date().toISOString(), email: email, productId: p.id, productName: p.name, productIcon: p.icon || '📦', productDesc: p.desc || '', price: p.price, currency: p.currency || 'EUR', deliverable: deliverable, status: 'completed' });
+
+        /* Discord webhook */
+        (function() {
+          try {
+            var w = JSON.parse(localStorage.getItem('nexus_webhooks') || '{}');
+            if (w.url && w.onOrder) {
+              fetch(w.url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ embeds: [{
+                  title: '🛍️ Nouvelle commande',
+                  color: 3066993,
+                  fields: [
+                    { name: 'Invoice ID', value: invoiceId, inline: true },
+                    { name: 'Produit',    value: (p.icon || '📦') + ' ' + p.name, inline: true },
+                    { name: 'Email',      value: email, inline: true },
+                    { name: 'Montant',    value: sym + Number(p.price).toFixed(2), inline: true }
+                  ],
+                  footer: { text: 'Nexus Store' },
+                  timestamp: new Date().toISOString()
+                }] })
+              }).catch(function() {});
+            }
+          } catch(e) {}
+        })();
+
+        document.getElementById('coFormState').style.display = 'none';
+        document.getElementById('coSuccessState').style.display = '';
+        document.getElementById('coSuccessSub').textContent = 'Check your email (' + email + ') for confirmation.';
+        document.getElementById('coInvId').textContent = invoiceId;
+        document.getElementById('coDelivVal').textContent = deliverable;
+        document.getElementById('coDelivVal').classList.remove('shown');
+        document.getElementById('coRevealBtn').textContent = '👁 Click to reveal';
+        document.getElementById('coViewInv').href = 'invoice.html?id=' + invoiceId;
+      }, 900);
+    });
+
+    window._nexusOpenCheckout = function (productId) {
+      _pid = productId;
+      var prods = getProds();
+      var p = prods.find(function (x) { return x.id === productId; });
+      if (!p) return;
+      var sym = SYM[p.currency] || '€';
+      document.getElementById('coProductRow').innerHTML =
+        '<span class="co-product-row__icon">' + (p.icon || '📦') + '</span>' +
+        '<div class="co-product-row__info"><div class="co-product-row__name">' + escH(p.name) + '</div><div class="co-product-row__desc">' + escH(p.desc || '') + '</div></div>' +
+        '<span class="co-product-row__price">' + sym + Number(p.price).toFixed(2) + '</span>';
+      document.getElementById('coEmail').value = '';
+      document.getElementById('coEmail').classList.remove('co-input-err');
+      document.getElementById('coErr').textContent = '';
+      document.getElementById('coFormState').style.display = '';
+      document.getElementById('coSuccessState').style.display = 'none';
+      var sb = document.getElementById('coSubmitBtn'); sb.disabled = false; sb.textContent = 'Complete Purchase';
+      document.getElementById('coOverlay').classList.add('open');
+      document.getElementById('coModal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+      setTimeout(function () { document.getElementById('coEmail').focus(); }, 150);
+    };
+  }());
 }());

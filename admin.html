@@ -49,6 +49,10 @@
           <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
           Avis
         </a>
+        <a class="sidebar__link" data-page="orders" onclick="showPage('orders')">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          Commandes
+        </a>
         <a class="sidebar__link" data-page="content" onclick="showPage('content')">
           <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
           Contenu
@@ -199,6 +203,36 @@
           <table class="a-table">
             <thead><tr><th>Auteur</th><th>Produit</th><th>Date</th><th>Avis</th><th>Actions</th></tr></thead>
             <tbody id="reviewsTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ─── COMMANDES ─── -->
+      <div class="page" id="page-orders">
+        <div class="page-header">
+          <h1>Commandes</h1>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <input type="text" id="ordersSearch" placeholder="Rechercher ID, email, produit…" class="a-input" style="width:260px;font-size:13px;" oninput="filterOrders(this.value)" />
+            <a href="invoice.html" target="_blank" class="a-btn a-btn--ghost">
+              <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              Page invoice
+            </a>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="a-table" id="ordersTable">
+            <thead>
+              <tr>
+                <th>Invoice ID</th>
+                <th>Produit</th>
+                <th>Email</th>
+                <th>Montant</th>
+                <th>Date</th>
+                <th>Statut</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="ordersTbody"></tbody>
           </table>
         </div>
       </div>
@@ -357,7 +391,41 @@
       <!-- ─── SETTINGS ─── -->
       <div class="page" id="page-settings">
         <div class="page-header"><h1>Paramètres</h1></div>
+
+        <!-- Webhooks Discord -->
+        <div class="stats-editor" style="margin-bottom:20px;">
+          <div class="section-title" style="margin-bottom:6px;">🔔 Webhooks Discord</div>
+          <p style="font-size:13px;color:rgba(255,255,255,.4);margin:0 0 18px;line-height:1.65;">
+            Recevez une notification dans un salon Discord à chaque événement choisi.<br>
+            Créez un webhook : <strong style="color:rgba(255,255,255,.6);">Paramètres serveur → Intégrations → Webhooks → Créer un webhook</strong>.
+          </p>
+          <div class="field">
+            <label>URL du Webhook Discord</label>
+            <input type="url" id="whkUrl" placeholder="https://discord.com/api/webhooks/…" />
+          </div>
+          <div class="field" style="margin-bottom:0;">
+            <label>Déclencher pour</label>
+            <div style="display:flex;flex-wrap:wrap;gap:20px;margin-top:8px;">
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:400;color:rgba(255,255,255,.7);">
+                <input type="checkbox" id="whkOnOrder" style="accent-color:#3b82f6;width:15px;height:15px;" />
+                Nouvelle commande
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:400;color:rgba(255,255,255,.7);">
+                <input type="checkbox" id="whkOnRefund" style="accent-color:#3b82f6;width:15px;height:15px;" />
+                Remboursement
+              </label>
+            </div>
+          </div>
+          <div style="margin-top:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <button class="a-btn a-btn--primary" onclick="saveWebhooks()">Enregistrer</button>
+            <button class="a-btn a-btn--ghost" onclick="testWebhook()">Envoyer un test</button>
+            <span class="save-msg" id="whkSaveMsg"></span>
+          </div>
+        </div>
+
+        <!-- Mot de passe -->
         <div class="stats-editor">
+          <div class="section-title" style="margin-bottom:16px;">🔑 Sécurité</div>
           <div class="field">
             <label>Nouveau mot de passe admin</label>
             <input type="password" id="newPass" placeholder="••••••••" />

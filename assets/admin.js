@@ -74,10 +74,29 @@
   }
   function setCategories(c) { localStorage.setItem('nexus_categories', JSON.stringify(c)); }
 
+  function getOrders() {
+    try { return JSON.parse(localStorage.getItem('nexus_orders')) || []; } catch(e) { return []; }
+  }
+  function setOrders(o) { localStorage.setItem('nexus_orders', JSON.stringify(o)); }
+
   function getContent() {
     try { return Object.assign({}, DEFAULT_CONTENT, JSON.parse(localStorage.getItem('nexus_content') || '{}')); } catch(e) { return DEFAULT_CONTENT; }
   }
   function setContent(c) { localStorage.setItem('nexus_content', JSON.stringify(c)); }
+
+  function getWebhooks() {
+    try { return JSON.parse(localStorage.getItem('nexus_webhooks')) || {}; } catch(e) { return {}; }
+  }
+  function setWebhooks(w) { localStorage.setItem('nexus_webhooks', JSON.stringify(w)); }
+
+  function sendDiscordWebhook(url, embed) {
+    if (!url) return;
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ embeds: [embed] })
+    }).catch(function() {});
+  }
 
   /* ── Toast ── */
   function toast(msg) {
@@ -131,9 +150,11 @@
     if (name === 'products') renderProducts();
     if (name === 'categories') renderCategories();
     if (name === 'reviews') renderReviews();
+    if (name === 'orders') renderOrders();
     if (name === 'content') loadContentForm();
     if (name === 'stats') loadStatsForm();
     if (name === 'links') loadLinksForm();
+    if (name === 'settings') loadWebhooksForm();
   };
 
   /* ── Stock helper (supports legacy numeric stock + new deliverables) ── */
@@ -149,10 +170,12 @@
     var totalStock = products.reduce(function (a, p) { return a + getProductStock(p); }, 0);
     var outOfStock = products.filter(function (p) { return getProductStock(p) === 0; }).length;
 
+    var orders = getOrders();
+    var revenue = orders.reduce(function(a, o) { return a + (o.status !== 'refunded' ? Number(o.price || 0) : 0); }, 0);
     document.getElementById('dashKpis').innerHTML =
       kpiCard('Produits', products.length, 'Total actif') +
-      kpiCard('Stock total', totalStock, 'Unités disponibles') +
-      kpiCard('Rupture', outOfStock, 'Produits épuisés') +
+      kpiCard('Commandes', orders.length, 'Total reçues') +
+      kpiCard('Revenus', '€' + revenue.toFixed(2), 'Hors remboursements') +
       kpiCard('Note moyenne', stats.rating + ' ★', 'Satisfaction client');
 
     var tbody = document.getElementById('dashTbody');
@@ -665,46 +688,187 @@
   };
 
   /* ── Content editor ── */
+  var _contentLiveTimer = null;
+  var _contentListenersAttached = false;
+  var CONTENT_FIELDS = ['cSiteName','cFooterDesc','cFooterCopy','cHomeEyebrow','cHomeTitle','cHomeSub','cHomeCta1','cHomeCta2','cProductsTitle','cReviewsEyebrow','cReviewsTitle','cReviewsSub','cReviewsRating'];
+
+  function readContentForm() {
+    var c = {};
+    c.siteName       = document.getElementById('cSiteName').value.trim();
+    c.footerDesc     = document.getElementById('cFooterDesc').value.trim();
+    c.footerCopy     = document.getElementById('cFooterCopy').value.trim();
+    c.homeEyebrow    = document.getElementById('cHomeEyebrow').value.trim();
+    c.homeTitle      = document.getElementById('cHomeTitle').value.trim();
+    c.homeSub        = document.getElementById('cHomeSub').value.trim();
+    c.homeCta1       = document.getElementById('cHomeCta1').value.trim();
+    c.homeCta2       = document.getElementById('cHomeCta2').value.trim();
+    c.productsTitle  = document.getElementById('cProductsTitle').value.trim();
+    c.reviewsEyebrow = document.getElementById('cReviewsEyebrow').value.trim();
+    c.reviewsTitle   = document.getElementById('cReviewsTitle').value.trim();
+    c.reviewsSub     = document.getElementById('cReviewsSub').value.trim();
+    c.reviewsRating  = document.getElementById('cReviewsRating').value.trim();
+    Object.keys(c).forEach(function(k) { if (!c[k]) delete c[k]; });
+    return c;
+  }
+
   function loadContentForm() {
     var c = getContent();
-    document.getElementById('cSiteName').value      = c.siteName      || '';
-    document.getElementById('cFooterDesc').value    = c.footerDesc    || '';
-    document.getElementById('cFooterCopy').value    = c.footerCopy    || '';
-    document.getElementById('cHomeEyebrow').value   = c.homeEyebrow   || '';
-    document.getElementById('cHomeTitle').value     = c.homeTitle     || '';
-    document.getElementById('cHomeSub').value       = c.homeSub       || '';
-    document.getElementById('cHomeCta1').value      = c.homeCta1      || '';
-    document.getElementById('cHomeCta2').value      = c.homeCta2      || '';
-    document.getElementById('cProductsTitle').value = c.productsTitle || '';
+    document.getElementById('cSiteName').value       = c.siteName       || '';
+    document.getElementById('cFooterDesc').value     = c.footerDesc     || '';
+    document.getElementById('cFooterCopy').value     = c.footerCopy     || '';
+    document.getElementById('cHomeEyebrow').value    = c.homeEyebrow    || '';
+    document.getElementById('cHomeTitle').value      = c.homeTitle      || '';
+    document.getElementById('cHomeSub').value        = c.homeSub        || '';
+    document.getElementById('cHomeCta1').value       = c.homeCta1       || '';
+    document.getElementById('cHomeCta2').value       = c.homeCta2       || '';
+    document.getElementById('cProductsTitle').value  = c.productsTitle  || '';
     document.getElementById('cReviewsEyebrow').value = c.reviewsEyebrow || '';
-    document.getElementById('cReviewsTitle').value  = c.reviewsTitle  || '';
-    document.getElementById('cReviewsSub').value    = c.reviewsSub    || '';
-    document.getElementById('cReviewsRating').value = c.reviewsRating || '';
+    document.getElementById('cReviewsTitle').value   = c.reviewsTitle   || '';
+    document.getElementById('cReviewsSub').value     = c.reviewsSub     || '';
+    document.getElementById('cReviewsRating').value  = c.reviewsRating  || '';
     document.getElementById('contentSaveMsg').textContent = '';
+
+    if (!_contentListenersAttached) {
+      _contentListenersAttached = true;
+      CONTENT_FIELDS.forEach(function(id) {
+        document.getElementById(id).addEventListener('input', function() {
+          clearTimeout(_contentLiveTimer);
+          _contentLiveTimer = setTimeout(function() {
+            setContent(readContentForm());
+            var msg = document.getElementById('contentSaveMsg');
+            msg.textContent = 'Sauvegardé ✓'; msg.style.color = 'rgba(255,255,255,.4)';
+          }, 300);
+        });
+      });
+    }
   }
 
   window.saveContent = function() {
-    var c = {
-      siteName:       document.getElementById('cSiteName').value.trim(),
-      footerDesc:     document.getElementById('cFooterDesc').value.trim(),
-      footerCopy:     document.getElementById('cFooterCopy').value.trim(),
-      homeEyebrow:    document.getElementById('cHomeEyebrow').value.trim(),
-      homeTitle:      document.getElementById('cHomeTitle').value.trim(),
-      homeSub:        document.getElementById('cHomeSub').value.trim(),
-      homeCta1:       document.getElementById('cHomeCta1').value.trim(),
-      homeCta2:       document.getElementById('cHomeCta2').value.trim(),
-      productsTitle:  document.getElementById('cProductsTitle').value.trim(),
-      reviewsEyebrow: document.getElementById('cReviewsEyebrow').value.trim(),
-      reviewsTitle:   document.getElementById('cReviewsTitle').value.trim(),
-      reviewsSub:     document.getElementById('cReviewsSub').value.trim(),
-      reviewsRating:  document.getElementById('cReviewsRating').value.trim()
-    };
-    /* Remove empty keys so defaults still show for unset fields */
-    Object.keys(c).forEach(function(k) { if (!c[k]) delete c[k]; });
-    setContent(c);
+    setContent(readContentForm());
     var msg = document.getElementById('contentSaveMsg');
     msg.textContent = 'Contenu enregistré ✓'; msg.style.color = '#3cc864';
     toast('Contenu mis à jour ✓');
+  };
+
+  /* ── Webhooks ── */
+  function loadWebhooksForm() {
+    var w = getWebhooks();
+    document.getElementById('whkUrl').value = w.url || '';
+    document.getElementById('whkOnOrder').checked = !!w.onOrder;
+    document.getElementById('whkOnRefund').checked = !!w.onRefund;
+    document.getElementById('whkSaveMsg').textContent = '';
+  }
+
+  window.saveWebhooks = function() {
+    setWebhooks({
+      url:      document.getElementById('whkUrl').value.trim(),
+      onOrder:  document.getElementById('whkOnOrder').checked,
+      onRefund: document.getElementById('whkOnRefund').checked
+    });
+    var msg = document.getElementById('whkSaveMsg');
+    msg.textContent = 'Enregistré ✓'; msg.style.color = '#3cc864';
+    toast('Webhooks Discord enregistrés ✓');
+  };
+
+  window.testWebhook = function() {
+    var url = document.getElementById('whkUrl').value.trim();
+    var msg = document.getElementById('whkSaveMsg');
+    if (!url) { msg.textContent = 'URL manquante.'; msg.style.color = '#ff5555'; return; }
+    msg.textContent = 'Envoi…'; msg.style.color = 'rgba(255,255,255,.4)';
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ embeds: [{
+        title: '🔔 Test — Nexus Admin',
+        description: 'Votre webhook Discord est correctement configuré et fonctionnel.',
+        color: 3447003,
+        fields: [{ name: 'Store', value: 'Nexus', inline: true }, { name: 'Statut', value: '✅ Actif', inline: true }],
+        footer: { text: 'Nexus Store' },
+        timestamp: new Date().toISOString()
+      }] })
+    }).then(function(r) {
+      if (r.ok || r.status === 204) {
+        msg.textContent = 'Test envoyé ✓'; msg.style.color = '#3cc864';
+      } else {
+        msg.textContent = 'Erreur ' + r.status; msg.style.color = '#ff5555';
+      }
+    }).catch(function() {
+      msg.textContent = 'Erreur réseau (CORS?).'; msg.style.color = '#ff5555';
+    });
+  };
+
+  /* ── Orders ── */
+  function renderOrders(query) {
+    var orders = getOrders();
+    var q = (query || '').toLowerCase();
+    if (q) orders = orders.filter(function(o) {
+      return (o.id || '').toLowerCase().indexOf(q) !== -1 ||
+             (o.email || '').toLowerCase().indexOf(q) !== -1 ||
+             (o.productName || '').toLowerCase().indexOf(q) !== -1;
+    });
+    var tbody = document.getElementById('ordersTbody');
+    if (!orders.length) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:rgba(255,255,255,.3);padding:36px;">' +
+        (q ? 'Aucune commande correspondante.' : 'Aucune commande pour le moment.') + '</td></tr>';
+      return;
+    }
+    tbody.innerHTML = orders.map(function(o) {
+      var sym = CURRENCY_SYMBOLS[o.currency] || '€';
+      var d = o.date ? new Date(o.date).toLocaleDateString('fr-FR', {day:'numeric',month:'short',year:'numeric'}) : '—';
+      var statusPill = o.status === 'refunded'
+        ? '<span class="stock-pill stock-pill--out">Remboursé</span>'
+        : o.status === 'pending'
+          ? '<span class="stock-pill stock-pill--low">En attente</span>'
+          : '<span class="stock-pill stock-pill--ok">Complété</span>';
+      return '<tr>' +
+        '<td style="font-family:\'Courier New\',monospace;font-size:13px;letter-spacing:.03em;white-space:nowrap;">' + esc(o.id) + '</td>' +
+        '<td><span class="prod-icon">' + (o.productIcon || '📦') + '</span><span class="prod-name">' + esc(o.productName || '') + '</span></td>' +
+        '<td style="font-size:13px;color:rgba(255,255,255,.5);">' + esc(o.email || '') + '</td>' +
+        '<td style="font-weight:600;">' + sym + Number(o.price).toFixed(2) + '</td>' +
+        '<td style="font-size:13px;color:rgba(255,255,255,.5);white-space:nowrap;">' + d + '</td>' +
+        '<td>' + statusPill + '</td>' +
+        '<td><div class="action-group">' +
+          '<a class="a-btn a-btn--icon" href="invoice.html?id=' + esc(o.id) + '" target="_blank" title="Voir la facture">🧾</a>' +
+          (o.status !== 'refunded' ? '<button class="a-btn a-btn--icon" onclick="refundOrder(\'' + esc(o.id) + '\')" title="Rembourser" style="color:#ffa01e;">↩</button>' : '') +
+          '<button class="a-btn a-btn--icon" onclick="deleteOrder(\'' + esc(o.id) + '\')" title="Supprimer" style="color:#ff5555;">🗑</button>' +
+        '</div></td>' +
+      '</tr>';
+    }).join('');
+  }
+
+  window.filterOrders = function(q) { renderOrders(q); };
+
+  window.refundOrder = function(id) {
+    var orders = getOrders();
+    var o = orders.find(function(x) { return x.id === id; });
+    if (!o || !confirm('Marquer ' + id + ' comme remboursée ?')) return;
+    o.status = 'refunded';
+    setOrders(orders);
+    renderOrders(document.getElementById('ordersSearch').value);
+    var w = getWebhooks();
+    if (w.url && w.onRefund) {
+      var sym = CURRENCY_SYMBOLS[o.currency] || '€';
+      sendDiscordWebhook(w.url, {
+        title: '↩️ Remboursement effectué',
+        color: 15158332,
+        fields: [
+          { name: 'Invoice ID', value: o.id || '—', inline: true },
+          { name: 'Produit',    value: (o.productIcon || '') + ' ' + (o.productName || '—'), inline: true },
+          { name: 'Email',      value: o.email || '—', inline: true },
+          { name: 'Montant',    value: sym + Number(o.price || 0).toFixed(2), inline: true }
+        ],
+        footer: { text: 'Nexus Store' },
+        timestamp: new Date().toISOString()
+      });
+    }
+    toast('Commande marquée remboursée.');
+  };
+
+  window.deleteOrder = function(id) {
+    if (!confirm('Supprimer définitivement la commande ' + id + ' ?')) return;
+    setOrders(getOrders().filter(function(o) { return o.id !== id; }));
+    renderOrders(document.getElementById('ordersSearch').value);
+    toast('Commande supprimée.');
   };
 
   /* ── Links ── */
@@ -752,6 +916,7 @@
     localStorage.removeItem('nexus_categories');
     localStorage.removeItem('nexus_reviews');
     localStorage.removeItem('nexus_content');
+    localStorage.removeItem('nexus_orders');
     toast('Données réinitialisées.');
     renderProducts();
     loadStatsForm();
