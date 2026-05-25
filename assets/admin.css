@@ -258,6 +258,101 @@ input, select, button { font-family: inherit; }
 }
 .prod-name { font-weight: 500; }
 
+/* ── MODAL PRODUCT WIDER ── */
+.modal--product { max-width: 680px !important; }
+
+/* ── FORM SECTIONS ── */
+.form-section {
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 14px;
+  background: rgba(255,255,255,.02);
+}
+.form-section__header {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase;
+  color: rgba(255,255,255,.4);
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+
+/* ── FORM ROW (2 cols) ── */
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* ── TEXTAREA ── */
+.field textarea {
+  background: #1a1a1a; border: 1px solid rgba(255,255,255,.1);
+  border-radius: 8px; padding: 10px 12px; color: #fff;
+  font-size: 14px; transition: border-color 150ms ease;
+  outline: none; width: 100%; resize: vertical;
+  font-family: inherit; line-height: 1.5; min-height: 60px;
+}
+.field textarea:focus { border-color: rgba(255,255,255,.3); }
+
+/* ── REQUIRED / OPTIONAL LABELS ── */
+.f-required { color: #ff5555; }
+.f-optional { color: rgba(255,255,255,.28); font-weight: 400; font-size: 11px; }
+
+/* ── PRICE INPUT WITH PREFIX ── */
+.input-prefix-wrap { position: relative; }
+.input-prefix {
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  color: rgba(255,255,255,.35); font-size: 14px; font-weight: 500;
+  pointer-events: none; z-index: 1;
+}
+.input--prefixed { padding-left: 26px !important; }
+
+/* ── BADGE PICKER ── */
+.badge-picker { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 2px; }
+.badge-opt {
+  display: inline-flex; align-items: center;
+  padding: 5px 14px; border-radius: 6px;
+  font-size: 11px; font-weight: 700; letter-spacing: .07em;
+  cursor: pointer; border: 1px solid transparent;
+  transition: all 150ms ease; background: none;
+}
+.badge-opt--none {
+  background: rgba(255,255,255,.05); color: rgba(255,255,255,.4);
+  border-color: rgba(255,255,255,.09);
+}
+.badge-opt--none.active { background: rgba(255,255,255,.12); color: #fff; border-color: rgba(255,255,255,.25); }
+.badge-opt--hot { background: rgba(255,60,60,.08); color: #ff6b6b; border-color: rgba(255,60,60,.18); }
+.badge-opt--hot.active { background: rgba(255,60,60,.22); border-color: #ff6b6b; }
+.badge-opt--new { background: rgba(60,180,255,.08); color: #60b4ff; border-color: rgba(60,180,255,.18); }
+.badge-opt--new.active { background: rgba(60,180,255,.22); border-color: #60b4ff; }
+.badge-opt--sale { background: rgba(255,180,60,.08); color: #ffb83c; border-color: rgba(255,180,60,.18); }
+.badge-opt--sale.active { background: rgba(255,180,60,.22); border-color: #ffb83c; }
+
+/* ── STOCK INDICATOR ── */
+.stock-indicator {
+  display: flex; align-items: center; gap: 12px;
+  background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.07);
+  border-radius: 10px; padding: 14px 16px; margin-bottom: 14px;
+}
+.stock-indicator__icon { font-size: 20px; flex-shrink: 0; }
+.stock-indicator__title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,.75); }
+.stock-indicator__sub { font-size: 12px; color: rgba(255,255,255,.3); margin-top: 2px; }
+
+/* ── STOCK INPUT ROW ── */
+.stock-input-row { display: flex; gap: 8px; align-items: center; }
+.stock-input-row input { flex: 1; }
+
+/* ── STATUS COLOR DOTS ── */
+.status-color-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 2px; }
+.status-dot {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer; transition: transform 150ms, border-color 150ms, box-shadow 150ms;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: rgba(255,255,255,.4);
+  flex-shrink: 0;
+}
+.status-dot:hover { transform: scale(1.15); }
+.status-dot.active { border-color: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,.15); }
+.status-dot--none { background: rgba(255,255,255,.1); }
+
 /* ── RESPONSIVE ── */
 @media (max-width: 1024px) {
   .kpi-grid { grid-template-columns: repeat(2, 1fr); }
@@ -266,4 +361,5 @@ input, select, button { font-family: inherit; }
   .sidebar { display: none; }
   .main { margin-left: 0; padding: 20px; }
   .form-grid { grid-template-columns: 1fr; }
+  .form-row { grid-template-columns: 1fr; }
 }

@@ -139,31 +139,37 @@
     var modal = document.getElementById('modal');
     var overlay = document.getElementById('modalOverlay');
     document.getElementById('editId').value = id || '';
-    if (id) {
-      var p = getProducts().find(function (x) { return x.id === id; });
-      if (!p) return;
-      document.getElementById('modalTitle').textContent = 'Modifier le produit';
-      document.getElementById('fName').value = p.name;
-      document.getElementById('fCat').value = p.category;
-      document.getElementById('fPrice').value = p.price;
-      document.getElementById('fOrigPrice').value = p.origPrice || '';
-      document.getElementById('fIcon').value = p.icon || '';
-      document.getElementById('fStock').value = p.stock !== undefined ? p.stock : '';
-      document.getElementById('fDesc').value = p.desc || '';
-      document.getElementById('fBadge').value = p.badge || '';
-      document.getElementById('fGradient').value = p.gradient || 'linear-gradient(135deg,#1a1a2e,#16213e)';
-    } else {
-      document.getElementById('modalTitle').textContent = 'Nouveau produit';
-      document.getElementById('fName').value = '';
-      document.getElementById('fCat').value = 'streaming';
-      document.getElementById('fPrice').value = '';
-      document.getElementById('fOrigPrice').value = '';
-      document.getElementById('fIcon').value = '';
-      document.getElementById('fStock').value = '';
-      document.getElementById('fDesc').value = '';
-      document.getElementById('fBadge').value = '';
-      document.getElementById('fGradient').value = 'linear-gradient(135deg,#1a1a2e,#16213e)';
-    }
+
+    var p = id ? getProducts().find(function (x) { return x.id === id; }) : null;
+    document.getElementById('modalTitle').textContent = p ? 'Modifier le produit' : 'Nouveau produit';
+
+    document.getElementById('fName').value      = p ? p.name : '';
+    document.getElementById('fCat').value       = p ? p.category : 'streaming';
+    document.getElementById('fPrice').value     = p ? p.price : '';
+    document.getElementById('fOrigPrice').value = p && p.origPrice ? p.origPrice : '';
+    document.getElementById('fIcon').value      = p ? (p.icon || '') : '';
+    document.getElementById('fStock').value     = p ? (p.stock !== undefined ? p.stock : '') : '';
+    document.getElementById('fDesc').value      = p ? (p.desc || '') : '';
+    document.getElementById('fGradient').value  = p ? (p.gradient || 'linear-gradient(135deg,#1a1a2e,#16213e)') : 'linear-gradient(135deg,#1a1a2e,#16213e)';
+    document.getElementById('fCurrency').value  = p ? (p.currency || 'EUR') : 'EUR';
+    document.getElementById('fStatusLabel').value = p ? (p.statusLabel || '') : '';
+    document.getElementById('fMinQty').value    = p && p.minQty ? p.minQty : '';
+    document.getElementById('fMaxQty').value    = p && p.maxQty ? p.maxQty : '';
+
+    var activeBadge = p ? (p.badge || '') : '';
+    document.getElementById('fBadge').value = activeBadge;
+    document.querySelectorAll('#badgePicker .badge-opt').forEach(function (opt) {
+      opt.classList.toggle('active', opt.dataset.val === activeBadge);
+    });
+
+    var activeColor = p ? (p.statusColor || 'green') : 'green';
+    document.getElementById('fStatusColor').value = activeColor;
+    document.querySelectorAll('#statusColorPicker .status-dot').forEach(function (dot) {
+      dot.classList.toggle('active', dot.dataset.color === activeColor);
+    });
+
+    updateCurrencyPrefixes();
+    updateModalStockIndicator();
     modal.classList.add('open');
     overlay.classList.add('open');
   };
@@ -171,6 +177,42 @@
   window.closeModal = function () {
     document.getElementById('modal').classList.remove('open');
     document.getElementById('modalOverlay').classList.remove('open');
+  };
+
+  /* ── Currency prefix ── */
+  var CURRENCY_SYMBOLS = { EUR: '€', USD: '$', GBP: '£' };
+  window.updateCurrencyPrefixes = function () {
+    var sym = CURRENCY_SYMBOLS[document.getElementById('fCurrency').value] || '€';
+    document.getElementById('pricePrefix').textContent = sym;
+    document.getElementById('origPricePrefix').textContent = sym;
+  };
+
+  /* ── Modal stock helpers ── */
+  window.adjustModalStock = function (delta) {
+    var inp = document.getElementById('fStock');
+    inp.value = Math.max(0, (parseInt(inp.value) || 0) + delta);
+    updateModalStockIndicator();
+  };
+
+  window.updateModalStockIndicator = function () {
+    var val = parseInt(document.getElementById('fStock').value) || 0;
+    var title = document.getElementById('modalStockTitle');
+    var sub   = document.getElementById('modalStockSub');
+    var pill  = document.getElementById('modalStockPill');
+    if (val === 0) {
+      title.textContent = 'Aucun stock disponible';
+      sub.textContent   = 'Définissez une quantité ci-dessous';
+      pill.className    = 'stock-pill stock-pill--out';
+    } else if (val < 10) {
+      title.textContent = 'Stock faible';
+      sub.textContent   = val + ' unité' + (val > 1 ? 's' : '') + ' restante' + (val > 1 ? 's' : '');
+      pill.className    = 'stock-pill stock-pill--low';
+    } else {
+      title.textContent = 'En stock';
+      sub.textContent   = val + ' unités disponibles';
+      pill.className    = 'stock-pill stock-pill--ok';
+    }
+    pill.textContent = val;
   };
 
   window.saveProduct = function () {
@@ -189,7 +231,12 @@
       stock: parseInt(document.getElementById('fStock').value) || 0,
       desc: document.getElementById('fDesc').value.trim(),
       badge: document.getElementById('fBadge').value,
-      gradient: document.getElementById('fGradient').value
+      gradient: document.getElementById('fGradient').value,
+      currency: document.getElementById('fCurrency').value || 'EUR',
+      statusColor: document.getElementById('fStatusColor').value || 'green',
+      statusLabel: document.getElementById('fStatusLabel').value.trim(),
+      minQty: parseInt(document.getElementById('fMinQty').value) || null,
+      maxQty: parseInt(document.getElementById('fMaxQty').value) || null
     };
 
     if (editId) {
@@ -310,6 +357,24 @@
   /* ── Init ── */
   function init() {
     renderDashboard();
+    initModalPickers();
+  }
+
+  function initModalPickers() {
+    document.querySelectorAll('#badgePicker .badge-opt').forEach(function (opt) {
+      opt.addEventListener('click', function () {
+        document.querySelectorAll('#badgePicker .badge-opt').forEach(function (o) { o.classList.remove('active'); });
+        opt.classList.add('active');
+        document.getElementById('fBadge').value = opt.dataset.val;
+      });
+    });
+    document.querySelectorAll('#statusColorPicker .status-dot').forEach(function (dot) {
+      dot.addEventListener('click', function () {
+        document.querySelectorAll('#statusColorPicker .status-dot').forEach(function (d) { d.classList.remove('active'); });
+        dot.classList.add('active');
+        document.getElementById('fStatusColor').value = dot.dataset.color;
+      });
+    });
   }
 
   checkSession();

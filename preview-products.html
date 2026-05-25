@@ -220,15 +220,18 @@
     function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
     function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
 
+    var CURRENCY_SYMBOLS = { EUR: '€', USD: '$', GBP: '£' };
+
     function buildCard(p) {
+      var sym = CURRENCY_SYMBOLS[p.currency] || '$';
       var badge = '';
       if (p.badge) {
         var cls = p.badge === 'HOT' ? 'hot' : p.badge === 'NEW' ? 'new' : 'sale';
         badge = '<div class="product-card__badges"><span class="badge badge--' + cls + '">' + p.badge + '</span></div>';
       }
       var priceHtml = p.origPrice
-        ? '<div><span class="product-card__price-orig">$' + Number(p.origPrice).toFixed(2) + '</span><span class="product-card__price">$' + Number(p.price).toFixed(2) + '</span></div>'
-        : '<span class="product-card__price">$' + Number(p.price).toFixed(2) + '</span>';
+        ? '<div><span class="product-card__price-orig">' + sym + Number(p.origPrice).toFixed(2) + '</span><span class="product-card__price">' + sym + Number(p.price).toFixed(2) + '</span></div>'
+        : '<span class="product-card__price">' + sym + Number(p.price).toFixed(2) + '</span>';
       var gradient = p.gradient || 'linear-gradient(135deg,#1a1a2e,#16213e)';
       var icon = p.icon || '📦';
       return '<div class="product-card" data-name="' + esc(p.name) + '" data-cat="' + esc(p.category) + '" data-price="' + p.price + '">' +
