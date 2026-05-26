@@ -75,6 +75,15 @@
   <!-- ─── PAGE ─── -->
   <div class="pdv3-page">
 
+    <!-- ── BREADCRUMB ── -->
+    <div class="pdv3-breadcrumb">
+      <a href="preview.html">Home</a>
+      <span class="pdv3-breadcrumb-sep">›</span>
+      <a href="preview-products.html">Products</a>
+      <span class="pdv3-breadcrumb-sep">›</span>
+      <span class="pdv3-breadcrumb-cur" id="pdBreadcrumbName">Loading…</span>
+    </div>
+
     <!-- ── HERO BANNER ── -->
     <div class="pdv3-hero">
       <div class="pdv3-hero__bg-text" id="pdHeroBgText"></div>
@@ -91,6 +100,23 @@
           Global
         </span>
         <span class="pdv3-pill" id="pdHeroCatPill">📦 Digital</span>
+      </div>
+      <!-- Social proof -->
+      <div class="pdv3-hero__social">
+        <div class="pdv3-hero-stat">
+          <span class="pdv3-hero-stat__val" id="pdHeroOrders">4,350+</span>
+          <span class="pdv3-hero-stat__lbl">orders delivered</span>
+        </div>
+        <div class="pdv3-hero-stat--sep"></div>
+        <div class="pdv3-hero-stat">
+          <span class="pdv3-hero-stat__val">★ 4.96</span>
+          <span class="pdv3-hero-stat__lbl">avg. rating</span>
+        </div>
+        <div class="pdv3-hero-stat--sep"></div>
+        <div class="pdv3-hero-stat">
+          <span class="pdv3-hero-stat__val">~2 min</span>
+          <span class="pdv3-hero-stat__lbl">avg. delivery</span>
+        </div>
       </div>
     </div>
 
@@ -121,6 +147,29 @@
         <div>
           <div class="pdv3-shdr">Description</div>
           <div class="pdv3-desc-card" id="pdDesc">—</div>
+        </div>
+
+        <!-- What's included -->
+        <div>
+          <div class="pdv3-shdr">What's Included</div>
+          <div class="pdv3-checklist" id="pdChecklist">
+            <div class="pdv3-check-item">
+              <div class="pdv3-check-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg></div>
+              <span>Instant digital delivery — credentials sent immediately on screen</span>
+            </div>
+            <div class="pdv3-check-item">
+              <div class="pdv3-check-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg></div>
+              <span>Invoice PDF with full order details</span>
+            </div>
+            <div class="pdv3-check-item">
+              <div class="pdv3-check-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg></div>
+              <span>Free replacement if credentials don't work</span>
+            </div>
+            <div class="pdv3-check-item">
+              <div class="pdv3-check-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg></div>
+              <span>24/7 Discord support for any issue</span>
+            </div>
+          </div>
         </div>
 
         <!-- Specs + Service Guarantee -->
@@ -174,6 +223,48 @@
           </div>
           <div id="pdReviewsList">
             <div style="color:rgba(255,255,255,.32);font-size:13px;padding:4px 0;">No reviews yet for this product.</div>
+          </div>
+        </div>
+
+        <!-- FAQ -->
+        <div>
+          <div class="pdv3-shdr">Frequently Asked Questions</div>
+          <div class="pdv3-faq">
+            <div class="pdv3-faq-item">
+              <button class="pdv3-faq-q" onclick="toggleFaq(this)">
+                How quickly will I receive my product?
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+              </button>
+              <div class="pdv3-faq-a">Delivery is instant and fully automated. Your credentials appear on screen immediately after payment confirmation — no waiting, no manual steps.</div>
+            </div>
+            <div class="pdv3-faq-item">
+              <button class="pdv3-faq-q" onclick="toggleFaq(this)">
+                What if my product doesn't work?
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+              </button>
+              <div class="pdv3-faq-a">We offer a free replacement for any invalid or non-working deliverable. Simply open a ticket on our Discord server and our team will resolve it immediately — usually within minutes.</div>
+            </div>
+            <div class="pdv3-faq-item">
+              <button class="pdv3-faq-q" onclick="toggleFaq(this)">
+                Is my payment information secure?
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+              </button>
+              <div class="pdv3-faq-a">Yes. All transactions are protected with 256-bit SSL encryption. We never store or have access to your payment card details — everything is processed through secure payment gateways.</div>
+            </div>
+            <div class="pdv3-faq-item">
+              <button class="pdv3-faq-q" onclick="toggleFaq(this)">
+                Do you offer refunds?
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+              </button>
+              <div class="pdv3-faq-a">Due to the digital nature of our products, we do not offer refunds once credentials have been delivered. However, we always offer a free replacement if a product is invalid or not working as described.</div>
+            </div>
+            <div class="pdv3-faq-item">
+              <button class="pdv3-faq-q" onclick="toggleFaq(this)">
+                Can I buy multiple licenses?
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+              </button>
+              <div class="pdv3-faq-a">Absolutely. Use the quantity selector in the order panel to buy multiple units in one transaction. Volume discounts automatically apply — the more you buy, the lower the unit price.</div>
+            </div>
           </div>
         </div>
 
@@ -244,7 +335,22 @@
             <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
             Add to Cart
           </button>
-          <button class="pdv3-btn-checkout" id="pdBuyNow">Checkout Now</button>
+          <button class="pdv3-btn-checkout" id="pdBuyNow">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="display:inline;vertical-align:-2px;margin-right:6px;"><path d="M5 12l5 5L20 7"/></svg>
+            Checkout Now
+          </button>
+        </div>
+
+        <!-- Payment methods -->
+        <div class="pdv3-pay-methods">
+          <div class="pdv3-pay-methods__lbl">Accepted Payments</div>
+          <div class="pdv3-pay-row">
+            <span class="pdv3-pay-badge">VISA</span>
+            <span class="pdv3-pay-badge">MASTERCARD</span>
+            <span class="pdv3-pay-badge">AMEX</span>
+            <span class="pdv3-pay-badge">PAYPAL</span>
+            <span class="pdv3-pay-badge">CRYPTO</span>
+          </div>
         </div>
 
       </aside>
@@ -345,6 +451,9 @@
     var qty = 1;
 
     document.title = 'Nexus — ' + p.name;
+
+    /* ── Breadcrumb ── */
+    document.getElementById('pdBreadcrumbName').textContent = p.name;
 
     /* ── Hero ── */
     document.getElementById('pdHeroBgText').textContent = p.name;
@@ -520,6 +629,14 @@
     } catch(e) {}
 
   })();
+
+  /* ── FAQ toggle ── */
+  function toggleFaq(btn) {
+    var item = btn.parentElement;
+    var wasOpen = item.classList.contains('open');
+    document.querySelectorAll('.pdv3-faq-item.open').forEach(function(el) { el.classList.remove('open'); });
+    if (!wasOpen) item.classList.add('open');
+  }
   </script>
 
 </body>

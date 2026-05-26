@@ -386,21 +386,57 @@
     var _html = '<div class="co-overlay" id="coOverlay"></div>' +
       '<div class="co-modal" id="coModal">' +
         '<div id="coFormState">' +
-          '<div class="co-modal__hdr"><span class="co-modal__title">Complete Order</span><button class="co-x" id="coXBtn">✕</button></div>' +
-          '<div class="co-product-row" id="coProductRow"></div>' +
-          '<div class="co-field"><label>Email address</label><input type="email" id="coEmail" placeholder="you@example.com" autocomplete="email" /></div>' +
-          '<button class="co-submit" id="coSubmitBtn">Complete Purchase</button>' +
-          '<div class="co-secure">🔒 Instant delivery · Secure checkout</div>' +
-          '<div class="co-err" id="coErr"></div>' +
+          '<div class="co-hdr">' +
+            '<div class="co-hdr__brand"><svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>&nbsp;Secure Checkout</div>' +
+            '<div class="co-hdr__steps"><span class="co-step co-step--active">Information</span><span class="co-step-sep">&nbsp;›&nbsp;</span><span class="co-step">Delivery</span></div>' +
+            '<button class="co-x" id="coXBtn">✕</button>' +
+          '</div>' +
+          '<div class="co-layout">' +
+            '<div class="co-left">' +
+              '<div class="co-section-hdr">Contact Information</div>' +
+              '<div class="co-product-row" id="coProductRow"></div>' +
+              '<div class="co-field"><label>Email address <span style="color:#ff5555;font-weight:700;">*</span></label><input type="email" id="coEmail" placeholder="you@example.com" autocomplete="email" /></div>' +
+              '<button class="co-submit" id="coSubmitBtn">' +
+                '<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M5 12l5 5L20 7"/></svg>' +
+                'Complete Purchase' +
+              '</button>' +
+              '<div class="co-trust-row">' +
+                '<span class="co-trust-item"><svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>&nbsp;256-bit SSL</span>' +
+                '<span class="co-trust-item">⚡&nbsp;Instant Delivery</span>' +
+                '<span class="co-trust-item">↩&nbsp;Free Replacement</span>' +
+              '</div>' +
+              '<div class="co-err" id="coErr"></div>' +
+            '</div>' +
+            '<div class="co-right">' +
+              '<div class="co-right__hdr">Order Summary</div>' +
+              '<div class="co-right__product" id="coSummaryProduct"></div>' +
+              '<div class="co-right__divider"></div>' +
+              '<div class="co-right__rows" id="coSumRows"></div>' +
+              '<div class="co-right__divider"></div>' +
+              '<div class="co-perks">' +
+                '<div class="co-perk"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg><span>Instant digital delivery</span></div>' +
+                '<div class="co-perk"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg><span>Encrypted checkout</span></div>' +
+                '<div class="co-perk"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg><span>Free replacement guarantee</span></div>' +
+                '<div class="co-perk"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg><span>24/7 Discord support</span></div>' +
+              '</div>' +
+              '<div class="co-right__divider"></div>' +
+              '<div>' +
+                '<div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.25);margin-bottom:8px;">Accepted Payments</div>' +
+                '<div class="co-pay-row"><span class="co-pay-badge">VISA</span><span class="co-pay-badge">MASTERCARD</span><span class="co-pay-badge">AMEX</span><span class="co-pay-badge">PAYPAL</span><span class="co-pay-badge">CRYPTO</span></div>' +
+              '</div>' +
+            '</div>' +
+          '</div>' +
         '</div>' +
         '<div id="coSuccessState" style="display:none;">' +
-          '<div class="co-success">' +
-            '<div class="co-success__check">✓</div>' +
-            '<div class="co-success__title">Order Complete!</div>' +
-            '<div class="co-success__sub" id="coSuccessSub">Your product is ready below.</div>' +
-            '<div class="co-id-box"><div class="co-id-box__meta"><div class="co-id-box__lbl">Invoice ID</div><div class="co-id-box__val" id="coInvId"></div></div><button class="co-copy" id="coCopyBtn">Copy</button></div>' +
-            '<div class="co-deliv-box"><div class="co-deliv-box__lbl">Your Product</div><div class="co-deliv-box__val" id="coDelivVal"></div><button class="co-reveal" id="coRevealBtn">👁 Click to reveal</button></div>' +
-            '<div class="co-actions"><a class="co-view-inv" id="coViewInv" href="#">🧾 View Full Invoice</a><button class="co-back" id="coBackBtn">← Back to Shop</button></div>' +
+          '<div style="padding:28px 24px;">' +
+            '<div class="co-success">' +
+              '<div class="co-success__check">✓</div>' +
+              '<div class="co-success__title">Order Complete!</div>' +
+              '<div class="co-success__sub" id="coSuccessSub">Your product is ready below.</div>' +
+              '<div class="co-id-box"><div class="co-id-box__meta"><div class="co-id-box__lbl">Invoice ID</div><div class="co-id-box__val" id="coInvId"></div></div><button class="co-copy" id="coCopyBtn">Copy</button></div>' +
+              '<div class="co-deliv-box"><div class="co-deliv-box__lbl">Your Product</div><div class="co-deliv-box__val" id="coDelivVal"></div><button class="co-reveal" id="coRevealBtn">👁 Click to reveal</button></div>' +
+              '<div class="co-actions"><a class="co-view-inv" id="coViewInv" href="#">🧾 View Full Invoice</a><button class="co-back" id="coBackBtn">← Back to Shop</button></div>' +
+            '</div>' +
           '</div>' +
         '</div>' +
       '</div>';
@@ -456,7 +492,7 @@
       if (!hasStock) { errEl.textContent = 'This product is currently out of stock.'; return; }
 
       var btn = document.getElementById('coSubmitBtn');
-      btn.disabled = true; btn.textContent = 'Processing…';
+      btn.disabled = true; btn.innerHTML = 'Processing…';
 
       setTimeout(function () {
         var invoiceId = generateId();
@@ -516,16 +552,31 @@
       var p = prods.find(function (x) { return x.id === productId; });
       if (!p) return;
       var sym = SYM[p.currency] || '€';
+      var price = Number(p.price).toFixed(2);
+
+      /* Left: product row */
       document.getElementById('coProductRow').innerHTML =
         '<span class="co-product-row__icon">' + (p.icon || '📦') + '</span>' +
         '<div class="co-product-row__info"><div class="co-product-row__name">' + escH(p.name) + '</div><div class="co-product-row__desc">' + escH(p.desc || '') + '</div></div>' +
-        '<span class="co-product-row__price">' + sym + Number(p.price).toFixed(2) + '</span>';
+        '<span class="co-product-row__price">' + sym + price + '</span>';
+
+      /* Right: summary panel */
+      document.getElementById('coSummaryProduct').innerHTML =
+        '<div class="co-right__product-icon">' + (p.icon || '📦') + '</div>' +
+        '<div><div class="co-right__product-name">' + escH(p.name) + '</div><div class="co-right__product-qty">Qty: 1</div></div>';
+      document.getElementById('coSumRows').innerHTML =
+        '<div class="co-right__row"><span>Subtotal</span><span>' + sym + price + '</span></div>' +
+        '<div class="co-right__row"><span>Tax</span><span>€0.00</span></div>' +
+        '<div class="co-right__row co-right__row--total"><span>Total</span><span>' + sym + price + '</span></div>';
+
       document.getElementById('coEmail').value = '';
       document.getElementById('coEmail').classList.remove('co-input-err');
       document.getElementById('coErr').textContent = '';
       document.getElementById('coFormState').style.display = '';
       document.getElementById('coSuccessState').style.display = 'none';
-      var sb = document.getElementById('coSubmitBtn'); sb.disabled = false; sb.textContent = 'Complete Purchase';
+      var sb = document.getElementById('coSubmitBtn');
+      sb.disabled = false;
+      sb.innerHTML = '<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M5 12l5 5L20 7"/></svg> Complete Purchase';
       document.getElementById('coOverlay').classList.add('open');
       document.getElementById('coModal').classList.add('open');
       document.body.style.overflow = 'hidden';
