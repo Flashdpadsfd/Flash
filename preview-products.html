@@ -109,9 +109,8 @@
     <main class="shop-main">
 
       <div class="shop-topbar">
-        <h1 class="shop-topbar__title" id="pageTitle">All Products</h1>
+        <h1 class="shop-topbar__title" id="pageTitle"><span id="resultsCount" style="color:rgba(255,255,255,.35);font-size:inherit;">6</span> products</h1>
         <div class="shop-topbar__right">
-          <span class="results-count" id="resultsCount">6 products</span>
           <select class="sort-select" id="sortSelect">
             <option value="default">Popular</option>
             <option value="price-asc">Price: Low to High</option>
@@ -199,8 +198,11 @@
     function renderCats() {
       var section = document.getElementById('catSection');
       if (!section) return;
-      var html = '<div class="sidebar__item active" data-cat="all" data-label="All Products">' +
-        '<span class="sidebar__item-icon" style="background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);">🌐</span>All Products</div>';
+      var html =
+        '<div class="sidebar__item sidebar__item--featured active" data-cat="all" data-label="Featured Offers">' +
+          '<span class="sidebar__item-icon" style="background:rgba(255,214,0,.14);color:#ffd600;">⭐</span>Featured Offers</div>' +
+        '<div class="sidebar__item" data-cat="all" data-label="All Products">' +
+          '<span class="sidebar__item-icon" style="background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);">🌐</span>All Products</div>';
       getCats().forEach(function(c) {
         var bg = hexToRgba(c.color, 0.15);
         html += '<div class="sidebar__item" data-cat="' + c.id + '" data-label="' + c.name + '">' +
@@ -250,34 +252,58 @@
 
     var CURRENCY_SYMBOLS = { EUR: '€', USD: '$', GBP: '£' };
 
-    function buildCard(p) {
+    function buildCard(p, index) {
       var sym = CURRENCY_SYMBOLS[p.currency] || '$';
-      var badge = '';
-      if (p.badge) {
-        var cls = p.badge === 'HOT' ? 'hot' : p.badge === 'NEW' ? 'new' : 'sale';
-        badge = '<div class="product-card__badges"><span class="badge badge--' + cls + '">' + p.badge + '</span></div>';
-      }
-      var priceHtml = p.origPrice
-        ? '<div><span class="product-card__price-orig">' + sym + Number(p.origPrice).toFixed(2) + '</span><span class="product-card__price">' + sym + Number(p.price).toFixed(2) + '</span></div>'
-        : '<span class="product-card__price">' + sym + Number(p.price).toFixed(2) + '</span>';
       var gradient = p.gradient || 'linear-gradient(135deg,#1a1a2e,#16213e)';
       var cardBg = p.image
         ? 'background-image:url(' + p.image + ');background-size:cover;background-position:center;'
         : 'background:' + gradient + ';';
       var icon = p.icon || '📦';
+
+      // Badge label
+      var labelCls, labelTxt;
+      if (p.badge === 'HOT')  { labelCls = 'best';     labelTxt = '🔥 Best Seller'; }
+      else if (p.badge === 'NEW')  { labelCls = 'new';  labelTxt = '✨ New Arrival'; }
+      else if (p.badge === 'SALE') { labelCls = 'sale'; labelTxt = '💰 Sale'; }
+      else                         { labelCls = 'featured'; labelTxt = '⭐ Featured'; }
+
+      // Stable pseudo-random rating per product
+      var seed = Number(p.id) || (index + 1);
+      var rating = (4.5 + (seed * 7 % 5) / 10).toFixed(1);
+      var reviewCount = 10 + (seed * 13 % 23);
+
+      // Stock
+      var inStock = p.inStock !== false && p.stock !== 0;
+      var stockHtml = inStock
+        ? '<span class="pc-stock pc-stock--in">In stock</span>'
+        : '<span class="pc-stock pc-stock--out">Out of stock</span>';
+
+      // Price
+      var priceHtml = p.origPrice
+        ? '<span class="pc-price-orig">' + sym + Number(p.origPrice).toFixed(2) + '</span><span class="pc-price">' + sym + Number(p.price).toFixed(2) + '</span>'
+        : '<span class="pc-price">' + sym + Number(p.price).toFixed(2) + '</span>';
+
+      // Large overlay text – split name at first space
+      var nameParts = (p.name || '').split(' ');
+      var big1 = nameParts[0] || '';
+      var big2 = nameParts.slice(1).join(' ') || '';
+
+      // Store name watermark
+      var storeName = 'Nexus';
+      try { var ct = JSON.parse(localStorage.getItem('nexus_content')); if (ct && ct.siteName) storeName = ct.siteName; } catch(e) {}
+
       return '<div class="product-card" data-name="' + esc(p.name) + '" data-cat="' + esc(p.category) + '" data-price="' + p.price + '" data-product-id="' + p.id + '">' +
-        '<div class="product-card__img" style="' + cardBg + '">' +
-          '<span class="product-card__img-icon">' + icon + '</span>' +
-          badge +
+        '<div class="pc-thumb" style="' + cardBg + '">' +
+          '<div class="pc-label pc-label--' + labelCls + '">' + labelTxt + '</div>' +
+          '<div class="pc-brand"><span class="pc-brand-icon">' + icon + '</span>' + esc(capitalize(p.category)) + '</div>' +
+          '<div class="pc-big-text">' + esc(big1) + (big2 ? '<br>' + esc(big2) : '') + '</div>' +
+          '<div class="pc-visual">' + icon + '</div>' +
+          '<div class="pc-watermark">' + storeName + '</div>' +
         '</div>' +
-        '<div class="product-card__body">' +
-          '<div class="product-card__cat">' + capitalize(p.category) + '</div>' +
-          '<div class="product-card__name">' + esc(p.name) + '</div>' +
-          '<div class="product-card__desc">' + esc(p.desc || '') + '</div>' +
-        '</div>' +
-        '<div class="product-card__footer">' +
-          priceHtml +
-          '<button class="btn-buy">Buy Now</button>' +
+        '<div class="pc-info">' +
+          '<div class="pc-info-top">' + stockHtml + '<span class="pc-rating">★ ' + rating + ' <span class="pc-rating-count">(' + reviewCount + ')</span></span></div>' +
+          '<div class="pc-info-name">' + esc(p.name) + (p.desc ? ' · ' + esc(p.desc) : '') + '</div>' +
+          '<div class="pc-info-bot"><span class="pc-buynow">Buy Now →</span><div>' + priceHtml + '</div></div>' +
         '</div>' +
       '</div>';
     }
@@ -287,8 +313,8 @@
       var countEl = document.getElementById('resultsCount');
       if (!grid) return;
       var products = getProducts();
-      grid.innerHTML = products.map(buildCard).join('');
-      if (countEl) countEl.textContent = products.length + ' product' + (products.length !== 1 ? 's' : '');
+      grid.innerHTML = products.map(function(p, i) { return buildCard(p, i); }).join('');
+      if (countEl) countEl.textContent = products.length;
       if (window._nexusFilterAndSort) window._nexusFilterAndSort();
     }
 
@@ -304,7 +330,7 @@
     function applyContent(c) {
       if (!c) return;
       if (c.siteName)      document.querySelectorAll('.nav__logo, .drawer__logo, .footer__logo').forEach(function(el) { el.textContent = c.siteName; });
-      if (c.productsTitle) { var e = document.getElementById('pageTitle'); if (e) e.textContent = c.productsTitle; }
+      // pageTitle is now "N products" – productsTitle not applied here
       if (c.footerDesc)    document.querySelectorAll('.footer__desc').forEach(function(el) { el.innerHTML  = c.footerDesc; });
       if (c.footerCopy)    document.querySelectorAll('.footer__copy').forEach(function(el) { el.textContent = c.footerCopy; });
     }

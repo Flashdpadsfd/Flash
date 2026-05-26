@@ -81,7 +81,7 @@
       return 0;
     });
     visible.forEach(function (c) { productGrid.appendChild(c); });
-    if (resultsCount) resultsCount.textContent = visible.length + ' product' + (visible.length !== 1 ? 's' : '');
+    if (resultsCount) resultsCount.textContent = visible.length;
     var empty = productGrid.querySelector('.empty-state');
     if (!visible.length) {
       if (!empty) {
@@ -109,8 +109,6 @@
       document.querySelectorAll('.sidebar__item').forEach(function (i) { i.classList.remove('active'); });
       item.classList.add('active');
       activeCat = item.dataset.cat;
-      var ttl = $('pageTitle');
-      if (ttl) ttl.textContent = item.dataset.label || 'All Products';
       filterAndSort();
     });
   });
