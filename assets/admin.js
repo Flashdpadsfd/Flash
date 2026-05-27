@@ -180,18 +180,30 @@
     document.getElementById('loginPass').value = '';
   };
 
+  var PAGE_TITLES = {
+    dashboard: 'Vue d\'ensemble', orders: 'Commandes', customers: 'Clients',
+    products: 'Produits', categories: 'Catégories', promos: 'Codes promo',
+    reviews: 'Avis clients', content: 'Contenu', stats: 'Statistiques',
+    links: 'Liens', settings: 'Paramètres'
+  };
+
   /* ── Pages ── */
   window.showPage = function (name) {
     document.querySelectorAll('.page').forEach(function (p) { p.classList.remove('active'); });
     document.querySelectorAll('.sidebar__link').forEach(function (l) { l.classList.remove('active'); });
-    document.getElementById('page-' + name).classList.add('active');
-    document.querySelector('[data-page="' + name + '"]').classList.add('active');
+    var pageEl = document.getElementById('page-' + name);
+    var linkEl = document.querySelector('[data-page="' + name + '"]');
+    if (pageEl) pageEl.classList.add('active');
+    if (linkEl) linkEl.classList.add('active');
+    var titleEl = document.getElementById('topbarTitle');
+    if (titleEl) titleEl.textContent = PAGE_TITLES[name] || name;
     if (name === 'dashboard') renderDashboard();
     if (name === 'products') renderProducts();
     if (name === 'categories') renderCategories();
     if (name === 'reviews') renderReviews();
     if (name === 'promos') renderPromos();
     if (name === 'orders') renderOrders();
+    if (name === 'customers') renderCustomers();
     if (name === 'content') loadContentForm();
     if (name === 'stats') loadStatsForm();
     if (name === 'links') loadLinksForm();
@@ -205,36 +217,200 @@
   }
 
   /* ── Dashboard ── */
+  var _chartPeriod = 7;
+
+  window.switchChartPeriod = function(days, btn) {
+    _chartPeriod = days;
+    document.querySelectorAll('.chart-tab').forEach(function(t) { t.classList.remove('active'); });
+    btn.classList.add('active');
+    var labels = { 7: '7 derniers jours', 30: '30 derniers jours', 90: '90 derniers jours' };
+    var el = document.getElementById('chartSubLabel');
+    if (el) el.textContent = labels[days] || '';
+    renderChart(getOrders(), days);
+  };
+
   function renderDashboard() {
     var products = getProducts();
     var stats = getStats();
-    var totalStock = products.reduce(function (a, p) { return a + getProductStock(p); }, 0);
-    var outOfStock = products.filter(function (p) { return getProductStock(p) === 0; }).length;
-
     var orders = getOrders();
-    var revenue = orders.reduce(function(a, o) { return a + (o.status !== 'refunded' ? Number(o.price || 0) : 0); }, 0);
+    var now = Date.now();
+    var day = 86400000;
+
+    var totalRev = orders.reduce(function(a, o) { return a + (o.status !== 'refunded' ? Number(o.price || 0) : 0); }, 0);
+    var lastMonthOrders = orders.filter(function(o) { return now - new Date(o.date).getTime() < 30 * day; });
+    var prevMonthOrders = orders.filter(function(o) { var t = now - new Date(o.date).getTime(); return t >= 30 * day && t < 60 * day; });
+
+    var revNow = lastMonthOrders.reduce(function(a,o){return a+(o.status!=='refunded'?Number(o.price||0):0);},0);
+    var revPrev = prevMonthOrders.reduce(function(a,o){return a+(o.status!=='refunded'?Number(o.price||0):0);},0);
+    var revTrend = revPrev > 0 ? Math.round((revNow - revPrev) / revPrev * 100) : (revNow > 0 ? 100 : 0);
+
+    var customers = {};
+    orders.forEach(function(o){ if(o.email) customers[o.email.toLowerCase()] = 1; });
+    var customerCount = Object.keys(customers).length;
+
+    var dateEl = document.getElementById('dashDate');
+    if (dateEl) dateEl.textContent = new Date().toLocaleDateString('fr-FR', {weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
     document.getElementById('dashKpis').innerHTML =
-      kpiCard('Produits', products.length, 'Total actif') +
-      kpiCard('Commandes', orders.length, 'Total reçues') +
-      kpiCard('Revenus', '€' + revenue.toFixed(2), 'Hors remboursements') +
-      kpiCard('Note moyenne', stats.rating + ' ★', 'Satisfaction client');
+      kpiCard('💰', 'Revenus totaux', '€' + totalRev.toFixed(2), revTrend) +
+      kpiCard('📦', 'Commandes', orders.length, lastMonthOrders.length - prevMonthOrders.length) +
+      kpiCard('👥', 'Clients uniques', customerCount, null) +
+      kpiCard('⭐', 'Note moyenne', stats.rating + ' /5', null);
+
+    renderChart(orders, _chartPeriod);
+    renderTopProducts(orders, products);
 
     var tbody = document.getElementById('dashTbody');
-    tbody.innerHTML = products.slice(0, 5).map(function (p) {
-      return '<tr>' +
-        '<td><span class="prod-icon">' + (p.icon || '📦') + '</span><span class="prod-name">' + esc(p.name) + '</span></td>' +
-        '<td>' + capitalize(p.category) + '</td>' +
-        '<td>' + (CURRENCY_SYMBOLS[p.currency] || '$') + Number(p.price).toFixed(2) + '</td>' +
-        '<td>' + stockPill(getProductStock(p)) + '</td>' +
-        '<td>' + badgeHtml(p.badge) + '</td>' +
+    var recent = orders.slice().sort(function(a,b){ return new Date(b.date) - new Date(a.date); }).slice(0, 8);
+    if (!recent.length) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:rgba(255,255,255,.3);padding:32px;">Aucune commande pour le moment.</td></tr>';
+    } else {
+      tbody.innerHTML = recent.map(function(o) {
+        var sym = CURRENCY_SYMBOLS[o.currency] || '€';
+        var d = o.date ? new Date(o.date).toLocaleDateString('fr-FR', {day:'numeric',month:'short'}) : '—';
+        var statusPill = o.status === 'refunded'
+          ? '<span class="stock-pill stock-pill--out">Remboursé</span>'
+          : '<span class="stock-pill stock-pill--ok">Complété</span>';
+        return '<tr>' +
+          '<td style="font-family:monospace;font-size:12px;color:rgba(255,255,255,.5);">' + esc(o.id) + '</td>' +
+          '<td><span class="prod-icon">' + (o.productIcon || '📦') + '</span><span class="prod-name">' + esc(o.productName || '') + '</span></td>' +
+          '<td style="color:rgba(255,255,255,.5);">' + esc(o.email || '') + '</td>' +
+          '<td style="font-weight:600;">' + sym + Number(o.price).toFixed(2) + '</td>' +
+          '<td style="color:rgba(255,255,255,.5);">' + d + '</td>' +
+          '<td>' + statusPill + '</td>' +
         '</tr>';
-    }).join('');
+      }).join('');
+    }
   }
 
-  function kpiCard(label, value, sub) {
-    return '<div class="kpi-card"><div class="kpi-card__label">' + label + '</div>' +
+  function kpiCard(icon, label, value, trend) {
+    var trendHtml = '';
+    if (trend !== null && trend !== undefined) {
+      var cls = trend > 0 ? 'up' : trend < 0 ? 'down' : 'flat';
+      var arrow = trend > 0 ? '↑' : trend < 0 ? '↓' : '→';
+      trendHtml = '<div class="kpi-card__trend kpi-card__trend--' + cls + '">' + arrow + ' ' + Math.abs(trend) + (typeof trend === 'number' ? '%' : '') + '</div>';
+    }
+    var iconColors = { '💰': 'rgba(124,58,237,.18)', '📦': 'rgba(59,130,246,.15)', '👥': 'rgba(34,197,94,.13)', '⭐': 'rgba(245,158,11,.15)' };
+    var bg = iconColors[icon] || 'rgba(255,255,255,.06)';
+    return '<div class="kpi-card">' +
+      '<div class="kpi-card__top">' +
+        '<div class="kpi-card__icon" style="background:' + bg + ';font-size:16px;">' + icon + '</div>' +
+        trendHtml +
+      '</div>' +
+      '<div class="kpi-card__label">' + label + '</div>' +
       '<div class="kpi-card__value">' + value + '</div>' +
-      '<div class="kpi-card__sub">' + sub + '</div></div>';
+    '</div>';
+  }
+
+  function renderChart(orders, days) {
+    var canvas = document.getElementById('revenueChart');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var W = canvas.offsetWidth || 600;
+    var H = 180;
+    canvas.width = W * window.devicePixelRatio;
+    canvas.height = H * window.devicePixelRatio;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+    var now = new Date(); now.setHours(23,59,59,999);
+    var buckets = [];
+    for (var i = days - 1; i >= 0; i--) {
+      var d = new Date(now); d.setDate(d.getDate() - i);
+      buckets.push({ date: d, rev: 0, label: days <= 7 ? d.toLocaleDateString('fr-FR',{weekday:'short'}) : (d.getDate() + '/' + (d.getMonth()+1)) });
+    }
+    orders.forEach(function(o) {
+      if (o.status === 'refunded') return;
+      var od = new Date(o.date); od.setHours(12,0,0,0);
+      for (var j = 0; j < buckets.length; j++) {
+        var bd = new Date(buckets[j].date); bd.setHours(0,0,0,0);
+        var be = new Date(bd); be.setHours(23,59,59,999);
+        if (od >= bd && od <= be) { buckets[j].rev += Number(o.price || 0); break; }
+      }
+    });
+
+    var maxRev = Math.max.apply(null, buckets.map(function(b){return b.rev;}));
+    if (maxRev === 0) maxRev = 1;
+
+    var totalPeriod = buckets.reduce(function(a,b){return a+b.rev;},0);
+    var el = document.getElementById('chartTotalRev');
+    if (el) el.textContent = '€' + totalPeriod.toFixed(2);
+
+    ctx.clearRect(0, 0, W, H);
+
+    var padL = 44, padR = 12, padT = 10, padB = 32;
+    var chartW = W - padL - padR;
+    var chartH = H - padT - padB;
+    var barW = Math.max(4, Math.floor(chartW / buckets.length * 0.55));
+    var gap = chartW / buckets.length;
+
+    /* Grid lines */
+    ctx.strokeStyle = 'rgba(255,255,255,.06)';
+    ctx.lineWidth = 1;
+    for (var g = 0; g <= 4; g++) {
+      var gy = padT + chartH - (g / 4) * chartH;
+      ctx.beginPath(); ctx.moveTo(padL, gy); ctx.lineTo(padL + chartW, gy); ctx.stroke();
+      if (g > 0) {
+        ctx.fillStyle = 'rgba(255,255,255,.25)';
+        ctx.font = '10px Inter,sans-serif';
+        ctx.textAlign = 'right';
+        ctx.fillText('€' + Math.round(maxRev * g / 4), padL - 4, gy + 3);
+      }
+    }
+
+    /* Bars */
+    buckets.forEach(function(b, idx) {
+      var x = padL + idx * gap + gap / 2 - barW / 2;
+      var barH2 = (b.rev / maxRev) * chartH;
+      var y = padT + chartH - barH2;
+
+      var grad = ctx.createLinearGradient(0, y, 0, padT + chartH);
+      grad.addColorStop(0, 'rgba(124,58,237,.85)');
+      grad.addColorStop(1, 'rgba(124,58,237,.15)');
+      ctx.fillStyle = b.rev > 0 ? grad : 'rgba(255,255,255,.04)';
+      var r = 4;
+      ctx.beginPath();
+      ctx.moveTo(x + r, y); ctx.lineTo(x + barW - r, y);
+      ctx.quadraticCurveTo(x + barW, y, x + barW, y + r);
+      ctx.lineTo(x + barW, padT + chartH); ctx.lineTo(x, padT + chartH);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath(); ctx.fill();
+
+      /* X labels — only every Nth for readability */
+      var step = days <= 7 ? 1 : days <= 30 ? 5 : 15;
+      if (idx % step === 0 || idx === buckets.length - 1) {
+        ctx.fillStyle = 'rgba(255,255,255,.3)';
+        ctx.font = '10px Inter,sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(b.label, x + barW / 2, padT + chartH + 18);
+      }
+    });
+  }
+
+  function renderTopProducts(orders, products) {
+    var el = document.getElementById('topProductsList');
+    if (!el) return;
+    var map = {};
+    orders.forEach(function(o) {
+      if (o.status === 'refunded') return;
+      var k = o.productName || '—';
+      if (!map[k]) map[k] = { icon: o.productIcon || '📦', rev: 0, count: 0 };
+      map[k].rev += Number(o.price || 0);
+      map[k].count++;
+    });
+    var sorted = Object.keys(map).sort(function(a,b){return map[b].rev - map[a].rev;}).slice(0, 5);
+    if (!sorted.length) { el.innerHTML = '<div style="color:rgba(255,255,255,.3);font-size:13px;padding:8px 0;">Aucune vente.</div>'; return; }
+    el.innerHTML = sorted.map(function(name, i) {
+      var d = map[name];
+      return '<div class="top-product-row">' +
+        '<div class="top-product-rank">' + (i+1) + '</div>' +
+        '<div class="top-product-icon">' + d.icon + '</div>' +
+        '<div class="top-product-info"><div class="top-product-name">' + esc(name) + '</div><div class="top-product-sales">' + d.count + ' vente' + (d.count > 1 ? 's' : '') + '</div></div>' +
+        '<div class="top-product-rev">€' + d.rev.toFixed(2) + '</div>' +
+      '</div>';
+    }).join('');
   }
 
   /* ── Products ── */
@@ -945,6 +1121,61 @@
     toast('Commande supprimée.');
   };
 
+  /* ── Customers ── */
+  var _allCustomers = [];
+
+  function buildCustomers(orders) {
+    var map = {};
+    orders.forEach(function(o) {
+      if (!o.email) return;
+      var k = o.email.toLowerCase();
+      if (!map[k]) map[k] = { email: o.email, orders: 0, total: 0, lastDate: null, products: [] };
+      map[k].orders++;
+      if (o.status !== 'refunded') map[k].total += Number(o.price || 0);
+      var d = o.date ? new Date(o.date) : null;
+      if (d && (!map[k].lastDate || d > map[k].lastDate)) map[k].lastDate = d;
+      if (o.productName && map[k].products.indexOf(o.productName) === -1) map[k].products.push(o.productName);
+    });
+    return Object.values(map).sort(function(a,b){return b.total - a.total;});
+  }
+
+  function renderCustomers(query) {
+    _allCustomers = buildCustomers(getOrders());
+    var q = (query || '').toLowerCase();
+    var list = q ? _allCustomers.filter(function(c) {
+      return c.email.toLowerCase().indexOf(q) !== -1 ||
+             c.products.join(' ').toLowerCase().indexOf(q) !== -1;
+    }) : _allCustomers;
+
+    var el = document.getElementById('customersCount');
+    if (el) el.textContent = _allCustomers.length + ' client' + (_allCustomers.length > 1 ? 's' : '') + ' uniques';
+
+    var tbody = document.getElementById('customersTbody');
+    if (!list.length) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:rgba(255,255,255,.3);padding:36px;">' +
+        (q ? 'Aucun client correspondant.' : 'Aucune commande enregistrée.') + '</td></tr>';
+      return;
+    }
+    tbody.innerHTML = list.map(function(c) {
+      var initials = c.email.slice(0,2).toUpperCase();
+      var d = c.lastDate ? c.lastDate.toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'numeric'}) : '—';
+      var prods = c.products.slice(0,3).join(', ') + (c.products.length > 3 ? ' +' + (c.products.length - 3) : '');
+      return '<tr>' +
+        '<td><div style="display:flex;align-items:center;gap:10px;">' +
+          '<div class="customer-avatar">' + esc(initials) + '</div>' +
+          '<span style="font-weight:500;">' + esc(c.email.split('@')[0]) + '</span>' +
+        '</div></td>' +
+        '<td style="color:rgba(255,255,255,.5);font-size:13px;">' + esc(c.email) + '</td>' +
+        '<td style="font-weight:600;">' + c.orders + '</td>' +
+        '<td style="font-weight:600;color:#a78bfa;">€' + c.total.toFixed(2) + '</td>' +
+        '<td style="color:rgba(255,255,255,.5);font-size:13px;">' + d + '</td>' +
+        '<td style="color:rgba(255,255,255,.5);font-size:12px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + esc(prods || '—') + '</td>' +
+      '</tr>';
+    }).join('');
+  }
+
+  window.filterCustomers = function(q) { renderCustomers(q); };
+
   /* ── Links ── */
   function loadLinksForm() {
     var l = getLinks();
@@ -1015,6 +1246,14 @@
 
   /* ── Init ── */
   function init() {
+    var c = getContent();
+    var siteName = c.siteName || 'Nexus';
+    var brandName = document.getElementById('sidebarBrandName');
+    var brandIcon = document.getElementById('sidebarBrandIcon');
+    var topbarAvatar = document.getElementById('topbarAvatar');
+    if (brandName) brandName.textContent = siteName;
+    if (brandIcon) brandIcon.textContent = siteName.charAt(0).toUpperCase();
+    if (topbarAvatar) topbarAvatar.textContent = 'A';
     renderDashboard();
     populateCatSelect();
     initModalPickers();
