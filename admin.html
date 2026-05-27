@@ -6,7 +6,7 @@
   <title>Nexus — Admin</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/admin.css?v=3" />
+  <link rel="stylesheet" href="assets/admin.css?v=4" />
 </head>
 <body>
 
@@ -64,13 +64,27 @@
             <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 17.5h7M17.5 14v7"/></svg>
             Catégories
           </a>
+          <a class="sidebar__link" data-page="reviews" onclick="showPage('reviews')">
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            Avis clients
+          </a>
+        </div>
+        <div class="sidebar__group">
+          <div class="sidebar__group-label">Marketing</div>
           <a class="sidebar__link" data-page="promos" onclick="showPage('promos')">
             <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
             Codes promo
           </a>
-          <a class="sidebar__link" data-page="reviews" onclick="showPage('reviews')">
-            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            Avis clients
+        </div>
+        <div class="sidebar__group">
+          <div class="sidebar__group-label">Outils</div>
+          <a class="sidebar__link" data-page="webhooks" onclick="showPage('webhooks')">
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+            Discord Webhooks
+          </a>
+          <a class="sidebar__link" data-page="security" onclick="showPage('security')">
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Sécurité
           </a>
         </div>
         <div class="sidebar__group">
@@ -121,49 +135,148 @@
 
       <!-- ─── DASHBOARD ─── -->
       <div class="page active" id="page-dashboard">
-        <div class="page-header">
+
+        <!-- Header -->
+        <div class="db-hdr">
           <div>
-            <h1>Vue d'ensemble</h1>
-            <div class="page-header__meta" id="dashDate"></div>
+            <h1 class="db-hdr__title">Dashboard</h1>
+            <p class="db-hdr__sub">Discover the latest updates and insights regarding your store today.</p>
           </div>
-          <div style="display:flex;gap:8px;">
-            <div class="chart-tabs">
-              <button class="chart-tab active" id="chartTab7" onclick="switchChartPeriod(7,this)">7j</button>
-              <button class="chart-tab" id="chartTab30" onclick="switchChartPeriod(30,this)">30j</button>
-              <button class="chart-tab" id="chartTab90" onclick="switchChartPeriod(90,this)">90j</button>
+          <div class="db-hdr__actions">
+            <button class="db-btn db-btn--accent" onclick="showPage('settings')">
+              <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              Quick setup
+            </button>
+            <div class="db-period-wrap" id="dbPeriodWrap">
+              <button class="db-btn db-btn--outline" id="dbPeriodBtn">
+                <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <span id="dbPeriodLabel">Today</span>
+                <svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+              </button>
+              <div class="db-period-drop" id="dbPeriodDrop">
+                <div class="db-preset active" data-period="today">Today</div>
+                <div class="db-preset" data-period="yesterday">Yesterday</div>
+                <div class="db-preset" data-period="week">This Week</div>
+                <div class="db-preset" data-period="lastweek">Last Week</div>
+                <div class="db-preset" data-period="month">This Month</div>
+                <div class="db-preset" data-period="lastmonth">Last Month</div>
+                <div class="db-preset" data-period="year">This Year</div>
+                <div class="db-preset" data-period="lastyear">Last Year</div>
+                <div class="db-preset" data-period="all">All Time</div>
+              </div>
+            </div>
+            <button class="db-btn db-btn--icon" onclick="showPage('settings')" aria-label="Settings">
+              <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="db-tabs">
+          <button class="db-tab active" onclick="switchDashTab('revenue',this)">Revenue &amp; Orders</button>
+          <button class="db-tab" onclick="switchDashTab('traffic',this)">Traffic &amp; Visitors</button>
+        </div>
+
+        <!-- ── Revenue & Orders ── -->
+        <div id="dbRevSection">
+          <div class="db-kpi-row" id="dbKpis"></div>
+          <div class="db-main-row">
+            <div class="db-charts-col">
+              <div class="db-chart-card">
+                <div class="db-chart-card__title">Revenue</div>
+                <canvas id="revenueChart" style="width:100%;"></canvas>
+              </div>
+              <div class="db-chart-card">
+                <div class="db-chart-card__title">Orders</div>
+                <canvas id="ordersChart" style="width:100%;"></canvas>
+              </div>
+            </div>
+            <div class="db-latest-col">
+              <div class="db-latest-hdr">Latest Completed Orders</div>
+              <div id="dbLatestOrders" class="db-latest-list"></div>
+            </div>
+          </div>
+          <div class="db-bottom-3">
+            <div class="db-mini-card">
+              <div class="db-mini-card__hdr">
+                <span>Best Selling Products</span>
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="opacity:.3;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              </div>
+              <div class="db-mini-card__body" id="dbBestProducts"></div>
+              <div class="db-mini-card__foot"><a onclick="showPage('products')" style="cursor:pointer;">View all →</a></div>
+            </div>
+            <div class="db-mini-card">
+              <div class="db-mini-card__hdr">
+                <span>Top Spenders</span>
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="opacity:.3;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              </div>
+              <div class="db-mini-card__body" id="dbTopSpenders"></div>
+              <div class="db-mini-card__foot"><a onclick="showPage('customers')" style="cursor:pointer;">View all →</a></div>
+            </div>
+            <div class="db-mini-card">
+              <div class="db-mini-card__hdr">
+                <span>Most Used Methods</span>
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="opacity:.3;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              </div>
+              <div class="db-mini-card__body" id="dbMostMethods"></div>
+              <div class="db-mini-card__foot"><a style="cursor:pointer;">View all →</a></div>
             </div>
           </div>
         </div>
-        <div class="kpi-grid" id="dashKpis"></div>
-        <div class="dash-bottom">
-          <div class="chart-card">
-            <div class="chart-card__header">
-              <div>
-                <div class="chart-card__title">Revenus</div>
-                <div class="chart-card__sub" id="chartSubLabel">7 derniers jours</div>
-              </div>
-              <div style="text-align:right;">
-                <div style="font-size:20px;font-weight:700;" id="chartTotalRev">€0.00</div>
-                <div style="font-size:12px;color:rgba(255,255,255,.4);">Total période</div>
-              </div>
+
+        <!-- ── Traffic & Visitors ── -->
+        <div id="dbTrafficSection" style="display:none;">
+          <div class="db-live-banner">
+            <span class="db-live-dot"></span>
+            <span id="dbLiveText" style="font-size:13px;font-weight:500;">0 visitors browsing your store right now</span>
+            <span class="db-live-hint">updates every 5s</span>
+          </div>
+          <div class="db-kpi-row db-kpi-row--6" id="dbTrafficKpis"></div>
+          <div class="db-2col-charts">
+            <div class="db-chart-card">
+              <div class="db-chart-card__title">Pageviews</div>
+              <canvas id="pageviewsChart" style="width:100%;"></canvas>
             </div>
-            <canvas id="revenueChart" height="180"></canvas>
+            <div class="db-chart-card">
+              <div class="db-chart-card__title">Sessions</div>
+              <canvas id="sessionsChart" style="width:100%;"></canvas>
+            </div>
           </div>
-          <div class="top-products-card">
-            <div class="top-products-card__title">Top produits</div>
-            <div id="topProductsList"></div>
+          <div class="db-analytics-grid">
+            <div class="db-analytics-card">
+              <div class="db-analytics-card__hdr">
+                <span>Pages</span>
+                <div class="db-pill-tabs"><button class="db-pill active">Path</button></div>
+              </div>
+              <div id="dbPages"></div>
+            </div>
+            <div class="db-analytics-card">
+              <div class="db-analytics-card__hdr">
+                <span>Sources</span>
+                <div class="db-pill-tabs"><button class="db-pill active">Referrer</button></div>
+              </div>
+              <div id="dbSources"></div>
+            </div>
+            <div class="db-analytics-card">
+              <div class="db-analytics-card__hdr">
+                <span>Environment</span>
+                <div class="db-pill-tabs">
+                  <button class="db-pill active" onclick="switchEnvTab('browser',this)">Browser</button>
+                  <button class="db-pill" onclick="switchEnvTab('os',this)">OS</button>
+                </div>
+              </div>
+              <div id="dbEnvironment"></div>
+            </div>
+            <div class="db-analytics-card">
+              <div class="db-analytics-card__hdr">
+                <span>Location</span>
+                <div class="db-pill-tabs"><button class="db-pill active">Country</button></div>
+              </div>
+              <div id="dbLocation"></div>
+            </div>
           </div>
         </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-          <div class="section-title" style="margin-bottom:0;">Commandes récentes</div>
-          <a onclick="showPage('orders')" style="font-size:12px;color:rgba(124,58,237,.9);cursor:pointer;font-weight:600;">Voir tout →</a>
-        </div>
-        <div class="table-wrap">
-          <table class="a-table" id="dashTable">
-            <thead><tr><th>Invoice ID</th><th>Produit</th><th>Email</th><th>Montant</th><th>Date</th><th>Statut</th></tr></thead>
-            <tbody id="dashTbody"></tbody>
-          </table>
-        </div>
+
       </div>
 
       <!-- ─── PRODUCTS ─── -->
@@ -281,10 +394,6 @@
           <h1>Commandes</h1>
           <div style="display:flex;gap:8px;align-items:center;">
             <input type="text" id="ordersSearch" placeholder="Rechercher ID, email, produit…" class="a-input" style="width:260px;font-size:13px;" oninput="filterOrders(this.value)" />
-            <a href="invoice.html" target="_blank" class="a-btn a-btn--ghost">
-              <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-              Page invoice
-            </a>
           </div>
         </div>
         <div class="table-wrap">
@@ -303,6 +412,103 @@
             <tbody id="ordersTbody"></tbody>
           </table>
         </div>
+      </div>
+
+      <!-- ─── ORDER DETAIL ─── -->
+      <div class="page" id="page-order-detail">
+
+        <!-- Header -->
+        <div class="od-page-header">
+          <div>
+            <button class="od-back-btn" onclick="goBackToOrders()">
+              <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+              Invoices
+            </button>
+            <div class="od-page-title">Invoice Details</div>
+            <div class="od-page-sub">View the details of the invoice.</div>
+          </div>
+          <div class="od-page-header__actions">
+            <button class="a-btn a-btn--ghost" onclick="downloadOrderPDF()">
+              <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>
+              Download PDF
+            </button>
+            <button class="a-btn a-btn--ghost" id="odRefundBtn" onclick="refundOrderFromDetail()">
+              <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.86"/></svg>
+              Mark as Refunded
+            </button>
+            <button class="a-btn a-btn--primary" onclick="viewOrderInvoice()">
+              <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              View Invoice
+            </button>
+          </div>
+        </div>
+
+        <!-- Order Info + Customer Info -->
+        <div class="od-grid-2">
+          <div class="od-card">
+            <div class="od-card__head">
+              <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              Order Information
+            </div>
+            <div class="od-card__body" id="odOrderInfo"></div>
+          </div>
+          <div class="od-card">
+            <div class="od-card__head">
+              <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              Customer Information
+            </div>
+            <div class="od-card__body" id="odCustomerInfo"></div>
+            <div class="od-actions-row" id="odCustActions"></div>
+          </div>
+        </div>
+
+        <!-- Items -->
+        <div class="od-card" style="margin-bottom:16px;">
+          <div class="od-card__head">
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.72a2 2 0 001.99-1.61L23 6H6"/></svg>
+            Items
+          </div>
+          <div class="table-wrap" style="border-radius:0;border:none;">
+            <table class="a-table od-items-thead">
+              <thead>
+                <tr>
+                  <th>Status</th>
+                  <th>Product &amp; Variant</th>
+                  <th>Quantity</th>
+                  <th>Total Price</th>
+                  <th>Custom Fields</th>
+                  <th>Delivered</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="odItemsTbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Payment History + Customer Feedback -->
+        <div class="od-grid-2">
+          <div class="od-card">
+            <div class="od-card__head">
+              <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+              Payment History
+            </div>
+            <div class="table-wrap" style="border-radius:0;border:none;">
+              <table class="a-table od-items-thead">
+                <thead><tr><th>Status</th><th>Amount</th><th>Paid At</th><th>External ID</th></tr></thead>
+                <tbody id="odPayTbody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="od-card">
+            <div class="od-card__head">
+              <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              Customer Feedback
+            </div>
+            <div class="od-card__body" id="odFeedback"></div>
+          </div>
+        </div>
+
       </div>
 
       <!-- ─── CLIENTS ─── -->
@@ -504,11 +710,10 @@
         </div>
       </div>
 
-      <!-- ─── SETTINGS ─── -->
-      <div class="page" id="page-settings">
-        <div class="page-header"><h1>Paramètres</h1></div>
+      <!-- ─── WEBHOOKS ─── -->
+      <div class="page" id="page-webhooks">
+        <div class="page-header"><h1>Discord Webhooks</h1></div>
 
-        <!-- Webhooks Discord -->
         <div style="margin-bottom:28px;">
           <div class="section-title" style="margin-bottom:6px;">🔔 Notifications Discord</div>
           <p style="font-size:13px;color:rgba(255,255,255,.4);margin:0 0 18px;line-height:1.65;">
@@ -875,23 +1080,86 @@
           </div>
         </div>
 
+      </div>
+
+      <!-- ─── SECURITY ─── -->
+      <div class="page" id="page-security">
+        <div class="page-header"><h1>Sécurité</h1></div>
+
+        <!-- KPI sécurité -->
+        <div class="kpi-grid" id="secKpis" style="margin-bottom:24px;"></div>
+
         <!-- Mot de passe -->
+        <div class="stats-editor" style="margin-bottom:20px;">
+          <div class="section-title" style="margin-bottom:16px;">Changer le mot de passe</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:600px;">
+            <div class="field" style="margin-bottom:0;">
+              <label>Nouveau mot de passe</label>
+              <input type="password" id="newPass" placeholder="••••••••" />
+            </div>
+            <div class="field" style="margin-bottom:0;">
+              <label>Confirmer</label>
+              <input type="password" id="confirmPass" placeholder="••••••••" />
+            </div>
+          </div>
+          <div style="margin-top:14px;display:flex;align-items:center;gap:12px;">
+            <button class="a-btn a-btn--primary" onclick="changePassword()">Enregistrer</button>
+            <div class="save-msg" id="settingsSaveMsg"></div>
+          </div>
+        </div>
+
+        <!-- Log tentatives -->
+        <div class="stats-editor" style="margin-bottom:20px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <div class="section-title" style="margin-bottom:0;">Tentatives de connexion</div>
+            <button class="a-btn a-btn--ghost" style="font-size:12px;padding:5px 14px;" onclick="clearLoginLog()">Effacer les logs</button>
+          </div>
+          <div class="table-wrap">
+            <table class="a-table">
+              <thead><tr><th>Date &amp; Heure</th><th>Résultat</th><th>Tentatives consécutives</th></tr></thead>
+              <tbody id="loginLogTbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Sessions actives / info -->
         <div class="stats-editor">
-          <div class="section-title" style="margin-bottom:16px;">🔑 Sécurité</div>
-          <div class="field">
-            <label>Nouveau mot de passe admin</label>
-            <input type="password" id="newPass" placeholder="••••••••" />
+          <div class="section-title" style="margin-bottom:14px;">Statut brute force</div>
+          <div id="bruteForceStatus" style="font-size:14px;color:rgba(255,255,255,.55);line-height:1.7;"></div>
+          <div style="margin-top:14px;">
+            <button class="a-btn a-btn--ghost" style="font-size:12px;padding:5px 14px;" onclick="resetBruteForce()">Réinitialiser compteur</button>
           </div>
-          <div class="field">
-            <label>Confirmer le mot de passe</label>
-            <input type="password" id="confirmPass" placeholder="••••••••" />
+        </div>
+      </div>
+
+      <!-- ─── SETTINGS ─── -->
+      <div class="page" id="page-settings">
+        <div class="page-header"><h1>Paramètres</h1></div>
+
+        <!-- Informations boutique -->
+        <div class="stats-editor" style="margin-bottom:20px;">
+          <div class="section-title" style="margin-bottom:16px;">Informations générales</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:700px;">
+            <div class="field" style="margin-bottom:0;">
+              <label>Nom de la boutique</label>
+              <input type="text" id="settingsStoreName" placeholder="Nexus Shop" />
+            </div>
+            <div class="field" style="margin-bottom:0;">
+              <label>Email de contact</label>
+              <input type="email" id="settingsEmail" placeholder="contact@monshop.fr" />
+            </div>
           </div>
-          <button class="a-btn a-btn--primary" onclick="changePassword()">Changer le mot de passe</button>
-          <div class="save-msg" id="settingsSaveMsg"></div>
-          <div class="danger-zone">
-            <div class="section-title" style="color:#ff4444;">Zone dangereuse</div>
-            <button class="a-btn a-btn--danger" onclick="resetAll()">Réinitialiser toutes les données</button>
+          <div style="margin-top:14px;display:flex;align-items:center;gap:12px;">
+            <button class="a-btn a-btn--primary" onclick="saveSettingsInfo()">Enregistrer</button>
+            <span class="save-msg" id="settingsInfoMsg"></span>
           </div>
+        </div>
+
+        <!-- Zone dangereuse -->
+        <div class="danger-zone">
+          <div class="section-title" style="color:#ff4444;margin-bottom:8px;">Zone dangereuse</div>
+          <p style="font-size:13px;color:rgba(255,255,255,.4);margin:0 0 14px;">Cette action supprime toutes les données (produits, commandes, avis, webhooks, etc.) de façon irréversible.</p>
+          <button class="a-btn a-btn--danger" onclick="resetAll()">Réinitialiser toutes les données</button>
         </div>
       </div>
 

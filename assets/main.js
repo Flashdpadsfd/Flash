@@ -380,6 +380,24 @@
     function getOrders() { try { return JSON.parse(localStorage.getItem('nexus_orders')) || []; } catch(e) { return []; } }
     function addOrder(o) { var a = getOrders(); a.unshift(o); localStorage.setItem('nexus_orders', JSON.stringify(a)); }
 
+    function parseUA(ua) {
+      var browser = 'Unknown', os = 'Unknown', mt;
+      if (/Windows NT 10\.0/.test(ua)) os = 'Windows 10/11';
+      else if (/Windows NT 6\.3/.test(ua)) os = 'Windows 8.1';
+      else if (/Windows NT 6\.1/.test(ua)) os = 'Windows 7';
+      else if (/Windows/.test(ua)) os = 'Windows';
+      else if ((mt = ua.match(/Mac OS X ([\d_]+)/))) os = 'macOS ' + mt[1].replace(/_/g, '.');
+      else if ((mt = ua.match(/Android ([\d.]+)/))) os = 'Android ' + mt[1];
+      else if (/iPhone|iPad/.test(ua) && (mt = ua.match(/OS ([\d_]+)/))) os = 'iOS ' + mt[1].replace(/_/g, '.');
+      else if (/Linux/.test(ua)) os = 'Linux';
+      if ((mt = ua.match(/Edg\/([\d]+)/))) browser = 'Edge ' + mt[1];
+      else if ((mt = ua.match(/OPR\/([\d]+)/))) browser = 'Opera ' + mt[1];
+      else if ((mt = ua.match(/Firefox\/([\d]+)/))) browser = 'Firefox ' + mt[1];
+      else if ((mt = ua.match(/Chrome\/([\d]+)/))) browser = 'Chrome ' + mt[1];
+      else if ((mt = ua.match(/Version\/([\d]+).*Safari/))) browser = 'Safari ' + mt[1];
+      return { browser: browser, os: os };
+    }
+
     /* inject modal HTML */
     var _html = '<div class="co-overlay" id="coOverlay"></div>' +
       '<div class="co-modal" id="coModal">' +
@@ -435,7 +453,7 @@
               '<div class="co-success__sub" id="coSuccessSub">Your product is ready below.</div>' +
               '<div class="co-id-box"><div class="co-id-box__meta"><div class="co-id-box__lbl">Invoice ID</div><div class="co-id-box__val" id="coInvId"></div></div><button class="co-copy" id="coCopyBtn">Copy</button></div>' +
               '<div class="co-deliv-box"><div class="co-deliv-box__lbl">Your Product</div><div class="co-deliv-box__val" id="coDelivVal"></div><button class="co-reveal" id="coRevealBtn">👁 Click to reveal</button></div>' +
-              '<div class="co-actions"><a class="co-view-inv" id="coViewInv" href="#">🧾 View Full Invoice</a><button class="co-back" id="coBackBtn">← Back to Shop</button></div>' +
+              '<div class="co-actions"><button class="co-back" id="coBackBtn">← Back to Shop</button></div>' +
             '</div>' +
           '</div>' +
         '</div>' +
@@ -573,7 +591,12 @@
       var btn = document.getElementById('coSubmitBtn');
       btn.disabled = true; btn.innerHTML = 'Processing…';
 
-      setTimeout(function () {
+      var _uaParsed = parseUA(navigator.userAgent);
+      var _geoP = fetch('https://ipapi.co/json/').then(function(r) { return r.json(); }).catch(function() { return null; });
+      var _delayP = new Promise(function(resolve) { setTimeout(resolve, 900); });
+
+      Promise.all([_delayP, _geoP]).then(function(res) {
+        var geoD = res[1] || {};
         var invoiceId = generateId();
         var deliverable = '';
         if (delivs.length > 0) {
@@ -597,7 +620,7 @@
             if (pi !== -1) { promos[pi].uses = (promos[pi].uses || 0) + 1; localStorage.setItem('nexus_promos', JSON.stringify(promos)); }
           } catch(e) {}
         }
-        addOrder({ id: invoiceId, date: new Date().toISOString(), email: email, productId: p.id, productName: p.name, productIcon: p.icon || '📦', productDesc: p.desc || '', price: finalPrice, currency: p.currency || 'EUR', deliverable: deliverable, status: 'completed', promoCode: _appliedPromo ? _appliedPromo.code : null });
+        addOrder({ id: invoiceId, date: new Date().toISOString(), email: email, productId: p.id, productName: p.name, productIcon: p.icon || '📦', productDesc: p.desc || '', price: finalPrice, currency: p.currency || 'EUR', deliverable: deliverable, status: 'completed', promoCode: _appliedPromo ? _appliedPromo.code : null, ip: geoD.ip || null, country: geoD.country_name || null, asn: geoD.org || null, browser: _uaParsed.browser, os: _uaParsed.os, userAgent: navigator.userAgent });
 
         /* Discord ORDER_CREATE webhook */
         _whkPost('ORDER_CREATE', {
@@ -606,7 +629,9 @@
             { name: 'Invoice ID', value: invoiceId, inline: true },
             { name: 'Produit', value: (p.icon||'📦')+' '+p.name, inline: true },
             { name: 'Email', value: email, inline: true },
-            { name: 'Montant', value: sym+finalPrice.toFixed(2) + (_appliedPromo ? ' (promo -'+_appliedPromo.discount+'%)' : ''), inline: true }
+            { name: 'Montant', value: sym+finalPrice.toFixed(2) + (_appliedPromo ? ' (promo -'+_appliedPromo.discount+'%)' : ''), inline: true },
+            { name: 'IP', value: geoD.ip || '—', inline: true },
+            { name: 'Pays', value: geoD.country_name || '—', inline: true }
           ],
           footer: { text: 'Nexus Store' }, timestamp: new Date().toISOString()
         });
@@ -618,8 +643,7 @@
         document.getElementById('coDelivVal').textContent = deliverable;
         document.getElementById('coDelivVal').classList.remove('shown');
         document.getElementById('coRevealBtn').textContent = '👁 Click to reveal';
-        document.getElementById('coViewInv').href = 'invoice.html?id=' + invoiceId;
-      }, 900);
+      });
     });
 
     window._nexusOpenCheckout = function (productId) {

@@ -160,12 +160,21 @@
       loginScreen.style.display = 'none';
       app.style.display = 'flex';
       discordLog('ADMIN_LOGIN', {});
+      var loginLog = JSON.parse(localStorage.getItem('nexus_login_log') || '[]');
+      loginLog.unshift({ time: new Date().toISOString(), success: true, attempts: 0 });
+      if (loginLog.length > 50) loginLog = loginLog.slice(0, 50);
+      localStorage.setItem('nexus_login_log', JSON.stringify(loginLog));
+      localStorage.setItem('nexus_login_fails', '0');
       init();
     } else {
       loginError.classList.add('show');
       document.getElementById('loginPass').value = '';
       var fails = parseInt(localStorage.getItem('nexus_login_fails') || '0') + 1;
       localStorage.setItem('nexus_login_fails', String(fails));
+      var loginLog = JSON.parse(localStorage.getItem('nexus_login_log') || '[]');
+      loginLog.unshift({ time: new Date().toISOString(), success: false, attempts: fails });
+      if (loginLog.length > 50) loginLog = loginLog.slice(0, 50);
+      localStorage.setItem('nexus_login_log', JSON.stringify(loginLog));
       if (fails >= 3) {
         discordLog('LOGIN_FAIL', { attempts: fails });
         localStorage.setItem('nexus_login_fails', '0');
@@ -184,7 +193,8 @@
     dashboard: 'Vue d\'ensemble', orders: 'Commandes', customers: 'Clients',
     products: 'Produits', categories: 'Catégories', promos: 'Codes promo',
     reviews: 'Avis clients', content: 'Contenu', stats: 'Statistiques',
-    links: 'Liens', settings: 'Paramètres'
+    links: 'Liens', webhooks: 'Discord Webhooks', security: 'Sécurité', settings: 'Paramètres',
+    'order-detail': 'Invoice Details'
   };
 
   /* ── Pages ── */
@@ -192,7 +202,8 @@
     document.querySelectorAll('.page').forEach(function (p) { p.classList.remove('active'); });
     document.querySelectorAll('.sidebar__link').forEach(function (l) { l.classList.remove('active'); });
     var pageEl = document.getElementById('page-' + name);
-    var linkEl = document.querySelector('[data-page="' + name + '"]');
+    var sidebarTarget = name === 'order-detail' ? 'orders' : name;
+    var linkEl = document.querySelector('[data-page="' + sidebarTarget + '"]');
     if (pageEl) pageEl.classList.add('active');
     if (linkEl) linkEl.classList.add('active');
     var titleEl = document.getElementById('topbarTitle');
@@ -207,7 +218,9 @@
     if (name === 'content') loadContentForm();
     if (name === 'stats') loadStatsForm();
     if (name === 'links') loadLinksForm();
-    if (name === 'settings') loadWebhooksForm();
+    if (name === 'webhooks') loadWebhooksForm();
+    if (name === 'security') renderSecurity();
+    if (name === 'settings') loadSettingsInfo();
   };
 
   /* ── Stock helper (supports legacy numeric stock + new deliverables) ── */
@@ -217,108 +230,184 @@
   }
 
   /* ── Dashboard ── */
-  var _chartPeriod = 7;
+  var _dashPeriod = 'today';
+  var _dashEnvTab = 'browser';
 
-  window.switchChartPeriod = function(days, btn) {
-    _chartPeriod = days;
-    document.querySelectorAll('.chart-tab').forEach(function(t) { t.classList.remove('active'); });
-    btn.classList.add('active');
-    var labels = { 7: '7 derniers jours', 30: '30 derniers jours', 90: '90 derniers jours' };
-    var el = document.getElementById('chartSubLabel');
-    if (el) el.textContent = labels[days] || '';
-    renderChart(getOrders(), days);
+  function getPeriodRange(p) {
+    var n = new Date();
+    var today = new Date(n.getFullYear(), n.getMonth(), n.getDate()).getTime();
+    var DAY = 86400000;
+    switch (p) {
+      case 'today':     return [today, today + DAY - 1];
+      case 'yesterday': return [today - DAY, today - 1];
+      case 'week':      { var dow = new Date(today).getDay(); var m = today - (dow === 0 ? 6 : dow - 1) * DAY; return [m, m + 7 * DAY - 1]; }
+      case 'lastweek':  { var dow2 = new Date(today).getDay(); var m2 = today - (dow2 === 0 ? 6 : dow2 - 1) * DAY; return [m2 - 7 * DAY, m2 - 1]; }
+      case 'month':     { var y = n.getFullYear(), mo = n.getMonth(); return [new Date(y, mo, 1).getTime(), new Date(y, mo + 1, 0).getTime() + DAY - 1]; }
+      case 'lastmonth': { var y2 = n.getFullYear(), mo2 = n.getMonth(); return [new Date(y2, mo2 - 1, 1).getTime(), new Date(y2, mo2, 0).getTime() + DAY - 1]; }
+      case 'year':      { var yr = n.getFullYear(); return [new Date(yr, 0, 1).getTime(), new Date(yr, 11, 31).getTime() + DAY - 1]; }
+      case 'lastyear':  { var yr2 = n.getFullYear() - 1; return [new Date(yr2, 0, 1).getTime(), new Date(yr2, 11, 31).getTime() + DAY - 1]; }
+      default: return [0, Date.now() + DAY];
+    }
+  }
+
+  function filterByRange(orders, range) {
+    return orders.filter(function(o) { var t = new Date(o.date).getTime(); return t >= range[0] && t <= range[1]; });
+  }
+
+  function timeAgo(dateStr) {
+    var secs = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+    if (secs < 60) return 'just now';
+    if (secs < 3600) { var m = Math.floor(secs / 60); return m + ' min ago'; }
+    if (secs < 86400) { var h = Math.floor(secs / 3600); return h + ' hour' + (h > 1 ? 's' : '') + ' ago'; }
+    var d = Math.floor(secs / 86400); return d + ' day' + (d > 1 ? 's' : '') + ' ago';
+  }
+
+  function pctChange(curr, prev) {
+    if (prev === 0) return curr > 0 ? 100 : 0;
+    return Math.round((curr - prev) / prev * 100);
+  }
+
+  window.switchDashTab = function(tab, el) {
+    document.querySelectorAll('.db-tab').forEach(function(t) { t.classList.remove('active'); });
+    el.classList.add('active');
+    document.getElementById('dbRevSection').style.display = tab === 'revenue' ? '' : 'none';
+    document.getElementById('dbTrafficSection').style.display = tab === 'traffic' ? '' : 'none';
+    if (tab === 'traffic') renderTrafficSection();
+  };
+
+  window.switchEnvTab = function(type, el) {
+    _dashEnvTab = type;
+    el.closest('.db-pill-tabs').querySelectorAll('.db-pill').forEach(function(b) { b.classList.remove('active'); });
+    el.classList.add('active');
+    renderEnvSection();
   };
 
   function renderDashboard() {
-    var products = getProducts();
-    var stats = getStats();
     var orders = getOrders();
-    var now = Date.now();
-    var day = 86400000;
+    var range = getPeriodRange(_dashPeriod);
+    var span = range[1] - range[0];
+    var prevRange = [range[0] - span - 1, range[0] - 1];
+    var curr = filterByRange(orders, range).filter(function(o) { return o.status !== 'refunded'; });
+    var prev = filterByRange(orders, prevRange).filter(function(o) { return o.status !== 'refunded'; });
+    var currRev = curr.reduce(function(a, o) { return a + Number(o.price || 0); }, 0);
+    var prevRev = prev.reduce(function(a, o) { return a + Number(o.price || 0); }, 0);
+    var currEmails = {}, prevEmails = {};
+    curr.forEach(function(o) { if (o.email) currEmails[o.email.toLowerCase()] = 1; });
+    prev.forEach(function(o) { if (o.email) prevEmails[o.email.toLowerCase()] = 1; });
+    var currCust = Object.keys(currEmails).length, prevCust = Object.keys(prevEmails).length;
+    var currAov = curr.length ? currRev / curr.length : 0;
+    var prevAov = prev.length ? prevRev / prev.length : 0;
 
-    var totalRev = orders.reduce(function(a, o) { return a + (o.status !== 'refunded' ? Number(o.price || 0) : 0); }, 0);
-    var lastMonthOrders = orders.filter(function(o) { return now - new Date(o.date).getTime() < 30 * day; });
-    var prevMonthOrders = orders.filter(function(o) { var t = now - new Date(o.date).getTime(); return t >= 30 * day && t < 60 * day; });
+    var kpisEl = document.getElementById('dbKpis');
+    if (kpisEl) kpisEl.innerHTML =
+      dbKpiCard('REVENUE', '€' + currRev.toFixed(2), pctChange(currRev, prevRev),
+        '<svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>') +
+      dbKpiCard('ORDERS', curr.length, pctChange(curr.length, prev.length),
+        '<svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>') +
+      dbKpiCard('CUSTOMERS', currCust, pctChange(currCust, prevCust),
+        '<svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>') +
+      dbKpiCard('AVG. ORDER VALUE', '€' + currAov.toFixed(2), pctChange(currAov, prevAov),
+        '<svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>');
 
-    var revNow = lastMonthOrders.reduce(function(a,o){return a+(o.status!=='refunded'?Number(o.price||0):0);},0);
-    var revPrev = prevMonthOrders.reduce(function(a,o){return a+(o.status!=='refunded'?Number(o.price||0):0);},0);
-    var revTrend = revPrev > 0 ? Math.round((revNow - revPrev) / revPrev * 100) : (revNow > 0 ? 100 : 0);
+    renderAreaChart('revenueChart', orders, 7, 'currency');
+    renderAreaChart('ordersChart', orders, 7, 'count');
 
-    var customers = {};
-    orders.forEach(function(o){ if(o.email) customers[o.email.toLowerCase()] = 1; });
-    var customerCount = Object.keys(customers).length;
+    var latestEl = document.getElementById('dbLatestOrders');
+    if (latestEl) {
+      var recent = orders.filter(function(o) { return o.status !== 'refunded'; })
+        .sort(function(a, b) { return new Date(b.date) - new Date(a.date); }).slice(0, 15);
+      latestEl.innerHTML = recent.length ? recent.map(function(o) {
+        var s = CURRENCY_SYMBOLS[o.currency] || '€';
+        return '<div class="db-latest-item" onclick="viewOrderDetail(\'' + esc(o.id) + '\')">' +
+          '<div class="db-latest-thumb">' + (o.productIcon || '📦') + '</div>' +
+          '<div class="db-latest-info"><div class="db-latest-name">' + esc(o.productName || '—') + '</div>' +
+          '<div class="db-latest-method">' + esc(o.paymentMethod || 'Direct') + '</div></div>' +
+          '<div class="db-latest-right"><div class="db-latest-price">' + s + Number(o.price).toFixed(2) + '</div>' +
+          '<div class="db-latest-time">' + timeAgo(o.date) + '</div></div></div>';
+      }).join('') : '<div style="padding:32px 20px;text-align:center;color:rgba(255,255,255,.3);font-size:13px;">No orders yet.</div>';
+    }
 
-    var dateEl = document.getElementById('dashDate');
-    if (dateEl) dateEl.textContent = new Date().toLocaleDateString('fr-FR', {weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    var prodMap = {};
+    orders.forEach(function(o) {
+      if (o.status === 'refunded') return;
+      var k = o.productName || '—';
+      if (!prodMap[k]) prodMap[k] = { icon: o.productIcon || '📦', count: 0, rev: 0 };
+      prodMap[k].count++; prodMap[k].rev += Number(o.price || 0);
+    });
+    var bestEl = document.getElementById('dbBestProducts');
+    if (bestEl) {
+      var pk = Object.keys(prodMap).sort(function(a,b){ return prodMap[b].count - prodMap[a].count; }).slice(0, 5);
+      bestEl.innerHTML = pk.length ? pk.map(function(name) {
+        var d = prodMap[name];
+        return '<div class="db-mini-row"><div class="db-mini-thumb">' + d.icon + '</div>' +
+          '<div class="db-mini-info"><div class="db-mini-name">' + esc(name) + '</div><div class="db-mini-sub">' + d.count + ' sale' + (d.count>1?'s':'') + '</div></div>' +
+          '<div class="db-mini-amount">€' + d.rev.toFixed(2) + '</div></div>';
+      }).join('') : '<div style="padding:20px;color:rgba(255,255,255,.3);font-size:13px;text-align:center;">No data yet.</div>';
+    }
 
-    document.getElementById('dashKpis').innerHTML =
-      kpiCard('💰', 'Revenus totaux', '€' + totalRev.toFixed(2), revTrend) +
-      kpiCard('📦', 'Commandes', orders.length, lastMonthOrders.length - prevMonthOrders.length) +
-      kpiCard('👥', 'Clients uniques', customerCount, null) +
-      kpiCard('⭐', 'Note moyenne', stats.rating + ' /5', null);
+    var spendMap = {};
+    orders.forEach(function(o) {
+      if (o.status === 'refunded' || !o.email) return;
+      var k = o.email.toLowerCase();
+      if (!spendMap[k]) spendMap[k] = { count: 0, total: 0 };
+      spendMap[k].count++; spendMap[k].total += Number(o.price || 0);
+    });
+    var spendEl = document.getElementById('dbTopSpenders');
+    if (spendEl) {
+      var sk = Object.keys(spendMap).sort(function(a,b){ return spendMap[b].total - spendMap[a].total; }).slice(0, 5);
+      spendEl.innerHTML = sk.length ? sk.map(function(email, i) {
+        var d = spendMap[email];
+        return '<div class="db-mini-row"><div class="db-mini-avatar">' + (i+1) + '</div>' +
+          '<div class="db-mini-info"><div class="db-mini-name">' + esc(email) + '</div><div class="db-mini-sub">' + d.count + ' order' + (d.count>1?'s':'') + '</div></div>' +
+          '<div class="db-mini-amount">€' + d.total.toFixed(2) + '</div></div>';
+      }).join('') : '<div style="padding:20px;color:rgba(255,255,255,.3);font-size:13px;text-align:center;">No data yet.</div>';
+    }
 
-    renderChart(orders, _chartPeriod);
-    renderTopProducts(orders, products);
-
-    var tbody = document.getElementById('dashTbody');
-    var recent = orders.slice().sort(function(a,b){ return new Date(b.date) - new Date(a.date); }).slice(0, 8);
-    if (!recent.length) {
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:rgba(255,255,255,.3);padding:32px;">Aucune commande pour le moment.</td></tr>';
-    } else {
-      tbody.innerHTML = recent.map(function(o) {
-        var sym = CURRENCY_SYMBOLS[o.currency] || '€';
-        var d = o.date ? new Date(o.date).toLocaleDateString('fr-FR', {day:'numeric',month:'short'}) : '—';
-        var statusPill = o.status === 'refunded'
-          ? '<span class="stock-pill stock-pill--out">Remboursé</span>'
-          : '<span class="stock-pill stock-pill--ok">Complété</span>';
-        return '<tr>' +
-          '<td style="font-family:monospace;font-size:12px;color:rgba(255,255,255,.5);">' + esc(o.id) + '</td>' +
-          '<td><span class="prod-icon">' + (o.productIcon || '📦') + '</span><span class="prod-name">' + esc(o.productName || '') + '</span></td>' +
-          '<td style="color:rgba(255,255,255,.5);">' + esc(o.email || '') + '</td>' +
-          '<td style="font-weight:600;">' + sym + Number(o.price).toFixed(2) + '</td>' +
-          '<td style="color:rgba(255,255,255,.5);">' + d + '</td>' +
-          '<td>' + statusPill + '</td>' +
-        '</tr>';
-      }).join('');
+    var methodMap = {};
+    orders.forEach(function(o) {
+      if (o.status === 'refunded') return;
+      var k = o.paymentMethod || 'Direct';
+      if (!methodMap[k]) methodMap[k] = { count: 0, total: 0 };
+      methodMap[k].count++; methodMap[k].total += Number(o.price || 0);
+    });
+    var methodEl = document.getElementById('dbMostMethods');
+    if (methodEl) {
+      var mk = Object.keys(methodMap).sort(function(a,b){ return methodMap[b].total - methodMap[a].total; }).slice(0, 5);
+      methodEl.innerHTML = mk.length ? mk.map(function(m) {
+        var d = methodMap[m];
+        return '<div class="db-mini-row"><div class="db-mini-avatar" style="background:rgba(124,58,237,.2);color:#a78bfa;">' + m[0].toUpperCase() + '</div>' +
+          '<div class="db-mini-info"><div class="db-mini-name">' + esc(m) + '</div><div class="db-mini-sub">' + d.count + ' order' + (d.count>1?'s':'') + '</div></div>' +
+          '<div class="db-mini-amount">€' + d.total.toFixed(2) + '</div></div>';
+      }).join('') : '<div style="padding:20px;color:rgba(255,255,255,.3);font-size:13px;text-align:center;">No data yet.</div>';
     }
   }
 
-  function kpiCard(icon, label, value, trend) {
-    var trendHtml = '';
-    if (trend !== null && trend !== undefined) {
-      var cls = trend > 0 ? 'up' : trend < 0 ? 'down' : 'flat';
-      var arrow = trend > 0 ? '↑' : trend < 0 ? '↓' : '→';
-      trendHtml = '<div class="kpi-card__trend kpi-card__trend--' + cls + '">' + arrow + ' ' + Math.abs(trend) + (typeof trend === 'number' ? '%' : '') + '</div>';
-    }
-    var iconColors = { '💰': 'rgba(124,58,237,.18)', '📦': 'rgba(59,130,246,.15)', '👥': 'rgba(34,197,94,.13)', '⭐': 'rgba(245,158,11,.15)' };
-    var bg = iconColors[icon] || 'rgba(255,255,255,.06)';
-    return '<div class="kpi-card">' +
-      '<div class="kpi-card__top">' +
-        '<div class="kpi-card__icon" style="background:' + bg + ';font-size:16px;">' + icon + '</div>' +
-        trendHtml +
-      '</div>' +
-      '<div class="kpi-card__label">' + label + '</div>' +
-      '<div class="kpi-card__value">' + value + '</div>' +
+  function dbKpiCard(label, value, change, iconSvg) {
+    var cls = change > 0 ? 'up' : change < 0 ? 'down' : 'flat';
+    var arrow = change > 0 ? '↗' : change < 0 ? '↘' : '→';
+    return '<div class="db-kpi-card">' +
+      '<div class="db-kpi-card__label">' + iconSvg + ' ' + label + '</div>' +
+      '<div class="db-kpi-card__value">' + value + '</div>' +
+      '<div class="db-kpi-card__change db-kpi-card__change--' + cls + '">' + arrow + ' ' + Math.abs(change) + '% change</div>' +
     '</div>';
   }
 
-  function renderChart(orders, days) {
-    var canvas = document.getElementById('revenueChart');
+  function renderAreaChart(canvasId, orders, days, mode) {
+    var canvas = document.getElementById(canvasId);
     if (!canvas) return;
     var ctx = canvas.getContext('2d');
-    var W = canvas.offsetWidth || 600;
-    var H = 180;
-    canvas.width = W * window.devicePixelRatio;
-    canvas.height = H * window.devicePixelRatio;
-    canvas.style.width = W + 'px';
-    canvas.style.height = H + 'px';
+    var W = canvas.offsetWidth || 600, H = 200;
+    canvas.width = W * window.devicePixelRatio; canvas.height = H * window.devicePixelRatio;
+    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
     ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    ctx.clearRect(0, 0, W, H);
 
     var now = new Date(); now.setHours(23,59,59,999);
+    var DAY = 86400000;
     var buckets = [];
     for (var i = days - 1; i >= 0; i--) {
-      var d = new Date(now); d.setDate(d.getDate() - i);
-      buckets.push({ date: d, rev: 0, label: days <= 7 ? d.toLocaleDateString('fr-FR',{weekday:'short'}) : (d.getDate() + '/' + (d.getMonth()+1)) });
+      var d = new Date(now); d.setDate(d.getDate() - i); d.setHours(0,0,0,0);
+      buckets.push({ date: d, val: 0, label: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) });
     }
     orders.forEach(function(o) {
       if (o.status === 'refunded') return;
@@ -326,91 +415,123 @@
       for (var j = 0; j < buckets.length; j++) {
         var bd = new Date(buckets[j].date); bd.setHours(0,0,0,0);
         var be = new Date(bd); be.setHours(23,59,59,999);
-        if (od >= bd && od <= be) { buckets[j].rev += Number(o.price || 0); break; }
+        if (od >= bd && od <= be) { buckets[j].val += mode === 'currency' ? Number(o.price || 0) : 1; break; }
       }
     });
 
-    var maxRev = Math.max.apply(null, buckets.map(function(b){return b.rev;}));
-    if (maxRev === 0) maxRev = 1;
+    var maxVal = Math.max.apply(null, buckets.map(function(b) { return b.val; })) || 1;
+    var padL = 52, padR = 12, padT = 8, padB = 26, cW = W - padL - padR, cH = H - padT - padB;
 
-    var totalPeriod = buckets.reduce(function(a,b){return a+b.rev;},0);
-    var el = document.getElementById('chartTotalRev');
-    if (el) el.textContent = '€' + totalPeriod.toFixed(2);
-
-    ctx.clearRect(0, 0, W, H);
-
-    var padL = 44, padR = 12, padT = 10, padB = 32;
-    var chartW = W - padL - padR;
-    var chartH = H - padT - padB;
-    var barW = Math.max(4, Math.floor(chartW / buckets.length * 0.55));
-    var gap = chartW / buckets.length;
-
-    /* Grid lines */
-    ctx.strokeStyle = 'rgba(255,255,255,.06)';
-    ctx.lineWidth = 1;
+    ctx.font = '10px Inter,sans-serif';
     for (var g = 0; g <= 4; g++) {
-      var gy = padT + chartH - (g / 4) * chartH;
-      ctx.beginPath(); ctx.moveTo(padL, gy); ctx.lineTo(padL + chartW, gy); ctx.stroke();
-      if (g > 0) {
-        ctx.fillStyle = 'rgba(255,255,255,.25)';
-        ctx.font = '10px Inter,sans-serif';
-        ctx.textAlign = 'right';
-        ctx.fillText('€' + Math.round(maxRev * g / 4), padL - 4, gy + 3);
-      }
+      var gy = padT + cH - (g / 4) * cH;
+      ctx.strokeStyle = 'rgba(255,255,255,.05)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(padL, gy); ctx.lineTo(padL + cW, gy); ctx.stroke();
+      ctx.fillStyle = 'rgba(255,255,255,.25)'; ctx.textAlign = 'right';
+      var tick = maxVal * g / 4;
+      ctx.fillText(mode === 'currency' ? ('$' + tick.toFixed(2)) : Math.round(tick), padL - 6, gy + 3);
     }
 
-    /* Bars */
-    buckets.forEach(function(b, idx) {
-      var x = padL + idx * gap + gap / 2 - barW / 2;
-      var barH2 = (b.rev / maxRev) * chartH;
-      var y = padT + chartH - barH2;
+    if (buckets.length < 2) return;
 
-      var grad = ctx.createLinearGradient(0, y, 0, padT + chartH);
-      grad.addColorStop(0, 'rgba(124,58,237,.85)');
-      grad.addColorStop(1, 'rgba(124,58,237,.15)');
-      ctx.fillStyle = b.rev > 0 ? grad : 'rgba(255,255,255,.04)';
-      var r = 4;
-      ctx.beginPath();
-      ctx.moveTo(x + r, y); ctx.lineTo(x + barW - r, y);
-      ctx.quadraticCurveTo(x + barW, y, x + barW, y + r);
-      ctx.lineTo(x + barW, padT + chartH); ctx.lineTo(x, padT + chartH);
-      ctx.lineTo(x, y + r);
-      ctx.quadraticCurveTo(x, y, x + r, y);
-      ctx.closePath(); ctx.fill();
-
-      /* X labels — only every Nth for readability */
-      var step = days <= 7 ? 1 : days <= 30 ? 5 : 15;
-      if (idx % step === 0 || idx === buckets.length - 1) {
-        ctx.fillStyle = 'rgba(255,255,255,.3)';
-        ctx.font = '10px Inter,sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText(b.label, x + barW / 2, padT + chartH + 18);
-      }
+    var pts = buckets.map(function(b, idx) {
+      return { x: padL + (idx / (buckets.length - 1)) * cW, y: padT + cH - (b.val / maxVal) * cH };
     });
+
+    var xStep = Math.max(1, Math.ceil(buckets.length / 6));
+    ctx.fillStyle = 'rgba(255,255,255,.3)'; ctx.textAlign = 'center';
+    buckets.forEach(function(b, idx) {
+      if (idx % xStep === 0 || idx === buckets.length - 1) ctx.fillText(b.label, pts[idx].x, padT + cH + 18);
+    });
+
+    ctx.beginPath(); ctx.moveTo(pts[0].x, pts[0].y);
+    for (var k = 0; k < pts.length - 1; k++) {
+      var x0 = k > 0 ? pts[k-1].x : pts[0].x, y0 = k > 0 ? pts[k-1].y : pts[0].y;
+      var x1 = pts[k].x, y1 = pts[k].y, x2 = pts[k+1].x, y2 = pts[k+1].y;
+      var x3 = k < pts.length - 2 ? pts[k+2].x : x2, y3 = k < pts.length - 2 ? pts[k+2].y : y2;
+      ctx.bezierCurveTo(x1 + (x2-x0)/6, y1 + (y2-y0)/6, x2 - (x3-x1)/6, y2 - (y3-y1)/6, x2, y2);
+    }
+    var strokeCol = mode === 'currency' ? '#8b6cf0' : '#22d3ee';
+    ctx.strokeStyle = strokeCol; ctx.lineWidth = 2; ctx.stroke();
+    ctx.lineTo(pts[pts.length-1].x, padT + cH); ctx.lineTo(pts[0].x, padT + cH); ctx.closePath();
+    var grad = ctx.createLinearGradient(0, padT, 0, padT + cH);
+    grad.addColorStop(0, mode === 'currency' ? 'rgba(139,108,240,.35)' : 'rgba(34,211,238,.25)');
+    grad.addColorStop(1, mode === 'currency' ? 'rgba(139,108,240,.02)' : 'rgba(34,211,238,.02)');
+    ctx.fillStyle = grad; ctx.fill();
   }
 
-  function renderTopProducts(orders, products) {
-    var el = document.getElementById('topProductsList');
+  function renderTrafficSection() {
+    var orders = getOrders();
+    var naCard = function(label, iconSvg) {
+      return '<div class="db-kpi-card"><div class="db-kpi-card__label">' + iconSvg + ' ' + label + '</div>' +
+        '<div class="db-kpi-card__value" style="font-size:20px;color:rgba(255,255,255,.3);">N/A</div>' +
+        '<div class="db-kpi-card__change db-kpi-card__change--flat">analytics not tracked</div></div>';
+    };
+    var kpisEl = document.getElementById('dbTrafficKpis');
+    if (kpisEl) kpisEl.innerHTML =
+      naCard('PAGEVIEWS',         '<svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>') +
+      naCard('VISITORS',          '<svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>') +
+      naCard('VISITS',            '<svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>') +
+      naCard('BOUNCE RATE',       '<svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>') +
+      naCard('AVG. SESSION TIME', '<svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>') +
+      naCard('CONVERSION RATE',   '<svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>');
+
+    renderEmptyAreaChart('pageviewsChart', '#7c6cf0');
+    renderEmptyAreaChart('sessionsChart', '#a855f7');
+
+    var pagesEl = document.getElementById('dbPages');
+    if (pagesEl) pagesEl.innerHTML = '<div style="padding:20px 18px;color:rgba(255,255,255,.25);font-size:13px;">Page analytics not tracked yet.</div>';
+    var sourcesEl = document.getElementById('dbSources');
+    if (sourcesEl) sourcesEl.innerHTML = '<div style="padding:20px 18px;color:rgba(255,255,255,.25);font-size:13px;">Traffic sources not tracked yet.</div>';
+
+    renderEnvSection();
+    renderAnalyticsBar('dbLocation', orders, 'country', function(v) { return v || null; });
+  }
+
+  function renderEnvSection() {
+    var orders = getOrders();
+    renderAnalyticsBar('dbEnvironment', orders, _dashEnvTab === 'browser' ? 'browser' : 'os', function(v) { return v && v !== 'Unknown' ? v : null; });
+  }
+
+  function renderAnalyticsBar(elId, orders, key, labelFn) {
+    var el = document.getElementById(elId);
     if (!el) return;
     var map = {};
     orders.forEach(function(o) {
-      if (o.status === 'refunded') return;
-      var k = o.productName || '—';
-      if (!map[k]) map[k] = { icon: o.productIcon || '📦', rev: 0, count: 0 };
-      map[k].rev += Number(o.price || 0);
-      map[k].count++;
+      var v = o[key];
+      var label = labelFn ? labelFn(v) : v;
+      if (!label) return;
+      map[label] = (map[label] || 0) + 1;
     });
-    var sorted = Object.keys(map).sort(function(a,b){return map[b].rev - map[a].rev;}).slice(0, 5);
-    if (!sorted.length) { el.innerHTML = '<div style="color:rgba(255,255,255,.3);font-size:13px;padding:8px 0;">Aucune vente.</div>'; return; }
-    el.innerHTML = sorted.map(function(name, i) {
-      var d = map[name];
-      return '<div class="top-product-row">' +
-        '<div class="top-product-rank">' + (i+1) + '</div>' +
-        '<div class="top-product-icon">' + d.icon + '</div>' +
-        '<div class="top-product-info"><div class="top-product-name">' + esc(name) + '</div><div class="top-product-sales">' + d.count + ' vente' + (d.count > 1 ? 's' : '') + '</div></div>' +
-        '<div class="top-product-rev">€' + d.rev.toFixed(2) + '</div>' +
-      '</div>';
+    var keys = Object.keys(map).sort(function(a,b) { return map[b] - map[a]; }).slice(0, 8);
+    var total = keys.reduce(function(a, k) { return a + map[k]; }, 0) || 1;
+    var maxC = map[keys[0]] || 1;
+    if (!keys.length) { el.innerHTML = '<div style="padding:14px 18px;color:rgba(255,255,255,.25);font-size:13px;">No order data yet.</div>'; return; }
+    el.innerHTML = keys.map(function(k) {
+      var count = map[k], pct = Math.round(count / total * 100), barPct = Math.round(count / maxC * 100);
+      return '<div class="db-analytics-row">' +
+        '<div class="db-analytics-bar-wrap"><div class="db-analytics-path">' + esc(k) + '</div>' +
+        '<div class="db-analytics-bar" style="width:' + barPct + '%"></div></div>' +
+        '<span class="db-analytics-num">' + count + '</span>' +
+        '<span class="db-analytics-pct">' + pct + '%</span></div>';
     }).join('');
+  }
+
+  function renderEmptyAreaChart(canvasId, strokeColor) {
+    var canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var W = canvas.offsetWidth || 400, H = 200;
+    canvas.width = W * window.devicePixelRatio; canvas.height = H * window.devicePixelRatio;
+    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    ctx.clearRect(0, 0, W, H);
+    var padL = 40, padR = 12, padT = 8, padB = 26, cW = W - padL - padR, cH = H - padT - padB;
+    for (var g = 0; g <= 4; g++) {
+      var gy = padT + cH - (g / 4) * cH;
+      ctx.strokeStyle = 'rgba(255,255,255,.05)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(padL, gy); ctx.lineTo(padL + cW, gy); ctx.stroke();
+    }
   }
 
   /* ── Products ── */
@@ -1078,7 +1199,7 @@
         '<td style="font-size:13px;color:rgba(255,255,255,.5);white-space:nowrap;">' + d + '</td>' +
         '<td>' + statusPill + '</td>' +
         '<td><div class="action-group">' +
-          '<a class="a-btn a-btn--icon" href="invoice.html?id=' + esc(o.id) + '" target="_blank" title="Voir la facture">🧾</a>' +
+          '<button class="a-btn a-btn--icon" onclick="viewOrderDetail(\'' + esc(o.id) + '\')" title="Voir la facture">🧾</button>' +
           (o.status !== 'refunded' ? '<button class="a-btn a-btn--icon" onclick="refundOrder(\'' + esc(o.id) + '\')" title="Rembourser" style="color:#ffa01e;">↩</button>' : '') +
           '<button class="a-btn a-btn--icon" onclick="deleteOrder(\'' + esc(o.id) + '\')" title="Supprimer" style="color:#ff5555;">🗑</button>' +
         '</div></td>' +
@@ -1119,6 +1240,232 @@
     setOrders(getOrders().filter(function(o) { return o.id !== id; }));
     renderOrders(document.getElementById('ordersSearch').value);
     toast('Commande supprimée.');
+  };
+
+  /* ── Order Detail ── */
+  window.viewOrderDetail = function(id) {
+    var orders = getOrders();
+    var o = orders.find(function(x) { return x.id === id; });
+    if (!o) { toast('Commande introuvable.'); return; }
+    window._detailOrderId = id;
+
+    var sym = CURRENCY_SYMBOLS[o.currency] || '€';
+    var price = Number(o.price || 0);
+
+    function pill(status) {
+      return status === 'refunded'
+        ? '<span class="stock-pill stock-pill--out">Refunded</span>'
+        : status === 'pending'
+          ? '<span class="stock-pill stock-pill--low">Pending</span>'
+          : '<span class="stock-pill stock-pill--ok">Completed</span>';
+    }
+    function detRow(label, val) {
+      return '<div class="inv-det-row"><span class="inv-det-row__lbl">' + label + '</span><span class="inv-det-row__val">' + val + '</span></div>';
+    }
+
+    var d = o.date ? new Date(o.date) : null;
+    var dateStr = d ? d.toLocaleDateString('fr-FR') + ' ' + d.toLocaleTimeString('fr-FR') : '—';
+
+    /* ── Order Information ── */
+    var orderInfoEl = document.getElementById('odOrderInfo');
+    if (orderInfoEl) {
+      var totalPaidBadge = o.status !== 'refunded'
+        ? '<span style="display:inline-block;background:rgba(34,197,94,.15);color:#22c55e;border-radius:5px;padding:1px 8px;font-size:12px;font-weight:600;">+' + sym + price.toFixed(2) + '</span>'
+        : '<span style="color:rgba(255,255,255,.4);">—</span>';
+      orderInfoEl.innerHTML =
+        detRow('ID', '<span style="font-family:\'Courier New\',monospace;font-size:11px;color:rgba(255,255,255,.55);">' + esc(o.id) + '</span>') +
+        detRow('Status', pill(o.status)) +
+        detRow('Payment Method', o.paymentMethod ? esc(o.paymentMethod) : '—') +
+        detRow('Subtotal', sym + price.toFixed(2)) +
+        detRow('Total Price', '<strong>' + sym + price.toFixed(2) + '</strong>') +
+        detRow('Total Price (USD)', o.priceUSD ? '$' + Number(o.priceUSD).toFixed(2) : '—') +
+        detRow('Total Paid', totalPaidBadge) +
+        detRow('Created At', dateStr) +
+        detRow('Completed At', o.status === 'completed' ? dateStr : '—');
+    }
+
+    /* ── Customer Information ── */
+    var custInfoEl = document.getElementById('odCustomerInfo');
+    if (custInfoEl) {
+      custInfoEl.innerHTML =
+        detRow('E-mail Address', '<span style="word-break:break-all;">' + esc(o.email || '—') + '</span>') +
+        detRow('IP Address', o.ip ? esc(o.ip) : '—') +
+        detRow('Country', o.country ? esc(o.country) : '—') +
+        detRow('Browser', o.browser ? esc(o.browser) : '—') +
+        detRow('Operating System', o.os ? esc(o.os) : '—') +
+        detRow('User Agent', o.userAgent ? '<span style="font-size:11px;color:rgba(255,255,255,.45);">' + esc(o.userAgent) + '</span>' : '—') +
+        detRow('ASN', o.asn ? esc(String(o.asn)) : '—');
+    }
+    var custActEl = document.getElementById('odCustActions');
+    if (custActEl) {
+      custActEl.innerHTML =
+        '<button class="a-btn--blue-outline" onclick="viewCustomerFromDetail(\'' + esc(o.email || '') + '\')">' +
+          '<svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>' +
+          'View Customer' +
+        '</button>' +
+        '<button class="a-btn--red-outline" onclick="blacklistEmail(\'' + esc(o.email || '') + '\')">' +
+          '<svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>' +
+          'Blacklist E-mail' +
+        '</button>' +
+        (o.ip ? '<button class="a-btn--red-outline" onclick="blacklistIP(\'' + esc(o.ip) + '\')">' +
+          '<svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>' +
+          'Blacklist IP' +
+        '</button>' : '');
+    }
+
+    /* ── Refund button ── */
+    var refundBtn = document.getElementById('odRefundBtn');
+    if (refundBtn) refundBtn.style.display = o.status === 'refunded' ? 'none' : '';
+
+    /* ── Items ── */
+    var itemsTbody = document.getElementById('odItemsTbody');
+    if (itemsTbody) {
+      itemsTbody.innerHTML = '<tr>' +
+        '<td>' + pill(o.status) + '</td>' +
+        '<td><div style="display:flex;align-items:center;gap:10px;">' +
+          '<span class="prod-icon">' + (o.productIcon || '📦') + '</span>' +
+          '<div><div style="font-weight:500;">' + esc(o.productName || '') + '</div>' +
+          '<div style="font-size:12px;color:rgba(255,255,255,.4);">' + esc(o.productDesc || 'Default') + '</div></div>' +
+        '</div></td>' +
+        '<td>1</td>' +
+        '<td style="font-weight:500;">' + sym + price.toFixed(2) + '</td>' +
+        '<td style="color:rgba(255,255,255,.3);">—</td>' +
+        '<td><span class="od-deliv od-deliv--hidden" id="odDelivText">' + esc(o.deliverable || '—') + '</span></td>' +
+        '<td><button class="a-btn a-btn--icon" id="odRevealBtn" onclick="toggleDeliverable()" title="View">' +
+          '<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>' +
+          ' View' +
+        '</button></td>' +
+      '</tr>';
+    }
+
+    /* ── Payment History ── */
+    var payTbody = document.getElementById('odPayTbody');
+    if (payTbody) {
+      payTbody.innerHTML = '<tr>' +
+        '<td>' + pill(o.status) + '</td>' +
+        '<td style="font-weight:500;">' + sym + price.toFixed(2) + '</td>' +
+        '<td style="font-size:12px;color:rgba(255,255,255,.5);white-space:nowrap;">' + dateStr + '</td>' +
+        '<td><span class="od-ext-id">' + (o.externalId ? esc(o.externalId) : '—') + '</span></td>' +
+      '</tr>';
+    }
+
+    /* ── Customer Feedback ── */
+    var feedbackEl = document.getElementById('odFeedback');
+    if (feedbackEl) {
+      var reviews = [];
+      try { reviews = JSON.parse(localStorage.getItem('nexus_reviews') || '[]'); } catch(e) {}
+      var related = reviews.filter(function(r) { return r.email === o.email || r.product === o.productName; });
+      if (!related.length) {
+        feedbackEl.innerHTML = '<p style="color:rgba(255,255,255,.3);font-size:13px;padding:12px 0;">No feedback submitted yet.</p>';
+      } else {
+        feedbackEl.innerHTML = related.map(function(r) {
+          var stars = '';
+          for (var i = 0; i < (r.rating || 5); i++) stars += '★';
+          return '<div style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06);">' +
+            '<div style="color:#f59e0b;font-size:13px;">' + stars + '</div>' +
+            '<div style="font-size:13px;margin-top:4px;">' + esc(r.text || '') + '</div>' +
+          '</div>';
+        }).join('');
+      }
+    }
+
+    showPage('order-detail');
+  };
+
+  window.goBackToOrders = function() { showPage('orders'); };
+
+  window.refundOrderFromDetail = function() {
+    var id = window._detailOrderId;
+    if (!id) return;
+    var orders = getOrders();
+    var o = orders.find(function(x) { return x.id === id; });
+    if (!o || !confirm('Mark ' + id + ' as refunded?')) return;
+    o.status = 'refunded';
+    setOrders(orders);
+    var cfg = getWebhookFor('REFUND');
+    if (cfg && cfg.url) {
+      var sym = CURRENCY_SYMBOLS[o.currency] || '€';
+      sendDiscordWebhook(cfg.url, {
+        title: '↩️ Remboursement effectué', color: 15158332,
+        fields: [
+          { name: 'Invoice ID', value: o.id || '—', inline: true },
+          { name: 'Produit', value: (o.productIcon || '') + ' ' + (o.productName || '—'), inline: true },
+          { name: 'Email', value: o.email || '—', inline: true },
+          { name: 'Montant', value: sym + Number(o.price || 0).toFixed(2), inline: true }
+        ],
+        footer: { text: 'Nexus Store' }, timestamp: new Date().toISOString()
+      }, cfg.msg);
+    }
+    toast('Commande remboursée ✓');
+    viewOrderDetail(id);
+  };
+
+  window.toggleDeliverable = function() {
+    var el = document.getElementById('odDelivText');
+    var btn = document.getElementById('odRevealBtn');
+    if (!el) return;
+    var hidden = el.classList.toggle('od-deliv--hidden');
+    if (btn) btn.innerHTML = hidden
+      ? '<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg> View'
+      : '<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg> Hide';
+  };
+
+  window.viewCustomerFromDetail = function(email) {
+    if (!email) return;
+    showPage('customers');
+    var searchEl = document.getElementById('customersSearch');
+    if (searchEl) { searchEl.value = email; filterCustomers(email); }
+  };
+
+  window.downloadOrderPDF = function() {
+    var id = window._detailOrderId;
+    if (!id) return;
+    var orders = getOrders();
+    var o = orders.find(function(x) { return x.id === id; });
+    if (!o) return;
+    var sym = CURRENCY_SYMBOLS[o.currency] || '€';
+    var d = o.date ? new Date(o.date) : new Date();
+    var dateStr = d.toLocaleDateString('fr-FR') + ' ' + d.toLocaleTimeString('fr-FR');
+    var w = window.open('', '_blank');
+    w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Invoice ' + o.id + '</title><style>' +
+      'body{font-family:Inter,sans-serif;background:#fff;color:#111;padding:48px;max-width:680px;margin:0 auto;}' +
+      'h1{font-size:24px;font-weight:700;margin-bottom:4px;}' +
+      '.sub{color:#666;font-size:13px;margin-bottom:32px;}' +
+      'table{width:100%;border-collapse:collapse;margin-top:24px;}' +
+      'th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#999;padding:8px 0;border-bottom:1px solid #eee;}' +
+      'td{padding:10px 0;border-bottom:1px solid #f0f0f0;font-size:13px;}' +
+      '.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;background:#d1fae5;color:#065f46;}' +
+      '.total{font-weight:700;font-size:16px;}' +
+      '@media print{body{padding:24px;}}' +
+    '</style></head><body>' +
+      '<h1>Invoice</h1><div class="sub">' + esc(o.id) + ' &middot; ' + dateStr + '</div>' +
+      '<table><thead><tr><th>Produit</th><th>Qté</th><th>Prix</th><th>Statut</th></tr></thead><tbody>' +
+      '<tr><td>' + (o.productIcon || '') + ' ' + esc(o.productName || '') + '<br><small style="color:#999;">' + esc(o.productDesc || '') + '</small></td>' +
+      '<td>1</td><td>' + sym + Number(o.price || 0).toFixed(2) + '</td><td><span class="badge">Completed</span></td></tr>' +
+      '</tbody></table>' +
+      '<div style="margin-top:24px;text-align:right;"><span class="total">Total : ' + sym + Number(o.price || 0).toFixed(2) + '</span></div>' +
+      '<div style="margin-top:32px;font-size:12px;color:#999;">Client : ' + esc(o.email || '') + '</div>' +
+      '<script>window.onload=function(){window.print();}<\/script>' +
+    '</body></html>');
+    w.document.close();
+  };
+
+  window.viewOrderInvoice = function() { window.downloadOrderPDF(); };
+
+  window.blacklistEmail = function(email) {
+    if (!email || !confirm('Blacklister l\'email ' + email + ' ?')) return;
+    var bl = JSON.parse(localStorage.getItem('nexus_blacklist_emails') || '[]');
+    if (bl.indexOf(email) === -1) bl.push(email);
+    localStorage.setItem('nexus_blacklist_emails', JSON.stringify(bl));
+    toast('Email blacklisté ✓');
+  };
+
+  window.blacklistIP = function(ip) {
+    if (!ip || !confirm('Blacklister l\'IP ' + ip + ' ?')) return;
+    var bl = JSON.parse(localStorage.getItem('nexus_blacklist_ips') || '[]');
+    if (bl.indexOf(ip) === -1) bl.push(ip);
+    localStorage.setItem('nexus_blacklist_ips', JSON.stringify(bl));
+    toast('IP blacklistée ✓');
   };
 
   /* ── Customers ── */
@@ -1225,6 +1572,78 @@
     toast('Données réinitialisées.');
     renderProducts();
     loadStatsForm();
+  };
+
+  function loadSettingsInfo() {
+    var c = JSON.parse(localStorage.getItem('nexus_content') || '{}');
+    var nameEl = document.getElementById('settingsStoreName');
+    var emailEl = document.getElementById('settingsEmail');
+    if (nameEl) nameEl.value = c.siteName || '';
+    if (emailEl) emailEl.value = c.contactEmail || '';
+  }
+
+  window.saveSettingsInfo = function() {
+    var c = JSON.parse(localStorage.getItem('nexus_content') || '{}');
+    var name = document.getElementById('settingsStoreName').value.trim();
+    var email = document.getElementById('settingsEmail').value.trim();
+    if (name) c.siteName = name;
+    if (email) c.contactEmail = email;
+    localStorage.setItem('nexus_content', JSON.stringify(c));
+    var msg = document.getElementById('settingsInfoMsg');
+    if (msg) { msg.textContent = 'Enregistré ✓'; setTimeout(function() { msg.textContent = ''; }, 2000); }
+    toast('Paramètres enregistrés ✓');
+  };
+
+  /* ── Security ── */
+  function renderSecurity() {
+    var fails = parseInt(localStorage.getItem('nexus_login_fails') || '0');
+    var log = JSON.parse(localStorage.getItem('nexus_login_log') || '[]');
+    var blocked = log.filter(function(e) { return !e.success; }).length;
+    var lastOk = log.find(function(e) { return e.success; });
+
+    var kpisEl = document.getElementById('secKpis');
+    if (kpisEl) {
+      kpisEl.innerHTML =
+        kpiCard('🔒', 'Tentatives échouées', String(blocked), blocked > 0 ? 'down' : 'flat') +
+        kpiCard('✅', 'Dernière connexion réussie', lastOk ? new Date(lastOk.time).toLocaleDateString('fr-FR') : '—', 'flat') +
+        kpiCard('⚠️', 'Compteur brute force', fails + ' / 3', fails > 0 ? 'down' : 'up');
+    }
+
+    var tbody = document.getElementById('loginLogTbody');
+    if (tbody) {
+      if (!log.length) {
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:rgba(255,255,255,.3);padding:24px;">Aucun événement enregistré</td></tr>';
+      } else {
+        tbody.innerHTML = log.map(function(e) {
+          var d = new Date(e.time);
+          var dateStr = d.toLocaleDateString('fr-FR') + ' ' + d.toLocaleTimeString('fr-FR');
+          var status = e.success
+            ? '<span class="stock-pill stock-pill--ok">Succès</span>'
+            : '<span class="stock-pill stock-pill--out">Échec</span>';
+          return '<tr><td>' + dateStr + '</td><td>' + status + '</td><td style="color:rgba(255,255,255,.5);">' + (e.success ? '—' : e.attempts + ' consécutive(s)') + '</td></tr>';
+        }).join('');
+      }
+    }
+
+    var bfEl = document.getElementById('bruteForceStatus');
+    if (bfEl) {
+      bfEl.innerHTML = fails === 0
+        ? '<span style="color:#22c55e;">Aucune tentative en cours. Système protégé.</span>'
+        : '<span style="color:#f59e0b;">Attention — ' + fails + ' tentative(s) échouée(s) en cours. Le webhook Discord sera déclenché à 3.</span>';
+    }
+  }
+
+  window.clearLoginLog = function() {
+    if (!confirm('Effacer tout l\'historique de connexion ?')) return;
+    localStorage.removeItem('nexus_login_log');
+    renderSecurity();
+    toast('Logs effacés ✓');
+  };
+
+  window.resetBruteForce = function() {
+    localStorage.setItem('nexus_login_fails', '0');
+    renderSecurity();
+    toast('Compteur brute force réinitialisé ✓');
   };
 
   /* ── Helpers ── */
