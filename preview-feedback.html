@@ -687,5 +687,165 @@
   })();
   </script>
 
+  <!-- ─── LEAVE A REVIEW FORM ─── -->
+  <div class="reviews-wrap" style="padding-top:0;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:80px;" class="feedback-forms-grid">
+
+      <!-- Review form -->
+      <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.09);border-radius:18px;padding:28px;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:6px;">Laisser un avis</div>
+        <h2 style="font-family:Lancelot,serif;font-size:28px;font-weight:500;margin:0 0 20px;line-height:1.2;">Votre expérience</h2>
+        <div style="margin-bottom:14px;">
+          <label style="font-size:12px;font-weight:600;color:rgba(255,255,255,.5);display:block;margin-bottom:6px;">Note <span style="color:#ff5555;">*</span></label>
+          <div id="starPicker" style="display:flex;gap:6px;cursor:pointer;" data-rating="5">
+            <svg class="star-pick" data-v="1" width="28" height="28" viewBox="0 0 24 24" fill="#f5a623"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg class="star-pick" data-v="2" width="28" height="28" viewBox="0 0 24 24" fill="#f5a623"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg class="star-pick" data-v="3" width="28" height="28" viewBox="0 0 24 24" fill="#f5a623"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg class="star-pick" data-v="4" width="28" height="28" viewBox="0 0 24 24" fill="#f5a623"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg class="star-pick" data-v="5" width="28" height="28" viewBox="0 0 24 24" fill="#f5a623"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+          <div>
+            <label style="font-size:12px;font-weight:600;color:rgba(255,255,255,.5);display:block;margin-bottom:6px;">Prénom <span style="color:#ff5555;">*</span></label>
+            <input type="text" id="rvFormName" placeholder="Alex L." style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:9px 14px;color:#fff;font-size:13px;font-family:Inter,sans-serif;outline:none;box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:600;color:rgba(255,255,255,.5);display:block;margin-bottom:6px;">Produit acheté</label>
+            <input type="text" id="rvFormProduct" placeholder="Netflix Premium" style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:9px 14px;color:#fff;font-size:13px;font-family:Inter,sans-serif;outline:none;box-sizing:border-box;" />
+          </div>
+        </div>
+        <div style="margin-bottom:14px;">
+          <label style="font-size:12px;font-weight:600;color:rgba(255,255,255,.5);display:block;margin-bottom:6px;">Votre avis <span style="color:#ff5555;">*</span></label>
+          <textarea id="rvFormText" rows="4" placeholder="Livraison instantanée, produit parfait…" style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:10px 14px;color:#fff;font-size:13px;font-family:Inter,sans-serif;outline:none;resize:vertical;box-sizing:border-box;"></textarea>
+        </div>
+        <button onclick="submitReview()" style="background:#fff;color:#000;border:none;border-radius:8px;padding:11px 22px;font-size:13px;font-weight:700;cursor:pointer;width:100%;transition:background 150ms;">⭐ Soumettre mon avis</button>
+        <div id="rvFormMsg" style="font-size:13px;margin-top:10px;text-align:center;min-height:18px;"></div>
+      </div>
+
+      <!-- Support ticket form -->
+      <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.09);border-radius:18px;padding:28px;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:6px;">Support</div>
+        <h2 style="font-family:Lancelot,serif;font-size:28px;font-weight:500;margin:0 0 20px;line-height:1.2;">Ouvrir un ticket</h2>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+          <div>
+            <label style="font-size:12px;font-weight:600;color:rgba(255,255,255,.5);display:block;margin-bottom:6px;">Nom <span style="color:#ff5555;">*</span></label>
+            <input type="text" id="tkName" placeholder="Votre prénom" style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:9px 14px;color:#fff;font-size:13px;font-family:Inter,sans-serif;outline:none;box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:600;color:rgba(255,255,255,.5);display:block;margin-bottom:6px;">Email <span style="color:#ff5555;">*</span></label>
+            <input type="email" id="tkEmail" placeholder="vous@exemple.com" style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:9px 14px;color:#fff;font-size:13px;font-family:Inter,sans-serif;outline:none;box-sizing:border-box;" />
+          </div>
+        </div>
+        <div style="margin-bottom:12px;">
+          <label style="font-size:12px;font-weight:600;color:rgba(255,255,255,.5);display:block;margin-bottom:6px;">Sujet <span style="color:#ff5555;">*</span></label>
+          <select id="tkSubject" style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:9px 14px;color:#fff;font-size:13px;font-family:Inter,sans-serif;outline:none;box-sizing:border-box;">
+            <option value="">Sélectionner…</option>
+            <option value="Commande non reçue">Commande non reçue</option>
+            <option value="Produit ne fonctionne pas">Produit ne fonctionne pas</option>
+            <option value="Demande de remboursement">Demande de remboursement</option>
+            <option value="Question générale">Question générale</option>
+            <option value="Autre">Autre</option>
+          </select>
+        </div>
+        <div style="margin-bottom:14px;">
+          <label style="font-size:12px;font-weight:600;color:rgba(255,255,255,.5);display:block;margin-bottom:6px;">Message <span style="color:#ff5555;">*</span></label>
+          <textarea id="tkMessage" rows="4" placeholder="Décrivez votre problème en détail…" style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:10px 14px;color:#fff;font-size:13px;font-family:Inter,sans-serif;outline:none;resize:vertical;box-sizing:border-box;"></textarea>
+        </div>
+        <button onclick="submitTicket()" style="background:rgba(139,92,246,.9);color:#fff;border:none;border-radius:8px;padding:11px 22px;font-size:13px;font-weight:700;cursor:pointer;width:100%;transition:background 150ms;">🎫 Envoyer le ticket</button>
+        <div id="tkMsg" style="font-size:13px;margin-top:10px;text-align:center;min-height:18px;"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <style>
+  @media (max-width: 700px) { .feedback-forms-grid { grid-template-columns: 1fr !important; } }
+  </style>
+
+  <script>
+  (function() {
+    var starPicker = document.getElementById('starPicker');
+    starPicker.addEventListener('click', function(e) {
+      var s = e.target.closest('.star-pick');
+      if (!s) return;
+      var v = parseInt(s.dataset.v);
+      starPicker.dataset.rating = v;
+      starPicker.querySelectorAll('.star-pick').forEach(function(el) {
+        el.setAttribute('fill', parseInt(el.dataset.v) <= v ? '#f5a623' : 'rgba(255,255,255,.15)');
+      });
+    });
+
+    window.submitReview = function() {
+      var name = document.getElementById('rvFormName').value.trim();
+      var product = document.getElementById('rvFormProduct').value.trim();
+      var text = document.getElementById('rvFormText').value.trim();
+      var stars = parseInt(starPicker.dataset.rating || '5');
+      var msgEl = document.getElementById('rvFormMsg');
+      if (!name || !text) { msgEl.textContent = 'Nom et avis requis.'; msgEl.style.color = '#ff5555'; return; }
+      msgEl.textContent = 'Envoi…'; msgEl.style.color = 'rgba(255,255,255,.4)';
+      try {
+        var _wa = JSON.parse(localStorage.getItem('nexus_webhooks') || '{}');
+        var _wc = _wa['NEW_REVIEW'] || {};
+        if (_wc.url) {
+          var body = { embeds: [{
+            title: '⭐ Nouvel avis client', color: 0x57F287,
+            fields: [
+              { name: 'Client', value: name, inline: true },
+              { name: 'Note', value: '★'.repeat(stars) + ' (' + stars + '/5)', inline: true },
+              { name: 'Produit', value: product || '—', inline: true },
+              { name: 'Avis', value: text, inline: false }
+            ],
+            footer: { text: 'Nexus Store' }, timestamp: new Date().toISOString()
+          }] };
+          if (_wc.msg) body.content = _wc.msg;
+          fetch(_wc.url, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) })
+            .catch(function(){});
+        }
+      } catch(e) {}
+      msgEl.textContent = 'Merci pour votre avis ! ✓'; msgEl.style.color = '#3cd43c';
+      document.getElementById('rvFormName').value = '';
+      document.getElementById('rvFormProduct').value = '';
+      document.getElementById('rvFormText').value = '';
+      starPicker.dataset.rating = '5';
+      starPicker.querySelectorAll('.star-pick').forEach(function(el) { el.setAttribute('fill', '#f5a623'); });
+    };
+
+    window.submitTicket = function() {
+      var name = document.getElementById('tkName').value.trim();
+      var email = document.getElementById('tkEmail').value.trim();
+      var subject = document.getElementById('tkSubject').value;
+      var message = document.getElementById('tkMessage').value.trim();
+      var msgEl = document.getElementById('tkMsg');
+      if (!name || !email || !subject || !message) { msgEl.textContent = 'Tous les champs sont requis.'; msgEl.style.color = '#ff5555'; return; }
+      msgEl.textContent = 'Envoi…'; msgEl.style.color = 'rgba(255,255,255,.4)';
+      try {
+        var _wa = JSON.parse(localStorage.getItem('nexus_webhooks') || '{}');
+        var _wc = _wa['SUPPORT_TICKET'] || {};
+        if (_wc.url) {
+          var body = { embeds: [{
+            title: '🎫 Nouveau ticket support', color: 0x9B59B6,
+            fields: [
+              { name: 'Client', value: name, inline: true },
+              { name: 'Email', value: email, inline: true },
+              { name: 'Sujet', value: subject, inline: false },
+              { name: 'Message', value: message, inline: false }
+            ],
+            footer: { text: 'Nexus Store' }, timestamp: new Date().toISOString()
+          }] };
+          if (_wc.msg) body.content = _wc.msg;
+          fetch(_wc.url, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) })
+            .catch(function(){});
+        }
+      } catch(e) {}
+      msgEl.textContent = 'Ticket envoyé ! Nous vous répondrons sous 24h. ✓'; msgEl.style.color = '#3cd43c';
+      document.getElementById('tkName').value = '';
+      document.getElementById('tkEmail').value = '';
+      document.getElementById('tkSubject').value = '';
+      document.getElementById('tkMessage').value = '';
+    };
+  })();
+  </script>
+
 </body>
 </html>

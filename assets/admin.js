@@ -113,12 +113,18 @@
     var stock = d.deliverables ? d.deliverables.length : (d.stock || 0);
     var pLabel = (d.icon || '📦') + ' ' + (d.name || '—');
     var embed;
-    if      (type === 'PRODUCT_ADD')    embed = { title:'📦 Produit ajouté',    color:0x22c55e, fields:[{name:'Produit',value:pLabel,inline:true},{name:'Prix',value:sym+Number(d.price||0).toFixed(2),inline:true},{name:'Catégorie',value:d.category||'—',inline:true}] };
-    else if (type === 'PRODUCT_UPDATE') embed = { title:'✏️ Produit modifié',  color:0x3b82f6, fields:[{name:'Produit',value:pLabel,inline:true},{name:'Prix',value:sym+Number(d.price||0).toFixed(2),inline:true},{name:'Stock',value:String(stock)+' unités',inline:true}] };
-    else if (type === 'PRODUCT_DELETE') embed = { title:'🗑️ Produit supprimé', color:0xef4444, fields:[{name:'Produit',value:pLabel,inline:true},{name:'ID',value:String(d.id||'—'),inline:true}] };
-    else if (type === 'STOCK_UPDATE')   embed = { title:'📊 Stock mis à jour',  color:0x0ea5e9, fields:[{name:'Produit',value:pLabel,inline:true},{name:'Nouveau stock',value:String(stock)+' unités',inline:true},{name:'Mode',value:d.mode==='add'?'Ajout':'Remplacement',inline:true}] };
-    else if (type === 'LOW_STOCK')      embed = { title:'⚠️ Stock faible',      color:0xf97316, fields:[{name:'Produit',value:pLabel,inline:true},{name:'Stock restant',value:String(stock)+' unités',inline:true}] };
-    else if (type === 'ADMIN_LOGIN')    embed = { title:'🔐 Connexion admin',   color:0x6366f1, description:'Une session admin a été ouverte.', fields:[{name:'Heure',value:new Date().toLocaleString('fr-FR'),inline:true}] };
+    if      (type === 'PRODUCT_ADD')    embed = { title:'📦 Produit ajouté',       color:0x57F287, fields:[{name:'Produit',value:pLabel,inline:true},{name:'Prix',value:sym+Number(d.price||0).toFixed(2),inline:true},{name:'Catégorie',value:d.category||'—',inline:true}] };
+    else if (type === 'PRODUCT_UPDATE') embed = { title:'✏️ Produit modifié',      color:0x3b82f6, fields:[{name:'Produit',value:pLabel,inline:true},{name:'Prix',value:sym+Number(d.price||0).toFixed(2),inline:true},{name:'Stock',value:String(stock)+' unités',inline:true}] };
+    else if (type === 'PRODUCT_DELETE') embed = { title:'🗑️ Produit supprimé',    color:0xED4245, fields:[{name:'Produit',value:pLabel,inline:true},{name:'ID',value:String(d.id||'—'),inline:true}] };
+    else if (type === 'STOCK_UPDATE')   embed = { title:'📊 Stock mis à jour',     color:0x0ea5e9, fields:[{name:'Produit',value:pLabel,inline:true},{name:'Nouveau stock',value:String(stock)+' unités',inline:true},{name:'Mode',value:d.mode==='add'?'Ajout':'Remplacement',inline:true}] };
+    else if (type === 'LOW_STOCK')      embed = { title:'⚠️ Stock faible',         color:0xFEE75C, fields:[{name:'Produit',value:pLabel,inline:true},{name:'Stock restant',value:String(stock)+' unités',inline:true}] };
+    else if (type === 'ADMIN_LOGIN')    embed = { title:'🔐 Connexion admin',      color:0x57F287, description:'Une session admin a été ouverte.', fields:[{name:'Heure',value:new Date().toLocaleString('fr-FR'),inline:true}] };
+    else if (type === 'LOGIN_FAIL')     embed = { title:'🚨 Tentative Brute Force',color:0xED4245, description:'Plusieurs mots de passe incorrects détectés.', fields:[{name:'Tentatives',value:String(d.attempts||'3+')+' erreurs consécutives',inline:true},{name:'Heure',value:new Date().toLocaleString('fr-FR'),inline:true}] };
+    else if (type === 'CART_ABANDON')   embed = { title:'🛒 Panier abandonné',     color:0xFEE75C, fields:[{name:'Produit',value:d.product||'—',inline:true},{name:'Email',value:d.email||'Non fourni',inline:true},{name:'Valeur potentielle',value:String(d.amount||'—'),inline:true}] };
+    else if (type === 'PAYMENT_FAIL')   embed = { title:'❌ Échec de paiement',    color:0xED4245, fields:[{name:'Produit',value:d.product||'—',inline:true},{name:'Raison',value:d.reason||'Informations invalides',inline:true},{name:'Heure',value:new Date().toLocaleString('fr-FR'),inline:true}] };
+    else if (type === 'PROMO_USE')      embed = { title:'🏷️ Code promo utilisé',  color:0x5865F2, fields:[{name:'Code',value:d.code||'—',inline:true},{name:'Réduction',value:String(d.discount||0)+'%',inline:true},{name:'Produit',value:d.product||'—',inline:true}] };
+    else if (type === 'NEW_REVIEW')     embed = { title:'⭐ Nouvel avis client',   color:0x57F287, fields:[{name:'Client',value:d.name||'Anonyme',inline:true},{name:'Note',value:'★'.repeat(d.stars||5)+' ('+String(d.stars||5)+'/5)',inline:true},{name:'Produit',value:d.product||'—',inline:true},{name:'Avis',value:d.text||'—',inline:false}] };
+    else if (type === 'SUPPORT_TICKET') embed = { title:'🎫 Nouveau ticket support',color:0x9B59B6, fields:[{name:'Client',value:d.name||'Anonyme',inline:true},{name:'Email',value:d.email||'—',inline:true},{name:'Sujet',value:d.subject||'—',inline:false},{name:'Message',value:d.message||'—',inline:false}] };
     else return;
     embed.footer = { text:'Nexus Store' };
     embed.timestamp = new Date().toISOString();
@@ -158,6 +164,12 @@
     } else {
       loginError.classList.add('show');
       document.getElementById('loginPass').value = '';
+      var fails = parseInt(localStorage.getItem('nexus_login_fails') || '0') + 1;
+      localStorage.setItem('nexus_login_fails', String(fails));
+      if (fails >= 3) {
+        discordLog('LOGIN_FAIL', { attempts: fails });
+        localStorage.setItem('nexus_login_fails', '0');
+      }
     }
   });
 
@@ -178,6 +190,7 @@
     if (name === 'products') renderProducts();
     if (name === 'categories') renderCategories();
     if (name === 'reviews') renderReviews();
+    if (name === 'promos') renderPromos();
     if (name === 'orders') renderOrders();
     if (name === 'content') loadContentForm();
     if (name === 'stats') loadStatsForm();
@@ -785,7 +798,7 @@
   };
 
   /* ── Webhooks ── */
-  var WHK_EVENTS = ['ORDER_CREATE','REFUND','PRODUCT_ADD','PRODUCT_UPDATE','PRODUCT_DELETE','STOCK_UPDATE','LOW_STOCK','ADMIN_LOGIN','BUG','CHANGELOG'];
+  var WHK_EVENTS = ['ORDER_CREATE','REFUND','CART_ABANDON','PAYMENT_FAIL','LOGIN_FAIL','PROMO_USE','NEW_REVIEW','SUPPORT_TICKET','PRODUCT_ADD','PRODUCT_UPDATE','PRODUCT_DELETE','STOCK_UPDATE','LOW_STOCK','ADMIN_LOGIN','BUG','CHANGELOG'];
 
   function loadWebhooksForm() {
     var all = getWebhooks();
@@ -1048,6 +1061,61 @@
     initDeliverableTabs('deliverableTabs', 'fDeliverables', 'fDeliverableMode', 'fExistingDeliverables', 'fDeliverableLabel');
     initDeliverableTabs('stockDeliverableTabs', 'stockDeliverables', 'fStockDeliverableMode', 'stockExistingDeliverables', 'stockDeliverableLabel');
   }
+
+  /* ── Codes Promo ── */
+  function getPromos() { try { return JSON.parse(localStorage.getItem('nexus_promos')) || []; } catch(e) { return []; } }
+  function setPromos(p) { localStorage.setItem('nexus_promos', JSON.stringify(p)); }
+
+  function renderPromos() {
+    var el = document.getElementById('promosList');
+    if (!el) return;
+    var promos = getPromos();
+    if (!promos.length) {
+      el.innerHTML = '<p style="color:rgba(255,255,255,.3);font-size:13px;">Aucun code promo actif.</p>';
+      return;
+    }
+    el.innerHTML = '<table style="width:100%;border-collapse:collapse;">' +
+      '<thead><tr style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.35);">' +
+      '<th style="padding:8px 12px;text-align:left;">Code</th><th style="padding:8px 12px;text-align:left;">Réduction</th>' +
+      '<th style="padding:8px 12px;text-align:left;">Utilisations</th><th style="padding:8px 12px;text-align:left;">Max</th>' +
+      '<th style="padding:8px 12px;"></th></tr></thead><tbody>' +
+      promos.map(function(p, i) {
+        return '<tr style="border-top:1px solid rgba(255,255,255,.06);">' +
+          '<td style="padding:10px 12px;font-weight:700;color:#fff;font-family:monospace;">' + esc(p.code) + '</td>' +
+          '<td style="padding:10px 12px;color:#5865f2;">-' + p.discount + '%</td>' +
+          '<td style="padding:10px 12px;color:rgba(255,255,255,.5);">' + (p.uses||0) + '</td>' +
+          '<td style="padding:10px 12px;color:rgba(255,255,255,.5);">' + (p.maxUses > 0 ? p.maxUses : '∞') + '</td>' +
+          '<td style="padding:10px 12px;text-align:right;"><button class="a-btn a-btn--ghost" style="font-size:11px;padding:3px 10px;color:#ff5555;" onclick="deletePromo(' + i + ')">Supprimer</button></td>' +
+        '</tr>';
+      }).join('') +
+      '</tbody></table>';
+  }
+
+  window.addPromo = function() {
+    var code = (document.getElementById('promoCode').value || '').trim().toUpperCase();
+    var discount = parseInt(document.getElementById('promoDiscount').value || '0');
+    var maxUses = parseInt(document.getElementById('promoMaxUses').value || '0');
+    var msg = document.getElementById('promoSaveMsg');
+    if (!code) { msg.textContent = 'Code requis.'; msg.style.color = '#ff5555'; return; }
+    if (discount < 1 || discount > 100) { msg.textContent = 'Réduction invalide (1-100%).'; msg.style.color = '#ff5555'; return; }
+    var promos = getPromos();
+    if (promos.find(function(p) { return p.code === code; })) { msg.textContent = 'Code déjà existant.'; msg.style.color = '#ff5555'; return; }
+    promos.push({ code: code, discount: discount, maxUses: maxUses, uses: 0 });
+    setPromos(promos);
+    document.getElementById('promoCode').value = '';
+    document.getElementById('promoDiscount').value = '';
+    document.getElementById('promoMaxUses').value = '';
+    msg.textContent = 'Code créé ✓'; msg.style.color = '#3cc864';
+    renderPromos();
+    setTimeout(function() { msg.textContent = ''; }, 3000);
+  };
+
+  window.deletePromo = function(index) {
+    var promos = getPromos();
+    promos.splice(index, 1);
+    setPromos(promos);
+    renderPromos();
+  };
 
   checkSession();
 })();

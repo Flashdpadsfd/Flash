@@ -394,6 +394,8 @@
               '<div class="co-section-hdr">Contact Information</div>' +
               '<div class="co-product-row" id="coProductRow"></div>' +
               '<div class="co-field"><label>Email address <span style="color:#ff5555;font-weight:700;">*</span></label><input type="email" id="coEmail" placeholder="you@example.com" autocomplete="email" /></div>' +
+              '<div class="co-promo-wrap"><input type="text" class="co-promo-input" id="coPromoInput" placeholder="Code promo (optionnel)" /><button class="co-promo-btn" id="coPromoBtn">Appliquer</button></div>' +
+              '<div class="co-promo-msg" id="coPromoMsg"></div>' +
               '<button class="co-submit" id="coSubmitBtn">' +
                 '<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M5 12l5 5L20 7"/></svg>' +
                 'Complete Purchase' +
@@ -441,11 +443,44 @@
     document.body.insertAdjacentHTML('beforeend', _html);
 
     var _pid = null;
+    var _appliedPromo = null;
+
+    function _whkPost(type, embed, content) {
+      try {
+        var _wa = JSON.parse(localStorage.getItem('nexus_webhooks') || '{}');
+        var _wc = _wa[type] || {};
+        if (!_wc.url) return;
+        var body = { embeds: [embed] };
+        if (_wc.msg) body.content = _wc.msg;
+        if (content) body.content = (body.content ? body.content + ' ' : '') + content;
+        fetch(_wc.url, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) }).catch(function(){});
+      } catch(e) {}
+    }
+
+    function _fireCartAbandon() {
+      var prods = getProds();
+      var p = prods.find(function(x) { return x.id === _pid; });
+      if (!p) return;
+      var email = document.getElementById('coEmail') ? document.getElementById('coEmail').value.trim() : '';
+      var sym = SYM[p.currency] || '€';
+      _whkPost('CART_ABANDON', {
+        title: '🛒 Panier abandonné', color: 0xFEE75C,
+        fields: [
+          { name: 'Produit', value: (p.icon||'📦')+' '+p.name, inline: true },
+          { name: 'Email', value: email || 'Non fourni', inline: true },
+          { name: 'Valeur potentielle', value: sym+Number(p.price).toFixed(2), inline: true }
+        ],
+        footer: { text: 'Nexus Store' }, timestamp: new Date().toISOString()
+      });
+    }
 
     function closeModal() {
+      var formState = document.getElementById('coFormState');
+      if (formState && formState.style.display !== 'none' && _pid) _fireCartAbandon();
       document.getElementById('coOverlay').classList.remove('open');
       document.getElementById('coModal').classList.remove('open');
       document.body.style.overflow = '';
+      _appliedPromo = null;
     }
     document.getElementById('coXBtn').addEventListener('click', closeModal);
     document.getElementById('coOverlay').addEventListener('click', closeModal);
@@ -471,23 +506,69 @@
       document.getElementById('coRevealBtn').textContent = shown ? '🔒 Hide' : '👁 Click to reveal';
     });
 
+    document.getElementById('coPromoBtn').addEventListener('click', function () {
+      var code = (document.getElementById('coPromoInput').value || '').trim().toUpperCase();
+      var msgEl = document.getElementById('coPromoMsg');
+      var prods = getProds();
+      var p = prods.find(function(x) { return x.id === _pid; });
+      if (!code) { msgEl.textContent = 'Entrez un code promo.'; msgEl.style.color = '#ff5555'; return; }
+      try {
+        var promos = JSON.parse(localStorage.getItem('nexus_promos') || '[]');
+        var promo = promos.find(function(pr) { return pr.code === code; });
+        if (!promo) { msgEl.textContent = 'Code invalide.'; msgEl.style.color = '#ff5555'; _appliedPromo = null; return; }
+        if (promo.maxUses > 0 && promo.uses >= promo.maxUses) { msgEl.textContent = 'Code expiré.'; msgEl.style.color = '#ff5555'; _appliedPromo = null; return; }
+        _appliedPromo = promo;
+        msgEl.textContent = '✓ Code appliqué — -' + promo.discount + '%'; msgEl.style.color = '#3cd43c';
+        _whkPost('PROMO_USE', {
+          title: '🏷️ Code promo utilisé', color: 0x5865F2,
+          fields: [
+            { name: 'Code', value: promo.code, inline: true },
+            { name: 'Réduction', value: '-'+promo.discount+'%', inline: true },
+            { name: 'Produit', value: p ? (p.icon||'📦')+' '+p.name : '—', inline: true }
+          ],
+          footer: { text: 'Nexus Store' }, timestamp: new Date().toISOString()
+        });
+      } catch(e) { msgEl.textContent = 'Erreur.'; msgEl.style.color = '#ff5555'; }
+    });
+
     document.getElementById('coSubmitBtn').addEventListener('click', function () {
       var email = document.getElementById('coEmail').value.trim();
       var inp = document.getElementById('coEmail');
       var errEl = document.getElementById('coErr');
       inp.classList.remove('co-input-err');
       errEl.textContent = '';
+      var prods = getProds();
+      var p = prods.find(function (x) { return x.id === _pid; });
       if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         inp.classList.add('co-input-err');
         errEl.textContent = 'Please enter a valid email address.';
+        _whkPost('PAYMENT_FAIL', {
+          title: '❌ Échec de paiement', color: 0xED4245,
+          fields: [
+            { name: 'Produit', value: p ? (p.icon||'📦')+' '+p.name : '—', inline: true },
+            { name: 'Raison', value: 'Email invalide ou manquant', inline: true },
+            { name: 'Heure', value: new Date().toLocaleString('fr-FR'), inline: true }
+          ],
+          footer: { text: 'Nexus Store' }, timestamp: new Date().toISOString()
+        });
         return;
       }
-      var prods = getProds();
-      var p = prods.find(function (x) { return x.id === _pid; });
       if (!p) { errEl.textContent = 'Product not found.'; return; }
       var delivs = p.deliverables || [];
       var hasStock = delivs.length > 0 || (p.stock || 0) > 0;
-      if (!hasStock) { errEl.textContent = 'This product is currently out of stock.'; return; }
+      if (!hasStock) {
+        errEl.textContent = 'This product is currently out of stock.';
+        _whkPost('PAYMENT_FAIL', {
+          title: '❌ Échec de paiement', color: 0xED4245,
+          fields: [
+            { name: 'Produit', value: (p.icon||'📦')+' '+p.name, inline: true },
+            { name: 'Raison', value: 'Produit hors stock', inline: true },
+            { name: 'Email', value: email, inline: true }
+          ],
+          footer: { text: 'Nexus Store' }, timestamp: new Date().toISOString()
+        });
+        return;
+      }
 
       var btn = document.getElementById('coSubmitBtn');
       btn.disabled = true; btn.innerHTML = 'Processing…';
@@ -507,31 +588,28 @@
         saveProds(prods);
 
         var sym = SYM[p.currency] || '€';
-        addOrder({ id: invoiceId, date: new Date().toISOString(), email: email, productId: p.id, productName: p.name, productIcon: p.icon || '📦', productDesc: p.desc || '', price: p.price, currency: p.currency || 'EUR', deliverable: deliverable, status: 'completed' });
-
-        /* Discord webhook */
-        (function() {
+        var finalPrice = Number(p.price);
+        if (_appliedPromo) {
+          finalPrice = finalPrice * (1 - _appliedPromo.discount / 100);
           try {
-            var _all = JSON.parse(localStorage.getItem('nexus_webhooks') || '{}');
-            var _cfg = _all['ORDER_CREATE'] || {};
-            if (_cfg.url) {
-              var _body = { embeds: [{
-                title: '🛍️ Nouvelle commande',
-                color: 3066993,
-                fields: [
-                  { name: 'Invoice ID', value: invoiceId, inline: true },
-                  { name: 'Produit',    value: (p.icon || '📦') + ' ' + p.name, inline: true },
-                  { name: 'Email',      value: email, inline: true },
-                  { name: 'Montant',    value: sym + Number(p.price).toFixed(2), inline: true }
-                ],
-                footer: { text: 'Nexus Store' },
-                timestamp: new Date().toISOString()
-              }] };
-              if (_cfg.msg) _body.content = _cfg.msg;
-              fetch(_cfg.url, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(_body) }).catch(function() {});
-            }
+            var promos = JSON.parse(localStorage.getItem('nexus_promos') || '[]');
+            var pi = promos.findIndex(function(pr) { return pr.code === _appliedPromo.code; });
+            if (pi !== -1) { promos[pi].uses = (promos[pi].uses || 0) + 1; localStorage.setItem('nexus_promos', JSON.stringify(promos)); }
           } catch(e) {}
-        })();
+        }
+        addOrder({ id: invoiceId, date: new Date().toISOString(), email: email, productId: p.id, productName: p.name, productIcon: p.icon || '📦', productDesc: p.desc || '', price: finalPrice, currency: p.currency || 'EUR', deliverable: deliverable, status: 'completed', promoCode: _appliedPromo ? _appliedPromo.code : null });
+
+        /* Discord ORDER_CREATE webhook */
+        _whkPost('ORDER_CREATE', {
+          title: '🛍️ Nouvelle commande', color: 0x57F287,
+          fields: [
+            { name: 'Invoice ID', value: invoiceId, inline: true },
+            { name: 'Produit', value: (p.icon||'📦')+' '+p.name, inline: true },
+            { name: 'Email', value: email, inline: true },
+            { name: 'Montant', value: sym+finalPrice.toFixed(2) + (_appliedPromo ? ' (promo -'+_appliedPromo.discount+'%)' : ''), inline: true }
+          ],
+          footer: { text: 'Nexus Store' }, timestamp: new Date().toISOString()
+        });
 
         document.getElementById('coFormState').style.display = 'none';
         document.getElementById('coSuccessState').style.display = '';
