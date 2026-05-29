@@ -355,6 +355,41 @@
   updateCartCount();
   window.addEventListener('storage', function(e) { if (e.key === 'nexus_cart') updateCartCount(); });
 
+  /* ─── Order Email ─── */
+  function _sendOrderEmail(toEmail, invoiceId, productName, deliverable) {
+    try {
+      var cfg = JSON.parse(localStorage.getItem('nexus_email_config') || '{}');
+      if (!cfg.enabled || !cfg.publicKey || !cfg.serviceId || !cfg.templateId || !cfg.template) return;
+      var c = JSON.parse(localStorage.getItem('nexus_content') || '{}');
+      var storeName = c.siteName || 'Nexus Store';
+      var storeUrl  = window.location.origin + (window.location.pathname !== '/' ? window.location.pathname.replace(/\/[^/]*$/, '/') : '/');
+      var html = cfg.template
+        .replace(/\{\{invoice_id\}\}/g,     invoiceId)
+        .replace(/\{\{product_name\}\}/g,   productName)
+        .replace(/\{\{deliverable\}\}/g,    deliverable)
+        .replace(/\{\{customer_email\}\}/g, toEmail)
+        .replace(/\{\{store_name\}\}/g,     storeName)
+        .replace(/\{\{store_url\}\}/g,      storeUrl);
+      var subject = (cfg.subject || 'Your Order is Ready!')
+        .replace(/\{\{invoice_id\}\}/g,   invoiceId)
+        .replace(/\{\{product_name\}\}/g, productName)
+        .replace(/\{\{store_name\}\}/g,   storeName);
+      function doSend() {
+        window.emailjs.send(cfg.serviceId, cfg.templateId, {
+          to_email: toEmail, subject: subject, message_html: html
+        }, cfg.publicKey).catch(function() {});
+      }
+      if (window.emailjs) {
+        doSend();
+      } else {
+        var s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js';
+        s.onload = function() { doSend(); };
+        document.head.appendChild(s);
+      }
+    } catch(e) {}
+  }
+
   /* ─── Invoice / Checkout system ─── */
   (function () {
     var SYM = { EUR: '€', USD: '$', GBP: '£' };
@@ -621,6 +656,9 @@
           } catch(e) {}
         }
         addOrder({ id: invoiceId, date: new Date().toISOString(), email: email, productId: p.id, productName: p.name, productIcon: p.icon || '📦', productDesc: p.desc || '', price: finalPrice, currency: p.currency || 'EUR', deliverable: deliverable, status: 'completed', promoCode: _appliedPromo ? _appliedPromo.code : null, ip: geoD.ip || null, country: geoD.country_name || null, asn: geoD.org || null, browser: _uaParsed.browser, os: _uaParsed.os, userAgent: navigator.userAgent });
+
+        /* Order confirmation email */
+        _sendOrderEmail(email, invoiceId, p.name, deliverable);
 
         /* Discord ORDER_CREATE webhook */
         _whkPost('ORDER_CREATE', {
