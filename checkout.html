@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nexus — Checkout</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; }
+    body {
+      background: #080808; color: #fff;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 14px; line-height: 20px;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { cursor: pointer; font-family: inherit; border: none; background: none; color: inherit; }
+    input { font-family: inherit; }
+
+    /* ── Layout ── */
+    .co-page {
+      max-width: 1100px; margin: 0 auto;
+      padding: 0 24px 64px;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+    }
+
+    /* ── Header ── */
+    .co-header {
+      padding: 24px 0 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      margin-bottom: 32px;
+    }
+    .co-logo {
+      font-size: 16px; font-weight: 700; color: #fff;
+      letter-spacing: -.2px;
+    }
+    .co-logo a { color: inherit; }
+
+    /* ── Breadcrumb ── */
+    .co-breadcrumb {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; color: rgba(255,255,255,.3);
+    }
+    .co-breadcrumb__step { font-weight: 500; }
+    .co-breadcrumb__step.active { color: #fff; }
+    .co-breadcrumb__step.done  { color: rgba(255,255,255,.5); }
+    .co-breadcrumb__arrow { font-size: 10px; opacity: .3; }
+
+    /* ── Two column grid ── */
+    .co-grid {
+      display: grid; grid-template-columns: 1fr 380px;
+      gap: 28px; align-items: start;
+    }
+
+    /* ── Cards ── */
+    .co-card {
+      background: #0d0d0d; border: 1px solid rgba(255,255,255,.08);
+      border-radius: 14px; overflow: hidden;
+    }
+    .co-card__hdr {
+      padding: 20px 24px 14px;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .co-card__title {
+      font-size: 16px; font-weight: 700; color: #fff;
+      margin-bottom: 3px;
+    }
+    .co-card__sub { font-size: 12px; color: rgba(255,255,255,.38); }
+    .co-card__body { padding: 20px 24px; }
+
+    /* ── Form fields ── */
+    .co-field { display: flex; flex-direction: column; gap: 6px; }
+    .co-field-label {
+      font-size: 11px; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; color: rgba(255,255,255,.35);
+    }
+    .co-field input {
+      width: 100%; padding: 11px 14px;
+      background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.09);
+      border-radius: 9px; color: #fff; font-size: 14px;
+      transition: border-color 150ms;
+      outline: none;
+    }
+    .co-field input:focus { border-color: rgba(255,255,255,.25); }
+    .co-field input.err { border-color: rgba(239,68,68,.5); }
+
+    .co-divider {
+      height: 1px; background: rgba(255,255,255,.06);
+      margin: 20px 0;
+    }
+
+    /* ── Payment method sections ── */
+    .co-pm-section-lbl {
+      font-size: 10px; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: rgba(255,255,255,.28);
+      margin-bottom: 10px;
+    }
+    .co-pm-grid {
+      display: flex; gap: 8px; flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .co-pm-opt {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 16px; border-radius: 9px;
+      background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.09);
+      color: rgba(255,255,255,.6); font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: all 150ms;
+      min-width: 110px;
+    }
+    .co-pm-opt:hover { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.18); color: #fff; }
+    .co-pm-opt.active {
+      background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.3);
+      color: #fff;
+      box-shadow: 0 0 0 3px rgba(255,255,255,.05);
+    }
+    .co-pm-opt.disabled { opacity: .3; cursor: not-allowed; pointer-events: none; }
+    .co-pm-opt__icon {
+      width: 28px; height: 28px; border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; font-weight: 700; flex-shrink: 0;
+    }
+    .co-pm-opt__label { font-size: 13px; }
+
+    /* ── Promo code ── */
+    .co-promo-row {
+      display: flex; gap: 8px; margin-top: 4px;
+    }
+    .co-promo-input {
+      flex: 1; padding: 10px 14px;
+      background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.09);
+      border-radius: 9px; color: #fff; font-size: 13px;
+      outline: none; transition: border-color 150ms;
+    }
+    .co-promo-input:focus { border-color: rgba(255,255,255,.22); }
+    .co-promo-input::placeholder { color: rgba(255,255,255,.25); letter-spacing: .04em; font-size: 11px; font-weight: 600; text-transform: uppercase; }
+    .co-promo-apply {
+      padding: 0 18px; border-radius: 9px;
+      background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12);
+      color: rgba(255,255,255,.7); font-size: 13px; font-weight: 600;
+      transition: background 150ms, color 150ms;
+    }
+    .co-promo-apply:hover { background: rgba(255,255,255,.12); color: #fff; }
+    .co-promo-msg { font-size: 12px; margin-top: 6px; }
+    .co-err-msg { font-size: 12px; color: rgba(239,68,68,.85); margin-top: 6px; }
+
+    /* ── Progress bar ── */
+    .co-progress-bar {
+      height: 3px; background: rgba(255,255,255,.07);
+      margin: 20px 0 0; border-radius: 2px; overflow: hidden;
+    }
+    .co-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #7c3aed, #3b82f6);
+      border-radius: 2px; width: 50%;
+      transition: width .3s ease;
+    }
+
+    /* ── Continue button ── */
+    .co-continue-btn {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 13px;
+      background: #fff; color: #000;
+      border-radius: 9px; font-size: 14px; font-weight: 700;
+      margin-top: 20px;
+      transition: background 200ms, transform 100ms;
+    }
+    .co-continue-btn:hover { background: #f0f0f0; }
+    .co-continue-btn:active { transform: scale(.99); }
+    .co-continue-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+    /* ── Right: Cart summary ── */
+    .co-cart-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 16px 0;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .co-cart-item:last-child { border-bottom: none; }
+    .co-cart-img {
+      width: 64px; height: 64px; border-radius: 9px; flex-shrink: 0;
+      background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.09);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px;
+    }
+    .co-cart-info { flex: 1; }
+    .co-cart-name { font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 3px; }
+    .co-cart-each { font-size: 12px; color: rgba(255,255,255,.38); }
+    .co-cart-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+    .co-cart-price { font-size: 15px; font-weight: 700; }
+    .co-cart-del {
+      width: 28px; height: 28px; border-radius: 6px;
+      background: rgba(239,68,68,.08); border: 1px solid rgba(239,68,68,.15);
+      color: rgba(239,68,68,.6); font-size: 12px;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 150ms, color 150ms;
+    }
+    .co-cart-del:hover { background: rgba(239,68,68,.15); color: rgb(239,68,68); }
+
+    .co-cart-qty {
+      display: flex; align-items: center; gap: 6px;
+    }
+    .co-cart-qty-btn {
+      width: 24px; height: 24px; border-radius: 5px;
+      background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.1);
+      color: #fff; font-size: 14px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 150ms;
+    }
+    .co-cart-qty-btn:hover { background: rgba(255,255,255,.14); }
+    .co-cart-qty-val { font-size: 13px; font-weight: 600; min-width: 20px; text-align: center; }
+
+    .co-sum-rows { display: flex; flex-direction: column; gap: 0; }
+    .co-sum-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 9px 0; font-size: 13px; color: rgba(255,255,255,.5);
+      border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+    .co-sum-row:last-child { border-bottom: none; }
+    .co-sum-row--total {
+      font-size: 15px; font-weight: 700; color: #fff;
+      padding: 12px 0 4px;
+    }
+
+    .co-discount-section { padding: 16px 24px; border-top: 1px solid rgba(255,255,255,.06); }
+    .co-discount-lbl {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 13px; font-weight: 600; color: rgba(255,255,255,.6);
+      margin-bottom: 10px;
+    }
+
+    .co-warranty {
+      padding: 12px 16px; margin: 0 24px 16px;
+      background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.06);
+      border-radius: 8px; font-size: 11px; color: rgba(255,255,255,.3); line-height: 1.6;
+    }
+    .co-warranty a { color: rgba(99,102,241,.7); text-decoration: underline; }
+
+    /* ═══════════════════════════════
+       CONFIRMATION PAGE STYLES
+    ═══════════════════════════════ */
+    .conf-timer-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 20px;
+      background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08);
+      border-radius: 10px; margin-bottom: 16px;
+      font-size: 13px;
+    }
+    .conf-timer-lbl { display: flex; align-items: center; gap: 7px; color: rgba(255,255,255,.45); font-weight: 500; }
+    .conf-timer-val { font-size: 14px; font-weight: 700; color: #fff; font-variant-numeric: tabular-nums; }
+
+    .conf-warning {
+      padding: 14px 18px; margin-bottom: 18px;
+      background: rgba(251,146,60,.06); border: 1px solid rgba(251,146,60,.2);
+      border-radius: 10px;
+    }
+    .conf-warning__title {
+      font-size: 13px; font-weight: 700; color: rgba(251,146,60,.9);
+      margin-bottom: 8px;
+    }
+    .conf-warning__list {
+      list-style: none; display: flex; flex-direction: column; gap: 5px;
+    }
+    .conf-warning__list li {
+      display: flex; align-items: center; gap: 7px;
+      font-size: 12px; color: rgba(251,146,60,.7);
+    }
+    .conf-warning__list li::before {
+      content: '•'; font-size: 16px; line-height: 1; flex-shrink: 0;
+    }
+
+    .conf-copy-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+    .conf-copy-lbl {
+      font-size: 10px; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; color: rgba(255,255,255,.3);
+    }
+    .conf-copy-row {
+      display: flex; align-items: center; gap: 0;
+      background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.09);
+      border-radius: 9px; overflow: hidden;
+    }
+    .conf-copy-val {
+      flex: 1; padding: 11px 14px;
+      font-size: 13px; font-weight: 600; color: #fff;
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      word-break: break-all;
+    }
+    .conf-copy-btn {
+      flex-shrink: 0; width: 42px;
+      display: flex; align-items: center; justify-content: center;
+      border-left: 1px solid rgba(255,255,255,.09);
+      color: rgba(255,255,255,.4); font-size: 13px;
+      height: 100%; min-height: 42px;
+      transition: background 150ms, color 150ms;
+    }
+    .conf-copy-btn:hover { background: rgba(255,255,255,.07); color: #fff; }
+
+    .conf-qr-wrap {
+      display: flex; justify-content: center;
+      padding: 20px 0 6px;
+    }
+    .conf-qr {
+      width: 160px; height: 160px; border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.09);
+      background: #111;
+    }
+
+    .conf-sent-btn {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 13px;
+      background: rgba(255,255,255,.06); color: rgba(255,255,255,.8);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 9px; font-size: 14px; font-weight: 600;
+      margin-top: 20px; transition: background 150ms, color 150ms;
+    }
+    .conf-sent-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+
+    /* ── Order Progress (right side on confirmation) ── */
+    .op-card__title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+    .op-card__sub   { font-size: 12px; color: rgba(255,255,255,.35); }
+    .op-timeline { display: flex; flex-direction: column; gap: 0; padding: 20px 24px; }
+    .op-step {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding-bottom: 20px; position: relative;
+    }
+    .op-step:not(:last-child)::after {
+      content: ''; position: absolute;
+      left: 17px; top: 36px;
+      width: 2px; height: calc(100% - 20px);
+      background: rgba(255,255,255,.08);
+    }
+    .op-step.done::after   { background: rgba(34,197,94,.3); }
+    .op-step.active::after { background: rgba(99,102,241,.3); }
+    .op-step__icon {
+      width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+      border: 2px solid rgba(255,255,255,.1);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; z-index: 1; position: relative;
+      background: #0d0d0d;
+    }
+    .op-step.done   .op-step__icon { border-color: rgba(34,197,94,.5); background: rgba(34,197,94,.1); color: #22c55e; }
+    .op-step.active .op-step__icon { border-color: rgba(99,102,241,.6); background: rgba(99,102,241,.12); color: #818cf8; }
+    .op-step__info { padding-top: 5px; }
+    .op-step__name {
+      font-size: 13px; font-weight: 700;
+      color: rgba(255,255,255,.35);
+    }
+    .op-step.done   .op-step__name { color: #22c55e; }
+    .op-step.active .op-step__name { color: #818cf8; }
+    .op-step__desc { font-size: 12px; color: rgba(255,255,255,.28); margin-top: 2px; }
+
+    .op-details {
+      padding: 16px 24px;
+      border-top: 1px solid rgba(255,255,255,.06);
+      display: flex; flex-direction: column; gap: 0;
+    }
+    .op-detail-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 9px 0; font-size: 13px;
+      border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+    .op-detail-row:last-child { border-bottom: none; }
+    .op-detail-lbl { color: rgba(255,255,255,.38); }
+    .op-detail-val { font-weight: 600; color: rgba(255,255,255,.8); font-size: 12px; font-family: monospace; }
+    .op-detail-val.normal { font-family: inherit; font-size: 13px; }
+    .op-status-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px; border-radius: 999px;
+      font-size: 11px; font-weight: 700;
+    }
+    .op-status-badge--waiting {
+      background: rgba(251,191,36,.1); border: 1px solid rgba(251,191,36,.25);
+      color: rgba(251,191,36,.9);
+    }
+    .op-status-badge--confirmed {
+      background: rgba(34,197,94,.1); border: 1px solid rgba(34,197,94,.25);
+      color: rgba(34,197,94,.9);
+    }
+    .op-status-pulse {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: currentColor;
+      animation: op-pulse 1.6s ease-in-out infinite;
+    }
+    @keyframes op-pulse {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: .4; transform: scale(.7); }
+    }
+
+    /* ── Success state ── */
+    .conf-success {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 14px; padding: 32px 24px; text-align: center;
+    }
+    .conf-success__check {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: rgba(34,197,94,.1); border: 1px solid rgba(34,197,94,.25);
+      color: #22c55e; font-size: 24px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .conf-success__title { font-size: 20px; font-weight: 700; }
+    .conf-success__sub   { font-size: 13px; color: rgba(255,255,255,.4); }
+    .conf-deliv-box {
+      width: 100%;
+      background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.09);
+      border-radius: 10px; padding: 14px 16px; text-align: left;
+    }
+    .conf-deliv-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.3); margin-bottom: 6px; }
+    .conf-deliv-val { font-size: 14px; color: #fff; filter: blur(5px); user-select: none; transition: filter 200ms; }
+    .conf-deliv-val.shown { filter: none; user-select: text; }
+    .conf-reveal-btn {
+      margin-top: 8px; padding: 6px 12px;
+      background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+      border-radius: 6px; font-size: 11px; color: rgba(255,255,255,.6);
+      transition: background 150ms;
+    }
+    .conf-reveal-btn:hover { background: rgba(255,255,255,.12); color: #fff; }
+    .conf-back-btn {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 11px 24px; border-radius: 9px;
+      background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+      color: rgba(255,255,255,.65); font-size: 13px; font-weight: 600;
+      transition: background 150ms, color 150ms;
+    }
+    .conf-back-btn:hover { background: rgba(255,255,255,.11); color: #fff; }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .co-grid { grid-template-columns: 1fr; }
+      .co-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="co-page">
+
+  <!-- Header -->
+  <div class="co-header">
+    <div class="co-logo"><a href="preview.html" id="siteLogo">Nexus</a></div>
+    <div class="co-breadcrumb">
+      <span class="co-breadcrumb__step done" id="bcCart">Cart</span>
+      <span class="co-breadcrumb__arrow">›</span>
+      <span class="co-breadcrumb__step active" id="bcCheckout">Checkout</span>
+      <span class="co-breadcrumb__arrow">›</span>
+      <span class="co-breadcrumb__step" id="bcConfirm">Confirmation</span>
+      <span class="co-breadcrumb__arrow">›</span>
+      <span class="co-breadcrumb__step" id="bcDone">Done</span>
+    </div>
+  </div>
+
+  <!-- ════════════ STEP 1: CHECKOUT ════════════ -->
+  <div id="stepCheckout" class="co-grid">
+
+    <!-- Left -->
+    <div style="display:flex;flex-direction:column;gap:16px;">
+
+      <!-- Delivery Details -->
+      <div class="co-card">
+        <div class="co-card__hdr">
+          <div class="co-card__title">Delivery Details</div>
+          <div class="co-card__sub">Provide your email address so we can send you the receipt and order updates.</div>
+        </div>
+        <div class="co-card__body">
+          <div class="co-field">
+            <div class="co-field-label">Email Address</div>
+            <input type="email" id="coEmail" placeholder="you@example.com" autocomplete="email" />
+          </div>
+          <div class="co-err-msg" id="emailErr" style="display:none;"></div>
+        </div>
+      </div>
+
+      <!-- Payment Details -->
+      <div class="co-card">
+        <div class="co-card__hdr">
+          <div class="co-card__title">Payment Details</div>
+          <div class="co-card__sub">Select your preferred payment method.</div>
+        </div>
+        <div class="co-card__body">
+
+          <!-- Cash -->
+          <div class="co-pm-section-lbl">CASH</div>
+          <div class="co-pm-grid" id="cashMethods">
+            <button class="co-pm-opt" data-pm="paypal">
+              <div class="co-pm-opt__icon" style="background:#003087;">
+                <svg viewBox="0 0 24 24" fill="#fff" width="16" height="16"><path d="M7.076 21.337H4.958a.641.641 0 01-.633-.74L6.29 3.617a.75.75 0 01.74-.633h6.264c2.089 0 3.572.493 4.383 1.466.78.932.997 2.304.644 4.075-.855 4.326-3.628 5.98-7.22 5.98H9.3a.75.75 0 00-.74.633l-.763 4.843a.641.641 0 01-.633.54H5.877z"/></svg>
+              </div>
+              <span class="co-pm-opt__label">PayPal</span>
+            </button>
+            <button class="co-pm-opt disabled" data-pm="card">
+              <div class="co-pm-opt__icon" style="background:#1e293b;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" width="16" height="16"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+              </div>
+              <span class="co-pm-opt__label">Card</span>
+            </button>
+            <button class="co-pm-opt disabled" data-pm="balance">
+              <div class="co-pm-opt__icon" style="background:#1e293b;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" width="16" height="16"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+              </div>
+              <span class="co-pm-opt__label" id="balanceLbl">Balance<br><small style="font-size:10px;opacity:.5;">$0.00</small></span>
+            </button>
+          </div>
+
+          <div class="co-divider"></div>
+
+          <!-- Crypto -->
+          <div class="co-pm-section-lbl">CRYPTO</div>
+          <div class="co-pm-grid" id="cryptoMethods">
+            <!-- Rendered dynamically based on configured wallets -->
+          </div>
+          <div id="noWalletsMsg" style="display:none;font-size:12px;color:rgba(255,255,255,.3);padding:4px 0 8px;">
+            No crypto wallets configured. Enable them in the admin panel.
+          </div>
+
+          <div class="co-divider"></div>
+
+          <!-- Promo -->
+          <div style="margin-bottom:4px;">
+            <div style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:rgba(255,255,255,.55);margin-bottom:10px;">
+              <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+              Discount Code
+            </div>
+            <div class="co-promo-row">
+              <input class="co-promo-input" type="text" id="promoInput" placeholder="ENTER CODE" />
+              <button class="co-promo-apply" id="promoBtn">Apply</button>
+            </div>
+            <div class="co-promo-msg" id="promoMsg"></div>
+          </div>
+
+          <div class="co-progress-bar"><div class="co-progress-fill" id="checkoutProgress" style="width:33%"></div></div>
+
+          <button class="co-continue-btn" id="continueBtn">
+            Continue
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right: Cart summary -->
+    <div style="display:flex;flex-direction:column;gap:16px;">
+
+      <div class="co-card">
+        <div class="co-card__hdr">
+          <div class="co-card__title">Your Cart</div>
+          <div class="co-card__sub">Review your items before checkout</div>
+        </div>
+        <div style="padding:0 24px;" id="cartItems">
+          <!-- Rendered by JS -->
+        </div>
+        <div class="co-discount-section">
+          <!-- Discount (second copy - mirrors left side visually) -->
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <div class="co-sum-rows" id="cartSumRows">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+        </div>
+        <div class="co-warranty" id="warrantyNote" style="display:none;">
+          <!-- Optional warranty note -->
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ════════════ STEP 2: CONFIRMATION ════════════ -->
+  <div id="stepConfirm" class="co-grid" style="display:none;">
+
+    <!-- Left: Payment instructions -->
+    <div style="display:flex;flex-direction:column;gap:16px;">
+
+      <!-- Timer bar -->
+      <div class="conf-timer-bar">
+        <div class="conf-timer-lbl">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Pay before
+        </div>
+        <div class="conf-timer-val" id="confTimerVal">30:00</div>
+      </div>
+
+      <div class="co-card">
+        <div class="co-card__body">
+
+          <!-- Warning -->
+          <div class="conf-warning" id="confWarning">
+            <div class="conf-warning__title">Important:</div>
+            <ul class="conf-warning__list" id="confWarningList">
+              <!-- filled by JS -->
+            </ul>
+          </div>
+
+          <!-- Amount -->
+          <div class="conf-copy-field">
+            <div class="conf-copy-lbl">Amount to Send</div>
+            <div class="conf-copy-row">
+              <div class="conf-copy-val" id="confAmount"></div>
+              <button class="conf-copy-btn" id="confAmtCopy" title="Copy">
+                <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Address -->
+          <div class="conf-copy-field">
+            <div class="conf-copy-lbl" id="confAddrLbl">Address</div>
+            <div class="conf-copy-row">
+              <div class="conf-copy-val" id="confAddr" style="font-size:11px;"></div>
+              <button class="conf-copy-btn" id="confAddrCopy" title="Copy">
+                <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- QR -->
+          <div class="conf-qr-wrap">
+            <img class="conf-qr" id="confQR" src="" alt="QR Code" />
+          </div>
+
+          <!-- Polling status -->
+          <div style="display:flex;align-items:center;gap:8px;margin-top:16px;padding:10px 14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:9px;">
+            <div class="op-status-pulse" id="confPulse" style="color:#fbbf24;"></div>
+            <span id="confStatusTxt" style="font-size:12px;color:rgba(255,255,255,.45);">Waiting for payment on blockchain…</span>
+          </div>
+
+          <button class="conf-sent-btn" id="confSentBtn">
+            I Have Sent The Payment
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right: Order progress -->
+    <div style="display:flex;flex-direction:column;gap:16px;">
+
+      <div class="co-card">
+        <div class="co-card__hdr">
+          <div class="op-card__title">Order Progress</div>
+          <div class="op-card__sub">Track your order status in real-time</div>
+        </div>
+        <div class="op-timeline">
+          <div class="op-step done" id="opStep1">
+            <div class="op-step__icon">✓</div>
+            <div class="op-step__info">
+              <div class="op-step__name">Order Created</div>
+              <div class="op-step__desc">Your order has been placed successfully</div>
+            </div>
+          </div>
+          <div class="op-step active" id="opStep2">
+            <div class="op-step__icon">
+              <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+            </div>
+            <div class="op-step__info">
+              <div class="op-step__name">Awaiting Payment</div>
+              <div class="op-step__desc">Send payment using the instructions provided</div>
+            </div>
+          </div>
+          <div class="op-step" id="opStep3">
+            <div class="op-step__icon">
+              <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div class="op-step__info">
+              <div class="op-step__name">Verifying Payment</div>
+              <div class="op-step__desc">We'll verify your payment once received</div>
+            </div>
+          </div>
+          <div class="op-step" id="opStep4">
+            <div class="op-step__icon">✓</div>
+            <div class="op-step__info">
+              <div class="op-step__name">Order Complete</div>
+              <div class="op-step__desc">Credentials delivered to your email</div>
+            </div>
+          </div>
+        </div>
+        <div class="op-details">
+          <div class="op-detail-row">
+            <span class="op-detail-lbl">Order ID</span>
+            <span class="op-detail-val" id="opOrderId">—</span>
+          </div>
+          <div class="op-detail-row">
+            <span class="op-detail-lbl">Total</span>
+            <span class="op-detail-val normal" id="opTotal">—</span>
+          </div>
+          <div class="op-detail-row">
+            <span class="op-detail-lbl">Method</span>
+            <span class="op-detail-val normal" id="opMethod">—</span>
+          </div>
+          <div class="op-detail-row">
+            <span class="op-detail-lbl">Status</span>
+            <span>
+              <span class="op-status-badge op-status-badge--waiting" id="opStatus">
+                <span class="op-status-pulse"></span>
+                Awaiting Payment
+              </span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ════════════ STEP 3: SUCCESS ════════════ -->
+  <div id="stepSuccess" style="display:none;max-width:500px;margin:0 auto;width:100%;">
+    <div class="co-card">
+      <div class="conf-success">
+        <div class="conf-success__check">✓</div>
+        <div class="conf-success__title">Payment Confirmed!</div>
+        <div class="conf-success__sub" id="successSub">Your product is ready below.</div>
+
+        <div class="conf-deliv-box" style="width:100%;">
+          <div class="conf-deliv-lbl">Your Product</div>
+          <div class="conf-deliv-val" id="successDeliv">—</div>
+          <button class="conf-reveal-btn" id="successRevealBtn">👁 Click to reveal</button>
+        </div>
+
+        <div class="conf-deliv-box" style="width:100%;background:rgba(34,197,94,.04);border-color:rgba(34,197,94,.12);">
+          <div class="conf-deliv-lbl">Invoice ID</div>
+          <div style="font-size:14px;font-weight:700;color:#fff;font-family:monospace;" id="successInvId">—</div>
+        </div>
+
+        <button class="conf-back-btn" onclick="window.location.href='preview-products.html'">
+          ← Back to Shop
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  /* ── Constants ── */
+  var POLL_INTERVAL = 30000;
+  var PAYMENT_TIMEOUT = 1800000; // 30 min
+  var CRYPTO_INFO = {
+    btc: { name: 'Bitcoin',  symbol: 'BTC', color: '#f7931a', bg: '#f7931a', icon: '₿',  decimals: 8 },
+    eth: { name: 'Ethereum', symbol: 'ETH', color: '#627eea', bg: '#627eea', icon: 'Ξ',  decimals: 18 },
+    ltc: { name: 'Litecoin', symbol: 'LTC', color: '#bfbbbb', bg: '#a6a9aa', icon: 'Ł',  decimals: 8 },
+    sol: { name: 'Solana',   symbol: 'SOL', color: '#9945ff', bg: '#9945ff', icon: '◎', decimals: 9 }
+  };
+  var SYM = { EUR: '€', USD: '$', GBP: '£' };
+
+  /* ── Storage helpers ── */
+  function getProds() {
+    var D = [
+      {id:1,name:'Netflix Premium',price:4.99,icon:'🎬',desc:'1 Month · 4K UHD · Shared',deliverables:[],stock:50,currency:'EUR',category:'streaming'},
+      {id:2,name:'Spotify Premium',price:8.99,icon:'🎵',desc:'3 Months · Family Plan',deliverables:[],stock:32,currency:'EUR',category:'music'},
+      {id:3,name:'Xbox Game Pass',price:6.99,icon:'🎮',desc:'1 Month · Ultimate',deliverables:[],stock:18,currency:'EUR',category:'gaming'},
+      {id:4,name:'NordVPN',price:12.99,icon:'🔒',desc:'6 Months · Premium',deliverables:[],stock:7,currency:'EUR',category:'vpn'},
+      {id:5,name:'Disney+',price:3.99,icon:'📺',desc:'1 Month · 4K · Shared',deliverables:[],stock:45,currency:'EUR',category:'streaming'},
+      {id:6,name:'Adobe Creative Cloud',price:19.99,icon:'🎨',desc:'1 Month · All Apps',deliverables:[],stock:0,currency:'EUR',category:'software'}
+    ];
+    try { return JSON.parse(localStorage.getItem('nexus_products')) || D; } catch(e) { return D; }
+  }
+  function saveProds(p) { localStorage.setItem('nexus_products', JSON.stringify(p)); }
+  function getPayments() { try { return JSON.parse(localStorage.getItem('nexus_payments')) || {}; } catch(e) { return {}; } }
+  function getOrders() { try { return JSON.parse(localStorage.getItem('nexus_orders')) || []; } catch(e) { return []; } }
+  function addOrder(o) { var a = getOrders(); a.unshift(o); localStorage.setItem('nexus_orders', JSON.stringify(a)); }
+  function getPromos() { try { return JSON.parse(localStorage.getItem('nexus_promos')) || []; } catch(e) { return []; } }
+  function getContent() { try { return JSON.parse(localStorage.getItem('nexus_content') || '{}'); } catch(e) { return {}; } }
+  function generateId() {
+    var c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',id='NX-';
+    for(var i=0;i<8;i++) id+=c[Math.floor(Math.random()*c.length)];
+    return id;
+  }
+  function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  /* ── State ── */
+  var params = new URLSearchParams(window.location.search);
+  var pid = parseInt(params.get('id') || '0', 10);
+  var allProds = getProds();
+  var product = allProds.find(function(x) { return x.id === pid; });
+  if (!product) { window.location.href = 'preview-products.html'; return; }
+
+  var selectedPM = null;
+  var appliedPromo = null;
+  var orderData = null; // { invoiceId, email, cryptoKey, amount, address, deliverable, orderMs }
+  var pollTimer = null, timeoutTimer = null, timerInterval = null;
+
+  /* ── Apply site name ── */
+  var c = getContent();
+  if (c.siteName) { document.getElementById('siteLogo').textContent = c.siteName; document.title = c.siteName + ' — Checkout'; }
+
+  /* ── Render cart ── */
+  var sym = SYM[product.currency] || '€';
+  var basePrice = Number(product.price);
+
+  function getFinalPrice() {
+    if (appliedPromo) return basePrice * (1 - appliedPromo.discount / 100);
+    return basePrice;
+  }
+
+  function renderCart() {
+    var fp = getFinalPrice();
+    document.getElementById('cartItems').innerHTML =
+      '<div class="co-cart-item">' +
+        '<div class="co-cart-img">' + (product.icon || '📦') + '</div>' +
+        '<div class="co-cart-info">' +
+          '<div class="co-cart-name">' + esc(product.name) + '</div>' +
+          '<div class="co-cart-each">' + sym + fp.toFixed(2) + ' each</div>' +
+        '</div>' +
+        '<div class="co-cart-right">' +
+          '<div class="co-cart-price">' + sym + fp.toFixed(2) + '</div>' +
+        '</div>' +
+      '</div>';
+    document.getElementById('cartSumRows').innerHTML =
+      '<div class="co-sum-row"><span>Subtotal</span><span>' + sym + fp.toFixed(2) + '</span></div>' +
+      '<div class="co-sum-row"><span>Tax</span><span>' + sym + '0.00</span></div>' +
+      (appliedPromo ? '<div class="co-sum-row" style="color:rgba(99,235,132,.8)"><span>Discount (-' + appliedPromo.discount + '%)</span><span>-' + sym + (basePrice * appliedPromo.discount / 100).toFixed(2) + '</span></div>' : '') +
+      '<div class="co-sum-row co-sum-row--total"><span>Total</span><span>' + sym + fp.toFixed(2) + '</span></div>';
+  }
+  renderCart();
+
+  /* ── Render crypto payment methods ── */
+  var payments = getPayments();
+  var cryptoGrid = document.getElementById('cryptoMethods');
+  var cryptoCoins = ['btc', 'eth', 'ltc', 'sol'];
+  var hasCrypto = false;
+  cryptoCoins.forEach(function(coin) {
+    var cfg = payments[coin];
+    if (!cfg || !cfg.enabled || !cfg.address) return;
+    hasCrypto = true;
+    var info = CRYPTO_INFO[coin];
+    var btn = document.createElement('button');
+    btn.className = 'co-pm-opt';
+    btn.dataset.pm = coin;
+    btn.innerHTML =
+      '<div class="co-pm-opt__icon" style="background:' + info.bg + ';color:#fff;font-size:16px;font-weight:800;">' + info.icon + '</div>' +
+      '<span class="co-pm-opt__label">' + info.name + '</span>';
+    btn.addEventListener('click', function() { selectPM(coin); });
+    cryptoGrid.appendChild(btn);
+  });
+  if (!hasCrypto) document.getElementById('noWalletsMsg').style.display = '';
+
+  /* Also bind cash methods */
+  document.querySelectorAll('#cashMethods .co-pm-opt:not(.disabled)').forEach(function(btn) {
+    btn.addEventListener('click', function() { selectPM(btn.dataset.pm); });
+  });
+
+  function selectPM(key) {
+    selectedPM = key;
+    document.querySelectorAll('.co-pm-opt').forEach(function(b) { b.classList.remove('active'); });
+    var active = document.querySelector('.co-pm-opt[data-pm="' + key + '"]');
+    if (active) active.classList.add('active');
+  }
+
+  /* ── Promo code ── */
+  document.getElementById('promoBtn').addEventListener('click', function() {
+    var code = (document.getElementById('promoInput').value || '').trim().toUpperCase();
+    var msgEl = document.getElementById('promoMsg');
+    if (!code) { msgEl.textContent = 'Enter a promo code.'; msgEl.style.color = 'rgba(239,68,68,.8)'; return; }
+    var promos = getPromos();
+    var promo = promos.find(function(p) { return p.code === code; });
+    if (!promo) { msgEl.textContent = 'Invalid code.'; msgEl.style.color = 'rgba(239,68,68,.8)'; appliedPromo = null; }
+    else if (promo.maxUses > 0 && promo.uses >= promo.maxUses) { msgEl.textContent = 'Code expired.'; msgEl.style.color = 'rgba(239,68,68,.8)'; appliedPromo = null; }
+    else {
+      appliedPromo = promo;
+      msgEl.textContent = '✓ Code applied — -' + promo.discount + '%';
+      msgEl.style.color = 'rgba(99,235,132,.9)';
+    }
+    renderCart();
+  });
+
+  /* ── Copy helper ── */
+  function copyText(text, btn) {
+    try {
+      navigator.clipboard.writeText(text).then(function() {
+        var orig = btn.innerHTML;
+        btn.innerHTML = '✓';
+        setTimeout(function() { btn.innerHTML = orig; }, 2000);
+      });
+    } catch(e) {}
+  }
+
+  /* ── Continue button ── */
+  document.getElementById('continueBtn').addEventListener('click', function() {
+    var email = document.getElementById('coEmail').value.trim();
+    var errEl = document.getElementById('emailErr');
+
+    errEl.style.display = 'none';
+    document.getElementById('coEmail').classList.remove('err');
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      document.getElementById('coEmail').classList.add('err');
+      errEl.textContent = 'Please enter a valid email address.';
+      errEl.style.display = '';
+      return;
+    }
+    if (!selectedPM) {
+      errEl.textContent = 'Please select a payment method.';
+      errEl.style.display = '';
+      return;
+    }
+
+    var fp = getFinalPrice();
+    var invoiceId = generateId();
+
+    if (cryptoCoins.indexOf(selectedPM) !== -1) {
+      /* Crypto payment */
+      startCryptoPayment(email, invoiceId, selectedPM, fp);
+    } else if (selectedPM === 'paypal') {
+      /* PayPal — for now show a message */
+      errEl.textContent = 'PayPal not yet configured. Please select a crypto method.';
+      errEl.style.display = '';
+    }
+  });
+
+  /* ── Crypto payment flow ── */
+  function startCryptoPayment(email, invoiceId, coin, fiatAmount) {
+    var btn = document.getElementById('continueBtn');
+    btn.disabled = true; btn.textContent = 'Fetching live rate…';
+
+    var currency = product.currency || 'EUR';
+    var info = CRYPTO_INFO[coin];
+    var cfg = getPayments()[coin];
+
+    /* Fetch CoinGecko price */
+    var cgIds = { btc: 'bitcoin', eth: 'ethereum', ltc: 'litecoin', sol: 'solana' };
+    fetch('https://api.coingecko.com/api/v3/simple/price?ids=' + cgIds[coin] + '&vs_currencies=' + currency.toLowerCase())
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        var rate = data[cgIds[coin]][currency.toLowerCase()];
+        if (!rate) throw new Error('No rate');
+        var amount = fiatAmount / rate;
+        /* Add unique offset */
+        var offset = (Math.floor(Math.random() * 9000) + 1000) * Math.pow(10, -info.decimals + 4);
+        var finalAmount = Math.round((amount + offset) * Math.pow(10, info.decimals)) / Math.pow(10, info.decimals);
+        var decimals = coin === 'eth' ? 8 : 8;
+        var amountStr = finalAmount.toFixed(decimals) + ' ' + info.symbol;
+
+        var address = cfg.address;
+        var orderMs = Date.now();
+
+        /* Get deliverable */
+        var prods2 = getProds();
+        var p2 = prods2.find(function(x) { return x.id === product.id; });
+        var deliverable = (p2 && p2.deliverables && p2.deliverables.length > 0)
+          ? p2.deliverables[0]
+          : '(Contact support — invoice: ' + invoiceId + ')';
+
+        orderData = {
+          invoiceId: invoiceId, email: email, coin: coin,
+          amount: finalAmount, amountStr: amountStr,
+          address: address, orderMs: orderMs, fiatAmount: fiatAmount,
+          deliverable: deliverable
+        };
+
+        showConfirmationStep(orderData, info, rate, fiatAmount, currency);
+      })
+      .catch(function() {
+        btn.disabled = false;
+        btn.innerHTML = 'Continue <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+        document.getElementById('emailErr').textContent = 'Could not fetch live rate. Please try again.';
+        document.getElementById('emailErr').style.display = '';
+      });
+  }
+
+  function showConfirmationStep(od, info, rate, fiatAmount, currency) {
+    /* Breadcrumb */
+    document.getElementById('bcCheckout').classList.remove('active');
+    document.getElementById('bcCheckout').classList.add('done');
+    document.getElementById('bcConfirm').classList.add('active');
+
+    /* Fill confirmation UI */
+    document.getElementById('stepCheckout').style.display = 'none';
+    document.getElementById('stepConfirm').style.display = '';
+
+    document.getElementById('confAmount').textContent = od.amountStr;
+    document.getElementById('confAddrLbl').textContent = info.name + ' Address';
+    document.getElementById('confAddr').textContent = od.address;
+
+    /* QR */
+    var uri = (od.coin === 'btc' ? 'bitcoin:' : od.coin === 'eth' ? 'ethereum:' : od.coin === 'ltc' ? 'litecoin:' : 'solana:') +
+      od.address + '?amount=' + od.amount;
+    document.getElementById('confQR').src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(uri) + '&bgcolor=0d0d0d&color=ffffff&format=png';
+
+    /* Warning list */
+    var sym2 = SYM[currency] || '€';
+    document.getElementById('confWarningList').innerHTML = [
+      '<li>Send exactly <strong>' + od.amountStr + '</strong></li>',
+      '<li>Send only ' + info.name + ' to this address</li>',
+      '<li>Takes 1 network confirmation</li>'
+    ].join('');
+
+    /* Order details */
+    document.getElementById('opOrderId').textContent = od.invoiceId;
+    document.getElementById('opTotal').textContent = sym2 + Number(fiatAmount).toFixed(2);
+    document.getElementById('opMethod').textContent = info.name;
+
+    /* Copy buttons */
+    document.getElementById('confAmtCopy').onclick = function() { copyText(od.amount.toFixed(8), this); };
+    document.getElementById('confAddrCopy').onclick = function() { copyText(od.address, this); };
+
+    /* Start timer */
+    startTimer();
+
+    /* Start polling */
+    startPolling(od, info);
+
+    /* "I Have Sent" — trigger immediate check */
+    document.getElementById('confSentBtn').addEventListener('click', function() {
+      document.getElementById('confStatusTxt').textContent = 'Checking blockchain now…';
+      doPoll(od);
+    });
+  }
+
+  /* ── Timer ── */
+  function startTimer() {
+    var end = Date.now() + PAYMENT_TIMEOUT;
+    timerInterval = setInterval(function() {
+      var left = end - Date.now();
+      if (left <= 0) {
+        clearInterval(timerInterval);
+        document.getElementById('confTimerVal').textContent = 'Expired';
+        document.getElementById('confStatusTxt').textContent = 'Payment window expired. Please restart.';
+        document.getElementById('confPulse').style.color = '#ef4444';
+        stopPolling();
+        return;
+      }
+      /* Format as date/time: 13 Jun, 01:27 */
+      var endDate = new Date(end);
+      var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      var h = endDate.getHours(); var m = endDate.getMinutes();
+      document.getElementById('confTimerVal').textContent =
+        endDate.getDate() + ' ' + months[endDate.getMonth()] + ', ' +
+        (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
+    }, 1000);
+    /* Trigger immediately */
+    var endDate2 = new Date(Date.now() + PAYMENT_TIMEOUT);
+    var months2 = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var h2 = endDate2.getHours(); var m2 = endDate2.getMinutes();
+    document.getElementById('confTimerVal').textContent =
+      endDate2.getDate() + ' ' + months2[endDate2.getMonth()] + ', ' +
+      (h2 < 10 ? '0' : '') + h2 + ':' + (m2 < 10 ? '0' : '') + m2;
+  }
+
+  /* ── Blockchain polling ── */
+  function startPolling(od) {
+    doPoll(od);
+    pollTimer = setInterval(function() { doPoll(od); }, POLL_INTERVAL);
+    timeoutTimer = setTimeout(function() {
+      stopPolling();
+    }, PAYMENT_TIMEOUT);
+  }
+
+  function stopPolling() {
+    if (pollTimer)    clearInterval(pollTimer);
+    if (timeoutTimer) clearTimeout(timeoutTimer);
+    if (timerInterval) clearInterval(timerInterval);
+    pollTimer = timeoutTimer = timerInterval = null;
+  }
+
+  function doPoll(od) {
+    pollBlockchain(od.coin, od.address, od.amount, od.orderMs, function(err, result) {
+      if (err) { document.getElementById('confStatusTxt').textContent = 'Network error — retrying…'; return; }
+      if (!result || !result.confirmed) {
+        if (result && result.txHash) {
+          document.getElementById('confStatusTxt').textContent = 'Transaction found — awaiting confirmation (' + (result.confirmations || 0) + ' conf)…';
+          document.getElementById('confPulse').style.color = '#60a5fa';
+          setStep(3); // Verifying
+        }
+        return;
+      }
+      /* Confirmed! */
+      stopPolling();
+      onConfirmed(result, od);
+    });
+  }
+
+  function pollBlockchain(coin, address, expectedAmount, afterMs, callback) {
+    if (coin === 'btc' || coin === 'ltc') {
+      var network = coin === 'btc' ? 'btc' : 'ltc';
+      fetch('https://api.blockcypher.com/v1/' + network + '/main/addrs/' + encodeURIComponent(address) + '/full?limit=10')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          var txs = data.txs || [];
+          for (var i = 0; i < txs.length; i++) {
+            var tx = txs[i];
+            var rMs = tx.received ? new Date(tx.received).getTime() : 0;
+            if (rMs < afterMs - 300000) continue;
+            var confs = tx.confirmations || 0;
+            var outputs = tx.outputs || [];
+            for (var j = 0; j < outputs.length; j++) {
+              var out = outputs[j];
+              if ((out.addresses || []).indexOf(address) !== -1) {
+                var amt = (out.value || 0) / 1e8;
+                if (Math.abs(amt - expectedAmount) < 0.0002) {
+                  callback(null, { confirmed: confs >= 1, txHash: tx.hash, amount: amt, confirmations: confs });
+                  return;
+                }
+              }
+            }
+          }
+          callback(null, { confirmed: false });
+        })
+        .catch(function(e) { callback(e, null); });
+    } else if (coin === 'eth') {
+      fetch('https://eth.blockscout.com/api?module=account&action=txlist&address=' + encodeURIComponent(address) + '&sort=desc&page=1&offset=20')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          var txs = Array.isArray(data.result) ? data.result : [];
+          for (var i = 0; i < txs.length; i++) {
+            var tx = txs[i];
+            var txMs = parseInt(tx.timeStamp || '0', 10) * 1000;
+            if (txMs < afterMs - 300000) continue;
+            if (tx.isError === '1') continue;
+            if ((tx.to || '').toLowerCase() !== address.toLowerCase()) continue;
+            var amt = parseInt(tx.value || '0', 10) / 1e18;
+            if (Math.abs(amt - expectedAmount) < expectedAmount * 0.005) {
+              var confs = parseInt(tx.confirmations || '0', 10);
+              callback(null, { confirmed: confs >= 1, txHash: tx.hash, amount: amt, confirmations: confs });
+              return;
+            }
+          }
+          callback(null, { confirmed: false });
+        })
+        .catch(function(e) { callback(e, null); });
+    } else if (coin === 'sol') {
+      fetch('https://api.mainnet-beta.solana.com', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'getSignaturesForAddress', params: [address, { limit: 10 }] })
+      })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          var sigs = (data.result || []).filter(function(s) { return s.blockTime && s.blockTime * 1000 >= afterMs - 300000; }).slice(0, 3);
+          if (!sigs.length) { callback(null, { confirmed: false }); return; }
+          var done = false; var pending = sigs.length;
+          sigs.forEach(function(sig) {
+            if (done) return;
+            fetch('https://api.mainnet-beta.solana.com', {
+              method: 'POST', headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'getTransaction', params: [sig.signature, { encoding: 'json', maxSupportedTransactionVersion: 0 }] })
+            })
+              .then(function(r) { return r.json(); })
+              .then(function(txData) {
+                if (done) return;
+                var tx = txData.result;
+                if (!tx || (tx.meta && tx.meta.err)) { pending--; if (!pending) callback(null, { confirmed: false }); return; }
+                var accs = (tx.transaction && tx.transaction.message && tx.transaction.message.accountKeys) || [];
+                var idx = accs.indexOf(address);
+                if (idx !== -1) {
+                  var pre = (tx.meta.preBalances || [])[idx] || 0;
+                  var post = (tx.meta.postBalances || [])[idx] || 0;
+                  var recv = (post - pre) / 1e9;
+                  if (recv > 0 && Math.abs(recv - expectedAmount) < expectedAmount * 0.01) {
+                    done = true;
+                    callback(null, { confirmed: true, txHash: sig.signature, amount: recv, confirmations: 1 });
+                    return;
+                  }
+                }
+                pending--;
+                if (!pending && !done) callback(null, { confirmed: false });
+              })
+              .catch(function() { pending--; if (!pending && !done) callback(null, { confirmed: false }); });
+          });
+        })
+        .catch(function(e) { callback(e, null); });
+    }
+  }
+
+  /* ── Step progress UI ── */
+  function setStep(n) {
+    /* n: 2=awaiting, 3=verifying, 4=complete */
+    for (var i = 1; i <= 4; i++) {
+      var el = document.getElementById('opStep' + i);
+      el.classList.remove('done', 'active');
+      if (i < n) el.classList.add('done');
+      else if (i === n) el.classList.add('active');
+    }
+  }
+
+  /* ── Payment confirmed ── */
+  function onConfirmed(txResult, od) {
+    /* Deduct stock */
+    var prods2 = getProds();
+    var p2 = prods2.find(function(x) { return x.id === product.id; });
+    if (p2) {
+      if ((p2.deliverables || []).length > 0) { p2.deliverables = p2.deliverables.slice(1); }
+      else if (p2.stock > 0) { p2.stock--; }
+      var idx2 = prods2.findIndex(function(x) { return x.id === product.id; });
+      if (idx2 !== -1) { prods2[idx2] = p2; saveProds(prods2); }
+    }
+
+    /* Save order */
+    addOrder({
+      id: od.invoiceId, date: new Date().toISOString(),
+      email: od.email, productId: product.id,
+      productName: product.name, productIcon: product.icon || '📦',
+      price: od.fiatAmount, currency: product.currency || 'EUR',
+      deliverable: od.deliverable, status: 'completed',
+      paymentMethod: 'crypto_' + od.coin, txHash: txResult.txHash
+    });
+
+    /* Discord webhook */
+    try {
+      var wa = JSON.parse(localStorage.getItem('nexus_webhooks') || '{}');
+      var wc = wa['ORDER_CREATE'] || {};
+      if (wc.url) {
+        fetch(wc.url, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ embeds: [{ title: '💎 Crypto Payment Confirmed', color: 0x57F287,
+            fields: [
+              { name: 'Invoice', value: od.invoiceId, inline: true },
+              { name: 'Product', value: (product.icon || '📦') + ' ' + product.name, inline: true },
+              { name: 'TX', value: txResult.txHash || '—', inline: false }
+            ], footer: { text: 'Nexus Store' }, timestamp: new Date().toISOString() }] })
+        }).catch(function() {});
+      }
+    } catch(e) {}
+
+    /* Update breadcrumb */
+    document.getElementById('bcConfirm').classList.remove('active');
+    document.getElementById('bcConfirm').classList.add('done');
+    document.getElementById('bcDone').classList.add('active');
+
+    /* Show success */
+    setStep(4);
+    document.getElementById('stepConfirm').style.display = 'none';
+    document.getElementById('stepSuccess').style.display = '';
+
+    document.getElementById('successSub').textContent = 'Order confirmed. Check ' + od.email + ' for confirmation.';
+    document.getElementById('successInvId').textContent = od.invoiceId;
+    document.getElementById('successDeliv').textContent = od.deliverable;
+
+    document.getElementById('successRevealBtn').addEventListener('click', function() {
+      var el = document.getElementById('successDeliv');
+      var shown = el.classList.toggle('shown');
+      this.textContent = shown ? '🔒 Hide' : '👁 Click to reveal';
+    });
+  }
+
+}());
+</script>
+
+</body>
+</html>

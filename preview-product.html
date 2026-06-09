@@ -577,7 +577,7 @@
       buyBtn.textContent = 'Out of Stock';
     }
     buyBtn.addEventListener('click', function() {
-      if (window._nexusOpenCheckout) window._nexusOpenCheckout(pid);
+      window.location.href = 'checkout?id=' + pid;
     });
 
     /* ── Add to Cart ── */
