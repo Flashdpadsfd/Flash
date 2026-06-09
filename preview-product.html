@@ -344,12 +344,14 @@
         <!-- Payment methods -->
         <div class="pdv3-pay-methods">
           <div class="pdv3-pay-methods__lbl">Accepted Payments</div>
-          <div class="pdv3-pay-row">
+          <div class="pdv3-pay-row" id="pdPayBadges">
             <span class="pdv3-pay-badge">VISA</span>
-            <span class="pdv3-pay-badge">MASTERCARD</span>
-            <span class="pdv3-pay-badge">AMEX</span>
+            <span class="pdv3-pay-badge">MC</span>
             <span class="pdv3-pay-badge">PAYPAL</span>
-            <span class="pdv3-pay-badge">CRYPTO</span>
+            <span class="pdv3-pay-badge" style="color:rgba(247,147,26,.8);border-color:rgba(247,147,26,.22);">BTC</span>
+            <span class="pdv3-pay-badge" style="color:rgba(98,126,234,.8);border-color:rgba(98,126,234,.22);">ETH</span>
+            <span class="pdv3-pay-badge" style="color:rgba(191,187,187,.7);">LTC</span>
+            <span class="pdv3-pay-badge" style="color:rgba(153,69,255,.8);border-color:rgba(153,69,255,.22);">SOL</span>
           </div>
         </div>
 
@@ -409,7 +411,8 @@
   })();
   </script>
 
-  <script src="assets/main.js?v=11"></script>
+  <script src="assets/main.js?v=12"></script>
+  <script src="assets/crypto-checkout.js?v=1"></script>
 
   <!-- ─── PRODUCT DETAIL SCRIPT ─── -->
   <script>

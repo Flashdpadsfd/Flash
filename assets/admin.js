@@ -1375,6 +1375,15 @@
       fields: [
         { key: 'address', label: 'Litecoin Wallet Address', type: 'text', ph: 'ltc1q... or L...', hint: 'Your Litecoin wallet address.' }
       ]
+    },
+    {
+      key: 'sol', name: 'Solana (SOL)',
+      desc: 'Ultra-fast, near-zero fee crypto payments via Solana.',
+      bg: '#9945ff',
+      icon: '<svg viewBox="0 0 24 24" fill="#fff" width="20" height="20"><path d="M3.904 16.726a.49.49 0 01.347-.144h16.619a.245.245 0 01.173.418l-2.57 2.57a.49.49 0 01-.346.144H1.508a.245.245 0 01-.173-.418l2.569-2.57zm0-12.17a.49.49 0 01.347-.143h16.619a.245.245 0 01.173.418l-2.57 2.57a.49.49 0 01-.346.143H1.508a.245.245 0 01-.173-.418l2.569-2.57zM20.319 10.41a.49.49 0 01-.346.144H3.354a.245.245 0 01-.173-.419l2.57-2.57a.49.49 0 01.346-.143h16.619a.245.245 0 01.173.418l-2.57 2.57z"/></svg>',
+      fields: [
+        { key: 'address', label: 'Solana Wallet Address', type: 'text', ph: 'Your SOL address (base58)...', hint: 'Your Solana wallet address. Customers send SOL directly to it.' }
+      ]
     }
   ];
 
@@ -1420,11 +1429,12 @@
         }
       }).join('');
 
+      var isCrypto = ['btc','eth','ltc','sol'].indexOf(m.key) !== -1;
       return '<div class="pm-card' + (enabled ? ' pm-card--enabled' : '') + '" id="pm-card-' + m.key + '">' +
         '<div class="pm-card__head">' +
           '<div class="pm-card__logo" style="background:' + m.bg + ';">' + m.icon + '</div>' +
           '<div class="pm-card__info">' +
-            '<div class="pm-card__name">' + esc(m.name) + '</div>' +
+            '<div class="pm-card__name">' + esc(m.name) + (isCrypto ? ' <span style="font-size:10px;font-weight:700;background:rgba(99,235,132,.1);border:1px solid rgba(99,235,132,.2);color:#63eb84;padding:2px 6px;border-radius:4px;vertical-align:middle;letter-spacing:.04em;">AUTO-VERIFY</span>' : '') + '</div>' +
             '<div class="pm-card__desc">' + esc(m.desc) + '</div>' +
           '</div>' +
           '<div class="pm-card__right">' +

@@ -1913,3 +1913,359 @@ body.loaded .hero__cta    { animation: revealUp 600ms cubic-bezier(.16,1,.3,1) 6
   border-radius: 5px; padding: 4px 9px; font-size: 9px; font-weight: 700;
   color: rgba(255,255,255,.35); letter-spacing: .04em;
 }
+
+/*──────────────────────────────────────────────
+  CRYPTO CHECKOUT MODAL
+──────────────────────────────────────────────*/
+.cry-overlay {
+  display: none; position: fixed; inset: 0; z-index: 8000;
+  background: rgba(0,0,0,.75); backdrop-filter: blur(6px);
+}
+.cry-overlay.open { display: block; }
+
+.cry-modal {
+  position: fixed; z-index: 8001;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -48%) scale(.97);
+  width: 520px; max-width: calc(100vw - 32px);
+  max-height: 90vh; overflow-y: auto;
+  background: #0a0a0a;
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 16px;
+  box-shadow: 0 32px 64px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.04);
+  opacity: 0; pointer-events: none;
+  transition: opacity 220ms ease, transform 220ms ease;
+}
+.cry-modal.open {
+  opacity: 1; pointer-events: all;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.cry-hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+}
+.cry-hdr__left {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; font-weight: 700; color: rgba(255,255,255,.85);
+  letter-spacing: .02em;
+}
+.cry-hdr__shield {
+  display: flex; align-items: center; justify-content: center;
+  width: 24px; height: 24px; border-radius: 6px;
+  background: rgba(255,255,255,.06); color: rgba(255,255,255,.5);
+}
+.cry-close {
+  width: 28px; height: 28px; border-radius: 6px;
+  border: none; background: rgba(255,255,255,.06);
+  color: rgba(255,255,255,.5); font-size: 12px;
+  cursor: pointer; transition: background 150ms, color 150ms;
+  display: flex; align-items: center; justify-content: center;
+}
+.cry-close:hover { background: rgba(255,255,255,.12); color: #fff; }
+
+.cry-step-hdr {
+  padding: 20px 20px 12px;
+  font-size: 14px; font-weight: 600; color: rgba(255,255,255,.7);
+}
+
+/* ── Coin selector grid ── */
+.cry-coins {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px; padding: 0 20px 20px;
+}
+.cry-coin {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 18px 12px;
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 12px;
+  cursor: pointer; transition: background 180ms, border-color 180ms, transform 100ms;
+}
+.cry-coin:hover { background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.18); }
+.cry-coin:active { transform: scale(.98); }
+.cry-coin--active {
+  background: rgba(255,255,255,.06);
+  border-color: rgba(255,255,255,.3);
+  box-shadow: 0 0 0 3px rgba(255,255,255,.06);
+}
+.cry-coin--disabled { opacity: .3; cursor: not-allowed; pointer-events: none; }
+.cry-coin__icon { font-size: 26px; font-weight: 700; font-family: monospace; line-height: 1; }
+.cry-coin__name { font-size: 13px; font-weight: 600; color: rgba(255,255,255,.8); }
+.cry-coin__sym  { font-size: 11px; color: rgba(255,255,255,.35); letter-spacing: .05em; }
+
+.cry-unavail {
+  margin: 0 20px 16px;
+  padding: 10px 14px;
+  background: rgba(239,68,68,.08); border: 1px solid rgba(239,68,68,.2);
+  border-radius: 8px; font-size: 12px; color: rgba(239,68,68,.85);
+}
+.cry-loading {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 20px 18px;
+  font-size: 12px; color: rgba(255,255,255,.4);
+}
+
+/* ── Step 2: payment screen ── */
+.cry-pay-top {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+.cry-pay-coin {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 14px; font-weight: 600; color: rgba(255,255,255,.85);
+}
+.cry-pay-sym {
+  font-size: 11px; color: rgba(255,255,255,.35);
+  background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+  padding: 2px 7px; border-radius: 4px; letter-spacing: .04em; font-weight: 700;
+}
+.cry-pay-timer-wrap {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 13px; font-weight: 700; color: rgba(255,255,255,.55);
+  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+  padding: 4px 10px; border-radius: 6px;
+}
+
+.cry-pay-body {
+  display: flex; gap: 20px;
+  padding: 18px 20px;
+}
+.cry-qr-wrap {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  flex-shrink: 0;
+}
+.cry-qr {
+  width: 140px; height: 140px; border-radius: 10px;
+  border: 1px solid rgba(255,255,255,.09);
+  background: #1a1a1a;
+}
+.cry-qr-scan {
+  font-size: 10px; color: rgba(255,255,255,.3); letter-spacing: .06em;
+  text-transform: uppercase; font-weight: 600;
+}
+
+.cry-pay-details {
+  flex: 1; display: flex; flex-direction: column; gap: 12px;
+}
+.cry-detail-row {
+  display: flex; flex-direction: column; gap: 5px;
+}
+.cry-detail-lbl {
+  font-size: 10px; font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase; color: rgba(255,255,255,.32);
+}
+.cry-amount-box, .cry-addr-box {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.09);
+  border-radius: 8px; padding: 8px 12px;
+}
+.cry-amount-val {
+  flex: 1; font-size: 15px; font-weight: 700; color: #fff;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+.cry-addr-val {
+  flex: 1; font-size: 11px; color: rgba(255,255,255,.6);
+  word-break: break-all; font-family: 'SF Mono', 'Fira Code', monospace;
+}
+.cry-copy-btn {
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; border-radius: 5px;
+  background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+  color: rgba(255,255,255,.5); font-size: 11px; cursor: pointer;
+  transition: background 150ms, color 150ms;
+}
+.cry-copy-btn:hover { background: rgba(255,255,255,.12); color: #fff; }
+
+.cry-warn {
+  display: flex; align-items: flex-start; gap: 7px;
+  padding: 9px 12px;
+  background: rgba(251,191,36,.06); border: 1px solid rgba(251,191,36,.15);
+  border-radius: 7px; font-size: 11px; color: rgba(251,191,36,.75);
+  line-height: 1.5;
+}
+.cry-warn svg { flex-shrink: 0; margin-top: 1px; }
+
+/* ── Status bar ── */
+.cry-status {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 20px;
+  border-top: 1px solid rgba(255,255,255,.06);
+  font-size: 12px; color: rgba(255,255,255,.5);
+}
+.cry-status__pulse {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #fbbf24; flex-shrink: 0;
+  animation: cry-pulse 1.8s ease-in-out infinite;
+}
+.cry-status--pending .cry-status__pulse { background: #60a5fa; }
+.cry-status--error .cry-status__pulse   { background: #ef4444; animation: none; }
+@keyframes cry-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: .4; transform: scale(.8); }
+}
+
+.cry-progress-bar {
+  height: 2px; background: rgba(255,255,255,.06); margin: 0 20px;
+  border-radius: 2px; overflow: hidden;
+}
+.cry-progress-fill {
+  height: 100%; background: linear-gradient(90deg, #7c3aed, #3b82f6);
+  border-radius: 2px;
+  transition: width 1s linear;
+  width: 100%;
+}
+
+.cry-back-btn {
+  display: block; width: calc(100% - 40px); margin: 10px 20px 18px;
+  padding: 9px; border-radius: 8px;
+  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+  color: rgba(255,255,255,.45); font-size: 12px; cursor: pointer;
+  transition: background 150ms, color 150ms;
+}
+.cry-back-btn:hover { background: rgba(255,255,255,.08); color: rgba(255,255,255,.7); }
+
+/* ── Step 3: success ── */
+.cry-success {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 12px; padding: 28px 24px;
+}
+.cry-success__icon {
+  width: 52px; height: 52px; border-radius: 50%;
+  background: rgba(34,197,94,.12); border: 1px solid rgba(34,197,94,.25);
+  color: #22c55e; font-size: 22px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+.cry-success__title {
+  font-size: 20px; font-weight: 700; color: #fff;
+}
+.cry-success__sub {
+  font-size: 13px; color: rgba(255,255,255,.4); margin-top: -4px;
+}
+.cry-tx-row {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 11px; color: rgba(255,255,255,.35);
+  background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.07);
+  padding: 7px 12px; border-radius: 7px; width: 100%;
+}
+.cry-tx-lbl { font-weight: 700; flex-shrink: 0; }
+.cry-tx-val { font-family: monospace; word-break: break-all; }
+
+.cry-inv-box {
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.09);
+  border-radius: 9px; padding: 10px 14px; width: 100%;
+}
+.cry-inv-meta { display: flex; flex-direction: column; gap: 2px; }
+.cry-inv-lbl { font-size: 10px; color: rgba(255,255,255,.32); font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+.cry-inv-val { font-size: 14px; font-weight: 700; color: #fff; font-family: monospace; }
+
+.cry-deliv-box {
+  position: relative; width: 100%;
+  background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.09);
+  border-radius: 9px; padding: 12px 14px;
+}
+.cry-deliv-lbl {
+  font-size: 10px; color: rgba(255,255,255,.32); font-weight: 700;
+  text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px;
+}
+.cry-deliv-val {
+  font-size: 14px; color: #fff; word-break: break-all;
+  filter: blur(6px); user-select: none; transition: filter 200ms;
+}
+.cry-deliv-val.shown { filter: none; user-select: text; }
+.cry-reveal-btn {
+  margin-top: 8px; padding: 6px 12px;
+  background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12);
+  border-radius: 6px; font-size: 11px; color: rgba(255,255,255,.6); cursor: pointer;
+  transition: background 150ms;
+}
+.cry-reveal-btn:hover { background: rgba(255,255,255,.12); color: #fff; }
+
+.cry-shop-btn {
+  margin-top: 6px; padding: 10px 20px;
+  background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12);
+  border-radius: 9px; font-size: 13px; font-weight: 600;
+  color: rgba(255,255,255,.65); cursor: pointer;
+  transition: background 150ms, color 150ms;
+}
+.cry-shop-btn:hover { background: rgba(255,255,255,.12); color: #fff; }
+
+/* ── Spinner ── */
+.cry-spinner {
+  width: 16px; height: 16px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,.12);
+  border-top-color: rgba(255,255,255,.6);
+  animation: cry-spin .7s linear infinite;
+}
+@keyframes cry-spin { to { transform: rotate(360deg); } }
+
+/* ── Checkout modal — Payment method selector ── */
+.co-pm-selector {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 8px; margin: 0 0 16px;
+}
+.co-pm-btn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px; border-radius: 8px;
+  background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08);
+  color: rgba(255,255,255,.6); font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: background 150ms, border-color 150ms, color 150ms;
+}
+.co-pm-btn:hover { background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.18); color: #fff; }
+.co-pm-btn--active {
+  background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.28);
+  color: #fff;
+}
+.co-pm-btn__icon { font-size: 16px; }
+
+/* ── Product page improvements ── */
+.pdv3-sidebar {
+  background: rgba(255,255,255,.015);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 14px;
+  overflow: hidden;
+  position: sticky; top: 72px;
+  max-height: calc(100vh - 90px);
+  overflow-y: auto;
+}
+
+/* Scrollbar for sidebar */
+.pdv3-sidebar::-webkit-scrollbar { width: 4px; }
+.pdv3-sidebar::-webkit-scrollbar-track { background: transparent; }
+.pdv3-sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 2px; }
+
+/* Upgrade checkout button */
+.pdv3-btn-checkout {
+  background: #fff !important;
+  color: #000 !important;
+  font-weight: 700 !important;
+}
+.pdv3-btn-checkout:hover {
+  background: #f0f0f0 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(255,255,255,.1);
+}
+
+/* Crypto badges in payment section */
+.pdv3-pay-badge--crypto {
+  background: rgba(153,69,255,.10);
+  border-color: rgba(153,69,255,.25);
+  color: rgba(153,69,255,.85);
+}
+
+@media (max-width: 900px) {
+  .cry-pay-body { flex-direction: column; }
+  .cry-qr-wrap { flex-direction: row; gap: 16px; align-items: center; }
+  .cry-qr { width: 100px; height: 100px; }
+}
+@media (max-width: 540px) {
+  .cry-coins { grid-template-columns: 1fr 1fr; }
+  .cry-modal { border-radius: 12px 12px 0 0; top: auto; bottom: 0; left: 0; right: 0;
+    transform: translateY(10px); width: 100%; max-width: 100%;
+    max-height: 92vh; }
+  .cry-modal.open { transform: translateY(0); }
+}

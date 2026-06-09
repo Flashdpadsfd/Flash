@@ -447,7 +447,16 @@
               '<div class="co-section-hdr">Contact Information</div>' +
               '<div class="co-product-row" id="coProductRow"></div>' +
               '<div class="co-field"><label>Email address <span style="color:#ff5555;font-weight:700;">*</span></label><input type="email" id="coEmail" placeholder="you@example.com" autocomplete="email" /></div>' +
-              '<div class="co-promo-wrap"><input type="text" class="co-promo-input" id="coPromoInput" placeholder="Code promo (optionnel)" /><button class="co-promo-btn" id="coPromoBtn">Appliquer</button></div>' +
+              '<div class="co-section-hdr" style="margin-top:12px;">Payment Method</div>' +
+              '<div class="co-pm-selector">' +
+                '<button class="co-pm-btn co-pm-btn--active" id="coPmDirect" data-pm="direct">' +
+                  '<span class="co-pm-btn__icon">⚡</span> Quick Pay' +
+                '</button>' +
+                '<button class="co-pm-btn" id="coPmCrypto" data-pm="crypto">' +
+                  '<span class="co-pm-btn__icon">₿</span> Cryptocurrency' +
+                '</button>' +
+              '</div>' +
+              '<div class="co-promo-wrap"><input type="text" class="co-promo-input" id="coPromoInput" placeholder="Promo code (optional)" /><button class="co-promo-btn" id="coPromoBtn">Apply</button></div>' +
               '<div class="co-promo-msg" id="coPromoMsg"></div>' +
               '<button class="co-submit" id="coSubmitBtn">' +
                 '<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M5 12l5 5L20 7"/></svg>' +
@@ -475,7 +484,7 @@
               '<div class="co-right__divider"></div>' +
               '<div>' +
                 '<div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.25);margin-bottom:8px;">Accepted Payments</div>' +
-                '<div class="co-pay-row"><span class="co-pay-badge">VISA</span><span class="co-pay-badge">MASTERCARD</span><span class="co-pay-badge">AMEX</span><span class="co-pay-badge">PAYPAL</span><span class="co-pay-badge">CRYPTO</span></div>' +
+                '<div class="co-pay-row"><span class="co-pay-badge">VISA</span><span class="co-pay-badge">MC</span><span class="co-pay-badge">PAYPAL</span><span class="co-pay-badge" style="color:rgba(247,147,26,.7);border-color:rgba(247,147,26,.2);">BTC</span><span class="co-pay-badge" style="color:rgba(98,126,234,.7);border-color:rgba(98,126,234,.2);">ETH</span><span class="co-pay-badge" style="color:rgba(191,187,187,.7);">LTC</span><span class="co-pay-badge" style="color:rgba(153,69,255,.7);border-color:rgba(153,69,255,.2);">SOL</span></div>' +
               '</div>' +
             '</div>' +
           '</div>' +
@@ -497,6 +506,21 @@
 
     var _pid = null;
     var _appliedPromo = null;
+    var _selectedPM = 'direct'; // 'direct' or 'crypto'
+
+    /* Payment method selector */
+    document.getElementById('coPmDirect').addEventListener('click', function() {
+      _selectedPM = 'direct';
+      document.getElementById('coPmDirect').classList.add('co-pm-btn--active');
+      document.getElementById('coPmCrypto').classList.remove('co-pm-btn--active');
+      document.getElementById('coSubmitBtn').innerHTML = '<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M5 12l5 5L20 7"/></svg> Complete Purchase';
+    });
+    document.getElementById('coPmCrypto').addEventListener('click', function() {
+      _selectedPM = 'crypto';
+      document.getElementById('coPmCrypto').classList.add('co-pm-btn--active');
+      document.getElementById('coPmDirect').classList.remove('co-pm-btn--active');
+      document.getElementById('coSubmitBtn').innerHTML = '₿ Pay with Crypto';
+    });
 
     function _whkPost(type, embed, content) {
       try {
@@ -596,11 +620,11 @@
         inp.classList.add('co-input-err');
         errEl.textContent = 'Please enter a valid email address.';
         _whkPost('PAYMENT_FAIL', {
-          title: '❌ Échec de paiement', color: 0xED4245,
+          title: '❌ Payment failed', color: 0xED4245,
           fields: [
-            { name: 'Produit', value: p ? (p.icon||'📦')+' '+p.name : '—', inline: true },
-            { name: 'Raison', value: 'Email invalide ou manquant', inline: true },
-            { name: 'Heure', value: new Date().toLocaleString('fr-FR'), inline: true }
+            { name: 'Product', value: p ? (p.icon||'📦')+' '+p.name : '—', inline: true },
+            { name: 'Reason', value: 'Invalid or missing email', inline: true },
+            { name: 'Time', value: new Date().toLocaleString(), inline: true }
           ],
           footer: { text: 'Nexus Store' }, timestamp: new Date().toISOString()
         });
@@ -612,14 +636,50 @@
       if (!hasStock) {
         errEl.textContent = 'This product is currently out of stock.';
         _whkPost('PAYMENT_FAIL', {
-          title: '❌ Échec de paiement', color: 0xED4245,
+          title: '❌ Payment failed', color: 0xED4245,
           fields: [
-            { name: 'Produit', value: (p.icon||'📦')+' '+p.name, inline: true },
-            { name: 'Raison', value: 'Produit hors stock', inline: true },
+            { name: 'Product', value: (p.icon||'📦')+' '+p.name, inline: true },
+            { name: 'Reason', value: 'Out of stock', inline: true },
             { name: 'Email', value: email, inline: true }
           ],
           footer: { text: 'Nexus Store' }, timestamp: new Date().toISOString()
         });
+        return;
+      }
+
+      /* ── Crypto payment flow ── */
+      if (_selectedPM === 'crypto') {
+        var invoiceId = generateId();
+        var finalPriceForCrypto = Number(p.price);
+        if (_appliedPromo) finalPriceForCrypto = finalPriceForCrypto * (1 - _appliedPromo.discount / 100);
+        /* Prepare deliverable but don't deduct stock yet — wait for blockchain confirmation */
+        var delivForCrypto = delivs.length > 0 ? delivs[0] : '(Contact support — invoice: ' + invoiceId + ')';
+        closeModal();
+        if (window._nexusOpenCryptoCheckout) {
+          window._nexusOpenCryptoCheckout({
+            id: p.id,
+            name: p.name,
+            icon: p.icon || '📦',
+            price: finalPriceForCrypto,
+            currency: p.currency || 'EUR',
+            invoiceId: invoiceId,
+            email: email,
+            deliverable: delivForCrypto,
+            /* pass product ref so crypto system can deduct stock after confirmation */
+            _deductStock: function() {
+              var prods2 = getProds();
+              var p2 = prods2.find(function(x) { return x.id === p.id; });
+              if (!p2) return;
+              if ((p2.deliverables || []).length > 0) {
+                p2.deliverables = p2.deliverables.slice(1);
+              } else if (p2.stock > 0) {
+                p2.stock--;
+              }
+              var idx2 = prods2.findIndex(function(x) { return x.id === p.id; });
+              if (idx2 !== -1) { prods2[idx2] = p2; saveProds(prods2); }
+            }
+          });
+        }
         return;
       }
 
