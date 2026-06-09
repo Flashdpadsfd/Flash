@@ -5,6 +5,7 @@
     { "source": "/products",          "destination": "/preview-products.html" },
     { "source": "/product",           "destination": "/preview-product.html" },
     { "source": "/reviews",           "destination": "/preview-feedback.html" },
-    { "source": "/invoice",           "destination": "/invoice.html" }
+    { "source": "/invoice",           "destination": "/invoice.html" },
+    { "source": "/checkout",          "destination": "/checkout.html" }
   ]
 }
