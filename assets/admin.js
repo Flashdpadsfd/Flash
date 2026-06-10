@@ -2526,22 +2526,33 @@
     var btn = document.getElementById('emailTestBtn');
     if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
     function finishBtn(label) { if (btn) { btn.disabled = false; btn.textContent = label; setTimeout(function() { btn.textContent = 'Send Test Email'; }, 2500); } }
-    function doSend() {
-      window.emailjs.send(cfg.serviceId, cfg.templateId, {
-        to_email: adminEmail, subject: subject, message_html: html
-      }, cfg.publicKey)
-      .then(function()  { finishBtn('Sent ✓'); toast('Test email sent to ' + adminEmail + ' ✓'); })
-      .catch(function() { finishBtn('Error ✗'); toast('Failed to send. Check your EmailJS credentials.'); });
+    function sendViaEmailJs() {
+      function doSend() {
+        window.emailjs.send(cfg.serviceId, cfg.templateId, {
+          to_email: adminEmail, subject: subject, message_html: html
+        }, cfg.publicKey)
+        .then(function()  { finishBtn('Sent ✓'); toast('Test email sent via EmailJS to ' + adminEmail + ' ✓'); })
+        .catch(function() { finishBtn('Error ✗'); toast('Failed to send. Check your EmailJS credentials.'); });
+      }
+      if (window.emailjs) {
+        doSend();
+      } else {
+        var s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js';
+        s.onload = function() { doSend(); };
+        s.onerror = function() { finishBtn('Error ✗'); toast('Could not load EmailJS SDK.'); };
+        document.head.appendChild(s);
+      }
     }
-    if (window.emailjs) {
-      doSend();
-    } else {
-      var s = document.createElement('script');
-      s.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js';
-      s.onload = function() { doSend(); };
-      s.onerror = function() { finishBtn('Error ✗'); toast('Could not load EmailJS SDK.'); };
-      document.head.appendChild(s);
-    }
+    /* 1) API du site (Gmail SMTP — sans branding). 2) Fallback EmailJS. */
+    fetch('/api/send-order-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ to: adminEmail, invoiceId: 'TEST-' + Date.now(), productName: 'Test Product', deliverable: 'test@example.com:password123', storeName: storeName, storeUrl: window.location.origin || '', subject: subject })
+    }).then(function(r) {
+      if (r.ok) { finishBtn('Sent ✓'); toast('Test email sent via site API (Gmail) to ' + adminEmail + ' ✓'); }
+      else { sendViaEmailJs(); }
+    }).catch(function() { sendViaEmailJs(); });
   };
 
   /* ── Helpers ── */

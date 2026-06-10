@@ -373,42 +373,57 @@
   function _sendOrderEmail(toEmail, invoiceId, productName, deliverable) {
     try {
       var cfg = _emailConfig();
-      if (!cfg.enabled || !cfg.publicKey || !cfg.serviceId || !cfg.templateId || !cfg.template) {
-        console.warn('[Nexus] Order email skipped — incomplete email config.');
-        return;
-      }
+      if (!cfg.enabled) { console.warn('[Nexus] Order email disabled.'); return; }
       var c = JSON.parse(localStorage.getItem('nexus_content') || '{}');
       var storeName = c.siteName || 'Nexus Store';
       var storeUrl  = window.location.origin + (window.location.pathname !== '/' ? window.location.pathname.replace(/\/[^/]*$/, '/') : '/');
-      var html = cfg.template
-        .replace(/\{\{invoice_id\}\}/g,     invoiceId)
-        .replace(/\{\{product_name\}\}/g,   productName)
-        .replace(/\{\{deliverable\}\}/g,    deliverable)
-        .replace(/\{\{customer_email\}\}/g, toEmail)
-        .replace(/\{\{store_name\}\}/g,     storeName)
-        .replace(/\{\{store_url\}\}/g,      storeUrl);
       var subject = (cfg.subject || 'Your Order is Ready!')
         .replace(/\{\{invoice_id\}\}/g,   invoiceId)
         .replace(/\{\{product_name\}\}/g, productName)
         .replace(/\{\{store_name\}\}/g,   storeName);
-      function doSend() {
-        window.emailjs.send(cfg.serviceId, cfg.templateId, {
-          to_email: toEmail, subject: subject, message_html: html
-        }, cfg.publicKey).then(function() {
-          console.info('[Nexus] Order email sent to ' + toEmail);
-        }).catch(function(err) {
-          console.error('[Nexus] Order email failed:', err && (err.text || err.message) || err);
-        });
+
+      function sendViaEmailJs() {
+        if (!cfg.publicKey || !cfg.serviceId || !cfg.templateId || !cfg.template) {
+          console.warn('[Nexus] Order email skipped — incomplete email config.');
+          return;
+        }
+        var html = cfg.template
+          .replace(/\{\{invoice_id\}\}/g,     invoiceId)
+          .replace(/\{\{product_name\}\}/g,   productName)
+          .replace(/\{\{deliverable\}\}/g,    deliverable)
+          .replace(/\{\{customer_email\}\}/g, toEmail)
+          .replace(/\{\{store_name\}\}/g,     storeName)
+          .replace(/\{\{store_url\}\}/g,      storeUrl);
+        function doSend() {
+          window.emailjs.send(cfg.serviceId, cfg.templateId, {
+            to_email: toEmail, subject: subject, message_html: html
+          }, cfg.publicKey).then(function() {
+            console.info('[Nexus] Order email sent via EmailJS to ' + toEmail);
+          }).catch(function(err) {
+            console.error('[Nexus] Order email failed:', err && (err.text || err.message) || err);
+          });
+        }
+        if (window.emailjs) {
+          doSend();
+        } else {
+          var s = document.createElement('script');
+          s.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js';
+          s.onload = function() { doSend(); };
+          s.onerror = function() { console.error('[Nexus] Could not load EmailJS SDK.'); };
+          document.head.appendChild(s);
+        }
       }
-      if (window.emailjs) {
-        doSend();
-      } else {
-        var s = document.createElement('script');
-        s.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js';
-        s.onload = function() { doSend(); };
-        s.onerror = function() { console.error('[Nexus] Could not load EmailJS SDK.'); };
-        document.head.appendChild(s);
-      }
+
+      /* 1) API du site (Gmail SMTP — sans branding EmailJS).
+         2) Si indisponible (env non configurée, site statique local…) → EmailJS. */
+      fetch('/api/send-order-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ to: toEmail, invoiceId: invoiceId, productName: productName, deliverable: deliverable, storeName: storeName, storeUrl: storeUrl, subject: subject })
+      }).then(function(r) {
+        if (r.ok) { console.info('[Nexus] Order email sent via site API to ' + toEmail); }
+        else { console.warn('[Nexus] Site email API unavailable (' + r.status + ') — falling back to EmailJS.'); sendViaEmailJs(); }
+      }).catch(function() { sendViaEmailJs(); });
     } catch(e) { console.error('[Nexus] Order email error:', e); }
   }
 
