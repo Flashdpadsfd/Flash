@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Lancelot&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/style.css?v=10" />
+  <link rel="stylesheet" href="assets/style.css?v=11" />
 </head>
 <body>
 
@@ -317,7 +317,7 @@
       return '<div class="product-card" data-name="' + esc(p.name) + '" data-cat="' + esc(p.category) + '" data-price="' + p.price + '" data-product-id="' + p.id + '">' +
         thumbHtml +
         '<div class="pc-info">' +
-          '<div class="pc-info-top">' + stockHtml + '<span class="pc-rating">★ ' + rating + ' <span class="pc-rating-count">(' + reviewCount + ')</span></span></div>' +
+          '<div class="pc-info-top">' + stockHtml + '<span class="pc-rating">' + rating + ' <span class="pc-rating-count">(' + reviewCount + ')</span></span></div>' +
           '<div class="pc-title">' + esc(p.name) + '</div>' +
           '<div class="pc-price-row">' + priceHtml + '</div>' +
         '</div>' +
