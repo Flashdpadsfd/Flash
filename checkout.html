@@ -304,9 +304,9 @@
       padding: 20px 0 6px;
     }
     .conf-qr {
-      width: 160px; height: 160px; border-radius: 12px;
+      width: 170px; height: 170px; border-radius: 12px;
       border: 1px solid rgba(255,255,255,.09);
-      background: #111;
+      background: #fff; padding: 8px;
     }
 
     .conf-sent-btn {
@@ -710,6 +710,20 @@
 
   </div>
 
+  <!-- ════════════ STEP 2b: PAYPAL ════════════ -->
+  <div id="stepPaypal" style="display:none;max-width:480px;margin:0 auto;width:100%;">
+    <div class="co-card">
+      <div class="co-card__hdr">
+        <div class="co-card__title">Pay with PayPal</div>
+        <div class="co-card__sub" id="ppSub">—</div>
+      </div>
+      <div class="co-card__body">
+        <div id="paypalBtns" style="min-height:120px;background:#fff;border-radius:10px;padding:16px;"></div>
+        <div id="ppErr" class="co-err-msg" style="display:none;"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- ════════════ STEP 3: SUCCESS ════════════ -->
   <div id="stepSuccess" style="display:none;max-width:500px;margin:0 auto;width:100%;">
     <div class="co-card">
@@ -845,6 +859,14 @@
   });
   if (!hasCrypto) document.getElementById('noWalletsMsg').style.display = '';
 
+  /* PayPal — only clickable if enabled + configured in admin panel */
+  var ppCfg = payments.paypal;
+  var paypalReady = !!(ppCfg && ppCfg.enabled && ppCfg.clientId);
+  if (!paypalReady) {
+    var ppBtnEl = document.querySelector('#cashMethods .co-pm-opt[data-pm="paypal"]');
+    if (ppBtnEl) ppBtnEl.classList.add('disabled');
+  }
+
   /* Also bind cash methods */
   document.querySelectorAll('#cashMethods .co-pm-opt:not(.disabled)').forEach(function(btn) {
     btn.addEventListener('click', function() { selectPM(btn.dataset.pm); });
@@ -912,11 +934,71 @@
       /* Crypto payment */
       startCryptoPayment(email, invoiceId, selectedPM, fp);
     } else if (selectedPM === 'paypal') {
-      /* PayPal — for now show a message */
-      errEl.textContent = 'PayPal not yet configured. Please select a crypto method.';
-      errEl.style.display = '';
+      if (!paypalReady) {
+        errEl.textContent = 'PayPal is not configured. Please select a crypto method.';
+        errEl.style.display = '';
+        return;
+      }
+      startPaypalPayment(email, invoiceId, fp);
     }
   });
+
+  /* ── PayPal payment flow (official PayPal JS SDK) ── */
+  function startPaypalPayment(email, invoiceId, fiatAmount) {
+    var currency = product.currency || 'EUR';
+    var sym2 = SYM[currency] || '€';
+
+    /* Breadcrumb */
+    document.getElementById('bcCheckout').classList.remove('active');
+    document.getElementById('bcCheckout').classList.add('done');
+    document.getElementById('bcConfirm').classList.add('active');
+
+    document.getElementById('stepCheckout').style.display = 'none';
+    document.getElementById('stepPaypal').style.display = '';
+    document.getElementById('ppSub').textContent = product.name + ' — ' + sym2 + fiatAmount.toFixed(2);
+
+    function showPpErr(msg) {
+      var e = document.getElementById('ppErr');
+      e.textContent = msg; e.style.display = '';
+    }
+
+    function renderButtons() {
+      try {
+        window.paypal.Buttons({
+          style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'paypal' },
+          createOrder: function(data, actions) {
+            return actions.order.create({
+              purchase_units: [{
+                description: product.name + ' (' + invoiceId + ')',
+                amount: { value: fiatAmount.toFixed(2), currency_code: currency }
+              }]
+            });
+          },
+          onApprove: function(data, actions) {
+            return actions.order.capture().then(function(details) {
+              completeOrder({
+                invoiceId: invoiceId, email: email, fiatAmount: fiatAmount,
+                paymentMethod: 'paypal',
+                txHash: (details && details.id) || data.orderID || '—'
+              });
+            });
+          },
+          onError: function() {
+            showPpErr('PayPal error. Please try again or use a crypto method.');
+          }
+        }).render('#paypalBtns');
+      } catch(e) {
+        showPpErr('Could not load PayPal buttons.');
+      }
+    }
+
+    if (window.paypal && window.paypal.Buttons) { renderButtons(); return; }
+    var s = document.createElement('script');
+    s.src = 'https://www.paypal.com/sdk/js?client-id=' + encodeURIComponent(ppCfg.clientId) + '&currency=' + currency;
+    s.onload = renderButtons;
+    s.onerror = function() { showPpErr('Could not load PayPal SDK. Check the Client ID in the admin panel.'); };
+    document.head.appendChild(s);
+  }
 
   /* ── Crypto payment flow ── */
   function startCryptoPayment(email, invoiceId, coin, fiatAmount) {
@@ -935,11 +1017,9 @@
         var rate = data[cgIds[coin]][currency.toLowerCase()];
         if (!rate) throw new Error('No rate');
         var amount = fiatAmount / rate;
-        /* Add unique offset */
-        var offset = (Math.floor(Math.random() * 9000) + 1000) * Math.pow(10, -info.decimals + 4);
-        var finalAmount = Math.round((amount + offset) * Math.pow(10, info.decimals)) / Math.pow(10, info.decimals);
-        var decimals = coin === 'eth' ? 8 : 8;
-        var amountStr = finalAmount.toFixed(decimals) + ' ' + info.symbol;
+        /* Exact fiat equivalent, rounded up to 8 decimals (no weird offset) */
+        var finalAmount = Math.ceil(amount * 1e8) / 1e8;
+        var amountStr = finalAmount.toFixed(8).replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '') + ' ' + info.symbol;
 
         var address = cfg.address;
         var orderMs = Date.now();
@@ -985,12 +1065,13 @@
     /* QR */
     var uri = (od.coin === 'btc' ? 'bitcoin:' : od.coin === 'eth' ? 'ethereum:' : od.coin === 'ltc' ? 'litecoin:' : 'solana:') +
       od.address + '?amount=' + od.amount;
-    document.getElementById('confQR').src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(uri) + '&bgcolor=0d0d0d&color=ffffff&format=png';
+    /* Standard black-on-white QR — inverted QR codes can't be scanned by most wallet apps */
+    document.getElementById('confQR').src = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + encodeURIComponent(uri) + '&format=png&margin=0';
 
     /* Warning list */
     var sym2 = SYM[currency] || '€';
     document.getElementById('confWarningList').innerHTML = [
-      '<li>Send exactly <strong>' + od.amountStr + '</strong></li>',
+      '<li>Send exactly <strong>' + od.amountStr + '</strong> (≈ ' + sym2 + Number(fiatAmount).toFixed(2) + ')</li>',
       '<li>Send only ' + info.name + ' to this address</li>',
       '<li>Takes 1 network confirmation</li>'
     ].join('');
@@ -1001,7 +1082,7 @@
     document.getElementById('opMethod').textContent = info.name;
 
     /* Copy buttons */
-    document.getElementById('confAmtCopy').onclick = function() { copyText(od.amount.toFixed(8), this); };
+    document.getElementById('confAmtCopy').onclick = function() { copyText(od.amountStr.split(' ')[0], this); };
     document.getElementById('confAddrCopy').onclick = function() { copyText(od.address, this); };
 
     /* Start timer */
@@ -1086,6 +1167,7 @@
       fetch('https://api.blockcypher.com/v1/' + network + '/main/addrs/' + encodeURIComponent(address) + '/full?limit=10')
         .then(function(r) { return r.json(); })
         .then(function(data) {
+          if (data.error) { callback(new Error(data.error), null); return; }
           var txs = data.txs || [];
           for (var i = 0; i < txs.length; i++) {
             var tx = txs[i];
@@ -1097,7 +1179,8 @@
               var out = outputs[j];
               if ((out.addresses || []).indexOf(address) !== -1) {
                 var amt = (out.value || 0) / 1e8;
-                if (Math.abs(amt - expectedAmount) < 0.0002) {
+                /* Accept any payment >= 90% of expected (received after order time) */
+                if (amt >= expectedAmount * 0.9) {
                   callback(null, { confirmed: confs >= 1, txHash: tx.hash, amount: amt, confirmations: confs });
                   return;
                 }
@@ -1119,7 +1202,7 @@
             if (tx.isError === '1') continue;
             if ((tx.to || '').toLowerCase() !== address.toLowerCase()) continue;
             var amt = parseInt(tx.value || '0', 10) / 1e18;
-            if (Math.abs(amt - expectedAmount) < expectedAmount * 0.005) {
+            if (amt >= expectedAmount * 0.9) {
               var confs = parseInt(tx.confirmations || '0', 10);
               callback(null, { confirmed: confs >= 1, txHash: tx.hash, amount: amt, confirmations: confs });
               return;
@@ -1155,7 +1238,7 @@
                   var pre = (tx.meta.preBalances || [])[idx] || 0;
                   var post = (tx.meta.postBalances || [])[idx] || 0;
                   var recv = (post - pre) / 1e9;
-                  if (recv > 0 && Math.abs(recv - expectedAmount) < expectedAmount * 0.01) {
+                  if (recv >= expectedAmount * 0.9) {
                     done = true;
                     callback(null, { confirmed: true, txHash: sig.signature, amount: recv, confirmations: 1 });
                     return;
@@ -1182,8 +1265,55 @@
     }
   }
 
-  /* ── Payment confirmed ── */
-  function onConfirmed(txResult, od) {
+  /* ── Order email (EmailJS — same config as admin panel) ── */
+  function sendOrderEmail(toEmail, invoiceId, productName, deliverable) {
+    try {
+      var cfg = JSON.parse(localStorage.getItem('nexus_email_config') || '{}');
+      if (!cfg.enabled || !cfg.publicKey || !cfg.serviceId || !cfg.templateId || !cfg.template) return;
+      var c2 = JSON.parse(localStorage.getItem('nexus_content') || '{}');
+      var storeName = c2.siteName || 'Nexus Store';
+      var storeUrl  = window.location.origin + '/';
+      var html = cfg.template
+        .replace(/\{\{invoice_id\}\}/g,     invoiceId)
+        .replace(/\{\{product_name\}\}/g,   productName)
+        .replace(/\{\{deliverable\}\}/g,    deliverable)
+        .replace(/\{\{customer_email\}\}/g, toEmail)
+        .replace(/\{\{store_name\}\}/g,     storeName)
+        .replace(/\{\{store_url\}\}/g,      storeUrl);
+      var subject = (cfg.subject || 'Your Order is Ready!')
+        .replace(/\{\{invoice_id\}\}/g,   invoiceId)
+        .replace(/\{\{product_name\}\}/g, productName)
+        .replace(/\{\{store_name\}\}/g,   storeName);
+      function doSend() {
+        window.emailjs.send(cfg.serviceId, cfg.templateId, {
+          to_email: toEmail, subject: subject, message_html: html
+        }, cfg.publicKey).catch(function() {});
+      }
+      if (window.emailjs) {
+        doSend();
+      } else {
+        var s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js';
+        s.onload = function() { doSend(); };
+        document.head.appendChild(s);
+      }
+    } catch(e) {}
+  }
+
+  /* ── Take a deliverable for this product ── */
+  function takeDeliverable(invoiceId) {
+    var prods2 = getProds();
+    var p2 = prods2.find(function(x) { return x.id === product.id; });
+    return (p2 && p2.deliverables && p2.deliverables.length > 0)
+      ? p2.deliverables[0]
+      : '(Contact support — invoice: ' + invoiceId + ')';
+  }
+
+  /* ── Shared order completion (crypto + PayPal) ── */
+  function completeOrder(o) {
+    /* o: { invoiceId, email, fiatAmount, paymentMethod, txHash, deliverable? } */
+    var deliverable = o.deliverable || takeDeliverable(o.invoiceId);
+
     /* Deduct stock */
     var prods2 = getProds();
     var p2 = prods2.find(function(x) { return x.id === product.id; });
@@ -1196,13 +1326,16 @@
 
     /* Save order */
     addOrder({
-      id: od.invoiceId, date: new Date().toISOString(),
-      email: od.email, productId: product.id,
+      id: o.invoiceId, date: new Date().toISOString(),
+      email: o.email, productId: product.id,
       productName: product.name, productIcon: product.icon || '📦',
-      price: od.fiatAmount, currency: product.currency || 'EUR',
-      deliverable: od.deliverable, status: 'completed',
-      paymentMethod: 'crypto_' + od.coin, txHash: txResult.txHash
+      price: o.fiatAmount, currency: product.currency || 'EUR',
+      deliverable: deliverable, status: 'completed',
+      paymentMethod: o.paymentMethod, txHash: o.txHash
     });
+
+    /* Email the customer their product */
+    sendOrderEmail(o.email, o.invoiceId, product.name, deliverable);
 
     /* Discord webhook */
     try {
@@ -1211,11 +1344,12 @@
       if (wc.url) {
         fetch(wc.url, {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ embeds: [{ title: '💎 Crypto Payment Confirmed', color: 0x57F287,
+          body: JSON.stringify({ embeds: [{ title: '💎 Payment Confirmed', color: 0x57F287,
             fields: [
-              { name: 'Invoice', value: od.invoiceId, inline: true },
+              { name: 'Invoice', value: o.invoiceId, inline: true },
               { name: 'Product', value: (product.icon || '📦') + ' ' + product.name, inline: true },
-              { name: 'TX', value: txResult.txHash || '—', inline: false }
+              { name: 'Method', value: o.paymentMethod, inline: true },
+              { name: 'TX', value: o.txHash || '—', inline: false }
             ], footer: { text: 'Nexus Store' }, timestamp: new Date().toISOString() }] })
         }).catch(function() {});
       }
@@ -1229,16 +1363,26 @@
     /* Show success */
     setStep(4);
     document.getElementById('stepConfirm').style.display = 'none';
+    document.getElementById('stepPaypal').style.display = 'none';
     document.getElementById('stepSuccess').style.display = '';
 
-    document.getElementById('successSub').textContent = 'Order confirmed. Check ' + od.email + ' for confirmation.';
-    document.getElementById('successInvId').textContent = od.invoiceId;
-    document.getElementById('successDeliv').textContent = od.deliverable;
+    document.getElementById('successSub').textContent = 'Order confirmed. A copy was sent to ' + o.email + '.';
+    document.getElementById('successInvId').textContent = o.invoiceId;
+    document.getElementById('successDeliv').textContent = deliverable;
 
     document.getElementById('successRevealBtn').addEventListener('click', function() {
       var el = document.getElementById('successDeliv');
       var shown = el.classList.toggle('shown');
       this.textContent = shown ? '🔒 Hide' : '👁 Click to reveal';
+    });
+  }
+
+  /* ── Payment confirmed (crypto) ── */
+  function onConfirmed(txResult, od) {
+    completeOrder({
+      invoiceId: od.invoiceId, email: od.email, fiatAmount: od.fiatAmount,
+      paymentMethod: 'crypto_' + od.coin, txHash: txResult.txHash,
+      deliverable: od.deliverable
     });
   }
 
