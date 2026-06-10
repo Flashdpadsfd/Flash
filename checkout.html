@@ -819,9 +819,12 @@
 
   function renderCart() {
     var fp = getFinalPrice();
+    var thumbHtml = product.image
+      ? '<img src="' + esc(product.image) + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">'
+      : (product.icon || '📦');
     document.getElementById('cartItems').innerHTML =
       '<div class="co-cart-item">' +
-        '<div class="co-cart-img">' + (product.icon || '📦') + '</div>' +
+        '<div class="co-cart-img">' + thumbHtml + '</div>' +
         '<div class="co-cart-info">' +
           '<div class="co-cart-name">' + esc(product.name) + '</div>' +
           '<div class="co-cart-each">' + sym + fp.toFixed(2) + ' each</div>' +

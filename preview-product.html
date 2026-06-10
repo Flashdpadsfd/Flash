@@ -459,8 +459,16 @@
     document.getElementById('pdBreadcrumbName').textContent = p.name;
 
     /* ── Hero ── */
-    document.getElementById('pdHeroBgText').textContent = p.name;
-    document.getElementById('pdHeroIcon').textContent = p.icon || '📦';
+    if (p.image) {
+      /* Custom image → replace the default hero entirely */
+      var heroEl = document.querySelector('.pdv3-hero');
+      heroEl.style.background = 'url(' + p.image + ') center/cover no-repeat';
+      document.getElementById('pdHeroBgText').style.display = 'none';
+      document.getElementById('pdHeroIcon').style.display = 'none';
+    } else {
+      document.getElementById('pdHeroBgText').textContent = p.name;
+      document.getElementById('pdHeroIcon').textContent = p.icon || '📦';
+    }
     var catKey = p.category || 'other';
     document.getElementById('pdHeroCatPill').textContent = (CAT_ICONS[catKey] || '📦') + ' ' + (CAT_LABELS[catKey] || cap(catKey));
 
@@ -507,7 +515,12 @@
     }).join('');
 
     /* ── Sidebar product thumb ── */
-    document.getElementById('pdSideThumb').textContent = p.icon || '📦';
+    if (p.image) {
+      document.getElementById('pdSideThumb').innerHTML =
+        '<img src="' + p.image + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">';
+    } else {
+      document.getElementById('pdSideThumb').textContent = p.icon || '📦';
+    }
     document.getElementById('pdSideName').textContent = p.name;
 
     /* ── Volume pricing pills ── */

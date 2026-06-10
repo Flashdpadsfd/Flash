@@ -256,9 +256,6 @@
     function buildCard(p, index) {
       var sym = CURRENCY_SYMBOLS[p.currency] || '$';
       var gradient = p.gradient || 'linear-gradient(135deg,#1a1a2e,#16213e)';
-      var cardBg = p.image
-        ? 'background-image:url(' + p.image + ');background-size:cover;background-position:center;'
-        : 'background:' + gradient + ';';
       var icon = p.icon || '📦';
 
       // Badge label
@@ -293,14 +290,27 @@
       var storeName = 'Nexus';
       try { var ct = JSON.parse(localStorage.getItem('nexus_content')); if (ct && ct.siteName) storeName = ct.siteName; } catch(e) {}
 
+      /* Custom image → clean banner only (no default overlays). No image → designed fallback. */
+      var thumbHtml;
+      if (p.image) {
+        thumbHtml =
+          '<div class="pc-thumb pc-thumb--img">' +
+            '<img class="pc-img" src="' + esc(p.image) + '" alt="' + esc(p.name) + '" loading="lazy">' +
+            '<div class="pc-label pc-label--' + labelCls + '">' + labelTxt + '</div>' +
+          '</div>';
+      } else {
+        thumbHtml =
+          '<div class="pc-thumb" style="background:' + gradient + ';">' +
+            '<div class="pc-label pc-label--' + labelCls + '">' + labelTxt + '</div>' +
+            '<div class="pc-brand"><span class="pc-brand-icon">' + icon + '</span>' + esc(capitalize(p.category)) + '</div>' +
+            '<div class="pc-big-text">' + esc(big1) + (big2 ? '<br>' + esc(big2) : '') + '</div>' +
+            '<div class="pc-visual">' + icon + '</div>' +
+            '<div class="pc-watermark">' + storeName + '</div>' +
+          '</div>';
+      }
+
       return '<div class="product-card" data-name="' + esc(p.name) + '" data-cat="' + esc(p.category) + '" data-price="' + p.price + '" data-product-id="' + p.id + '">' +
-        '<div class="pc-thumb" style="' + cardBg + '">' +
-          '<div class="pc-label pc-label--' + labelCls + '">' + labelTxt + '</div>' +
-          '<div class="pc-brand"><span class="pc-brand-icon">' + icon + '</span>' + esc(capitalize(p.category)) + '</div>' +
-          '<div class="pc-big-text">' + esc(big1) + (big2 ? '<br>' + esc(big2) : '') + '</div>' +
-          '<div class="pc-visual">' + icon + '</div>' +
-          '<div class="pc-watermark">' + storeName + '</div>' +
-        '</div>' +
+        thumbHtml +
         '<div class="pc-info">' +
           '<div class="pc-info-top">' + stockHtml + '<span class="pc-rating">★ ' + rating + ' <span class="pc-rating-count">(' + reviewCount + ')</span></span></div>' +
           '<div class="pc-info-name">' + esc(p.name) + (p.desc ? ' · ' + esc(p.desc) : '') + '</div>' +

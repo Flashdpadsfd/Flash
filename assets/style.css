@@ -351,21 +351,35 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 /*──────────────────────────────────────────────
   PRODUCT GRID & CARDS (DailyStore style)
 ──────────────────────────────────────────────*/
-.product-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+.product-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
 
 .product-card {
-  border-radius: 10px; overflow: hidden; display: flex; flex-direction: column;
-  cursor: pointer; background: #111;
-  transition: transform 180ms ease, box-shadow 180ms ease;
+  border-radius: 14px; overflow: hidden; display: flex; flex-direction: column;
+  cursor: pointer; background: #0e0e0e;
+  border: 1px solid rgba(255,255,255,.07);
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
 }
-.product-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,.55); }
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0,0,0,.6);
+  border-color: rgba(255,255,255,.18);
+}
 .product-card.hidden { display: none; }
 
 /* ── Thumbnail ── */
 .pc-thumb {
-  position: relative; aspect-ratio: 16/10; overflow: hidden;
+  position: relative; aspect-ratio: 16/9; overflow: hidden;
   display: flex; align-items: flex-start; justify-content: flex-start;
 }
+
+/* Custom uploaded image — fills the whole banner, zooms on hover */
+.pc-img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; display: block;
+  transition: transform 350ms ease;
+}
+.product-card:hover .pc-img { transform: scale(1.05); }
 
 /* Top-left badge */
 .pc-label {
@@ -413,8 +427,8 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 
 /* ── Info strip ── */
 .pc-info {
-  padding: 10px 13px 12px;
-  background: #111;
+  padding: 12px 14px 14px;
+  background: #0e0e0e;
   border-top: 1px solid rgba(255,255,255,.05);
 }
 .pc-info-top {
