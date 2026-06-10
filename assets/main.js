@@ -356,10 +356,27 @@
   window.addEventListener('storage', function(e) { if (e.key === 'nexus_cart') updateCartCount(); });
 
   /* ─── Order Email ─── */
+  /* Config effective = defaults du site (email-config.js) surchargés par le
+     localStorage admin. Les valeurs vides du localStorage n'écrasent pas les defaults. */
+  function _emailConfig() {
+    var cfg = {};
+    var defs = window.NEXUS_EMAIL_DEFAULTS || {};
+    Object.keys(defs).forEach(function(k) { cfg[k] = defs[k]; });
+    var stored = {};
+    try { stored = JSON.parse(localStorage.getItem('nexus_email_config') || '{}'); } catch(e) {}
+    Object.keys(stored).forEach(function(k) {
+      if (stored[k] !== '' && stored[k] !== null && stored[k] !== undefined) cfg[k] = stored[k];
+    });
+    if (!cfg.template) cfg.template = window.NEXUS_EMAIL_TEMPLATE_DEFAULT || '';
+    return cfg;
+  }
   function _sendOrderEmail(toEmail, invoiceId, productName, deliverable) {
     try {
-      var cfg = JSON.parse(localStorage.getItem('nexus_email_config') || '{}');
-      if (!cfg.enabled || !cfg.publicKey || !cfg.serviceId || !cfg.templateId || !cfg.template) return;
+      var cfg = _emailConfig();
+      if (!cfg.enabled || !cfg.publicKey || !cfg.serviceId || !cfg.templateId || !cfg.template) {
+        console.warn('[Nexus] Order email skipped — incomplete email config.');
+        return;
+      }
       var c = JSON.parse(localStorage.getItem('nexus_content') || '{}');
       var storeName = c.siteName || 'Nexus Store';
       var storeUrl  = window.location.origin + (window.location.pathname !== '/' ? window.location.pathname.replace(/\/[^/]*$/, '/') : '/');
@@ -377,7 +394,11 @@
       function doSend() {
         window.emailjs.send(cfg.serviceId, cfg.templateId, {
           to_email: toEmail, subject: subject, message_html: html
-        }, cfg.publicKey).catch(function() {});
+        }, cfg.publicKey).then(function() {
+          console.info('[Nexus] Order email sent to ' + toEmail);
+        }).catch(function(err) {
+          console.error('[Nexus] Order email failed:', err && (err.text || err.message) || err);
+        });
       }
       if (window.emailjs) {
         doSend();
@@ -385,9 +406,10 @@
         var s = document.createElement('script');
         s.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js';
         s.onload = function() { doSend(); };
+        s.onerror = function() { console.error('[Nexus] Could not load EmailJS SDK.'); };
         document.head.appendChild(s);
       }
-    } catch(e) {}
+    } catch(e) { console.error('[Nexus] Order email error:', e); }
   }
 
   /* ─── Invoice / Checkout system ─── */

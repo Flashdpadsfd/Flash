@@ -2412,7 +2412,17 @@
   var DEFAULT_EMAIL_TEMPLATE = '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Your Order is Ready!</title><style>*{box-sizing:border-box;margin:0;padding:0}body{background:#111;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Helvetica,Arial,sans-serif;color:#fff;padding:24px 16px}.wrapper{max-width:480px;margin:0 auto}.card{background:#1a1a1a;border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,.07)}.header{padding:32px 28px 26px;text-align:center;border-bottom:1px solid rgba(255,255,255,.07)}.header h1{font-size:20px;font-weight:700;color:#fff}.header p{font-size:13px;color:rgba(255,255,255,.45);margin-top:6px}.body{padding:24px 28px}.lbl{font-size:10px;font-weight:600;letter-spacing:.9px;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:8px}.id-box{background:#111;border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:14px 16px;margin-bottom:20px}.id-box span{font-family:monospace;font-size:13px;color:#fff;word-break:break-all}.product-name{font-size:17px;font-weight:700;color:#fff;margin-bottom:18px}.creds-box{background:#111;border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:14px 16px;margin-bottom:14px}.creds-box pre{font-family:monospace;font-size:12px;color:#a78bfa;white-space:pre-wrap;word-break:break-all;line-height:1.6}.notice{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.04);border-radius:8px;padding:11px 14px;margin-bottom:22px;font-size:12px;color:rgba(255,255,255,.4)}.review-card{background:#111;border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:22px;text-align:center;margin-bottom:16px}.review-card h3{font-size:15px;font-weight:700;color:#fff;margin-bottom:6px}.review-card p{font-size:12px;color:rgba(255,255,255,.35);margin-bottom:16px}.btn{display:inline-block;background:#e6a817;color:#000;font-weight:800;font-size:12px;letter-spacing:.7px;text-transform:uppercase;padding:12px 28px;border-radius:8px;text-decoration:none}.support-card{background:#1e1500;border:1px solid rgba(230,168,23,.18);border-radius:10px;padding:18px;text-align:center;margin-bottom:16px}.support-card p{font-size:12px;color:#e6a817;margin-bottom:4px}.support-card a{color:#e6a817;text-decoration:underline}.footer{padding:18px 28px;text-align:center;border-top:1px solid rgba(255,255,255,.06)}.footer p{font-size:11px;color:rgba(255,255,255,.18)}</style></head><body><div class="wrapper"><div class="card"><div class="header"><h1>&#x1F4E6; Your Order is Ready!</h1><p>Here is your order!</p></div><div class="body"><div class="lbl">Order ID</div><div class="id-box"><span>{{invoice_id}}</span></div><div class="product-name">{{product_name}}</div><div class="lbl">Credentials / Keys</div><div class="creds-box"><pre>{{deliverable}}</pre></div><div class="notice">&#x1F512; Please save these items securely.</div><div class="review-card"><h3>&#x2B50; Happy with your purchase?</h3><p>Let us know by leaving a review on your received products!</p><a class="btn" href="{{store_url}}">LEAVE A REVIEW</a></div><div class="support-card"><p>&#x26A0;&#xFE0F; Having an issue?</p><p>Before opening a ticket, please check our support page. You might find a quick solution there instead of waiting for our administration team!</p><p style="margin-top:8px;">Still need help? <a href="{{store_url}}">Contact Support</a></p></div></div><div class="footer"><p>&copy; {{store_name}}. All rights reserved.</p></div></div></div></body></html>';
 
   function getEmailConfig() {
-    try { return JSON.parse(localStorage.getItem('nexus_email_config') || '{}'); } catch(e) { return {}; }
+    /* Defaults du site (assets/email-config.js) surchargés par le localStorage.
+       Les valeurs vides du localStorage n'écrasent pas les defaults. */
+    var cfg = {};
+    var defs = window.NEXUS_EMAIL_DEFAULTS || {};
+    Object.keys(defs).forEach(function(k) { cfg[k] = defs[k]; });
+    var stored = {};
+    try { stored = JSON.parse(localStorage.getItem('nexus_email_config') || '{}'); } catch(e) {}
+    Object.keys(stored).forEach(function(k) {
+      if (stored[k] !== '' && stored[k] !== null && stored[k] !== undefined) cfg[k] = stored[k];
+    });
+    return cfg;
   }
   function setEmailConfig(cfg) { localStorage.setItem('nexus_email_config', JSON.stringify(cfg)); }
 
@@ -2500,7 +2510,8 @@
     var storeName = c.siteName || 'Nexus Store';
     var adminEmail = c.contactEmail || '';
     if (!adminEmail) {
-      toast('Set a contact email in Settings first.'); return;
+      adminEmail = (prompt('Adresse email pour recevoir le test :') || '').trim();
+      if (!adminEmail) return;
     }
     var html = (cfg.template || DEFAULT_EMAIL_TEMPLATE)
       .replace(/\{\{invoice_id\}\}/g,       'TEST-' + Date.now())
