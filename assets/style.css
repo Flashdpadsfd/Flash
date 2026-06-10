@@ -355,7 +355,7 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 
 .product-card {
   position: relative; border-radius: 12px; overflow: hidden;
-  aspect-ratio: 16/10;
+  aspect-ratio: 5/3;
   cursor: pointer; background: #0e0e0e;
   border: 1px solid rgba(255,255,255,.07);
   transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
@@ -378,22 +378,21 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   position: absolute; inset: 0;
   width: 100%; height: 100%;
   object-fit: cover; display: block;
-  transition: transform 350ms ease;
+  transition: transform 500ms ease;
 }
 .product-card:hover .pc-img { transform: scale(1.05); }
 
-/* Top-left badge */
+/* Top-left badge — dailystore glass pill: bg-white/10 + backdrop-blur-md */
 .pc-label {
-  position: absolute; top: 10px; left: 10px; z-index: 3;
-  font-size: 10px; font-weight: 700; letter-spacing: .3px;
-  padding: 3px 8px; border-radius: 5px;
+  position: absolute; top: 12px; left: 12px; z-index: 3;
+  font-size: 10px; font-weight: 500; letter-spacing: .2px;
+  padding: 3px 8px; border-radius: 6px;
   display: inline-flex; align-items: center; gap: 4px;
-  backdrop-filter: blur(4px);
+  background: rgba(255,255,255,.10);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  color: #e4e4e7;
 }
-.pc-label--featured { background: rgba(255,214,0,.14); color: #ffd600; border: 1px solid rgba(255,214,0,.28); }
-.pc-label--best     { background: rgba(255,140,0,.14); color: #ff9500; border: 1px solid rgba(255,140,0,.28); }
-.pc-label--new      { background: rgba(100,200,100,.14); color: #5dd05d; border: 1px solid rgba(100,200,100,.28); }
-.pc-label--sale     { background: rgba(255,80,80,.14); color: #ff6060; border: 1px solid rgba(255,80,80,.28); }
+.pc-label--featured, .pc-label--best, .pc-label--new, .pc-label--sale { background: rgba(255,255,255,.10); color: #e4e4e7; }
 
 /* Brand row inside image */
 .pc-brand {
@@ -426,26 +425,28 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   color: rgba(255,255,255,.22); user-select: none;
 }
 
-/* ── Info overlay — directly on the image, no grey strip ── */
+/* ── Info overlay — dailystore gradient: from-black/80 via-black/20 to-transparent ── */
 .pc-info {
   position: absolute; left: 0; right: 0; bottom: 0; z-index: 5;
-  padding: 34px 14px 12px;
-  background: linear-gradient(to top, rgba(0,0,0,.92) 0%, rgba(0,0,0,.6) 55%, transparent 100%);
+  padding: 40px 14px 12px;
+  background: linear-gradient(to top, rgba(0,0,0,.8) 0%, rgba(0,0,0,.2) 60%, transparent 100%);
   pointer-events: none;
 }
 .pc-info-top {
   display: flex; align-items: center; gap: 8px; margin-bottom: 5px;
 }
-/* Square solid badges (dailystore style) */
+/* Stock badges — glass pills like dailystore (bg-white/10 + blur), colored dot + text */
 .pc-stock {
-  font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 4px;
+  font-size: 10px; font-weight: 500; padding: 3px 8px; border-radius: 6px;
   letter-spacing: .2px; display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(255,255,255,.10);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
 }
 .pc-stock::before { content: ''; width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
-.pc-stock--in  { background: #1fcb4f; color: #06240e; }
-.pc-stock--in::before  { background: #06240e; }
-.pc-stock--out { background: #e8403a; color: #fff; }
-.pc-stock--out::before { background: #fff; }
+.pc-stock--in  { color: #4ade80; }
+.pc-stock--in::before  { background: #4ade80; box-shadow: 0 0 6px rgba(74,222,128,.8); }
+.pc-stock--out { color: #f87171; }
+.pc-stock--out::before { background: #f87171; box-shadow: 0 0 6px rgba(248,113,113,.8); }
 .pc-rating { font-size: 12px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 3px; }
 .pc-rating::before { content: '★'; color: #ffa317; font-size: 12px; }
 .pc-rating-count { color: rgba(255,255,255,.45); font-size: 11px; font-weight: 600; }
@@ -462,21 +463,25 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 .pc-buy-hover {
   position: absolute; inset: 0; z-index: 6;
   display: flex; align-items: center; justify-content: center;
-  background: rgba(0,0,0,.45);
-  opacity: 0; transition: opacity 180ms ease;
+  background: rgba(0,0,0,.6);
+  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  opacity: 0; transition: opacity 200ms ease;
   pointer-events: none;
 }
 .product-card:hover .pc-buy-hover { opacity: 1; }
 .pc-buy-btn {
-  display: inline-flex; align-items: center; gap: 6px;
+  display: inline-flex; align-items: center; gap: 8px;
+  height: 36px; padding: 0 14px;
   background: #1fcb4f; color: #fff;
-  font-size: 14px; font-weight: 700; letter-spacing: .2px;
-  padding: 10px 22px; border-radius: 10px;
+  font-size: 13px; font-weight: 500; letter-spacing: .4px;
+  border-radius: 12px;
   box-shadow: 0 6px 20px rgba(31,203,79,.35);
-  transform: translateY(6px); transition: transform 180ms ease;
+  transform: translateY(6px) scale(1);
+  transition: transform 200ms ease, background 200ms ease;
 }
 .product-card:hover .pc-buy-btn { transform: translateY(0); }
-.pc-buy-arrow { font-size: 13px; }
+.product-card:active .pc-buy-btn { transform: scale(.97); }
+.pc-buy-arrow { font-size: 12px; }
 
 /*──────────────────────────────────────────────
   SHOP LAYOUT
