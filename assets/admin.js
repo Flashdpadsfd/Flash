@@ -50,6 +50,27 @@
   var CURRENCY_SYMBOLS = { EUR: '€', USD: '$', GBP: '£' };
   var _customFields = [];
 
+  /* ── Product page : System Specs + Service Guarantee ── */
+  var DEFAULT_PAGE_GUARANTEES = [
+    { icon: 'zap',     title: 'Instant Delivery', desc: 'Immediate access' },
+    { icon: 'lock',    title: 'Secure',           desc: 'Encrypted checkout' },
+    { icon: 'chat',    title: '24/7 Support',     desc: 'Via Discord' },
+    { icon: 'refresh', title: 'Replacement',      desc: 'If invalid' }
+  ];
+  var GUARANTEE_ICON_OPTIONS = [
+    ['zap', '⚡ Lightning'], ['lock', '🔒 Lock'], ['chat', '💬 Chat'],
+    ['refresh', '🔄 Refresh'], ['shield', '🛡️ Shield'], ['globe', '🌍 Globe'],
+    ['clock', '⏱️ Clock'], ['check', '✅ Check'], ['star', '⭐ Star'], ['gift', '🎁 Gift']
+  ];
+  function defaultPageSpecs(p) {
+    var cat = p && p.category ? p.category.charAt(0).toUpperCase() + p.category.slice(1) : 'Digital';
+    return [
+      { k: 'Category',        v: cat },
+      { k: 'Delivery Method', v: 'Instant Digital Delivery' },
+      { k: 'Region',          v: 'Global' }
+    ];
+  }
+
   /* ── Letter avatar (replaces emoji icons) ── */
   var _thumbColors = ['#7c3aed','#2563eb','#059669','#d97706','#dc2626','#0891b2','#7c3aed','#db2777'];
   function letterThumb(name, size) {
@@ -619,6 +640,7 @@
   function renderCustomFields() {
     var el = document.getElementById('customFieldsList');
     if (!el) return;
+    window._customFields = _customFields; /* expose for inline handlers */
     if (!_customFields.length) {
       el.innerHTML = '<p style="font-size:12px;color:var(--text-muted);padding:8px 0;">No custom fields added yet.</p>';
       return;
@@ -637,6 +659,73 @@
       '</div>';
     }).join('');
   }
+
+  /* ── Product Page : System Specs editor ── */
+  window._pageSpecs = [];
+  window._pageGuarantees = [];
+
+  function renderPageSpecs() {
+    var el = document.getElementById('pageSpecsList');
+    if (!el) return;
+    if (!window._pageSpecs.length) {
+      el.innerHTML = '<p style="font-size:12px;color:var(--text-muted);padding:8px 0;">No rows — only the automatic Stock row will be shown.</p>';
+      return;
+    }
+    el.innerHTML = window._pageSpecs.map(function(s, i) {
+      return '<div class="ps-item">' +
+        '<input type="text" placeholder="Label (e.g. Region)" value="' + esc(s.k || '') + '" oninput="_pageSpecs[' + i + '].k=this.value" />' +
+        '<input type="text" placeholder="Value (e.g. Global)" value="' + esc(s.v || '') + '" oninput="_pageSpecs[' + i + '].v=this.value" />' +
+        '<button type="button" class="a-btn a-btn--icon" onclick="removePageSpec(' + i + ')" style="color:var(--red);font-size:14px;" title="Remove">×</button>' +
+      '</div>';
+    }).join('');
+  }
+  window.addPageSpec = function () {
+    window._pageSpecs.push({ k: '', v: '' });
+    renderPageSpecs();
+  };
+  window.removePageSpec = function (i) {
+    window._pageSpecs.splice(i, 1);
+    renderPageSpecs();
+  };
+  window.resetPageSpecs = function () {
+    var editId = document.getElementById('editId').value;
+    var p = editId ? getProducts().find(function(x) { return x.id === parseInt(editId); }) : null;
+    window._pageSpecs = defaultPageSpecs(p || { category: document.getElementById('fCat').value });
+    renderPageSpecs();
+  };
+
+  /* ── Product Page : Service Guarantee editor ── */
+  function renderPageGuarantees() {
+    var el = document.getElementById('pageGuaranteesList');
+    if (!el) return;
+    if (!window._pageGuarantees.length) {
+      el.innerHTML = '<p style="font-size:12px;color:var(--text-muted);padding:8px 0;">No cards — the Service Guarantee block will be hidden.</p>';
+      return;
+    }
+    el.innerHTML = window._pageGuarantees.map(function(g, i) {
+      var opts = GUARANTEE_ICON_OPTIONS.map(function(o) {
+        return '<option value="' + o[0] + '"' + (g.icon === o[0] ? ' selected' : '') + '>' + o[1] + '</option>';
+      }).join('');
+      return '<div class="pg-item">' +
+        '<select onchange="_pageGuarantees[' + i + '].icon=this.value">' + opts + '</select>' +
+        '<input type="text" placeholder="Title (e.g. Instant Delivery)" value="' + esc(g.title || '') + '" oninput="_pageGuarantees[' + i + '].title=this.value" />' +
+        '<input type="text" placeholder="Subtitle (e.g. Immediate access)" value="' + esc(g.desc || '') + '" oninput="_pageGuarantees[' + i + '].desc=this.value" />' +
+        '<button type="button" class="a-btn a-btn--icon" onclick="removePageGuarantee(' + i + ')" style="color:var(--red);font-size:14px;" title="Remove">×</button>' +
+      '</div>';
+    }).join('');
+  }
+  window.addPageGuarantee = function () {
+    window._pageGuarantees.push({ icon: 'check', title: '', desc: '' });
+    renderPageGuarantees();
+  };
+  window.removePageGuarantee = function (i) {
+    window._pageGuarantees.splice(i, 1);
+    renderPageGuarantees();
+  };
+  window.resetPageGuarantees = function () {
+    window._pageGuarantees = JSON.parse(JSON.stringify(DEFAULT_PAGE_GUARANTEES));
+    renderPageGuarantees();
+  };
 
   /* ── Modal produit ── */
   window.openModal = function (id) {
@@ -682,6 +771,16 @@
     /* Custom fields */
     _customFields = (p && Array.isArray(p.customFields)) ? JSON.parse(JSON.stringify(p.customFields)) : [];
     renderCustomFields();
+
+    /* Product page : specs + guarantees */
+    window._pageSpecs = (p && Array.isArray(p.pageSpecs))
+      ? JSON.parse(JSON.stringify(p.pageSpecs))
+      : defaultPageSpecs(p);
+    window._pageGuarantees = (p && Array.isArray(p.pageGuarantees))
+      ? JSON.parse(JSON.stringify(p.pageGuarantees))
+      : JSON.parse(JSON.stringify(DEFAULT_PAGE_GUARANTEES));
+    renderPageSpecs();
+    renderPageGuarantees();
 
     /* Live stats */
     document.getElementById('fShowViews').checked    = p ? (p.showViews !== false) : true;
@@ -841,6 +940,9 @@
       outOfStock:   document.getElementById('fOutOfStock').value || 'show',
       deliveryNote: document.getElementById('fDeliveryNote').value.trim(),
       customFields: JSON.parse(JSON.stringify(_customFields)),
+      /* product page (system specs + service guarantee) */
+      pageSpecs: window._pageSpecs.filter(function(s) { return ((s.k || '').trim() || (s.v || '').trim()); }),
+      pageGuarantees: window._pageGuarantees.filter(function(g) { return (g.title || '').trim(); }),
       /* live stats */
       showViews:     document.getElementById('fShowViews').checked,
       showSales:     document.getElementById('fShowSales').checked,

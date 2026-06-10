@@ -838,6 +838,19 @@ input, select, button, textarea { font-family: inherit; }
 }
 .cf-req-toggle input[type="checkbox"] { accent-color: var(--accent); cursor: pointer; }
 
+/* ── Product Page tab (specs + guarantees) ── */
+.ps-hint { font-size: 11.5px; color: var(--text-muted); margin: -2px 0 12px; line-height: 1.5; }
+.ps-hint b { color: var(--text); font-weight: 600; }
+.ps-item {
+  display: grid; grid-template-columns: 1fr 1.3fr 34px;
+  gap: 8px; align-items: center; margin-bottom: 8px;
+}
+.pg-item {
+  display: grid; grid-template-columns: 110px 1fr 1.2fr 34px;
+  gap: 8px; align-items: center; margin-bottom: 8px;
+}
+.ps-item input, .pg-item input, .pg-item select { font-size: 13px; }
+
 /* ══════════════════════════════════
    SECURITY PAGE
 ══════════════════════════════════ */

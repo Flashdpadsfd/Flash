@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Lancelot&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/style.css?v=11" />
+  <link rel="stylesheet" href="assets/style.css?v=12" />
 </head>
 <body>
 
@@ -178,38 +178,9 @@
             <div class="pdv3-shdr">System Specs</div>
             <div id="pdSpecsLeft"></div>
           </div>
-          <div class="pdv3-guarantee-col">
+          <div class="pdv3-guarantee-col" id="pdGuaranteeCol">
             <div class="pdv3-shdr">Service Guarantee</div>
-            <div class="pdv3-guarantee-grid">
-              <div class="pdv3-gcard">
-                <div class="pdv3-gcard__icon">
-                  <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                </div>
-                <div class="pdv3-gcard__title">Instant Delivery</div>
-                <div class="pdv3-gcard__desc">Immediate access</div>
-              </div>
-              <div class="pdv3-gcard">
-                <div class="pdv3-gcard__icon">
-                  <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-                </div>
-                <div class="pdv3-gcard__title">Secure</div>
-                <div class="pdv3-gcard__desc">Encrypted checkout</div>
-              </div>
-              <div class="pdv3-gcard">
-                <div class="pdv3-gcard__icon">
-                  <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-                </div>
-                <div class="pdv3-gcard__title">24/7 Support</div>
-                <div class="pdv3-gcard__desc">Via Discord</div>
-              </div>
-              <div class="pdv3-gcard">
-                <div class="pdv3-gcard__icon">
-                  <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
-                </div>
-                <div class="pdv3-gcard__title">Replacement</div>
-                <div class="pdv3-gcard__desc">If invalid</div>
-              </div>
-            </div>
+            <div class="pdv3-guarantee-grid" id="pdGuaranteeGrid"></div>
           </div>
         </div>
 
@@ -500,19 +471,66 @@
     /* ── Description ── */
     document.getElementById('pdDesc').innerHTML = esc(p.desc || 'No description available.').replace(/\n/g, '<br>');
 
-    /* ── System specs ── */
-    var specsData = [
-      { icon: '<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 10h16M4 14h16M4 18h7"/></svg>', k: 'Category', v: cap(catKey), green: false },
-      { icon: '<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>', k: 'Delivery Method', v: 'Instant Digital Delivery', green: false },
-      { icon: '<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20"/></svg>', k: 'Region', v: 'Global', green: false },
-      { icon: '<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>', k: 'Stock', v: avail > 0 ? 'In Stock (' + avail + ' available)' : 'Out of Stock', green: avail > 0 }
-    ];
+    /* ── System specs (admin-editable via p.pageSpecs) ── */
+    var SPEC_ICONS = {
+      category: '<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 10h16M4 14h16M4 18h7"/></svg>',
+      delivery: '<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+      region:   '<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20"/></svg>',
+      stock:    '<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+      generic:  '<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>'
+    };
+    function specIcon(k) {
+      var key = (k || '').toLowerCase();
+      if (key.indexOf('categ') !== -1)                              return SPEC_ICONS.category;
+      if (key.indexOf('deliver') !== -1)                            return SPEC_ICONS.delivery;
+      if (key.indexOf('region') !== -1 || key.indexOf('global') !== -1) return SPEC_ICONS.region;
+      if (key.indexOf('stock') !== -1)                              return SPEC_ICONS.stock;
+      return SPEC_ICONS.generic;
+    }
+    var specsData = (Array.isArray(p.pageSpecs) ? p.pageSpecs : [
+      { k: 'Category',        v: cap(catKey) },
+      { k: 'Delivery Method', v: 'Instant Digital Delivery' },
+      { k: 'Region',          v: 'Global' }
+    ]).map(function(s) { return { k: s.k, v: s.v, green: false }; });
+    /* Live stock row — always appended automatically */
+    specsData.push({ k: 'Stock', v: avail > 0 ? 'In Stock (' + avail + ' available)' : 'Out of Stock', green: avail > 0 });
     document.getElementById('pdSpecsLeft').innerHTML = specsData.map(function(s) {
       return '<div class="pdv3-spec-row">' +
-        '<span class="pdv3-spec-key">' + s.icon + esc(s.k) + '</span>' +
-        '<span class="pdv3-spec-val' + (s.green ? ' pdv3-spec-val--green' : '') + '">' + esc(String(s.v)) + '</span>' +
+        '<span class="pdv3-spec-key">' + specIcon(s.k) + esc(s.k || '') + '</span>' +
+        '<span class="pdv3-spec-val' + (s.green ? ' pdv3-spec-val--green' : '') + '">' + esc(String(s.v || '')) + '</span>' +
       '</div>';
     }).join('');
+
+    /* ── Service guarantee (admin-editable via p.pageGuarantees) ── */
+    var GUARANTEE_ICONS = {
+      zap:     '<svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+      lock:    '<svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>',
+      chat:    '<svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>',
+      refresh: '<svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>',
+      shield:  '<svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+      globe:   '<svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>',
+      clock:   '<svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+      check:   '<svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M5 12l5 5L20 7"/></svg>',
+      star:    '<svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+      gift:    '<svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg>'
+    };
+    var guarantees = Array.isArray(p.pageGuarantees) ? p.pageGuarantees : [
+      { icon: 'zap',     title: 'Instant Delivery', desc: 'Immediate access' },
+      { icon: 'lock',    title: 'Secure',           desc: 'Encrypted checkout' },
+      { icon: 'chat',    title: '24/7 Support',     desc: 'Via Discord' },
+      { icon: 'refresh', title: 'Replacement',      desc: 'If invalid' }
+    ];
+    if (guarantees.length) {
+      document.getElementById('pdGuaranteeGrid').innerHTML = guarantees.map(function(g) {
+        return '<div class="pdv3-gcard">' +
+          '<div class="pdv3-gcard__icon">' + (GUARANTEE_ICONS[g.icon] || GUARANTEE_ICONS.check) + '</div>' +
+          '<div class="pdv3-gcard__title">' + esc(g.title || '') + '</div>' +
+          '<div class="pdv3-gcard__desc">' + esc(g.desc || '') + '</div>' +
+        '</div>';
+      }).join('');
+    } else {
+      document.getElementById('pdGuaranteeCol').style.display = 'none';
+    }
 
     /* ── Sidebar product thumb ── */
     if (p.image) {
