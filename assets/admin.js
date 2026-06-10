@@ -756,12 +756,15 @@
       var img = new Image();
       img.onload = function () {
         var canvas = document.createElement('canvas');
-        var MAX = 640;
+        var MAX = 1600; /* high-res so cards & hero stay sharp (retina) */
         var scale = Math.min(1, MAX / Math.max(img.width, img.height));
         canvas.width  = Math.round(img.width  * scale);
         canvas.height = Math.round(img.height * scale);
-        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-        setImagePreview(canvas.toDataURL('image/jpeg', 0.75));
+        var ctx = canvas.getContext('2d');
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        setImagePreview(canvas.toDataURL('image/jpeg', 0.92));
       };
       img.src = e.target.result;
     };
@@ -1008,10 +1011,12 @@
       var img = new Image();
       img.onload = function() {
         var canvas = document.createElement('canvas');
-        var MAX = 640; var scale = Math.min(1, MAX / Math.max(img.width, img.height));
+        var MAX = 1600; var scale = Math.min(1, MAX / Math.max(img.width, img.height));
         canvas.width = Math.round(img.width * scale); canvas.height = Math.round(img.height * scale);
-        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-        setCatImagePreview(canvas.toDataURL('image/jpeg', 0.75));
+        var cctx = canvas.getContext('2d');
+        cctx.imageSmoothingEnabled = true; cctx.imageSmoothingQuality = 'high';
+        cctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        setCatImagePreview(canvas.toDataURL('image/jpeg', 0.92));
       };
       img.src = e.target.result;
     };
