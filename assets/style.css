@@ -354,7 +354,8 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 .product-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
 
 .product-card {
-  border-radius: 14px; overflow: hidden; display: flex; flex-direction: column;
+  position: relative; border-radius: 14px; overflow: hidden;
+  aspect-ratio: 16/10;
   cursor: pointer; background: #0e0e0e;
   border: 1px solid rgba(255,255,255,.07);
   transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
@@ -368,7 +369,7 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 
 /* ── Thumbnail ── */
 .pc-thumb {
-  position: relative; aspect-ratio: 16/9; overflow: hidden;
+  position: absolute; inset: 0; overflow: hidden;
   display: flex; align-items: flex-start; justify-content: flex-start;
 }
 
@@ -425,11 +426,12 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   color: rgba(255,255,255,.22); user-select: none;
 }
 
-/* ── Info strip ── */
+/* ── Info overlay — directly on the image, no grey strip ── */
 .pc-info {
-  padding: 12px 14px 14px;
-  background: #0e0e0e;
-  border-top: 1px solid rgba(255,255,255,.05);
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 5;
+  padding: 34px 14px 12px;
+  background: linear-gradient(to top, rgba(0,0,0,.92) 0%, rgba(0,0,0,.6) 55%, transparent 100%);
+  pointer-events: none;
 }
 .pc-info-top {
   display: flex; align-items: center; gap: 8px; margin-bottom: 5px;
@@ -456,7 +458,7 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 
 /* Hover "Buy Now" overlay button (dailystore style) */
 .pc-buy-hover {
-  position: absolute; inset: 0; z-index: 4;
+  position: absolute; inset: 0; z-index: 6;
   display: flex; align-items: center; justify-content: center;
   background: rgba(0,0,0,.45);
   opacity: 0; transition: opacity 180ms ease;
