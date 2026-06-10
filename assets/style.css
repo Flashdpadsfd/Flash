@@ -472,16 +472,18 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 .pc-buy-btn {
   display: inline-flex; align-items: center; gap: 8px;
   height: 36px; padding: 0 14px;
-  background: #1fcb4f; color: #fff;
+  background: #18181b; color: #e4e4e7;
   font-size: 13px; font-weight: 500; letter-spacing: .4px;
   border-radius: 12px;
-  box-shadow: 0 6px 20px rgba(31,203,79,.35);
+  border: 1px solid rgba(255,255,255,.08);
+  box-shadow: 0 6px 20px rgba(0,0,0,.5);
   transform: translateY(6px) scale(1);
-  transition: transform 200ms ease, background 200ms ease;
+  transition: transform 200ms ease, background 200ms ease, color 200ms ease;
 }
 .product-card:hover .pc-buy-btn { transform: translateY(0); }
+.product-card:hover .pc-buy-btn:hover { background: #27272a; color: #fff; }
 .product-card:active .pc-buy-btn { transform: scale(.97); }
-.pc-buy-arrow { font-size: 12px; }
+.pc-buy-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
 
 /*──────────────────────────────────────────────
   SHOP LAYOUT
