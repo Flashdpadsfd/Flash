@@ -1640,6 +1640,7 @@
     { title: '🧭 Navigation', fields: [
       ['nav.home', 'Lien « Home »', 'Home'],
       ['nav.shop', 'Lien « Products »', 'Products'],
+      ['nav.support', 'Lien « Support » (→ Discord)', 'Support'],
       ['nav.reviews', 'Lien « Reviews »', 'Reviews'],
       ['nav.login', 'Bouton « Sign In »', 'Sign In'],
       ['nav.register', 'Bouton « Create Account »', 'Create Account']

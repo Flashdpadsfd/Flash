@@ -124,7 +124,7 @@
   /* ─── i18n ─── */
   var TRANSLATIONS = {
     EN: {
-      'nav.shop':'Shop','nav.home':'Home','nav.reviews':'Reviews',
+      'nav.shop':'Shop','nav.home':'Home','nav.reviews':'Reviews','nav.support':'Support',
       'nav.login':'Sign In','nav.register':'Create Account',
       'hero.eyebrow':'Digital Products Store',
       'hero.title':'Premium. Curated.<br>Digital.',
@@ -139,7 +139,7 @@
       'footer.terms':'Terms','footer.privacy':'Privacy'
     },
     FR: {
-      'nav.shop':'Boutique','nav.home':'Accueil','nav.reviews':'Avis',
+      'nav.shop':'Boutique','nav.home':'Accueil','nav.reviews':'Avis','nav.support':'Support',
       'nav.login':'Connexion','nav.register':'Créer un compte',
       'hero.eyebrow':'Boutique de Produits Numériques',
       'hero.title':'Premium. Soigné.<br>Digital.',
@@ -154,7 +154,7 @@
       'footer.terms':'CGU','footer.privacy':'Confidentialité'
     },
     ES: {
-      'nav.shop':'Tienda','nav.home':'Inicio','nav.reviews':'Reseñas',
+      'nav.shop':'Tienda','nav.home':'Inicio','nav.reviews':'Reseñas','nav.support':'Soporte',
       'nav.login':'Iniciar sesión','nav.register':'Crear cuenta',
       'hero.eyebrow':'Tienda de Productos Digitales',
       'hero.title':'Premium. Curado.<br>Digital.',
@@ -169,7 +169,7 @@
       'footer.terms':'Términos','footer.privacy':'Privacidad'
     },
     DE: {
-      'nav.shop':'Shop','nav.home':'Startseite','nav.reviews':'Bewertungen',
+      'nav.shop':'Shop','nav.home':'Startseite','nav.reviews':'Bewertungen','nav.support':'Support',
       'nav.login':'Anmelden','nav.register':'Konto erstellen',
       'hero.eyebrow':'Digitale Produkte Shop',
       'hero.title':'Premium. Kuratiert.<br>Digital.',
@@ -184,7 +184,7 @@
       'footer.terms':'AGB','footer.privacy':'Datenschutz'
     },
     IT: {
-      'nav.shop':'Negozio','nav.home':'Home','nav.reviews':'Recensioni',
+      'nav.shop':'Negozio','nav.home':'Home','nav.reviews':'Recensioni','nav.support':'Supporto',
       'nav.login':'Accedi','nav.register':'Crea account',
       'hero.eyebrow':'Negozio di Prodotti Digitali',
       'hero.title':'Premium. Curato.<br>Digitale.',
@@ -199,7 +199,7 @@
       'footer.terms':'Termini','footer.privacy':'Privacy'
     },
     PT: {
-      'nav.shop':'Loja','nav.home':'Início','nav.reviews':'Avaliações',
+      'nav.shop':'Loja','nav.home':'Início','nav.reviews':'Avaliações','nav.support':'Suporte',
       'nav.login':'Entrar','nav.register':'Criar conta',
       'hero.eyebrow':'Loja de Produtos Digitais',
       'hero.title':'Premium. Curado.<br>Digital.',
@@ -214,7 +214,7 @@
       'footer.terms':'Termos','footer.privacy':'Privacidade'
     },
     AR: {
-      'nav.shop':'المتجر','nav.home':'الرئيسية','nav.reviews':'التقييمات',
+      'nav.shop':'المتجر','nav.home':'الرئيسية','nav.reviews':'التقييمات','nav.support':'الدعم',
       'nav.login':'تسجيل الدخول','nav.register':'إنشاء حساب',
       'hero.eyebrow':'متجر المنتجات الرقمية',
       'hero.title':'متميز. منتقى.<br>رقمي.',
