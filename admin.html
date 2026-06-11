@@ -617,11 +617,50 @@
         <!-- Page Produits -->
         <div class="stats-editor" style="margin-bottom:20px;">
           <div class="section-title" style="margin-bottom:16px;">🛍 Page Produits</div>
-          <div class="field" style="margin-bottom:0;">
-            <label>Titre de la boutique</label>
-            <input type="text" id="cProductsTitle" placeholder="All Products" />
+          <div class="form-row">
+            <div class="field">
+              <label>Mot après le compteur <span class="f-optional">(ex: « 6 products »)</span></label>
+              <input type="text" id="cProductsTitle" placeholder="products" />
+            </div>
+            <div class="field">
+              <label>Placeholder de recherche</label>
+              <input type="text" id="cSearchPlaceholder" placeholder="Search products…" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="field">
+              <label>Titre section catégories</label>
+              <input type="text" id="cCategoriesTitle" placeholder="Categories" />
+            </div>
+            <div class="field">
+              <label>Étiquette « Featured Offers »</label>
+              <input type="text" id="cFeaturedLabel" placeholder="Featured Offers" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="field">
+              <label>Étiquette « All Products »</label>
+              <input type="text" id="cAllProductsLabel" placeholder="All Products" />
+            </div>
+            <div class="field">
+              <label>Bouton d'achat (survol carte)</label>
+              <input type="text" id="cBuyNow" placeholder="Buy Now" />
+            </div>
+          </div>
+          <div class="form-row" style="margin-bottom:0;">
+            <div class="field" style="margin-bottom:0;">
+              <label>Étiquette « En stock »</label>
+              <input type="text" id="cInStock" placeholder="In stock" />
+            </div>
+            <div class="field" style="margin-bottom:0;">
+              <label>Étiquette « Rupture de stock »</label>
+              <input type="text" id="cOutOfStock" placeholder="Out of stock" />
+            </div>
           </div>
         </div>
+
+        <!-- Textes du site (navigation, stats, footer) -->
+        <div id="overrideEditor"></div>
 
         <!-- Page Avis -->
         <div class="stats-editor" style="margin-bottom:20px;">
@@ -1765,12 +1804,34 @@
           <div class="field">
             <label>Badge</label>
             <div class="badge-picker" id="badgePicker">
-              <button type="button" class="badge-opt badge-opt--none" data-val="">None</button>
-              <button type="button" class="badge-opt badge-opt--hot" data-val="HOT">HOT</button>
-              <button type="button" class="badge-opt badge-opt--new" data-val="NEW">NEW</button>
-              <button type="button" class="badge-opt badge-opt--sale" data-val="SALE">SALE</button>
+              <button type="button" class="badge-opt badge-opt--none" data-val="" data-emoji="" data-color="">None</button>
+              <button type="button" class="badge-opt badge-opt--hot" data-val="HOT" data-emoji="🔥" data-color="#ff6b6b">🔥 HOT</button>
+              <button type="button" class="badge-opt badge-opt--new" data-val="NEW" data-emoji="✨" data-color="#60b4ff">✨ NEW</button>
+              <button type="button" class="badge-opt badge-opt--sale" data-val="SALE" data-emoji="💰" data-color="#ffb83c">💰 SALE</button>
             </div>
-            <input type="hidden" id="fBadge" />
+            <div class="badge-custom">
+              <div class="badge-custom__row">
+                <input type="text" id="fBadgeText" maxlength="24" placeholder="Texte personnalisé (ex: PROMO -50%)" />
+                <input type="text" id="fBadgeEmoji" maxlength="4" placeholder="😀" class="badge-emoji-input" title="Emoji du badge" />
+                <label class="badge-color-wrap" title="Couleur du badge">
+                  <input type="color" id="fBadgeColor" value="#ff6b6b" />
+                </label>
+              </div>
+              <div class="badge-emoji-quick" id="badgeEmojiQuick">
+                <button type="button" data-emoji="🔥">🔥</button>
+                <button type="button" data-emoji="✨">✨</button>
+                <button type="button" data-emoji="💰">💰</button>
+                <button type="button" data-emoji="⭐">⭐</button>
+                <button type="button" data-emoji="🎁">🎁</button>
+                <button type="button" data-emoji="⚡">⚡</button>
+                <button type="button" data-emoji="💎">💎</button>
+                <button type="button" data-emoji="🚀">🚀</button>
+                <button type="button" data-emoji="👑">👑</button>
+                <button type="button" data-emoji="🏆">🏆</button>
+                <button type="button" data-emoji="" title="Sans emoji">∅</button>
+              </div>
+              <div class="badge-preview-row">Aperçu&nbsp;: <span class="tbadge" id="badgeLivePreview">—</span></div>
+            </div>
           </div>
           <div class="field">
             <label>Product Image <span class="f-optional">(optional — overrides background color)</span></label>

@@ -490,6 +490,39 @@ input, select, button, textarea { font-family: inherit; }
 .badge-opt--sale { background: rgba(255,180,60,.08); color: #ffb83c; border-color: rgba(255,180,60,.18); }
 .badge-opt--sale.active { background: rgba(255,180,60,.22); border-color: #ffb83c; }
 
+/* Badge custom (texte / emoji / couleur) */
+.badge-custom { margin-top: 10px; }
+.badge-custom__row { display: flex; gap: 8px; align-items: center; }
+.badge-custom__row input[type="text"] { flex: 1; min-width: 0; }
+.badge-emoji-input {
+  flex: 0 0 52px !important; width: 52px; text-align: center;
+  font-size: 15px; padding-left: 0 !important; padding-right: 0 !important;
+}
+.badge-color-wrap {
+  flex: 0 0 40px; width: 40px; height: 38px; border-radius: 8px;
+  border: 1px solid var(--border); background: rgba(255,255,255,.04);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; overflow: hidden; margin: 0;
+}
+.badge-color-wrap input[type="color"] {
+  width: 26px; height: 26px; padding: 0; border: none; border-radius: 6px;
+  background: none; cursor: pointer;
+}
+.badge-color-wrap input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+.badge-color-wrap input[type="color"]::-webkit-color-swatch { border: none; border-radius: 5px; }
+.badge-emoji-quick { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; }
+.badge-emoji-quick button {
+  width: 30px; height: 30px; border-radius: 7px; font-size: 14px;
+  background: rgba(255,255,255,.04); border: 1px solid var(--border);
+  color: var(--text-muted); cursor: pointer; transition: all 120ms ease;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.badge-emoji-quick button:hover { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.25); }
+.badge-preview-row {
+  margin-top: 10px; font-size: 11px; color: var(--text-dim);
+  display: flex; align-items: center; gap: 6px;
+}
+
 /* ══════════════════════════════════
    STOCK INDICATOR
 ══════════════════════════════════ */

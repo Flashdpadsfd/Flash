@@ -60,6 +60,7 @@
   var sortSelect   = $('sortSelect');
   var resultsCount = $('resultsCount');
   var activeCat    = 'all';
+  var activeSubcats = [];
   var searchQuery  = '';
 
   function filterAndSort() {
@@ -69,7 +70,7 @@
     cards.forEach(function (card) {
       var name = (card.dataset.name || '').toLowerCase();
       var cat  = (card.dataset.cat  || '').toLowerCase();
-      var ok   = (activeCat === 'all' || cat === activeCat) && (!searchQuery || name.indexOf(searchQuery) !== -1);
+      var ok   = (activeCat === 'all' || cat === activeCat || activeSubcats.indexOf(cat) !== -1) && (!searchQuery || name.indexOf(searchQuery) !== -1);
       card.classList[ok ? 'remove' : 'add']('hidden');
       if (ok) visible.push(card);
     });
@@ -109,6 +110,7 @@
       document.querySelectorAll('.sidebar__item').forEach(function (i) { i.classList.remove('active'); });
       item.classList.add('active');
       activeCat = item.dataset.cat;
+      activeSubcats = (item.dataset.subcats || '').split(',').filter(Boolean);
       filterAndSort();
     });
   });
@@ -228,11 +230,25 @@
     }
   };
 
+  /* Surcharges de texte définies dans l'admin (Visual Editor) — prioritaires sur toutes les langues */
+  function getTextOverrides() {
+    try { return JSON.parse(localStorage.getItem('nexus_text_overrides')) || {}; } catch(e) { return {}; }
+  }
+  function applyTextOverrides() {
+    var o = getTextOverrides();
+    document.querySelectorAll('[data-i18n]').forEach(function (el) { if (o[el.dataset.i18n]) el.textContent = o[el.dataset.i18n]; });
+    document.querySelectorAll('[data-i18n-html]').forEach(function (el) { if (o[el.dataset.i18nHtml]) el.innerHTML = o[el.dataset.i18nHtml]; });
+  }
+  window.addEventListener('storage', function (e) {
+    if (e.key === 'nexus_text_overrides') applyTextOverrides();
+  });
+
   function applyLang(lang) {
     var t = TRANSLATIONS[lang] || TRANSLATIONS.EN;
     document.querySelectorAll('[data-i18n]').forEach(function (el) { if (t[el.dataset.i18n] !== undefined) el.textContent = t[el.dataset.i18n]; });
     document.querySelectorAll('[data-i18n-html]').forEach(function (el) { if (t[el.dataset.i18nHtml] !== undefined) el.innerHTML = t[el.dataset.i18nHtml]; });
     document.documentElement.dir = lang === 'AR' ? 'rtl' : 'ltr';
+    applyTextOverrides();
   }
 
   var lt = $('langToggle'), ld = $('langDropdown'), ll = $('langLabel');
