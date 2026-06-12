@@ -1,4 +1,4 @@
-/* Nexus Admin Panel */
+/* FlashShp Admin Panel */
 (function () {
   'use strict';
 
@@ -14,7 +14,7 @@
   var DEFAULT_STATS = { rating: '4.96', sold: '4,350', customers: '439' };
   var DEFAULT_REVIEWS = [
     { id: 1,  name: 'Alex L.',    initials: 'AL', color: '#e50914', date: 'May 2025',      product: 'Netflix',      stars: 5, published: true, reply: '',  publishedAt: 'May 2025',      text: 'Got my Netflix credentials within seconds. Works perfectly on all my devices. Crazy value for the price, will definitely order again.' },
-    { id: 2,  name: 'Sarah K.',   initials: 'SK', color: '#1db954', date: 'May 2025',      product: 'Spotify',      stars: 5, published: true, reply: '',  publishedAt: 'May 2025',      text: 'Been using Spotify Premium from Nexus for 3 months straight. Not a single issue. Support is also super responsive. 10/10.' },
+    { id: 2,  name: 'Sarah K.',   initials: 'SK', color: '#1db954', date: 'May 2025',      product: 'Spotify',      stars: 5, published: true, reply: '',  publishedAt: 'May 2025',      text: 'Been using Spotify Premium from FlashShp for 3 months straight. Not a single issue. Support is also super responsive. 10/10.' },
     { id: 3,  name: 'Lucas R.',   initials: 'LR', color: '#6495ed', date: 'April 2025',    product: 'Gaming',       stars: 5, published: true, reply: '',  publishedAt: 'April 2025',    text: 'Legit service. Fast delivery, great price. I recommended it to my whole friend group and they all ordered too.' },
     { id: 4,  name: 'Marie T.',   initials: 'MT', color: '#ffa01e', date: 'April 2025',    product: 'Disney+',      stars: 5, published: true, reply: '',  publishedAt: 'April 2025',    text: 'Best purchase I\'ve made online in a while. Received access instantly and everything works without any issues. Very satisfied.' },
     { id: 5,  name: 'Jordan B.',  initials: 'JB', color: '#9b59b6', date: 'April 2025',    product: 'Netflix',      stars: 5, published: true, reply: '',  publishedAt: 'April 2025',    text: 'I was skeptical at first but everything went smooth. Got access in under 2 minutes. Will 100% be coming back for more.' },
@@ -33,7 +33,7 @@
     { id: 'vpn',       name: 'VPN',       color: '#ffa01e' }
   ];
   var DEFAULT_CONTENT = {
-    siteName:       'Nexus',
+    siteName:       'FlashShp',
     homeEyebrow:    'Digital Products Store',
     homeTitle:      'Premium. Curated.<br>Digital.',
     homeSub:        'Paying full price for a streaming service you use three times a week is a bad deal. We sell the same thing for less, no catch.',
@@ -45,7 +45,7 @@
     reviewsSub:     'Real reviews from real customers. Every review below is verified and 5-star rated.',
     reviewsRating:  '4.96',
     footerDesc:     'Premium streaming accounts,<br>delivered instantly.',
-    footerCopy:     '© 2026 Nexus. All rights reserved.'
+    footerCopy:     '© 2026 FlashShp. All rights reserved.'
   };
   var CURRENCY_SYMBOLS = { EUR: '€', USD: '$', GBP: '£' };
   var _customFields = [];
@@ -162,7 +162,7 @@
     else if (type === 'NEW_REVIEW')     embed = { title:'⭐ Nouvel avis client',   color:0x57F287, fields:[{name:'Client',value:d.name||'Anonyme',inline:true},{name:'Note',value:'★'.repeat(d.stars||5)+' ('+String(d.stars||5)+'/5)',inline:true},{name:'Produit',value:d.product||'—',inline:true},{name:'Avis',value:d.text||'—',inline:false}] };
     else if (type === 'SUPPORT_TICKET') embed = { title:'🎫 Nouveau ticket support',color:0x9B59B6, fields:[{name:'Client',value:d.name||'Anonyme',inline:true},{name:'Email',value:d.email||'—',inline:true},{name:'Sujet',value:d.subject||'—',inline:false},{name:'Message',value:d.message||'—',inline:false}] };
     else return;
-    embed.footer = { text:'Nexus Store' };
+    embed.footer = { text:'FlashShp Store' };
     embed.timestamp = new Date().toISOString();
     sendDiscordWebhook(cfg.url, embed, cfg.msg);
   }
@@ -1808,7 +1808,7 @@
     fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ embeds: [{ title:'🔔 Test — ' + type, description:'Webhook configuré et fonctionnel.', color:0x5865f2, fields:[{name:'Store',value:'Nexus',inline:true},{name:'Statut',value:'✅ Actif',inline:true}], footer:{text:'Nexus Store'}, timestamp:new Date().toISOString() }] })
+      body: JSON.stringify({ embeds: [{ title:'🔔 Test — ' + type, description:'Webhook configuré et fonctionnel.', color:0x5865f2, fields:[{name:'Store',value:'FlashShp',inline:true},{name:'Statut',value:'✅ Actif',inline:true}], footer:{text:'FlashShp Store'}, timestamp:new Date().toISOString() }] })
     }).then(function(r) {
       if (statusEl) { statusEl.textContent = (r.ok||r.status===204) ? '✓ OK' : 'Erreur '+r.status; statusEl.style.color = (r.ok||r.status===204) ? '#3cc864' : '#ff5555'; }
     }).catch(function() { if (statusEl) { statusEl.textContent = 'Erreur réseau.'; statusEl.style.color = '#ff5555'; } });
@@ -1821,7 +1821,7 @@
     if (!cfg.url) { msgEl.textContent = 'Configurez le webhook Changelog ci-dessus.'; msgEl.style.color = '#ff5555'; return; }
     if (!text)    { msgEl.textContent = 'Message vide.'; msgEl.style.color = '#ff5555'; return; }
     msgEl.textContent = 'Envoi…'; msgEl.style.color = 'rgba(255,255,255,.4)';
-    var body = { embeds: [{ title:'📋 Changelog — Nexus Store', color:0xa78bfa, description:text, footer:{text:'Nexus Store'}, timestamp:new Date().toISOString() }] };
+    var body = { embeds: [{ title:'📋 Changelog — FlashShp Store', color:0xa78bfa, description:text, footer:{text:'FlashShp Store'}, timestamp:new Date().toISOString() }] };
     if (cfg.msg) body.content = cfg.msg;
     fetch(cfg.url, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) })
       .then(function(r) {
@@ -1890,7 +1890,7 @@
           { name: 'Email',      value: o.email || '—', inline: true },
           { name: 'Montant',    value: sym + Number(o.price || 0).toFixed(2), inline: true }
         ],
-        footer: { text: 'Nexus Store' },
+        footer: { text: 'FlashShp Store' },
         timestamp: new Date().toISOString()
       }, cfg.msg);
     }
@@ -2055,7 +2055,7 @@
           { name: 'Email', value: o.email || '—', inline: true },
           { name: 'Montant', value: sym + Number(o.price || 0).toFixed(2), inline: true }
         ],
-        footer: { text: 'Nexus Store' }, timestamp: new Date().toISOString()
+        footer: { text: 'FlashShp Store' }, timestamp: new Date().toISOString()
       }, cfg.msg);
     }
     toast('Commande remboursée ✓');
@@ -2586,7 +2586,7 @@
     var el = document.getElementById('emailTemplateEditor');
     var html = el ? el.value : DEFAULT_EMAIL_TEMPLATE;
     var c = JSON.parse(localStorage.getItem('nexus_content') || '{}');
-    var storeName = c.siteName || 'Nexus Store';
+    var storeName = c.siteName || 'FlashShp Store';
     var storeUrl  = window.location.origin || 'https://example.com';
     var rendered  = html
       .replace(/\{\{invoice_id\}\}/g,       'cmpr76393008604k4nkd5acde')
@@ -2606,7 +2606,7 @@
       toast('Please save your EmailJS configuration first.'); return;
     }
     var c = JSON.parse(localStorage.getItem('nexus_content') || '{}');
-    var storeName = c.siteName || 'Nexus Store';
+    var storeName = c.siteName || 'FlashShp Store';
     var adminEmail = c.contactEmail || '';
     if (!adminEmail) {
       adminEmail = (prompt('Adresse email pour recevoir le test :') || '').trim();
@@ -2720,7 +2720,7 @@
   /* ── Init ── */
   function init() {
     var c = getContent();
-    var siteName = c.siteName || 'Nexus';
+    var siteName = c.siteName || 'FlashShp';
     var brandName = document.getElementById('sidebarBrandName');
     var brandIcon = document.getElementById('sidebarBrandIcon');
     var topbarAvatar = document.getElementById('topbarAvatar');

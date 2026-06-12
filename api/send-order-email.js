@@ -1,4 +1,4 @@
-/* Nexus - Envoi des emails de commande via Gmail SMTP (fonction Vercel)
+/* FlashShp - Envoi des emails de commande via Gmail SMTP (fonction Vercel)
    =====================================================================
    Remplace EmailJS : pas de bandeau "Email sent via EmailJS.com",
    nom d'expediteur controle (FROM_NAME), gratuit (~500 emails/jour Gmail).
@@ -50,7 +50,7 @@ module.exports = function (req, res) {
   var invoiceId   = escHtml(String(body.invoiceId   || '').slice(0, 64));
   var productName = escHtml(String(body.productName || '').slice(0, 128));
   var deliverable = escHtml(String(body.deliverable || '').slice(0, 2000));
-  var storeName   = escHtml(String(body.storeName   || 'Nexus').slice(0, 64));
+  var storeName   = escHtml(String(body.storeName   || 'FlashShp').slice(0, 64));
   var storeUrl    = String(body.storeUrl || 'https://nexus-theme-iota.vercel.app/').slice(0, 200);
   if (!/^https?:\/\//.test(storeUrl)) storeUrl = 'https://nexus-theme-iota.vercel.app/';
   var subject     = String(body.subject || 'Your Order is Ready!').slice(0, 150);
@@ -75,7 +75,7 @@ module.exports = function (req, res) {
     html: html
   }, function (err) {
     if (err) {
-      console.error('[Nexus] SMTP send failed:', err && err.message);
+      console.error('[FlashShp] SMTP send failed:', err && err.message);
       res.status(502).json({ error: 'Send failed' });
       return;
     }

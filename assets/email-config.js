@@ -1,4 +1,4 @@
-/* Nexus - Configuration email du site
+/* FlashShp - Configuration email du site
    =====================================
    Charge sur toutes les pages (window.*) ET importable cote serveur
    (module.exports) par la fonction Vercel api/send-order-email.js.

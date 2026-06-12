@@ -1,4 +1,4 @@
-/* Nexus Theme — SellAuth Edition */
+/* FlashShp Theme — SellAuth Edition */
 (function () {
   'use strict';
   function $(id) { return document.getElementById(id); }
@@ -142,7 +142,7 @@
       'footer.nav':'Navigation','footer.home':'Home','footer.products':'Products','footer.feedback':'Feedback',
       'footer.legal':'Legal','footer.tos':'Terms of Service',
       'footer.socials':'Socials',
-      'footer.copy':'© 2026 Nexus. All rights reserved.',
+      'footer.copy':'© 2026 FlashShp. All rights reserved.',
       'footer.terms':'Terms','footer.privacy':'Privacy'
     },
     FR: {
@@ -157,7 +157,7 @@
       'footer.nav':'Navigation','footer.home':'Accueil','footer.products':'Produits','footer.feedback':'Avis',
       'footer.legal':'Légal','footer.tos':'Conditions d\'utilisation',
       'footer.socials':'Réseaux sociaux',
-      'footer.copy':'© 2026 Nexus. Tous droits réservés.',
+      'footer.copy':'© 2026 FlashShp. Tous droits réservés.',
       'footer.terms':'CGU','footer.privacy':'Confidentialité'
     },
     ES: {
@@ -172,7 +172,7 @@
       'footer.nav':'Navegación','footer.home':'Inicio','footer.products':'Productos','footer.feedback':'Reseñas',
       'footer.legal':'Legal','footer.tos':'Términos de servicio',
       'footer.socials':'Redes sociales',
-      'footer.copy':'© 2026 Nexus. Todos los derechos reservados.',
+      'footer.copy':'© 2026 FlashShp. Todos los derechos reservados.',
       'footer.terms':'Términos','footer.privacy':'Privacidad'
     },
     DE: {
@@ -187,7 +187,7 @@
       'footer.nav':'Navigation','footer.home':'Startseite','footer.products':'Produkte','footer.feedback':'Bewertungen',
       'footer.legal':'Rechtliches','footer.tos':'Nutzungsbedingungen',
       'footer.socials':'Soziale Netzwerke',
-      'footer.copy':'© 2026 Nexus. Alle Rechte vorbehalten.',
+      'footer.copy':'© 2026 FlashShp. Alle Rechte vorbehalten.',
       'footer.terms':'AGB','footer.privacy':'Datenschutz'
     },
     IT: {
@@ -202,7 +202,7 @@
       'footer.nav':'Navigazione','footer.home':'Home','footer.products':'Prodotti','footer.feedback':'Recensioni',
       'footer.legal':'Legale','footer.tos':'Termini di servizio',
       'footer.socials':'Social',
-      'footer.copy':'© 2026 Nexus. Tutti i diritti riservati.',
+      'footer.copy':'© 2026 FlashShp. Tutti i diritti riservati.',
       'footer.terms':'Termini','footer.privacy':'Privacy'
     },
     PT: {
@@ -217,7 +217,7 @@
       'footer.nav':'Navegação','footer.home':'Início','footer.products':'Produtos','footer.feedback':'Avaliações',
       'footer.legal':'Legal','footer.tos':'Termos de serviço',
       'footer.socials':'Redes sociais',
-      'footer.copy':'© 2026 Nexus. Todos os direitos reservados.',
+      'footer.copy':'© 2026 FlashShp. Todos os direitos reservados.',
       'footer.terms':'Termos','footer.privacy':'Privacidade'
     },
     AR: {
@@ -232,7 +232,7 @@
       'footer.nav':'التنقل','footer.home':'الرئيسية','footer.products':'المنتجات','footer.feedback':'التقييمات',
       'footer.legal':'القانوني','footer.tos':'شروط الخدمة',
       'footer.socials':'التواصل الاجتماعي',
-      'footer.copy':'© 2026 Nexus. جميع الحقوق محفوظة.',
+      'footer.copy':'© 2026 FlashShp. جميع الحقوق محفوظة.',
       'footer.terms':'الشروط','footer.privacy':'الخصوصية'
     }
   };
@@ -396,9 +396,9 @@
   function _sendOrderEmail(toEmail, invoiceId, productName, deliverable) {
     try {
       var cfg = _emailConfig();
-      if (!cfg.enabled) { console.warn('[Nexus] Order email disabled.'); return; }
+      if (!cfg.enabled) { console.warn('[FlashShp] Order email disabled.'); return; }
       var c = JSON.parse(localStorage.getItem('nexus_content') || '{}');
-      var storeName = c.siteName || 'Nexus Store';
+      var storeName = c.siteName || 'FlashShp Store';
       var storeUrl  = window.location.origin + (window.location.pathname !== '/' ? window.location.pathname.replace(/\/[^/]*$/, '/') : '/');
       var subject = (cfg.subject || 'Your Order is Ready!')
         .replace(/\{\{invoice_id\}\}/g,   invoiceId)
@@ -407,7 +407,7 @@
 
       function sendViaEmailJs() {
         if (!cfg.publicKey || !cfg.serviceId || !cfg.templateId || !cfg.template) {
-          console.warn('[Nexus] Order email skipped — incomplete email config.');
+          console.warn('[FlashShp] Order email skipped — incomplete email config.');
           return;
         }
         var html = cfg.template
@@ -421,9 +421,9 @@
           window.emailjs.send(cfg.serviceId, cfg.templateId, {
             to_email: toEmail, subject: subject, message_html: html
           }, cfg.publicKey).then(function() {
-            console.info('[Nexus] Order email sent via EmailJS to ' + toEmail);
+            console.info('[FlashShp] Order email sent via EmailJS to ' + toEmail);
           }).catch(function(err) {
-            console.error('[Nexus] Order email failed:', err && (err.text || err.message) || err);
+            console.error('[FlashShp] Order email failed:', err && (err.text || err.message) || err);
           });
         }
         if (window.emailjs) {
@@ -432,7 +432,7 @@
           var s = document.createElement('script');
           s.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js';
           s.onload = function() { doSend(); };
-          s.onerror = function() { console.error('[Nexus] Could not load EmailJS SDK.'); };
+          s.onerror = function() { console.error('[FlashShp] Could not load EmailJS SDK.'); };
           document.head.appendChild(s);
         }
       }
@@ -444,10 +444,10 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ to: toEmail, invoiceId: invoiceId, productName: productName, deliverable: deliverable, storeName: storeName, storeUrl: storeUrl, subject: subject })
       }).then(function(r) {
-        if (r.ok) { console.info('[Nexus] Order email sent via site API to ' + toEmail); }
-        else { console.warn('[Nexus] Site email API unavailable (' + r.status + ') — falling back to EmailJS.'); sendViaEmailJs(); }
+        if (r.ok) { console.info('[FlashShp] Order email sent via site API to ' + toEmail); }
+        else { console.warn('[FlashShp] Site email API unavailable (' + r.status + ') — falling back to EmailJS.'); sendViaEmailJs(); }
       }).catch(function() { sendViaEmailJs(); });
-    } catch(e) { console.error('[Nexus] Order email error:', e); }
+    } catch(e) { console.error('[FlashShp] Order email error:', e); }
   }
 
   /* ─── Invoice / Checkout system ─── */
@@ -607,7 +607,7 @@
           { name: 'Email', value: email || 'Non fourni', inline: true },
           { name: 'Valeur potentielle', value: sym+Number(p.price).toFixed(2), inline: true }
         ],
-        footer: { text: 'Nexus Store' }, timestamp: new Date().toISOString()
+        footer: { text: 'FlashShp Store' }, timestamp: new Date().toISOString()
       });
     }
 
@@ -663,7 +663,7 @@
             { name: 'Réduction', value: '-'+promo.discount+'%', inline: true },
             { name: 'Produit', value: p ? (p.icon||'📦')+' '+p.name : '—', inline: true }
           ],
-          footer: { text: 'Nexus Store' }, timestamp: new Date().toISOString()
+          footer: { text: 'FlashShp Store' }, timestamp: new Date().toISOString()
         });
       } catch(e) { msgEl.textContent = 'Erreur.'; msgEl.style.color = '#ff5555'; }
     });
@@ -686,7 +686,7 @@
             { name: 'Reason', value: 'Invalid or missing email', inline: true },
             { name: 'Time', value: new Date().toLocaleString(), inline: true }
           ],
-          footer: { text: 'Nexus Store' }, timestamp: new Date().toISOString()
+          footer: { text: 'FlashShp Store' }, timestamp: new Date().toISOString()
         });
         return;
       }
@@ -702,7 +702,7 @@
             { name: 'Reason', value: 'Out of stock', inline: true },
             { name: 'Email', value: email, inline: true }
           ],
-          footer: { text: 'Nexus Store' }, timestamp: new Date().toISOString()
+          footer: { text: 'FlashShp Store' }, timestamp: new Date().toISOString()
         });
         return;
       }
@@ -791,7 +791,7 @@
             { name: 'IP', value: geoD.ip || '—', inline: true },
             { name: 'Pays', value: geoD.country_name || '—', inline: true }
           ],
-          footer: { text: 'Nexus Store' }, timestamp: new Date().toISOString()
+          footer: { text: 'FlashShp Store' }, timestamp: new Date().toISOString()
         });
 
         document.getElementById('coFormState').style.display = 'none';
@@ -857,7 +857,7 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ embeds: [{
-            title: '🐛 Erreur JavaScript — Nexus Store',
+            title: '🐛 Erreur JavaScript — FlashShp Store',
             color: 0xef4444,
             fields: [
               { name: 'Message', value: String(msg || '—').substring(0, 256), inline: false },
@@ -865,7 +865,7 @@
               { name: 'Ligne',   value: String(line || '—'), inline: true },
               { name: 'Page',    value: window.location.pathname, inline: true }
             ],
-            footer: { text: 'Nexus Store' },
+            footer: { text: 'FlashShp Store' },
             timestamp: new Date().toISOString()
           }] })
         }).catch(function() {});

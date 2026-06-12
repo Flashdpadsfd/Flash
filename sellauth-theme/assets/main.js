@@ -1,4 +1,4 @@
-/* Nexus Theme — SellAuth Edition · main.js
+/* FlashShp Theme — SellAuth Edition · main.js
  *
  * CONFIG : Set your Shop ID before this script loads:
  *   <script>window.NEXUS_SHOP_ID = 12345;</script>
@@ -54,11 +54,11 @@
       var productId = parseInt(card.dataset.productId || '0', 10);
       var variantId = parseInt(card.dataset.variantId || '0', 10);
       if (!productId) {
-        console.warn('[Nexus] Missing data-product-id on .product-card — replace placeholder IDs with your real SellAuth product IDs.');
+        console.warn('[FlashShp] Missing data-product-id on .product-card — replace placeholder IDs with your real SellAuth product IDs.');
         return;
       }
       if (!window.sellAuthEmbed) {
-        console.warn('[Nexus] sellauth-embed-2.js not loaded — check your SHOP_ID and script tag.');
+        console.warn('[FlashShp] sellauth-embed-2.js not loaded — check your SHOP_ID and script tag.');
         return;
       }
       var opts = {
@@ -160,7 +160,7 @@
       'footer.nav':'Navigation','footer.home':'Home','footer.products':'Products','footer.feedback':'Feedback',
       'footer.legal':'Legal','footer.tos':'Terms of Service',
       'footer.socials':'Socials',
-      'footer.copy':'© 2026 Nexus. All rights reserved.',
+      'footer.copy':'© 2026 FlashShp. All rights reserved.',
       'footer.terms':'Terms','footer.privacy':'Privacy'
     },
     FR: {
@@ -174,7 +174,7 @@
       'footer.nav':'Navigation','footer.home':'Accueil','footer.products':'Produits','footer.feedback':'Retours',
       'footer.legal':'Légal','footer.tos':'Conditions d\'utilisation',
       'footer.socials':'Réseaux sociaux',
-      'footer.copy':'© 2026 Nexus. Tous droits réservés.',
+      'footer.copy':'© 2026 FlashShp. Tous droits réservés.',
       'footer.terms':'CGU','footer.privacy':'Confidentialité'
     },
     ES: {
@@ -188,7 +188,7 @@
       'footer.nav':'Navegación','footer.home':'Inicio','footer.products':'Productos','footer.feedback':'Opiniones',
       'footer.legal':'Legal','footer.tos':'Términos de servicio',
       'footer.socials':'Redes sociales',
-      'footer.copy':'© 2026 Nexus. Todos los derechos reservados.',
+      'footer.copy':'© 2026 FlashShp. Todos los derechos reservados.',
       'footer.terms':'Términos','footer.privacy':'Privacidad'
     },
     DE: {
@@ -202,7 +202,7 @@
       'footer.nav':'Navigation','footer.home':'Startseite','footer.products':'Produkte','footer.feedback':'Feedback',
       'footer.legal':'Rechtliches','footer.tos':'Nutzungsbedingungen',
       'footer.socials':'Soziale Netzwerke',
-      'footer.copy':'© 2026 Nexus. Alle Rechte vorbehalten.',
+      'footer.copy':'© 2026 FlashShp. Alle Rechte vorbehalten.',
       'footer.terms':'AGB','footer.privacy':'Datenschutz'
     },
     IT: {
@@ -216,7 +216,7 @@
       'footer.nav':'Navigazione','footer.home':'Home','footer.products':'Prodotti','footer.feedback':'Feedback',
       'footer.legal':'Legale','footer.tos':'Termini di servizio',
       'footer.socials':'Social',
-      'footer.copy':'© 2026 Nexus. Tutti i diritti riservati.',
+      'footer.copy':'© 2026 FlashShp. Tutti i diritti riservati.',
       'footer.terms':'Termini','footer.privacy':'Privacy'
     },
     PT: {
@@ -230,7 +230,7 @@
       'footer.nav':'Navegação','footer.home':'Início','footer.products':'Produtos','footer.feedback':'Feedback',
       'footer.legal':'Legal','footer.tos':'Termos de serviço',
       'footer.socials':'Redes sociais',
-      'footer.copy':'© 2026 Nexus. Todos os direitos reservados.',
+      'footer.copy':'© 2026 FlashShp. Todos os direitos reservados.',
       'footer.terms':'Termos','footer.privacy':'Privacidade'
     },
     AR: {
@@ -244,7 +244,7 @@
       'footer.nav':'التنقل','footer.home':'الرئيسية','footer.products':'المنتجات','footer.feedback':'التعليقات',
       'footer.legal':'القانوني','footer.tos':'شروط الخدمة',
       'footer.socials':'التواصل الاجتماعي',
-      'footer.copy':'© 2026 Nexus. جميع الحقوق محفوظة.',
+      'footer.copy':'© 2026 FlashShp. جميع الحقوق محفوظة.',
       'footer.terms':'الشروط','footer.privacy':'الخصوصية'
     }
   };

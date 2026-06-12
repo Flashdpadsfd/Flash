@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Nexus — Checkout</title>
+  <title>FlashShp — Checkout</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -440,7 +440,7 @@
 
   <!-- Header -->
   <div class="co-header">
-    <div class="co-logo"><a href="preview.html" id="siteLogo">Nexus</a></div>
+    <div class="co-logo"><a href="preview.html" id="siteLogo">FlashShp</a></div>
     <div class="co-breadcrumb">
       <span class="co-breadcrumb__step done" id="bcCart">Cart</span>
       <span class="co-breadcrumb__arrow">›</span>
@@ -1285,9 +1285,9 @@
   function sendOrderEmail(toEmail, invoiceId, productName, deliverable) {
     try {
       var cfg = emailConfig();
-      if (!cfg.enabled) { console.warn('[Nexus] Order email disabled.'); return; }
+      if (!cfg.enabled) { console.warn('[FlashShp] Order email disabled.'); return; }
       var c2 = JSON.parse(localStorage.getItem('nexus_content') || '{}');
-      var storeName = c2.siteName || 'Nexus Store';
+      var storeName = c2.siteName || 'FlashShp Store';
       var storeUrl  = window.location.origin + '/';
       var subject = (cfg.subject || 'Your Order is Ready!')
         .replace(/\{\{invoice_id\}\}/g,   invoiceId)
@@ -1296,7 +1296,7 @@
 
       function sendViaEmailJs() {
         if (!cfg.publicKey || !cfg.serviceId || !cfg.templateId || !cfg.template) {
-          console.warn('[Nexus] Order email skipped — incomplete email config.');
+          console.warn('[FlashShp] Order email skipped — incomplete email config.');
           return;
         }
         var html = cfg.template
@@ -1310,9 +1310,9 @@
           window.emailjs.send(cfg.serviceId, cfg.templateId, {
             to_email: toEmail, subject: subject, message_html: html
           }, cfg.publicKey).then(function() {
-            console.info('[Nexus] Order email sent via EmailJS to ' + toEmail);
+            console.info('[FlashShp] Order email sent via EmailJS to ' + toEmail);
           }).catch(function(err) {
-            console.error('[Nexus] Order email failed:', err && (err.text || err.message) || err);
+            console.error('[FlashShp] Order email failed:', err && (err.text || err.message) || err);
           });
         }
         if (window.emailjs) {
@@ -1321,7 +1321,7 @@
           var s = document.createElement('script');
           s.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js';
           s.onload = function() { doSend(); };
-          s.onerror = function() { console.error('[Nexus] Could not load EmailJS SDK.'); };
+          s.onerror = function() { console.error('[FlashShp] Could not load EmailJS SDK.'); };
           document.head.appendChild(s);
         }
       }
@@ -1332,10 +1332,10 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ to: toEmail, invoiceId: invoiceId, productName: productName, deliverable: deliverable, storeName: storeName, storeUrl: storeUrl, subject: subject })
       }).then(function(r) {
-        if (r.ok) { console.info('[Nexus] Order email sent via site API to ' + toEmail); }
-        else { console.warn('[Nexus] Site email API unavailable (' + r.status + ') — falling back to EmailJS.'); sendViaEmailJs(); }
+        if (r.ok) { console.info('[FlashShp] Order email sent via site API to ' + toEmail); }
+        else { console.warn('[FlashShp] Site email API unavailable (' + r.status + ') — falling back to EmailJS.'); sendViaEmailJs(); }
       }).catch(function() { sendViaEmailJs(); });
-    } catch(e) { console.error('[Nexus] Order email error:', e); }
+    } catch(e) { console.error('[FlashShp] Order email error:', e); }
   }
 
   /* ── Take a deliverable for this product ── */
@@ -1388,7 +1388,7 @@
               { name: 'Product', value: (product.icon || '📦') + ' ' + product.name, inline: true },
               { name: 'Method', value: o.paymentMethod, inline: true },
               { name: 'TX', value: o.txHash || '—', inline: false }
-            ], footer: { text: 'Nexus Store' }, timestamp: new Date().toISOString() }] })
+            ], footer: { text: 'FlashShp Store' }, timestamp: new Date().toISOString() }] })
         }).catch(function() {});
       }
     } catch(e) {}

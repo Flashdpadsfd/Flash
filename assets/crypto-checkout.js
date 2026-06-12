@@ -1,4 +1,4 @@
-/* Nexus — Crypto Payment System
+/* FlashShp — Crypto Payment System
    Blockchain polling for BTC, ETH, LTC, SOL
    No API keys required for basic use
 */
@@ -634,7 +634,7 @@
                 { name: 'Product', value: (product.icon || '📦') + ' ' + product.name, inline: true },
                 { name: 'TX Hash', value: txResult.txHash || '—', inline: false }
               ],
-              footer: { text: 'Nexus Store' },
+              footer: { text: 'FlashShp Store' },
               timestamp: new Date().toISOString()
             }]
           })
