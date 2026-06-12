@@ -107,10 +107,17 @@
 
   document.querySelectorAll('.sidebar__item[data-cat]').forEach(function (item) {
     item.addEventListener('click', function () {
+      var wasActive = item.classList.contains('active');
       document.querySelectorAll('.sidebar__item').forEach(function (i) { i.classList.remove('active'); });
-      item.classList.add('active');
-      activeCat = item.dataset.cat;
-      activeSubcats = (item.dataset.subcats || '').split(',').filter(Boolean);
+      if (wasActive) {
+        /* re-clic sur la catégorie active → désélection, tous les produits */
+        activeCat = 'all';
+        activeSubcats = [];
+      } else {
+        item.classList.add('active');
+        activeCat = item.dataset.cat;
+        activeSubcats = (item.dataset.subcats || '').split(',').filter(Boolean);
+      }
       filterAndSort();
     });
   });
