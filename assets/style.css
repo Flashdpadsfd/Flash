@@ -351,7 +351,7 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 /*──────────────────────────────────────────────
   PRODUCT GRID & CARDS (DailyStore style)
 ──────────────────────────────────────────────*/
-.product-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+.product-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
 
 .product-card {
   position: relative; border-radius: 12px; overflow: hidden;
@@ -491,13 +491,13 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 .shop-layout {
   display: flex; align-items: flex-start;
   width: 100%;
-  padding: 52px 40px 80px; gap: 0;
+  padding: 52px 64px 80px; gap: 0;
   min-height: 100vh;
 }
 
 /* ── Sidebar ── */
 .sidebar {
-  width: 220px; flex-shrink: 0;
+  width: 240px; flex-shrink: 0;
   position: sticky; top: 52px;
   height: calc(100vh - 52px);
   overflow-y: auto; overflow-x: hidden;
@@ -577,16 +577,20 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 
 .sidebar__item {
   display: flex; align-items: center; gap: 10px;
-  padding: 7px 12px; margin: 0 4px 1px; border-radius: 7px;
+  padding: 9px 12px; margin: 0 4px 2px; border-radius: 8px;
   cursor: pointer; transition: background 150ms ease, color 150ms ease;
-  font-size: 13px; font-weight: 400; color: rgba(255,255,255,.55);
+  font-size: 14px; font-weight: 400; color: rgba(255,255,255,.6);
 }
 .sidebar__item:hover { background: rgba(255,255,255,.06); color: rgba(255,255,255,.90); }
 .sidebar__item.active { background: rgba(255,255,255,.09); color: #fff; font-weight: 500; }
 .sidebar__item-icon {
-  width: 26px; height: 26px; border-radius: 6px; flex-shrink: 0;
+  width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
-  font-size: 12px; font-weight: 700;
+  font-size: 13px; font-weight: 700;
+}
+.sidebar__divider {
+  height: 1px; margin: 10px 12px 14px;
+  background: rgba(255,255,255,.07);
 }
 .sidebar__item--sub { margin-left: 22px; font-size: 12.5px; }
 .sidebar__item--sub .sidebar__item-icon { width: 20px; height: 20px; font-size: 10px; border-radius: 5px; }
@@ -597,14 +601,14 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 }
 
 /* ── Shop main ── */
-.shop-main { flex: 1; min-width: 0; padding: 0 0 0 20px; }
+.shop-main { flex: 1; min-width: 0; padding: 0 0 0 28px; }
 
 
 .shop-topbar {
   display: flex; align-items: center; justify-content: space-between;
   padding-top: 20px; margin-bottom: 24px; gap: 16px; flex-wrap: wrap;
 }
-.shop-topbar__title { font-family: Lancelot, serif; font-size: 32px; font-weight: 500; line-height: 1.1; }
+.shop-topbar__title { font-family: Inter, sans-serif; font-size: 15px; font-weight: 500; line-height: 1.1; color: rgba(255,255,255,.6); }
 .shop-topbar__right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
 .results-count { font-size: 13px; color: rgba(255,255,255,.35); }
 
@@ -971,7 +975,7 @@ body.loaded .hero__cta    { animation: revealUp 600ms cubic-bezier(.16,1,.3,1) 6
   .footer__top { grid-template-columns: 1fr; gap: 28px; }
   .footer__bottom { flex-direction: column; text-align: center; }
   .shop-layout { padding: 66px 12px 48px; }
-  .shop-topbar__title { font-size: 24px; }
+  .shop-topbar__title { font-size: 14px; }
 }
 
 /* ══════════════════════════════════════════════

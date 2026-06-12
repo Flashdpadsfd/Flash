@@ -1627,7 +1627,7 @@
     cHomeEyebrow: 'homeEyebrow', cHomeTitle: 'homeTitle', cHomeSub: 'homeSub',
     cHomeCta1: 'homeCta1', cHomeCta2: 'homeCta2',
     cProductsTitle: 'productsCountWord', cSearchPlaceholder: 'searchPlaceholder',
-    cBuyNow: 'buyNowLabel',
+    cBuyNow: 'buyNowLabel', cFeaturedLabel: 'featuredLabel',
     cInStock: 'inStockLabel', cOutOfStock: 'outOfStockLabel',
     cReviewsEyebrow: 'reviewsEyebrow', cReviewsTitle: 'reviewsTitle',
     cReviewsSub: 'reviewsSub', cReviewsRating: 'reviewsRating'
