@@ -437,6 +437,7 @@
       /* Custom image → replace the default hero entirely */
       var heroEl = document.querySelector('.pdv3-hero');
       heroEl.style.background = 'url(' + p.image + ') center/cover no-repeat';
+      heroEl.classList.add('pdv3-hero--img');
       document.getElementById('pdHeroBgText').style.display = 'none';
       document.getElementById('pdHeroIcon').style.display = 'none';
     } else {
