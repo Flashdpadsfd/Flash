@@ -32,6 +32,21 @@ a { color: inherit; text-decoration: none; cursor: pointer; }
 input, select, button, textarea { font-family: inherit; }
 
 /* ══════════════════════════════════
+   ACCESSIBILITY — keyboard focus (skill: focus-states, CRITICAL)
+   On-brand accent ring, only for keyboard nav.
+══════════════════════════════════ */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+:focus:not(:focus-visible) { outline: none; }
+
+/* ══════════════════════════════════
    LOGIN
 ══════════════════════════════════ */
 .login-screen {
@@ -278,7 +293,8 @@ input, select, button, textarea { font-family: inherit; }
 }
 .table-wrap {
   background: var(--surface); border: 1px solid var(--border);
-  border-radius: 12px; overflow: hidden;
+  border-radius: 12px; overflow-x: auto; overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 .a-table { width: 100%; border-collapse: collapse; }
 .a-table th {
@@ -1123,4 +1139,16 @@ input, select, button, textarea { font-family: inherit; }
   .form-row { grid-template-columns: 1fr; }
   .db-kpi-row { grid-template-columns: 1fr 1fr; }
   .db-2col-charts { grid-template-columns: 1fr; }
+}
+
+/* ══════════════════════════════════
+   REDUCED MOTION (skill: reduced-motion, CRITICAL)
+══════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -2,6 +2,28 @@
 (function () {
   'use strict';
 
+  /* ─── Inline SVG icons (Lucide) for empty states ─── */
+  function AICON(name) {
+    var P = {
+      box:      '<path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>',
+      receipt:  '<path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M8 7h8"/><path d="M8 11h8"/><path d="M8 15h5"/>',
+      users:    '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+      message:  '<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>',
+      tag:      '<path d="M12.59 2.59A2 2 0 0 0 11.17 2H4a2 2 0 0 0-2 2v7.17a2 2 0 0 0 .59 1.41l8.7 8.71a2.43 2.43 0 0 0 3.42 0l6.58-6.59a2.43 2.43 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r="1" fill="currentColor" stroke="none"/>',
+      activity: '<path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"/>'
+    };
+    var d = P[name] || P.box;
+    return '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + '</svg>';
+  }
+  /* Builds a table empty-state row reusing the .empty-state component */
+  function emptyRow(colspan, icon, title, sub) {
+    return '<tr><td colspan="' + colspan + '">' +
+      '<div class="empty-state">' + AICON(icon) +
+      '<div class="empty-state__title">' + title + '</div>' +
+      (sub ? '<div class="empty-state__sub">' + sub + '</div>' : '') +
+      '</div></td></tr>';
+  }
+
   var DEFAULT_PASS = 'nexus2026';
   var DEFAULT_PRODUCTS = [
     { id: 1, name: 'Netflix Premium', category: 'streaming', price: 4.99, origPrice: null, desc: '1 Month · 4K UHD · Shared', badge: '', stock: 50, deliverables: [], gradient: 'linear-gradient(135deg,#1a1a2e,#16213e)' },
@@ -588,8 +610,9 @@
     }
     var tbody = document.getElementById('productsTbody');
     if (!products.length) {
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:rgba(255,255,255,.3);padding:32px;">' +
-        (query ? 'Aucun produit correspondant.' : 'Aucun produit. Cliquez sur « Nouveau produit ».') + '</td></tr>';
+      tbody.innerHTML = query
+        ? emptyRow(7, 'box', 'Aucun produit correspondant', 'Essayez un autre terme de recherche.')
+        : emptyRow(7, 'box', 'Aucun produit', 'Cliquez sur « Nouveau produit » pour commencer.');
       return;
     }
     tbody.innerHTML = products.map(function (p) {
@@ -1085,7 +1108,7 @@
     var tbody = document.getElementById('categoriesTbody');
     if (!tbody) return;
     if (!cats.length) {
-      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:rgba(255,255,255,.3);padding:24px;">No categories yet.</td></tr>';
+      tbody.innerHTML = emptyRow(5, 'tag', 'Aucune catégorie', 'Créez-en une pour organiser vos produits.');
     } else {
       tbody.innerHTML = cats.map(function(c) {
         return '<tr>' +
@@ -1314,7 +1337,7 @@
     var tbody = document.getElementById('reviewsTbody');
     if (!tbody) return;
     if (!reviews.length) {
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:rgba(255,255,255,.3);padding:28px;">No feedbacks yet.</td></tr>';
+      tbody.innerHTML = emptyRow(7, 'message', 'Aucun avis', 'Les avis clients apparaîtront ici.');
       return;
     }
     tbody.innerHTML = reviews.map(function(r) {
@@ -1841,8 +1864,9 @@
     });
     var tbody = document.getElementById('ordersTbody');
     if (!orders.length) {
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:rgba(255,255,255,.3);padding:36px;">' +
-        (q ? 'Aucune commande correspondante.' : 'Aucune commande pour le moment.') + '</td></tr>';
+      tbody.innerHTML = q
+        ? emptyRow(7, 'receipt', 'Aucune commande correspondante', 'Essayez un autre terme de recherche.')
+        : emptyRow(7, 'receipt', 'Aucune commande', 'Vos ventes apparaîtront ici.');
       return;
     }
     tbody.innerHTML = orders.map(function(o) {
@@ -2169,8 +2193,9 @@
 
     var tbody = document.getElementById('customersTbody');
     if (!list.length) {
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:rgba(255,255,255,.3);padding:36px;">' +
-        (q ? 'Aucun client correspondant.' : 'Aucune commande enregistrée.') + '</td></tr>';
+      tbody.innerHTML = q
+        ? emptyRow(6, 'users', 'Aucun client correspondant', 'Essayez un autre terme de recherche.')
+        : emptyRow(6, 'users', 'Aucun client', 'Vos clients apparaîtront après la première vente.');
       return;
     }
     tbody.innerHTML = list.map(function(c) {
@@ -2328,7 +2353,7 @@
     var tbody = document.getElementById('loginLogTbody');
     if (tbody) {
       if (!log.length) {
-        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:rgba(255,255,255,.3);padding:24px;">No events recorded yet.</td></tr>';
+        tbody.innerHTML = emptyRow(3, 'activity', 'Aucun événement', 'Les événements de sécurité seront listés ici.');
       } else {
         tbody.innerHTML = log.map(function(e) {
           var d = new Date(e.time);
