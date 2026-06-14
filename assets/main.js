@@ -147,6 +147,18 @@ window.NX_ICONS = function (name) {
     });
   });
 
+  /* ─── Pre-filter by ?cat= when arriving from a product page category link ─── */
+  if (productGrid) {
+    var _urlCat = new URLSearchParams(window.location.search).get('cat');
+    if (_urlCat) {
+      activeCat = _urlCat.toLowerCase();
+      document.querySelectorAll('.sidebar__item[data-cat]').forEach(function (i) {
+        if ((i.dataset.cat || '').toLowerCase() === activeCat) i.classList.add('active');
+      });
+      filterAndSort();
+    }
+  }
+
   /* ─── Sidebar section toggle ─── */
   window.toggleSection = function (id) {
     var el = document.getElementById(id);

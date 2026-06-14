@@ -122,8 +122,14 @@
       </div>
     </div>
 
-    <!-- ── TWO-COL BODY ── -->
+    <!-- ── BODY (cats | main | purchase) ── -->
     <div class="pdv3-body">
+
+      <!-- ── CATEGORIES (left) ── -->
+      <aside class="pdv3-cats" id="pdCatsAside">
+        <div class="pdv3-cats__hdr">Categories</div>
+        <nav class="pdv3-cats__list" id="pdCatsList"></nav>
+      </aside>
 
       <!-- ── MAIN CONTENT ── -->
       <main class="pdv3-main">
@@ -513,6 +519,27 @@
         '<span class="pdv3-spec-val' + (s.green ? ' pdv3-spec-val--green' : '') + '">' + esc(String(s.v || '')) + '</span>' +
       '</div>';
     }).join('');
+
+    /* ── Categories nav (left sidebar) — built from real product categories ── */
+    (function renderCatNav() {
+      var list = document.getElementById('pdCatsList');
+      if (!list) return;
+      var seen = {}, cats = [];
+      allProds.forEach(function(pr) {
+        var c = (pr.category || 'other').toLowerCase();
+        if (!seen[c]) { seen[c] = true; cats.push(c); }
+      });
+      var allIcon = '<svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>';
+      var html = '<a class="pdv3-cats__item" href="preview-products.html">' +
+        '<span class="pdv3-cats__ic">' + allIcon + '</span>All Products</a>';
+      cats.forEach(function(c) {
+        var active = c === catKey ? ' pdv3-cats__item--active' : '';
+        html += '<a class="pdv3-cats__item' + active + '" href="preview-products.html?cat=' + encodeURIComponent(c) + '">' +
+          '<span class="pdv3-cats__ic">' + (CAT_ICONS[c] || '📦') + '</span>' +
+          esc(CAT_LABELS[c] || cap(c)) + '</a>';
+      });
+      list.innerHTML = html;
+    })();
 
     /* ── Service guarantee (admin-editable via p.pageGuarantees) ── */
     var GUARANTEE_ICONS = {
