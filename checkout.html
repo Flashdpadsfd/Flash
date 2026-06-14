@@ -413,11 +413,13 @@
     .conf-deliv-val.shown { filter: none; user-select: text; }
     .conf-reveal-btn {
       margin-top: 8px; padding: 6px 12px;
+      display: inline-flex; align-items: center; gap: 5px;
       background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
       border-radius: 6px; font-size: 11px; color: rgba(255,255,255,.6);
       transition: background 150ms;
     }
     .conf-reveal-btn:hover { background: rgba(255,255,255,.12); color: #fff; }
+    .nx-ico { display: inline-block; vertical-align: -0.125em; flex-shrink: 0; }
     .conf-back-btn {
       display: flex; align-items: center; justify-content: center; gap: 8px;
       padding: 11px 24px; border-radius: 9px;
@@ -735,7 +737,7 @@
         <div class="conf-deliv-box" style="width:100%;">
           <div class="conf-deliv-lbl">Your Product</div>
           <div class="conf-deliv-val" id="successDeliv">—</div>
-          <button class="conf-reveal-btn" id="successRevealBtn">👁 Click to reveal</button>
+          <button class="conf-reveal-btn" id="successRevealBtn"><svg class="nx-ico" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.06 12.35a1 1 0 0 1 0-.7 10.75 10.75 0 0 1 19.88 0 1 1 0 0 1 0 .7 10.75 10.75 0 0 1-19.88 0"/><circle cx="12" cy="12" r="3"/></svg> Click to reveal</button>
         </div>
 
         <div class="conf-deliv-box" style="width:100%;background:rgba(34,197,94,.04);border-color:rgba(34,197,94,.12);">
@@ -1408,10 +1410,12 @@
     document.getElementById('successInvId').textContent = o.invoiceId;
     document.getElementById('successDeliv').textContent = deliverable;
 
+    var _eyeSvg = '<svg class="nx-ico" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.06 12.35a1 1 0 0 1 0-.7 10.75 10.75 0 0 1 19.88 0 1 1 0 0 1 0 .7 10.75 10.75 0 0 1-19.88 0"/><circle cx="12" cy="12" r="3"/></svg>';
+    var _eyeOffSvg = '<svg class="nx-ico" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.73 5.08a10.74 10.74 0 0 1 11.2 6.57 1 1 0 0 1 0 .7 10.75 10.75 0 0 1-1.44 2.49"/><path d="M14.08 14.16a3 3 0 0 1-4.24-4.24"/><path d="M17.48 17.5A10.75 10.75 0 0 1 2.06 12.35a1 1 0 0 1 0-.7 10.75 10.75 0 0 1 4.45-5.14"/><path d="m2 2 20 20"/></svg>';
     document.getElementById('successRevealBtn').addEventListener('click', function() {
       var el = document.getElementById('successDeliv');
       var shown = el.classList.toggle('shown');
-      this.textContent = shown ? '🔒 Hide' : '👁 Click to reveal';
+      this.innerHTML = shown ? _eyeOffSvg + ' Hide' : _eyeSvg + ' Click to reveal';
     });
   }
 

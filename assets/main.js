@@ -1,6 +1,31 @@
 /* FlashShp Theme — SellAuth Edition */
+
+/* ─── Inline SVG icon set (Lucide) — replaces system/structural emojis.
+   Product icons stay merchant-editable (emoji); only UI glyphs use these. ─── */
+window.NX_ICONS = function (name) {
+  var P = {
+    star:    ['fill',   '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>'],
+    flame:   ['stroke', '<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>'],
+    sparkles:['stroke', '<path d="M9.94 15.5A2 2 0 0 0 8.5 14.06l-6.14-1.58a.5.5 0 0 1 0-.96L8.5 9.94A2 2 0 0 0 9.94 8.5l1.58-6.14a.5.5 0 0 1 .96 0L14.06 8.5A2 2 0 0 0 15.5 9.94l6.14 1.58a.5.5 0 0 1 0 .96L15.5 14.06a2 2 0 0 0-1.44 1.44l-1.58 6.14a.5.5 0 0 1-.96 0z"/>'],
+    tag:     ['stroke', '<path d="M12.59 2.59A2 2 0 0 0 11.17 2H4a2 2 0 0 0-2 2v7.17a2 2 0 0 0 .59 1.41l8.7 8.71a2.43 2.43 0 0 0 3.42 0l6.58-6.59a2.43 2.43 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".9" fill="currentColor" stroke="none"/>'],
+    search:  ['stroke', '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>'],
+    check:   ['stroke', '<path d="M20 6 9 17l-5-5"/>'],
+    x:       ['stroke', '<path d="M18 6 6 18M6 6l12 12"/>'],
+    zap:     ['fill',   '<path d="M13 2 3 14h7l-1 8 10-12h-7z"/>'],
+    eye:     ['stroke', '<path d="M2.06 12.35a1 1 0 0 1 0-.7 10.75 10.75 0 0 1 19.88 0 1 1 0 0 1 0 .7 10.75 10.75 0 0 1-19.88 0"/><circle cx="12" cy="12" r="3"/>'],
+    'eye-off':['stroke','<path d="M10.73 5.08a10.74 10.74 0 0 1 11.2 6.57 1 1 0 0 1 0 .7 10.75 10.75 0 0 1-1.44 2.49"/><path d="M14.08 14.16a3 3 0 0 1-4.24-4.24"/><path d="M17.48 17.5A10.75 10.75 0 0 1 2.06 12.35a1 1 0 0 1 0-.7 10.75 10.75 0 0 1 4.45-5.14"/><path d="m2 2 20 20"/>']
+  };
+  var d = P[name];
+  if (!d) return '';
+  var attrs = 'class="nx-ico" width="1em" height="1em" viewBox="0 0 24 24" aria-hidden="true" focusable="false"';
+  return d[0] === 'fill'
+    ? '<svg ' + attrs + ' fill="currentColor" stroke="none">' + d[1] + '</svg>'
+    : '<svg ' + attrs + ' fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + d[1] + '</svg>';
+};
+
 (function () {
   'use strict';
+  var ICON = window.NX_ICONS;
   function $(id) { return document.getElementById(id); }
 
   /* ─── Drawer ─── */
@@ -88,7 +113,7 @@
       if (!empty) {
         empty = document.createElement('div');
         empty.className = 'empty-state';
-        empty.innerHTML = '<div class="empty-state__icon">🔍</div>'
+        empty.innerHTML = '<div class="empty-state__icon">'+ICON('search')+'</div>'
           + '<div class="empty-state__title">No products found</div>'
           + '<div class="empty-state__sub">Try a different search or category</div>';
         productGrid.appendChild(empty);
@@ -370,7 +395,7 @@
     if (!tc) return;
     var t = document.createElement('div');
     t.className = 'toast';
-    t.innerHTML = '<span class="toast__icon">'+(icon||'✅')+'</span><span>'+String(msg).replace(/</g,'&lt;')+'</span>';
+    t.innerHTML = '<span class="toast__icon">'+(icon||ICON('check'))+'</span><span>'+String(msg).replace(/</g,'&lt;')+'</span>';
     tc.appendChild(t);
     setTimeout(function() { t.classList.add('hide'); setTimeout(function() { t.parentNode && t.parentNode.removeChild(t); }, 250); }, 3000);
   };
@@ -500,7 +525,7 @@
           '<div class="co-hdr">' +
             '<div class="co-hdr__brand"><svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>&nbsp;Secure Checkout</div>' +
             '<div class="co-hdr__steps"><span class="co-step co-step--active">Information</span><span class="co-step-sep">&nbsp;›&nbsp;</span><span class="co-step">Delivery</span></div>' +
-            '<button class="co-x" id="coXBtn">✕</button>' +
+            '<button class="co-x" id="coXBtn" aria-label="Close">'+ICON('x')+'</button>' +
           '</div>' +
           '<div class="co-layout">' +
             '<div class="co-left">' +
@@ -510,7 +535,7 @@
               '<div class="co-section-hdr" style="margin-top:12px;">Payment Method</div>' +
               '<div class="co-pm-selector">' +
                 '<button class="co-pm-btn co-pm-btn--active" id="coPmDirect" data-pm="direct">' +
-                  '<span class="co-pm-btn__icon">⚡</span> Quick Pay' +
+                  '<span class="co-pm-btn__icon">'+ICON('zap')+'</span> Quick Pay' +
                 '</button>' +
                 '<button class="co-pm-btn" id="coPmCrypto" data-pm="crypto">' +
                   '<span class="co-pm-btn__icon">₿</span> Cryptocurrency' +
@@ -524,7 +549,7 @@
               '</button>' +
               '<div class="co-trust-row">' +
                 '<span class="co-trust-item"><svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>&nbsp;256-bit SSL</span>' +
-                '<span class="co-trust-item">⚡&nbsp;Instant Delivery</span>' +
+                '<span class="co-trust-item">'+ICON('zap')+'&nbsp;Instant Delivery</span>' +
                 '<span class="co-trust-item">↩&nbsp;Free Replacement</span>' +
               '</div>' +
               '<div class="co-err" id="coErr"></div>' +
@@ -556,7 +581,7 @@
               '<div class="co-success__title">Order Complete!</div>' +
               '<div class="co-success__sub" id="coSuccessSub">Your product is ready below.</div>' +
               '<div class="co-id-box"><div class="co-id-box__meta"><div class="co-id-box__lbl">Invoice ID</div><div class="co-id-box__val" id="coInvId"></div></div><button class="co-copy" id="coCopyBtn">Copy</button></div>' +
-              '<div class="co-deliv-box"><div class="co-deliv-box__lbl">Your Product</div><div class="co-deliv-box__val" id="coDelivVal"></div><button class="co-reveal" id="coRevealBtn">👁 Click to reveal</button></div>' +
+              '<div class="co-deliv-box"><div class="co-deliv-box__lbl">Your Product</div><div class="co-deliv-box__val" id="coDelivVal"></div><button class="co-reveal" id="coRevealBtn">'+ICON('eye')+' Click to reveal</button></div>' +
               '<div class="co-actions"><button class="co-back" id="coBackBtn">← Back to Shop</button></div>' +
             '</div>' +
           '</div>' +
@@ -640,7 +665,7 @@
     document.getElementById('coRevealBtn').addEventListener('click', function () {
       var v = document.getElementById('coDelivVal');
       var shown = v.classList.toggle('shown');
-      document.getElementById('coRevealBtn').textContent = shown ? '🔒 Hide' : '👁 Click to reveal';
+      document.getElementById('coRevealBtn').innerHTML = shown ? ICON('eye-off')+' Hide' : ICON('eye')+' Click to reveal';
     });
 
     document.getElementById('coPromoBtn').addEventListener('click', function () {
@@ -800,7 +825,7 @@
         document.getElementById('coInvId').textContent = invoiceId;
         document.getElementById('coDelivVal').textContent = deliverable;
         document.getElementById('coDelivVal').classList.remove('shown');
-        document.getElementById('coRevealBtn').textContent = '👁 Click to reveal';
+        document.getElementById('coRevealBtn').innerHTML = ICON('eye')+' Click to reveal';
       });
     });
 

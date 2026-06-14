@@ -275,12 +275,12 @@
       var icon = p.icon || '📦';
 
       // Badge label (texte, emoji et couleur personnalisables depuis l'admin)
-      var labelCls = 'featured', labelTxt = '⭐ Featured', labelStyle = '';
+      var labelCls = 'featured', labelTxt = NX_ICONS('star') + ' Featured', labelStyle = '';
       if (p.badge) {
         var BADGE_LEGACY = {
-          HOT:  { txt: 'Best Seller', emoji: '🔥', cls: 'best' },
-          NEW:  { txt: 'New Arrival', emoji: '✨', cls: 'new' },
-          SALE: { txt: 'Sale',        emoji: '💰', cls: 'sale' }
+          HOT:  { txt: 'Best Seller', emoji: NX_ICONS('flame'),    cls: 'best' },
+          NEW:  { txt: 'New Arrival', emoji: NX_ICONS('sparkles'), cls: 'new' },
+          SALE: { txt: 'Sale',        emoji: NX_ICONS('tag'),      cls: 'sale' }
         };
         var legacy = BADGE_LEGACY[p.badge];
         var isCustomized = !!(p.badgeColor || p.badgeEmoji);
