@@ -481,6 +481,9 @@
       delivery: '<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
       region:   '<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20"/></svg>',
       stock:    '<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+      warranty: '<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+      activation:'<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+      support:  '<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>',
       generic:  '<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>'
     };
     function specIcon(k) {
@@ -489,12 +492,18 @@
       if (key.indexOf('deliver') !== -1)                            return SPEC_ICONS.delivery;
       if (key.indexOf('region') !== -1 || key.indexOf('global') !== -1) return SPEC_ICONS.region;
       if (key.indexOf('stock') !== -1)                              return SPEC_ICONS.stock;
+      if (key.indexOf('warrant') !== -1 || key.indexOf('garant') !== -1) return SPEC_ICONS.warranty;
+      if (key.indexOf('activ') !== -1)                              return SPEC_ICONS.activation;
+      if (key.indexOf('support') !== -1)                            return SPEC_ICONS.support;
       return SPEC_ICONS.generic;
     }
     var specsData = (Array.isArray(p.pageSpecs) ? p.pageSpecs : [
       { k: 'Category',        v: cap(catKey) },
       { k: 'Delivery Method', v: 'Instant Digital Delivery' },
-      { k: 'Region',          v: 'Global' }
+      { k: 'Activation',      v: 'Automatic' },
+      { k: 'Region',          v: 'Global' },
+      { k: 'Warranty',        v: '30-Day Replacement' },
+      { k: 'Support',         v: '24/7 via Discord' }
     ]).map(function(s) { return { k: s.k, v: s.v, green: false }; });
     /* Live stock row — always appended automatically */
     specsData.push({ k: 'Stock', v: avail > 0 ? 'In Stock (' + avail + ' available)' : 'Out of Stock', green: avail > 0 });
