@@ -842,6 +842,16 @@ body.loaded .hero__cta    { animation: revealUp 600ms cubic-bezier(.16,1,.3,1) 6
 .reveal-delay-3 { transition-delay: 240ms; }
 .reveal-delay-4 { transition-delay: 320ms; }
 
+/* Entrance already played this session (set by main.js on reload) — show final
+   state instantly so a language switch / reload doesn't replay animations. */
+body.nx-no-entrance .hero__eyebrow,
+body.nx-no-entrance .hero__eyebrow-line,
+body.nx-no-entrance .hero__title,
+body.nx-no-entrance .hero__sub,
+body.nx-no-entrance .hero__cta { opacity: 1 !important; transform: none !important; animation: none !important; }
+body.nx-no-entrance .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+body.nx-no-entrance .product-card { animation: none !important; }
+
 /* Accessibility: honour users who ask for less motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

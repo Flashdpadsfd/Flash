@@ -313,10 +313,23 @@ window.NX_ICONS = function (name) {
   }
 
   /* ─── Animations ─── */
-  requestAnimationFrame(function () { requestAnimationFrame(function () { document.body.classList.add('loaded'); }); });
+  /* Entrance animations play only ONCE per page per browser session. A reload
+     of the same page (e.g. after switching language) therefore shows the final
+     state instantly instead of replaying everything. A fresh visit still animates. */
+  var animKey = 'nx_anim_' + location.pathname;
+  var skipEntrance = false;
+  try { skipEntrance = sessionStorage.getItem(animKey) === '1'; } catch (e) {}
+  if (skipEntrance) {
+    document.body.classList.add('nx-no-entrance', 'loaded');
+  } else {
+    try { sessionStorage.setItem(animKey, '1'); } catch (e) {}
+    requestAnimationFrame(function () { requestAnimationFrame(function () {
+      document.body.classList.add('loaded');
+    }); });
+  }
   /* Count-up for stat numbers — parses whatever value is in the element so it
      works for "4.96", "4,350", "1000000", etc., preserving decimals/grouping. */
-  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var reduceMotion = (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) || skipEntrance;
   function countUp(el) {
     var target = (el.textContent || '').trim();
     var m = target.match(/^([^\d-]*)([\d.,]+)(.*)$/);
