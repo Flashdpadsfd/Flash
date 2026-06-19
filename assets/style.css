@@ -395,6 +395,11 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
   cursor: pointer; background: #0e0e0e;
   border: 1px solid rgba(255,255,255,.07);
   transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+  /* Staggered entrance via inline --i. 'backwards' fill keeps the FROM state
+     during the delay but does NOT persist after, so :hover transform still works.
+     Cap the index so large catalogs don't accumulate huge delays. */
+  animation: revealUp 520ms cubic-bezier(.16,1,.3,1) backwards;
+  animation-delay: calc(min(var(--i, 0), 11) * 55ms);
 }
 .product-card:hover {
   transform: translateY(-4px);
@@ -730,6 +735,8 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
   font-family: Inter, sans-serif;
   font-size: 28px; font-weight: 600; line-height: 1; color: #fff;
   letter-spacing: -0.5px;
+  /* tabular figures keep width stable during the count-up animation */
+  font-variant-numeric: tabular-nums;
 }
 .stats__star { color: #ff6b35; font-size: 20px; vertical-align: middle; margin-left: 3px; }
 .stats__label {
@@ -834,6 +841,18 @@ body.loaded .hero__cta    { animation: revealUp 600ms cubic-bezier(.16,1,.3,1) 6
 .reveal-delay-2 { transition-delay: 160ms; }
 .reveal-delay-3 { transition-delay: 240ms; }
 .reveal-delay-4 { transition-delay: 320ms; }
+
+/* Accessibility: honour users who ask for less motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .hero__eyebrow, .hero__eyebrow-line, .hero__title, .hero__sub, .hero__cta,
+  .reveal { opacity: 1 !important; transform: none !important; }
+}
 
 /*──────────────────────────────────────────────
   CART PANEL

@@ -314,8 +314,51 @@ window.NX_ICONS = function (name) {
 
   /* ─── Animations ─── */
   requestAnimationFrame(function () { requestAnimationFrame(function () { document.body.classList.add('loaded'); }); });
+  /* Count-up for stat numbers — parses whatever value is in the element so it
+     works for "4.96", "4,350", "1000000", etc., preserving decimals/grouping. */
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function countUp(el) {
+    var target = (el.textContent || '').trim();
+    var m = target.match(/^([^\d-]*)([\d.,]+)(.*)$/);
+    if (!m) return;
+    var prefix = m[1], numStr = m[2], suffix = m[3];
+    var hasComma = numStr.indexOf(',') !== -1;
+    var clean = numStr.replace(/,/g, '');
+    var dot = clean.indexOf('.');
+    var decimals = dot === -1 ? 0 : (clean.length - dot - 1);
+    var finalVal = parseFloat(clean);
+    if (isNaN(finalVal)) return;
+    function fmt(v) {
+      var s = v.toFixed(decimals);
+      if (hasComma) {
+        var parts = s.split('.');
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        s = parts.join('.');
+      }
+      return prefix + s + suffix;
+    }
+    if (reduceMotion) { el.textContent = fmt(finalVal); return; }
+    var dur = 1400, startTs = null;
+    function ease(t) { return 1 - Math.pow(1 - t, 3); }
+    function step(ts) {
+      if (startTs === null) startTs = ts;
+      var p = Math.min((ts - startTs) / dur, 1);
+      el.textContent = fmt(finalVal * ease(p));
+      if (p < 1) requestAnimationFrame(step); else el.textContent = fmt(finalVal);
+    }
+    el.textContent = fmt(0);
+    requestAnimationFrame(step);
+  }
+
   var io = new IntersectionObserver(function (entries) {
-    entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+    entries.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      e.target.classList.add('visible');
+      if (e.target.classList.contains('stats')) {
+        e.target.querySelectorAll('.stats__value').forEach(countUp);
+      }
+      io.unobserve(e.target);
+    });
   }, { threshold: 0.12 });
   document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
 
