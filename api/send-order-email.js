@@ -10,9 +10,13 @@
                            > Securite > Validation en deux etapes
                            > Mots de passe des applications
    - FROM_NAME           : nom d'expediteur affiche (defaut: FlashShp)
+   - ALLOWED_ORIGINS     : (optionnel) liste de domaines autorises a appeler
+                           cette fonction, separes par des virgules
+                           (ex: monshop.com,boutique.fr). *.vercel.app et
+                           localhost sont toujours autorises.
 
-   Tant que ces variables ne sont pas definies, la fonction repond 501 et
-   le site retombe automatiquement sur EmailJS. */
+   Tant que GMAIL_USER/GMAIL_APP_PASSWORD ne sont pas definies, la fonction
+   repond 501 et le site retombe automatiquement sur EmailJS. */
 
 var nodemailer = require('nodemailer');
 var emailCfg = require('../assets/email-config.js');
@@ -25,9 +29,54 @@ function escHtml(s) {
     .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
+/* Replace every control character (incl. CR/LF/TAB) with a space and collapse
+   runs of whitespace. Prevents SMTP header injection in single-line fields
+   such as the subject, and keeps templated values tidy. Implemented with
+   char codes to avoid fragile regex escape handling. */
+function oneLine(s) {
+  s = String(s);
+  var out = '';
+  for (var i = 0; i < s.length; i++) {
+    var c = s.charCodeAt(i);
+    out += (c < 32 || c === 127) ? ' ' : s.charAt(i);
+  }
+  return out.replace(/ {2,}/g, ' ').trim();
+}
+
+/* Anti-abuse: only accept requests coming from our own front-end. Browsers
+   always attach Origin (and usually Referer) on POST fetches, so a missing or
+   foreign value means the call did not come from our pages (e.g. curl, bots).
+   Allowed hosts: *.vercel.app preview/prod deploys, localhost (dev) and any
+   host listed in the ALLOWED_ORIGINS env var. */
+function hostFrom(value) {
+  try { return new URL(value).hostname.toLowerCase(); } catch (e) { return ''; }
+}
+
+function isAllowedOrigin(req) {
+  var src = (req.headers && (req.headers.origin || req.headers.referer)) || '';
+  if (!src) return false;
+  var host = hostFrom(src);
+  if (!host) return false;
+  if ((host === 'localhost' || host === '127.0.0.1') && process.env.NODE_ENV !== 'production') return true;
+  /* Project-scoped: only OUR deployments (prod + preview), not every tenant
+     of the multi-tenant vercel.app root. */
+  if (/^nexus-theme[a-z0-9-]*\.vercel\.app$/.test(host)) return true;
+  var extra = String(process.env.ALLOWED_ORIGINS || '')
+    .split(',').map(function (h) { return h.trim().toLowerCase(); }).filter(Boolean);
+  for (var i = 0; i < extra.length; i++) {
+    if (host === extra[i] || host.endsWith('.' + extra[i])) return true;
+  }
+  return false;
+}
+
 module.exports = function (req, res) {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method not allowed' });
+    return;
+  }
+
+  if (!isAllowedOrigin(req)) {
+    res.status(403).json({ error: 'Forbidden' });
     return;
   }
 
@@ -38,30 +87,39 @@ module.exports = function (req, res) {
     return;
   }
 
-  var body = req.body || {};
+  var body = (req.body && typeof req.body === 'object') ? req.body : {};
   var to = String(body.to || '').trim().slice(0, 254);
   if (!EMAIL_RE.test(to)) {
     res.status(400).json({ error: 'Invalid recipient' });
     return;
   }
 
-  /* Contenu borne et echappe : le template HTML reste cote serveur,
-     le client ne fournit que des valeurs. */
+  /* Contenu borne et echappe : le template HTML reste cote serveur, le client
+     ne fournit que des valeurs. Toutes les valeurs injectees dans le HTML
+     passent par escHtml() - y compris store_url, qui se trouve dans des
+     attributs href="..." et permettrait sinon une injection HTML. */
   var invoiceId   = escHtml(String(body.invoiceId   || '').slice(0, 64));
   var productName = escHtml(String(body.productName || '').slice(0, 128));
   var deliverable = escHtml(String(body.deliverable || '').slice(0, 2000));
   var storeName   = escHtml(String(body.storeName   || 'FlashShp').slice(0, 64));
   var storeUrl    = String(body.storeUrl || 'https://nexus-theme-iota.vercel.app/').slice(0, 200);
   if (!/^https?:\/\//.test(storeUrl)) storeUrl = 'https://nexus-theme-iota.vercel.app/';
-  var subject     = String(body.subject || 'Your Order is Ready!').slice(0, 150);
+  storeUrl = escHtml(storeUrl);
+  var subject     = oneLine(String(body.subject || 'Your Order is Ready!')).slice(0, 150) || 'Your Order is Ready!';
 
-  var html = emailCfg.template
-    .replace(/\{\{invoice_id\}\}/g,     invoiceId)
-    .replace(/\{\{product_name\}\}/g,   productName)
-    .replace(/\{\{deliverable\}\}/g,    deliverable)
-    .replace(/\{\{customer_email\}\}/g, escHtml(to))
-    .replace(/\{\{store_name\}\}/g,     storeName)
-    .replace(/\{\{store_url\}\}/g,      storeUrl);
+  /* Function replacements: a string 2nd arg would interpret $&, $`, $', $$ and
+     $1.. as substitution patterns (escHtml does not neutralise '$'/backtick),
+     letting input leak/corrupt the template. A function replacer never does. */
+  var fields = {
+    invoice_id:     invoiceId,
+    product_name:   productName,
+    deliverable:    deliverable,
+    customer_email: escHtml(to),
+    store_name:     storeName,
+    store_url:      storeUrl
+  };
+  var html = emailCfg.template.replace(/\{\{(invoice_id|product_name|deliverable|customer_email|store_name|store_url)\}\}/g,
+    function (_m, key) { return fields[key]; });
 
   var transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -69,7 +127,7 @@ module.exports = function (req, res) {
   });
 
   transporter.sendMail({
-    from: { name: process.env.FROM_NAME || 'FlashShp', address: user },
+    from: { name: oneLine(process.env.FROM_NAME || 'FlashShp'), address: user },
     to: to,
     subject: subject,
     html: html
