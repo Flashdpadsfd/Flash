@@ -53,6 +53,20 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
 
 .btn-primary--lg { height: 44px; padding: 0 24px; font-size: 15px; }
 
+/* Hero "Explore Products" CTA — shadcn-style white pill button */
+#heroCta1 {
+  height: 36px; padding: 0 20px;
+  border-radius: 8px; border: 1px solid rgba(255,255,255,.10);
+  font-size: 14px; font-weight: 500; cursor: pointer;
+}
+#heroCta1:hover {
+  background: #fff;
+  box-shadow: 0 6px 20px rgba(255,255,255,.20);
+}
+@media (max-width: 639px) {
+  #heroCta1 { width: 100%; }
+}
+
 .btn-ghost {
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
   background: transparent; color: #fff;
