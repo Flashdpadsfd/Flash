@@ -560,15 +560,12 @@
 
       if (cats.length) {
         /* Une ligne « produit » nichée sous sa catégorie → clic = ouvre la fiche.
+           Pas d'icône/image dans la sidebar ; les images restent sur la fiche produit.
            Le produit courant est mis en surbrillance. */
-        function prodLinkHtml(p, color) {
-          color = color || '#6495ed';
-          var t = p.image
-            ? '<span class="sidebar__item-icon sidebar__item-icon--img"><img src="' + String(p.image).replace(/"/g, '&quot;') + '" alt=""></span>'
-            : '<span class="sidebar__item-icon" style="background:' + hexToRgba(color, 0.15) + ';color:' + color + ';">' + (p.icon || '📦') + '</span>';
+        function prodLinkHtml(p) {
           var act = String(p.id) === String(pid) ? ' active' : '';
-          return '<a class="sidebar__item sidebar__item--sub' + act + '" href="preview-product.html?id=' + encodeURIComponent(p.id) + '">' +
-            t + esc(p.name) + '</a>';
+          return '<a class="sidebar__item sidebar__item--sub sidebar__item--noicon' + act + '" href="preview-product.html?id=' + encodeURIComponent(p.id) + '">' +
+            esc(p.name) + '</a>';
         }
         /* Catégorie + sous-catégories + ses produits. Vide → en-tête seul (lien vers liste filtrée). */
         function renderNode(c) {
