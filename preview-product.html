@@ -559,14 +559,24 @@
       var cats = getCats();
 
       if (cats.length) {
-        var roots = cats.filter(function(c) {
-          return !c.parent || !cats.some(function(p) { return p.id === c.parent; });
-        });
-        var sections = roots.map(function(c) {
-          var subs = cats.filter(function(s) { return s.parent === c.id; });
-          if (!subs.length) {
-            /* Catégorie sans sous-catégorie → uniquement l'en-tête, cliquable
-               (lien vers la page Produits filtrée), pas de ligne icône en doublon. */
+        /* Une ligne « produit » nichée sous sa catégorie → clic = ouvre la fiche.
+           Le produit courant est mis en surbrillance. */
+        function prodLinkHtml(p, color) {
+          color = color || '#6495ed';
+          var t = p.image
+            ? '<span class="sidebar__item-icon sidebar__item-icon--img"><img src="' + String(p.image).replace(/"/g, '&quot;') + '" alt=""></span>'
+            : '<span class="sidebar__item-icon" style="background:' + hexToRgba(color, 0.15) + ';color:' + color + ';">' + (p.icon || '📦') + '</span>';
+          var act = String(p.id) === String(pid) ? ' active' : '';
+          return '<a class="sidebar__item sidebar__item--sub' + act + '" href="preview-product.html?id=' + encodeURIComponent(p.id) + '">' +
+            t + esc(p.name) + '</a>';
+        }
+        /* Catégorie + sous-catégories + ses produits. Vide → en-tête seul (lien vers liste filtrée). */
+        function renderNode(c) {
+          var childCats = cats.filter(function(s) { return s.parent === c.id; });
+          var ownProds  = allProds.filter(function(p) { return String(p.category) === String(c.id); });
+          var inner = childCats.map(renderNode).join('') +
+                      ownProds.map(function(p) { return prodLinkHtml(p, c.color); }).join('');
+          if (!inner) {
             return '<div class="sidebar__section">' +
               '<a class="sidebar__section-header sidebar__section-header--leaf' + (isActive(c) ? ' active' : '') + '" href="preview-products.html?cat=' + encodeURIComponent(c.id) + '">' +
                 '<span class="sidebar__section-title"><span class="sidebar__dot"></span>' + esc(c.name) + '</span>' +
@@ -581,12 +591,13 @@
               '<span class="sidebar__line"></span>' +
               '<svg class="sidebar__section-arrow" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>' +
             '</div>' +
-            '<div class="sidebar__section-body" id="' + bodyId + '">' +
-              subs.map(catLinkHtml).join('') +
-            '</div>' +
+            '<div class="sidebar__section-body" id="' + bodyId + '">' + inner + '</div>' +
           '</div>';
-        }).join('');
-        list.innerHTML = allProductsLink + sections;
+        }
+        var roots = cats.filter(function(c) {
+          return !c.parent || !cats.some(function(p) { return p.id === c.parent; });
+        });
+        list.innerHTML = allProductsLink + roots.map(renderNode).join('');
         return;
       }
 

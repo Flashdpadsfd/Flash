@@ -628,6 +628,7 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
   padding: 8px 10px; margin: 0 4px 2px; border-radius: 12px;
   cursor: pointer; transition: background 300ms ease, color 300ms ease;
   font-size: 13px; font-weight: 400; color: rgba(255,255,255,.72);
+  text-decoration: none;
 }
 .sidebar__item:hover { background: rgba(255,255,255,.02); color: rgba(255,255,255,.95); }
 .sidebar__item.active { background: rgba(255,255,255,.09); color: #fff; font-weight: 500; }
