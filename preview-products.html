@@ -185,57 +185,61 @@
       var r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
       return 'rgba('+r+','+g+','+b+','+a+')';
     }
-    function esc(s) {
-      return String(s == null ? '' : s)
-        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    function catIconHtml(c) {
+      var color = c.color || '#6495ed';
+      return c.image
+        ? '<span class="sidebar__item-icon sidebar__item-icon--img"><img src="' + String(c.image).replace(/"/g, '&quot;') + '" alt=""></span>'
+        : '<span class="sidebar__item-icon" style="background:' + hexToRgba(color, 0.15) + ';color:' + color + ';">' + (c.icon || '📦') + '</span>';
     }
-    function getProds() {
-      try { return JSON.parse(localStorage.getItem('nexus_products')) || []; } catch(e) { return []; }
-    }
-    /* Une ligne « produit » nichée sous sa catégorie → clic = ouvre la fiche produit.
-       Pas d'icône/image ici (sidebar épurée) ; les images restent sur la fiche produit. */
-    function prodItemHtml(p) {
-      return '<a class="sidebar__item sidebar__item--sub sidebar__item--noicon" href="preview-product.html?id=' + encodeURIComponent(p.id) + '">' +
-        esc(p.name) + '</a>';
-    }
-    /* Rend une catégorie + ses sous-catégories + les produits qui lui appartiennent.
-       Vide (aucun produit, aucune sous-catégorie) → en-tête seul, cliquable pour filtrer. */
-    function renderNode(cat, cats, prods) {
-      var childCats = cats.filter(function(s) { return s.parent === cat.id; });
-      var ownProds  = prods.filter(function(p) { return String(p.category) === String(cat.id); });
-      var inner = childCats.map(function(s) { return renderNode(s, cats, prods); }).join('') +
-                  ownProds.map(function(p) { return prodItemHtml(p, cat.color); }).join('');
-      if (!inner) {
-        return '<div class="sidebar__section">' +
-          '<div class="sidebar__section-header sidebar__section-header--leaf" data-cat="' + cat.id + '" data-label="' + esc(cat.name) + '">' +
-            '<span class="sidebar__section-title"><span class="sidebar__dot"></span>' + esc(cat.name) + '</span>' +
-            '<span class="sidebar__line"></span>' +
-          '</div>' +
-        '</div>';
-      }
-      var bodyId = 'catsec-' + cat.id;
-      return '<div class="sidebar__section">' +
-        '<div class="sidebar__section-header" onclick="toggleSection(\'' + bodyId + '\')">' +
-          '<span class="sidebar__section-title"><span class="sidebar__dot"></span>' + esc(cat.name) + '</span>' +
-          '<span class="sidebar__line"></span>' +
-          '<svg class="sidebar__section-arrow" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>' +
-        '</div>' +
-        '<div class="sidebar__section-body" id="' + bodyId + '">' + inner + '</div>' +
-      '</div>';
+    function catItemHtml(c, subIds) {
+      return '<div class="sidebar__item" data-cat="' + c.id + '" data-label="' + c.name + '"' +
+        (subIds && subIds.length ? ' data-subcats="' + subIds.join(',') + '"' : '') + '>' +
+        catIconHtml(c) + c.name + '</div>';
     }
     function renderCats() {
       var wrap = document.getElementById('catSections');
       if (!wrap) return;
       var cats = getCats();
-      var prods = getProds();
       var roots = cats.filter(function(c) {
         return !c.parent || !cats.some(function(p) { return p.id === c.parent; });
       });
-      wrap.innerHTML = roots.map(function(c) { return renderNode(c, cats, prods); }).join('');
+      var html = '';
+      roots.forEach(function(c) {
+        var subs = cats.filter(function(s) { return s.parent === c.id; });
+        if (!subs.length) {
+          /* Catégorie sans sous-catégorie → uniquement l'en-tête, cliquable pour filtrer
+             (pas de ligne icône en doublon en-dessous). */
+          html += '<div class="sidebar__section">' +
+            '<div class="sidebar__section-header sidebar__section-header--leaf" data-cat="' + c.id + '" data-label="' + c.name + '">' +
+              '<span class="sidebar__section-title">' +
+                '<span class="sidebar__dot"></span>' +
+                c.name +
+              '</span>' +
+              '<span class="sidebar__line"></span>' +
+            '</div>' +
+          '</div>';
+          return;
+        }
+        var bodyId = 'catsec-' + c.id;
+        html += '<div class="sidebar__section">' +
+          '<div class="sidebar__section-header" onclick="toggleSection(\'' + bodyId + '\')">' +
+            '<span class="sidebar__section-title">' +
+              '<span class="sidebar__dot"></span>' +
+              c.name +
+            '</span>' +
+            '<span class="sidebar__line"></span>' +
+            '<svg class="sidebar__section-arrow" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>' +
+          '</div>' +
+          '<div class="sidebar__section-body" id="' + bodyId + '">' +
+            subs.map(function(s) { return catItemHtml(s, null); }).join('') +
+          '</div>' +
+        '</div>';
+      });
+      wrap.innerHTML = html;
     }
     renderCats();
     window.addEventListener('storage', function(e) {
-      if (e.key === 'nexus_categories' || e.key === 'nexus_products') renderCats();
+      if (e.key === 'nexus_categories') location.reload();
     });
   })();
   </script>
