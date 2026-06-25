@@ -86,6 +86,7 @@ window.NX_ICONS = function (name) {
   var resultsCount = $('resultsCount');
   var activeCat    = 'all';
   var activeSubcats = [];
+  var activeProductId = null;
   var searchQuery  = '';
 
   function filterAndSort() {
@@ -95,7 +96,10 @@ window.NX_ICONS = function (name) {
     cards.forEach(function (card) {
       var name = (card.dataset.name || '').toLowerCase();
       var cat  = (card.dataset.cat  || '').toLowerCase();
-      var ok   = (activeCat === 'all' || cat === activeCat || activeSubcats.indexOf(cat) !== -1) && (!searchQuery || name.indexOf(searchQuery) !== -1);
+      var matchSel = activeProductId
+        ? String(card.dataset.productId) === String(activeProductId)
+        : (activeCat === 'all' || cat === activeCat || activeSubcats.indexOf(cat) !== -1);
+      var ok   = matchSel && (!searchQuery || name.indexOf(searchQuery) !== -1);
       card.classList[ok ? 'remove' : 'add']('hidden');
       if (ok) visible.push(card);
     });
@@ -140,6 +144,7 @@ window.NX_ICONS = function (name) {
     item.addEventListener('click', function () {
       var wasActive = item.classList.contains('active');
       clearCatActive();
+      activeProductId = null;
       if (wasActive) {
         /* re-clic sur la catégorie active → désélection, tous les produits */
         activeCat = 'all';
@@ -153,10 +158,35 @@ window.NX_ICONS = function (name) {
     });
   });
 
-  /* ─── Pre-filter by ?cat= when arriving from a product page category link ─── */
+  /* Items « produit » de la sidebar : clic = filtre la grille sur ce produit (reste sur la page) */
+  document.querySelectorAll('.sidebar__item[data-product-id]').forEach(function (item) {
+    item.addEventListener('click', function () {
+      var wasActive = item.classList.contains('active');
+      clearCatActive();
+      activeCat = 'all';
+      activeSubcats = [];
+      if (wasActive) {
+        activeProductId = null;
+      } else {
+        item.classList.add('active');
+        activeProductId = item.dataset.productId;
+      }
+      filterAndSort();
+    });
+  });
+
+  /* ─── Pre-filter by ?cat= / ?product= when arriving from a product page link ─── */
   if (productGrid) {
-    var _urlCat = new URLSearchParams(window.location.search).get('cat');
-    if (_urlCat) {
+    var _params  = new URLSearchParams(window.location.search);
+    var _urlCat  = _params.get('cat');
+    var _urlProd = _params.get('product');
+    if (_urlProd) {
+      activeProductId = _urlProd;
+      document.querySelectorAll('.sidebar__item[data-product-id]').forEach(function (i) {
+        if (String(i.dataset.productId) === String(_urlProd)) i.classList.add('active');
+      });
+      filterAndSort();
+    } else if (_urlCat) {
       activeCat = _urlCat.toLowerCase();
       document.querySelectorAll(CAT_FILTER_SELECTOR).forEach(function (i) {
         if ((i.dataset.cat || '').toLowerCase() === activeCat) i.classList.add('active');

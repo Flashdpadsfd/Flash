@@ -192,19 +192,29 @@
     function getProds() {
       try { return JSON.parse(localStorage.getItem('nexus_products')) || []; } catch(e) { return []; }
     }
-    /* Une ligne « produit » nichée sous sa catégorie → clic = ouvre la fiche produit.
-       Pas d'icône/image ici (sidebar épurée) ; les images restent sur la fiche produit. */
-    function prodItemHtml(p) {
-      return '<a class="sidebar__item sidebar__item--sub sidebar__item--noicon" href="preview-product.html?id=' + encodeURIComponent(p.id) + '">' +
-        esc(p.name) + '</a>';
+    function catIconHtml(c) {
+      var color = c.color || '#6495ed';
+      return c.image
+        ? '<span class="sidebar__item-icon sidebar__item-icon--img"><img src="' + String(c.image).replace(/"/g, '&quot;') + '" alt=""></span>'
+        : '<span class="sidebar__item-icon" style="background:' + hexToRgba(color, 0.15) + ';color:' + color + ';">' + (c.icon || '📦') + '</span>';
     }
-    /* Rend une catégorie + ses sous-catégories + les produits qui lui appartiennent.
-       Vide (aucun produit, aucune sous-catégorie) → en-tête seul, cliquable pour filtrer. */
-    function renderNode(cat, cats, prods) {
-      var childCats = cats.filter(function(s) { return s.parent === cat.id; });
-      var ownProds  = prods.filter(function(p) { return String(p.category) === String(cat.id); });
-      var inner = childCats.map(function(s) { return renderNode(s, cats, prods); }).join('') +
-                  ownProds.map(function(p) { return prodItemHtml(p); }).join('');
+    /* Sous-catégorie → item cliquable (icône + nom) qui FILTRE la grille en place. */
+    function subItemHtml(s) {
+      return '<div class="sidebar__item" data-cat="' + s.id + '" data-label="' + esc(s.name) + '">' +
+        catIconHtml(s) + esc(s.name) + '</div>';
+    }
+    /* Produit rattaché directement à la catégorie → item qui FILTRE la grille sur ce produit
+       (reste sur la page, comme l'écran). Sidebar épurée : pas d'icône sur les lignes produit. */
+    function prodItemHtml(p) {
+      return '<div class="sidebar__item sidebar__item--noicon" data-product-id="' + esc(p.id) + '" data-label="' + esc(p.name) + '">' +
+        esc(p.name) + '</div>';
+    }
+    /* Catégorie racine = section repliable ; dessous, ses sous-catégories et ses produits
+       directs — tous cliquables pour filtrer la grille (comme l'écran). Vide → en-tête seul. */
+    function renderRoot(cat, cats, prods) {
+      var subs = cats.filter(function(s) { return s.parent === cat.id; });
+      var directProds = prods.filter(function(p) { return String(p.category) === String(cat.id); });
+      var inner = subs.map(subItemHtml).join('') + directProds.map(prodItemHtml).join('');
       if (!inner) {
         return '<div class="sidebar__section">' +
           '<div class="sidebar__section-header sidebar__section-header--leaf" data-cat="' + cat.id + '" data-label="' + esc(cat.name) + '">' +
@@ -231,7 +241,7 @@
       var roots = cats.filter(function(c) {
         return !c.parent || !cats.some(function(p) { return p.id === c.parent; });
       });
-      wrap.innerHTML = roots.map(function(c) { return renderNode(c, cats, prods); }).join('');
+      wrap.innerHTML = roots.map(function(c) { return renderRoot(c, cats, prods); }).join('');
     }
     renderCats();
     window.addEventListener('storage', function(e) {

@@ -559,20 +559,19 @@
       var cats = getCats();
 
       if (cats.length) {
-        /* Une ligne « produit » nichée sous sa catégorie → clic = ouvre la fiche.
-           Pas d'icône/image dans la sidebar ; les images restent sur la fiche produit.
-           Le produit courant est mis en surbrillance. */
+        /* Ligne « produit » → mène à la page Produits filtrée sur ce produit (comme l'écran).
+           Sidebar épurée : pas d'icône sur les lignes produit. Produit courant surligné. */
         function prodLinkHtml(p) {
           var act = String(p.id) === String(pid) ? ' active' : '';
-          return '<a class="sidebar__item sidebar__item--sub sidebar__item--noicon' + act + '" href="preview-product.html?id=' + encodeURIComponent(p.id) + '">' +
+          return '<a class="sidebar__item sidebar__item--noicon' + act + '" href="preview-products.html?product=' + encodeURIComponent(p.id) + '">' +
             esc(p.name) + '</a>';
         }
-        /* Catégorie + sous-catégories + ses produits. Vide → en-tête seul (lien vers liste filtrée). */
-        function renderNode(c) {
-          var childCats = cats.filter(function(s) { return s.parent === c.id; });
-          var ownProds  = allProds.filter(function(p) { return String(p.category) === String(c.id); });
-          var inner = childCats.map(renderNode).join('') +
-                      ownProds.map(function(p) { return prodLinkHtml(p); }).join('');
+        /* Catégorie racine = section repliable ; dessous, sous-catégories (→ grille filtrée)
+           et produits directs (→ grille filtrée). Vide → en-tête seul (lien vers liste filtrée). */
+        function renderRoot(c) {
+          var subs = cats.filter(function(s) { return s.parent === c.id; });
+          var directProds = allProds.filter(function(p) { return String(p.category) === String(c.id); });
+          var inner = subs.map(catLinkHtml).join('') + directProds.map(prodLinkHtml).join('');
           if (!inner) {
             return '<div class="sidebar__section">' +
               '<a class="sidebar__section-header sidebar__section-header--leaf' + (isActive(c) ? ' active' : '') + '" href="preview-products.html?cat=' + encodeURIComponent(c.id) + '">' +
@@ -594,7 +593,7 @@
         var roots = cats.filter(function(c) {
           return !c.parent || !cats.some(function(p) { return p.id === c.parent; });
         });
-        list.innerHTML = allProductsLink + roots.map(renderNode).join('');
+        list.innerHTML = allProductsLink + roots.map(renderRoot).join('');
         return;
       }
 
