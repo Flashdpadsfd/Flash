@@ -446,51 +446,63 @@ window.NX_ICONS = function (name) {
   }
   window._nexusUpdateCartCount = updateCartCount;
 
+  function cartItemIcon(item) {
+    var v = item.icon || '📦';
+    return /^https?:|^data:/.test(v)
+      ? '<img src="' + String(v).replace(/"/g, '&quot;') + '" alt="">'
+      : v;
+  }
   window._renderCartPanel = function() {
     var cart  = getCart();
     var body  = document.getElementById('cartBody');
     var foot  = document.getElementById('cartFooter');
     var cntEl = document.getElementById('cartPanelCount');
     if (!body) return;
-    var total = cart.reduce(function(s,i){ return s+i.price*i.qty; }, 0);
-    var sym   = cart.length ? (CART_SYM[cart[0].currency] || '$') : '$';
-    if (cntEl) cntEl.textContent = cart.length ? '('+cart.reduce(function(s,i){ return s+i.qty; }, 0)+')' : '';
+    var totalQty = cart.reduce(function(s,i){ return s+i.qty; }, 0);
+    var total    = cart.reduce(function(s,i){ return s+i.price*i.qty; }, 0);
+    var sym      = cart.length ? (CART_SYM[cart[0].currency] || '$') : '$';
+    if (cntEl) cntEl.textContent = cart.length ? totalQty + (totalQty > 1 ? ' items' : ' item') : '';
     if (!cart.length) {
-      body.innerHTML = '<div style="text-align:center;padding:60px 24px;color:rgba(255,255,255,.3);font-size:14px;">Your cart is empty</div>';
+      body.innerHTML = '<div class="cart-panel__empty"><div class="cart-panel__empty-icon">🛒</div><div class="cart-panel__empty-text">Your cart is empty</div></div>';
       if (foot) foot.innerHTML = '';
       return;
     }
     body.innerHTML = cart.map(function(item, idx) {
       var s = CART_SYM[item.currency] || '$';
       return '<div class="cart-panel__item">'+
-        '<span class="cart-panel__item-icon">'+item.icon+'</span>'+
+        '<span class="cart-panel__item-icon">'+cartItemIcon(item)+'</span>'+
         '<div class="cart-panel__item-info">'+
           '<div class="cart-panel__item-name">'+item.name+'</div>'+
-          '<div class="cart-panel__item-meta">Qty: '+item.qty+' &nbsp;·&nbsp; '+s+Number(item.price).toFixed(2)+' each</div>'+
+          '<div class="cart-panel__stepper">'+
+            '<button class="cart-panel__step" data-cstep="dec" data-cidx="'+idx+'" aria-label="Decrease">−</button>'+
+            '<span class="cart-panel__qty">'+item.qty+'</span>'+
+            '<button class="cart-panel__step" data-cstep="inc" data-cidx="'+idx+'" aria-label="Increase">+</button>'+
+          '</div>'+
         '</div>'+
-        '<div style="text-align:right;flex-shrink:0">'+
-          '<div class="cart-panel__item-price">'+s+Number(item.price*item.qty).toFixed(2)+'</div>'+
-          '<button class="cart-panel__item-remove" data-cidx="'+idx+'">Remove</button>'+
-        '</div>'+
+        '<div class="cart-panel__item-price">'+s+Number(item.price*item.qty).toFixed(2)+'</div>'+
       '</div>';
     }).join('');
-    body.querySelectorAll('.cart-panel__item-remove').forEach(function(btn) {
+    body.querySelectorAll('.cart-panel__step').forEach(function(btn) {
       btn.addEventListener('click', function() {
-        var c2 = getCart(); c2.splice(parseInt(btn.dataset.cidx, 10), 1); saveCart(c2);
-        updateCartCount(); window._renderCartPanel();
+        var c2 = getCart(), i = parseInt(btn.dataset.cidx, 10);
+        if (!c2[i]) return;
+        if (btn.dataset.cstep === 'inc') { c2[i].qty += 1; }
+        else { c2[i].qty -= 1; if (c2[i].qty <= 0) c2.splice(i, 1); }
+        saveCart(c2); updateCartCount(); window._renderCartPanel();
       });
     });
     if (foot) {
       foot.innerHTML =
-        '<button class="cart-panel__checkout" id="cartCheckoutBtn">Checkout — '+sym+total.toFixed(2)+'</button>'+
-        '<button class="cart-panel__clear" id="cartClearBtn">Clear cart</button>';
+        '<div class="cart-panel__totalrow"><span>Total</span><span>'+sym+total.toFixed(2)+'</span></div>'+
+        '<button class="cart-panel__checkout" id="cartCheckoutBtn">Proceed to Checkout <span style="margin-left:4px;">→</span></button>';
       var cb = document.getElementById('cartCheckoutBtn');
       if (cb) cb.addEventListener('click', function() {
         var c = getCart();
-        if (c[0] && window._nexusOpenCheckout) { if (window._closeCart) window._closeCart(); window._nexusOpenCheckout(c[0].id); }
+        if (!c[0]) return;
+        if (window._closeCart) window._closeCart();
+        if (window._nexusOpenCheckout) window._nexusOpenCheckout(c[0].id);
+        else window.location.href = 'checkout.html?product=' + encodeURIComponent(c[0].id);
       });
-      var clr = document.getElementById('cartClearBtn');
-      if (clr) clr.addEventListener('click', function() { saveCart([]); updateCartCount(); window._renderCartPanel(); });
     }
   };
 

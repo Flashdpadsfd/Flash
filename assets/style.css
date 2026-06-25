@@ -630,8 +630,20 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
   font-size: 13px; font-weight: 400; color: rgba(255,255,255,.72);
   text-decoration: none;
 }
+.sidebar__item { position: relative; }
 .sidebar__item:hover { background: rgba(255,255,255,.02); color: rgba(255,255,255,.95); }
-.sidebar__item.active { background: rgba(255,255,255,.09); color: #fff; font-weight: 500; }
+/* État actif — style dailystore : dégradé depuis la gauche + anneau subtil,
+   texte plus net, et point blanc lumineux à droite. */
+.sidebar__item.active {
+  background: linear-gradient(to right, rgba(255,255,255,.06), transparent);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
+  color: #fff; font-weight: 600;
+}
+.sidebar__item.active::after {
+  content: ''; position: absolute; top: 50%; right: 12px;
+  width: 6px; height: 6px; border-radius: 50%; transform: translateY(-50%);
+  background: #fff; box-shadow: 0 0 8px rgba(255,255,255,.8);
+}
 /* Tuile d'icône — style dailystore : carré sombre uniforme + bordure subtile,
    le logo de marche en object-contain ; au survol, léger zoom + bordure plus claire. */
 .sidebar__item-icon {
@@ -1408,19 +1420,36 @@ body.nx-no-entrance .product-card { animation: none !important; }
 ══════════════════════════════════════════════ */
 .cart-panel__item {
   display: flex; align-items: center; gap: 12px;
-  padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,.06);
+  padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,.06);
 }
-.cart-panel__item-icon { font-size: 28px; flex-shrink: 0; line-height: 1; }
+.cart-panel__item-icon {
+  width: 44px; height: 44px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; line-height: 1;
+  background: #18181b; border: 1px solid rgba(255,255,255,.06);
+  border-radius: 10px; overflow: hidden;
+}
+.cart-panel__item-icon img { width: 100%; height: 100%; object-fit: contain; padding: 6px; }
 .cart-panel__item-info { flex: 1; min-width: 0; }
-.cart-panel__item-name { font-size: 13px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.cart-panel__item-meta { font-size: 11px; color: rgba(255,255,255,.38); margin-top: 2px; }
-.cart-panel__item-price { font-size: 13px; font-weight: 600; color: #fff; }
-.cart-panel__item-remove {
-  font-size: 11px; color: rgba(255,90,90,.5); cursor: pointer;
-  transition: color 150ms; margin-top: 4px; display: block; background: none; border: none; padding: 0;
-  font-family: inherit;
+.cart-panel__item-name { font-size: 13.5px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cart-panel__item-price { font-size: 13.5px; font-weight: 700; color: #fff; flex-shrink: 0; }
+/* Stepper − qty + (style dailystore) */
+.cart-panel__stepper {
+  display: inline-flex; align-items: center; margin-top: 8px;
+  background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08);
+  border-radius: 8px; overflow: hidden;
 }
-.cart-panel__item-remove:hover { color: #ff6b6b; }
+.cart-panel__step {
+  width: 26px; height: 24px; display: flex; align-items: center; justify-content: center;
+  background: none; border: none; color: rgba(255,255,255,.6); font-size: 15px; line-height: 1;
+  cursor: pointer; font-family: inherit; transition: background 150ms ease, color 150ms ease;
+}
+.cart-panel__step:hover { background: rgba(255,255,255,.10); color: #fff; }
+.cart-panel__qty { min-width: 26px; text-align: center; font-size: 12.5px; font-weight: 600; color: #fff; }
+/* Ligne Total au-dessus du bouton Proceed */
+.cart-panel__totalrow { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.cart-panel__totalrow span:first-child { font-size: 13px; color: rgba(255,255,255,.55); }
+.cart-panel__totalrow span:last-child { font-size: 17px; font-weight: 700; color: #fff; }
 .product-card { cursor: pointer; }
 
 /* ══════════════════════════════════════════════
