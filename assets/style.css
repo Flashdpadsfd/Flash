@@ -596,6 +596,13 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
   white-space: nowrap; transition: color 300ms ease;
 }
 .sidebar__section-header:hover .sidebar__section-title { color: #d4d4d8; }
+/* Catégorie sans sous-catégorie : l'en-tête seul fait office de filtre cliquable */
+.sidebar__section-header--leaf { text-decoration: none; }
+.sidebar__section-header--leaf.active .sidebar__section-title { color: #fff; }
+.sidebar__section-header--leaf.active .sidebar__dot {
+  background: rgba(255,255,255,.85);
+  box-shadow: 0 0 8px rgba(255,255,255,.45);
+}
 .sidebar__line {
   height: 1px; flex: 1;
   background: linear-gradient(to right, rgba(255,255,255,.06), transparent);

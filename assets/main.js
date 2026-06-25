@@ -130,10 +130,16 @@ window.NX_ICONS = function (name) {
   }
   if (sortSelect) sortSelect.addEventListener('change', filterAndSort);
 
-  document.querySelectorAll('.sidebar__item[data-cat]').forEach(function (item) {
+  /* Items de catégorie filtrables : lignes normales + en-têtes de catégorie sans sous-catégorie */
+  var CAT_FILTER_SELECTOR = '.sidebar__item[data-cat], .sidebar__section-header--leaf[data-cat]';
+  function clearCatActive() {
+    document.querySelectorAll('.sidebar__item.active, .sidebar__section-header--leaf.active')
+      .forEach(function (i) { i.classList.remove('active'); });
+  }
+  document.querySelectorAll(CAT_FILTER_SELECTOR).forEach(function (item) {
     item.addEventListener('click', function () {
       var wasActive = item.classList.contains('active');
-      document.querySelectorAll('.sidebar__item').forEach(function (i) { i.classList.remove('active'); });
+      clearCatActive();
       if (wasActive) {
         /* re-clic sur la catégorie active → désélection, tous les produits */
         activeCat = 'all';
@@ -152,7 +158,7 @@ window.NX_ICONS = function (name) {
     var _urlCat = new URLSearchParams(window.location.search).get('cat');
     if (_urlCat) {
       activeCat = _urlCat.toLowerCase();
-      document.querySelectorAll('.sidebar__item[data-cat]').forEach(function (i) {
+      document.querySelectorAll(CAT_FILTER_SELECTOR).forEach(function (i) {
         if ((i.dataset.cat || '').toLowerCase() === activeCat) i.classList.add('active');
       });
       filterAndSort();
