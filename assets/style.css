@@ -632,10 +632,19 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
 }
 .sidebar__item:hover { background: rgba(255,255,255,.02); color: rgba(255,255,255,.95); }
 .sidebar__item.active { background: rgba(255,255,255,.09); color: #fff; font-weight: 500; }
+/* Tuile d'icône — style dailystore : carré sombre uniforme + bordure subtile,
+   le logo de marche en object-contain ; au survol, léger zoom + bordure plus claire. */
 .sidebar__item-icon {
-  width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0;
+  width: 26px; height: 26px; border-radius: 8px; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
   font-size: 13px; font-weight: 700;
+  background: #18181b; border: 1px solid rgba(255,255,255,.04);
+  overflow: hidden;
+  transition: transform 300ms ease, background 300ms ease, border-color 300ms ease;
+}
+.sidebar__item:hover .sidebar__item-icon {
+  transform: scale(1.1);
+  background: #27272a; border-color: rgba(255,255,255,.10);
 }
 .sidebar__divider {
   height: 1px; margin: 10px 12px 14px;
@@ -643,9 +652,9 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
 }
 .sidebar__item--sub { margin-left: 22px; font-size: 12.5px; }
 .sidebar__item--sub .sidebar__item-icon { width: 20px; height: 20px; font-size: 10px; border-radius: 5px; }
-.sidebar__item-icon--img { overflow: hidden; padding: 0; background: rgba(255,255,255,.06); }
+.sidebar__item-icon--img { overflow: hidden; padding: 0; background: #18181b; }
 .sidebar__item-icon--img img {
-  width: 100%; height: 100%; object-fit: cover;
+  width: 100%; height: 100%; object-fit: contain; padding: 5px;
   border-radius: inherit; display: block;
 }
 
