@@ -61,6 +61,7 @@ function isAllowedOrigin(req) {
   /* Project-scoped: only OUR deployments (prod + preview), not every tenant
      of the multi-tenant vercel.app root. */
   if (/^nexus-theme[a-z0-9-]*\.vercel\.app$/.test(host)) return true;
+  if (/^flashshp[a-z0-9-]*\.vercel\.app$/.test(host)) return true;
   var extra = String(process.env.ALLOWED_ORIGINS || '')
     .split(',').map(function (h) { return h.trim().toLowerCase(); }).filter(Boolean);
   for (var i = 0; i < extra.length; i++) {
