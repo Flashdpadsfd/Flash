@@ -62,12 +62,20 @@ window.NX_ICONS = function (name) {
     navbar.classList[window.scrollY > 20 ? 'add' : 'remove']('scrolled');
   }, { passive: true });
 
+  /* URL de la fiche produit. On garde le même style d'URL que la page courante
+     (avec ou sans .html) pour fonctionner aussi bien en local que via le rewrite
+     /product en production, sans perdre le ?id=. */
+  function productUrl(id) {
+    var ext = /\.html$/.test(window.location.pathname) ? '.html' : '';
+    return 'preview-product' + ext + '?id=' + encodeURIComponent(id);
+  }
+
   /* ─── Product card click → product detail page ─── */
   document.addEventListener('click', function (e) {
     var card = e.target.closest('.product-card');
     if (!card) return;
     var productId = card.dataset.productId;
-    if (productId) window.location.href = 'preview-product.html?id=' + productId;
+    if (productId) window.location.href = productUrl(productId);
   });
 
   /* ─── Escape ─── */
@@ -158,21 +166,23 @@ window.NX_ICONS = function (name) {
     });
   });
 
-  /* Items « produit » de la sidebar : clic = filtre la grille sur ce produit (reste sur la page) */
-  document.querySelectorAll('.sidebar__item[data-product-id]').forEach(function (item) {
-    item.addEventListener('click', function () {
-      var wasActive = item.classList.contains('active');
-      clearCatActive();
-      activeCat = 'all';
-      activeSubcats = [];
-      if (wasActive) {
-        activeProductId = null;
-      } else {
-        item.classList.add('active');
-        activeProductId = item.dataset.productId;
-      }
-      filterAndSort();
-    });
+  /* Items « produit » de la sidebar : clic = filtre la grille sur ce produit (reste sur
+     la page, comme dans la vidéo de référence). Délégation sur le document pour rester
+     valable après un re-render de la sidebar (renderCats sur événement storage). */
+  document.addEventListener('click', function (e) {
+    var item = e.target.closest('.sidebar__item[data-product-id]');
+    if (!item) return;
+    var wasActive = item.classList.contains('active');
+    clearCatActive();
+    activeCat = 'all';
+    activeSubcats = [];
+    if (wasActive) {
+      activeProductId = null;
+    } else {
+      item.classList.add('active');
+      activeProductId = item.dataset.productId;
+    }
+    filterAndSort();
   });
 
   /* ─── Pre-filter by ?cat= / ?product= when arriving from a product page link ─── */

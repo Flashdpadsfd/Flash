@@ -91,7 +91,6 @@
       <div class="sidebar__search">
         <svg class="sidebar__search-icon" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
         <input class="sidebar__search-input" id="searchInput" type="text" placeholder="Search products…" autocomplete="off" />
-        <span class="sidebar__search-kbd">⌘K</span>
       </div>
 
       <!-- Catégories créées dans l'admin (rien ne s'affiche s'il n'y en a aucune) -->
@@ -104,14 +103,7 @@
 
       <div class="shop-topbar">
         <h1 class="shop-topbar__title" id="pageTitle"><span id="resultsCount" style="color:rgba(255,255,255,.35);font-size:inherit;">6</span> <span id="productsTitleLabel">products</span></h1>
-        <div class="shop-topbar__right">
-          <select class="sort-select" id="sortSelect">
-            <option value="default">Popular</option>
-            <option value="price-asc">Price: Low to High</option>
-            <option value="price-desc">Price: High to Low</option>
-            <option value="name">Name A–Z</option>
-          </select>
-        </div>
+        <div class="shop-topbar__right"></div>
       </div>
 
       <div class="product-grid" id="productGrid"></div>
@@ -378,6 +370,8 @@
     }
 
     renderGrid();
+
+    /* Le clic sur une carte produit est géré par assets/main.js (→ fiche produit). */
 
     window.addEventListener('storage', function(e) {
       if (e.key === 'nexus_products') renderGrid();
