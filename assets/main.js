@@ -602,14 +602,7 @@ window.NX_ICONS = function (name) {
       return id;
     }
     function getProds() {
-      var D = [
-        {id:1,name:'Netflix Premium',price:4.99,icon:'🎬',desc:'1 Month · 4K UHD · Shared',deliverables:[],stock:50,currency:'EUR'},
-        {id:2,name:'Spotify Premium',price:8.99,icon:'🎵',desc:'3 Months · Family Plan',deliverables:[],stock:32,currency:'EUR'},
-        {id:3,name:'Xbox Game Pass',price:6.99,icon:'🎮',desc:'1 Month · Ultimate',deliverables:[],stock:18,currency:'EUR'},
-        {id:4,name:'NordVPN',price:12.99,icon:'🔒',desc:'6 Months · Premium',deliverables:[],stock:7,currency:'EUR'},
-        {id:5,name:'Disney+',price:3.99,icon:'📺',desc:'1 Month · 4K · Shared',deliverables:[],stock:45,currency:'EUR'},
-        {id:6,name:'Adobe Creative Cloud',price:19.99,icon:'🎨',desc:'1 Month · All Apps',deliverables:[],stock:0,currency:'EUR'}
-      ];
+      var D = [];
       try { return JSON.parse(localStorage.getItem('nexus_products')) || D; } catch(e) { return D; }
     }
     function saveProds(p) { localStorage.setItem('nexus_products', JSON.stringify(p)); }

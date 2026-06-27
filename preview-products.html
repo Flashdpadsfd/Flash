@@ -269,14 +269,7 @@
   </script>
   <script>
   (function() {
-    var DEFAULT_PRODUCTS = [
-      { id:1, name:'Netflix Premium', category:'streaming', price:4.99, origPrice:null, icon:'🎬', desc:'1 Month · 4K UHD · Shared', badge:'', gradient:'linear-gradient(135deg,#1a1a2e,#16213e)' },
-      { id:2, name:'Spotify Premium', category:'streaming', price:8.99, origPrice:null, icon:'🎵', desc:'3 Months · Family Plan', badge:'HOT', gradient:'linear-gradient(135deg,#1e3a5f,#0a1628)' },
-      { id:3, name:'Xbox Game Pass', category:'gaming', price:6.99, origPrice:null, icon:'🎮', desc:'1 Month · Ultimate', badge:'NEW', gradient:'linear-gradient(135deg,#2d1b69,#11053b)' },
-      { id:4, name:'NordVPN', category:'vpn', price:12.99, origPrice:24.99, icon:'🔒', desc:'6 Months · Premium', badge:'', gradient:'linear-gradient(135deg,#1a3a1a,#0d1f0d)' },
-      { id:5, name:'Disney+', category:'streaming', price:3.99, origPrice:null, icon:'📺', desc:'1 Month · 4K · Shared', badge:'SALE', gradient:'linear-gradient(135deg,#3a1a1a,#1f0d0d)' },
-      { id:6, name:'Adobe Creative Cloud', category:'software', price:19.99, origPrice:null, icon:'🎨', desc:'1 Month · All Apps', badge:'', gradient:'linear-gradient(135deg,#1a2a3a,#0d1520)' }
-    ];
+    var DEFAULT_PRODUCTS = [];
 
     function getProducts() {
       try { return JSON.parse(localStorage.getItem('nexus_products')) || DEFAULT_PRODUCTS; } catch(e) { return DEFAULT_PRODUCTS; }

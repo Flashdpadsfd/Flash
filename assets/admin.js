@@ -25,14 +25,7 @@
   }
 
   var DEFAULT_PASS = 'nexus2026';
-  var DEFAULT_PRODUCTS = [
-    { id: 1, name: 'Netflix Premium', category: 'streaming', price: 4.99, origPrice: null, desc: '1 Month · 4K UHD · Shared', badge: '', stock: 50, deliverables: [], gradient: 'linear-gradient(135deg,#1a1a2e,#16213e)' },
-    { id: 2, name: 'Spotify Premium', category: 'streaming', price: 8.99, origPrice: null, desc: '3 Months · Family Plan', badge: 'HOT', stock: 32, deliverables: [], gradient: 'linear-gradient(135deg,#1e3a5f,#0a1628)' },
-    { id: 3, name: 'Xbox Game Pass', category: 'gaming', price: 6.99, origPrice: null, desc: '1 Month · Ultimate', badge: 'NEW', stock: 18, deliverables: [], gradient: 'linear-gradient(135deg,#2d1b69,#11053b)' },
-    { id: 4, name: 'NordVPN', category: 'vpn', price: 12.99, origPrice: 24.99, desc: '6 Months · Premium', badge: '', stock: 7, deliverables: [], gradient: 'linear-gradient(135deg,#1a3a1a,#0d1f0d)' },
-    { id: 5, name: 'Disney+', category: 'streaming', price: 3.99, origPrice: null, desc: '1 Month · 4K · Shared', badge: 'SALE', stock: 45, deliverables: [], gradient: 'linear-gradient(135deg,#3a1a1a,#1f0d0d)' },
-    { id: 6, name: 'Adobe Creative Cloud', category: 'software', price: 19.99, origPrice: null, desc: '1 Month · All Apps', badge: '', stock: 0, deliverables: [], gradient: 'linear-gradient(135deg,#1a2a3a,#0d1520)' }
-  ];
+  var DEFAULT_PRODUCTS = [];
   var DEFAULT_STATS = { rating: '4.96', sold: '4,350', customers: '439' };
   var DEFAULT_REVIEWS = [
     { id: 1,  name: 'Alex L.',    initials: 'AL', color: '#e50914', date: 'May 2025',      product: 'Netflix',      stars: 5, published: true, reply: '',  publishedAt: 'May 2025',      text: 'Got my Netflix credentials within seconds. Works perfectly on all my devices. Crazy value for the price, will definitely order again.' },
@@ -48,12 +41,7 @@
     { id: 11, name: 'Amira P.',   initials: 'AP', color: '#00b4d8', date: 'January 2025',  product: 'Disney+',      stars: 5, published: true, reply: '',  publishedAt: 'January 2025',  text: 'Honestly impressed. The checkout was seamless and I had my account details in seconds. Great shop, will recommend to friends.' },
     { id: 12, name: 'Marco V.',   initials: 'MV', color: '#64c864', date: 'December 2024', product: 'Software',     stars: 5, published: true, reply: '',  publishedAt: 'December 2024', text: 'Top notch. Bought two different products and both worked perfectly. The prices are unbeatable. Keep it up!' }
   ];
-  var DEFAULT_CATEGORIES = [
-    { id: 'streaming', name: 'Streaming', color: '#e50914' },
-    { id: 'gaming',    name: 'Gaming',    color: '#64c864' },
-    { id: 'software',  name: 'Software',  color: '#6495ed' },
-    { id: 'vpn',       name: 'VPN',       color: '#ffa01e' }
-  ];
+  var DEFAULT_CATEGORIES = [];
   var DEFAULT_CONTENT = {
     siteName:       'FlashShp',
     homeEyebrow:    'Digital Products Store',
