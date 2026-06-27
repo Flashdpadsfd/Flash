@@ -93,6 +93,11 @@
         <input class="sidebar__search-input" id="searchInput" type="text" placeholder="Search products…" autocomplete="off" />
       </div>
 
+      <!-- Catégorie « All Products » — toujours présente, active par défaut à l'arrivée -->
+      <div class="sidebar__item sidebar__item--all active" data-cat="all">
+        <span class="sidebar__item-icon" style="color:#fff;"><svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>All Products
+      </div>
+
       <!-- Catégories créées dans l'admin (rien ne s'affiche s'il n'y en a aucune) -->
       <div id="catSections"></div>
 
@@ -269,6 +274,28 @@
     function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
     function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
 
+    /* Note réelle calculée à partir des avis clients (nexus_reviews).
+       Un avis appartient à un produit s'il a le même productId, ou à défaut le même nom.
+       Seuls les avis publiés comptent. Champs note tolérés : stars ou rating. */
+    function getReviews() {
+      try { return JSON.parse(localStorage.getItem('nexus_reviews')) || []; } catch(e) { return []; }
+    }
+    function reviewStats(p) {
+      var name = String(p.name || '').toLowerCase().trim();
+      var matched = getReviews().filter(function(r) {
+        if (r.published === false) return false;
+        if (r.productId != null && String(r.productId) === String(p.id)) return true;
+        if (name && r.product && String(r.product).toLowerCase().trim() === name) return true;
+        return false;
+      });
+      if (!matched.length) return { count: 0, avg: 0 };
+      var sum = matched.reduce(function(s, r) {
+        var v = (r.stars != null) ? r.stars : (r.rating != null ? r.rating : 5);
+        return s + Number(v);
+      }, 0);
+      return { count: matched.length, avg: sum / matched.length };
+    }
+
     var CURRENCY_SYMBOLS = { EUR: '€', USD: '$', GBP: '£' };
 
     function buildCard(p, index) {
@@ -298,10 +325,11 @@
         }
       }
 
-      // Stable pseudo-random rating per product
-      var seed = Number(p.id) || (index + 1);
-      var rating = (4.5 + (seed * 7 % 5) / 10).toFixed(1);
-      var reviewCount = 10 + (seed * 13 % 23);
+      // Note réelle issue des avis clients ; aucune note tant qu'il n'y a pas d'avis
+      var rstats = reviewStats(p);
+      var ratingHtml = rstats.count
+        ? '<span class="pc-rating">' + rstats.avg.toFixed(1) + ' <span class="pc-rating-count">(' + rstats.count + ')</span></span>'
+        : '';
 
       // Stock
       var ct = {};
@@ -352,7 +380,7 @@
       return '<div class="product-card" style="--i:' + index + '" data-name="' + esc(p.name) + '" data-cat="' + esc(p.category) + '" data-price="' + p.price + '" data-product-id="' + p.id + '">' +
         thumbHtml +
         '<div class="pc-info">' +
-          '<div class="pc-info-top">' + stockHtml + '<span class="pc-rating">' + rating + ' <span class="pc-rating-count">(' + reviewCount + ')</span></span></div>' +
+          '<div class="pc-info-top">' + stockHtml + ratingHtml + '</div>' +
           '<div class="pc-title">' + esc(p.name) + '</div>' +
           '<div class="pc-price-row">' + priceHtml + '</div>' +
         '</div>' +
@@ -374,7 +402,7 @@
     /* Le clic sur une carte produit est géré par assets/main.js (→ fiche produit). */
 
     window.addEventListener('storage', function(e) {
-      if (e.key === 'nexus_products') renderGrid();
+      if (e.key === 'nexus_products' || e.key === 'nexus_reviews') renderGrid();
     });
   })();
   </script>

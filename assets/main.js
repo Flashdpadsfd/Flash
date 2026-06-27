@@ -190,6 +190,7 @@ window.NX_ICONS = function (name) {
     var _params  = new URLSearchParams(window.location.search);
     var _urlCat  = _params.get('cat');
     var _urlProd = _params.get('product');
+    if (_urlProd || (_urlCat && _urlCat.toLowerCase() !== 'all')) clearCatActive();
     if (_urlProd) {
       activeProductId = _urlProd;
       document.querySelectorAll('.sidebar__item[data-product-id]').forEach(function (i) {

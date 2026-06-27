@@ -335,10 +335,19 @@
     /* ── Rating ── */
     var allReviews = [];
     try { allReviews = JSON.parse(localStorage.getItem('nexus_reviews')) || []; } catch(e) {}
-    var pr = allReviews.filter(function(r) { return r.productId === pid; });
+    /* Un avis appartient au produit s'il a le même productId, ou à défaut le même nom.
+       Seuls les avis publiés comptent. Note tolérée : champ stars ou rating. */
+    var _pname = String(p.name || '').toLowerCase().trim();
+    function _rVal(r) { var v = Number(r.stars != null ? r.stars : (r.rating != null ? r.rating : 5)); if (!isFinite(v)) v = 5; return Math.max(0, Math.min(5, Math.round(v))); }
+    var pr = allReviews.filter(function(r) {
+      if (r.published === false) return false;
+      if (r.productId != null && String(r.productId) === String(pid)) return true;
+      if (_pname && r.product && String(r.product).toLowerCase().trim() === _pname) return true;
+      return false;
+    });
     var ratingEl = document.getElementById('pdRating');
     if (pr.length) {
-      var avg = pr.reduce(function(s,r){ return s + (r.rating || 5); }, 0) / pr.length;
+      var avg = pr.reduce(function(s,r){ return s + _rVal(r); }, 0) / pr.length;
       ratingEl.textContent = '★ ' + avg.toFixed(1) + ' (' + pr.length + ')';
       ratingEl.style.display = '';
     }
@@ -632,7 +641,7 @@
 
     /* ── Reviews ── */
     if (pr.length) {
-      var avg2 = pr.reduce(function(s,r){ return s + (r.rating || 5); }, 0) / pr.length;
+      var avg2 = pr.reduce(function(s,r){ return s + _rVal(r); }, 0) / pr.length;
       var fullStars = Math.round(avg2);
       document.getElementById('pdRevStars').textContent = '★'.repeat(fullStars) + '☆'.repeat(5 - fullStars);
       document.getElementById('pdRevScore').textContent = avg2.toFixed(1);
@@ -640,7 +649,8 @@
       document.getElementById('pdReviewsSummary').style.display = '';
       document.getElementById('pdReviewsList').innerHTML = pr.slice(0, 8).map(function(r) {
         var initial = (r.name || 'A').charAt(0).toUpperCase();
-        var rStars = '★'.repeat(r.rating || 5) + '☆'.repeat(5 - (r.rating || 5));
+        var _rv = _rVal(r);
+        var rStars = '★'.repeat(_rv) + '☆'.repeat(5 - _rv);
         var dateStr = '';
         try { dateStr = r.date ? new Date(r.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ''; } catch(e) {}
         return '<div class="pd-review">' +
