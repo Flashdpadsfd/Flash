@@ -190,7 +190,13 @@ window.NX_ICONS = function (name) {
     var _params  = new URLSearchParams(window.location.search);
     var _urlCat  = _params.get('cat');
     var _urlProd = _params.get('product');
+    var _urlQ    = _params.get('q') || _params.get('search');
     if (_urlProd || (_urlCat && _urlCat.toLowerCase() !== 'all')) clearCatActive();
+    /* Recherche arrivée depuis la sidebar d'une fiche produit (?q=) */
+    if (_urlQ && searchInput) {
+      searchInput.value = _urlQ;
+      searchQuery = String(_urlQ).trim().toLowerCase();
+    }
     if (_urlProd) {
       activeProductId = _urlProd;
       document.querySelectorAll('.sidebar__item[data-product-id]').forEach(function (i) {
@@ -202,6 +208,8 @@ window.NX_ICONS = function (name) {
       document.querySelectorAll(CAT_FILTER_SELECTOR).forEach(function (i) {
         if ((i.dataset.cat || '').toLowerCase() === activeCat) i.classList.add('active');
       });
+      filterAndSort();
+    } else if (_urlQ) {
       filterAndSort();
     }
   }
