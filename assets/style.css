@@ -1910,11 +1910,11 @@ body.nx-no-entrance .product-card { animation: none !important; }
 
 /* ── Specs + Guarantee ── */
 .pdv3-specs-wrap {
-  display: grid; grid-template-columns: 1fr 1fr;
+  display: grid; grid-template-columns: 1fr;
   background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.07);
   border-radius: 12px; overflow: hidden;
 }
-.pdv3-specs-col { padding: 20px; border-right: 1px solid rgba(255,255,255,.07); }
+.pdv3-specs-col { padding: 20px; }
 .pdv3-guarantee-col { padding: 20px; }
 .pdv3-spec-row {
   display: flex; align-items: center; justify-content: space-between; gap: 12px;

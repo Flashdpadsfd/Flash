@@ -135,29 +135,6 @@
           <div class="pdv3-desc-card" id="pdDesc">—</div>
         </div>
 
-        <!-- What's included -->
-        <div>
-          <div class="pdv3-shdr">What's Included</div>
-          <div class="pdv3-checklist" id="pdChecklist">
-            <div class="pdv3-check-item">
-              <div class="pdv3-check-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg></div>
-              <span>Instant digital delivery — credentials sent immediately on screen</span>
-            </div>
-            <div class="pdv3-check-item">
-              <div class="pdv3-check-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg></div>
-              <span>Invoice PDF with full order details</span>
-            </div>
-            <div class="pdv3-check-item">
-              <div class="pdv3-check-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg></div>
-              <span>Free replacement if credentials don't work</span>
-            </div>
-            <div class="pdv3-check-item">
-              <div class="pdv3-check-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg></div>
-              <span>24/7 Discord support for any issue</span>
-            </div>
-          </div>
-        </div>
-
         <!-- Specs + Service Guarantee -->
         <div class="pdv3-specs-wrap">
           <div class="pdv3-specs-col">
@@ -210,16 +187,6 @@
           <div class="pdv3-sum-row pdv3-sum-row--total"><span>Total</span><span id="pdTotal">—</span></div>
         </div>
 
-
-        <!-- Volume pricing -->
-        <div class="pdv3-vol-section">
-          <div class="pdv3-vol-hdr">VOLUME PRICING</div>
-          <div class="pdv3-vol-pills" id="pdVolPills"></div>
-          <div class="pdv3-vol-progress">
-            <div class="pdv3-vol-progress-fill" id="pdVolFill" style="width:0%"></div>
-          </div>
-          <div class="pdv3-vol-hint" id="pdVolHint"></div>
-        </div>
 
         <!-- Quantity -->
         <div class="pdv3-qty-section">
@@ -573,7 +540,8 @@
 
     /* ── Volume pricing pills ── */
     var discTiers = TIERS.filter(function(t) { return t.disc > 0; });
-    document.getElementById('pdVolPills').innerHTML = discTiers.map(function(t) {
+    var pdVolPills = document.getElementById('pdVolPills');
+    if (pdVolPills) pdVolPills.innerHTML = discTiers.map(function(t) {
       return '<div class="pdv3-vol-pill" data-min="' + t.min + '">' +
         '<span class="pdv3-vol-pill__disc">' + Math.round(t.disc * 100) + '%</span>' +
         '<span class="pdv3-vol-pill__min">' + t.min + '+</span>' +
@@ -618,8 +586,10 @@
         var need = nextTier.min - qty;
         hint = 'Buy ' + need + ' more to unlock ' + Math.round(nextTier.disc * 100) + '% off';
       }
-      document.getElementById('pdVolFill').style.width = fill + '%';
-      document.getElementById('pdVolHint').textContent = hint;
+      var pdVolFill = document.getElementById('pdVolFill');
+      if (pdVolFill) pdVolFill.style.width = fill + '%';
+      var pdVolHint = document.getElementById('pdVolHint');
+      if (pdVolHint) pdVolHint.textContent = hint;
     }
 
     updateSummary();
