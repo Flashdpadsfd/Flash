@@ -377,7 +377,10 @@
       { k: 'Delivery Method', v: 'Instant Digital Delivery' },
       { k: 'Activation',      v: 'Automatic' },
       { k: 'Warranty',        v: '30-Day Replacement' }
-    ]).map(function(s) { return { k: s.k, v: s.v, green: false }; });
+    ])
+    /* Region retiré partout, y compris pour les produits dont les pageSpecs enregistrés le contiennent encore */
+    .filter(function(s) { return String(s.k).toLowerCase() !== 'region'; })
+    .map(function(s) { return { k: s.k, v: s.v, green: false }; });
     /* Live stock row — always appended automatically */
     specsData.push({ k: 'Stock', v: avail > 0 ? 'In Stock (' + avail + ' available)' : 'Out of Stock', green: avail > 0 });
     document.getElementById('pdSpecsLeft').innerHTML = specsData.map(function(s) {
