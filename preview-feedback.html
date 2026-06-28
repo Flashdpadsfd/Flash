@@ -635,17 +635,15 @@
       for (var i = 1; i <= 5; i++) html += (i <= n ? FULL : EMPTY);
       return html;
     }
-    function renderGrid() {
+    function renderList(reviews) {
       var grid = document.getElementById('reviewsGrid');
       if (!grid) return;
-      var all     = getReviews();
-      var reviews = all.filter(function(r) { return r.published !== false; });
       var count = document.getElementById('reviewCount');
       if (count) count.textContent = reviews.length;
       grid.innerHTML = reviews.map(function(r) {
         return '<div class="review-card">' +
           '<div class="review-card__header">' +
-            '<div class="review-card__avatar" style="background:' + esc(r.color) + ';">' + esc(r.initials) + '</div>' +
+            '<div class="review-card__avatar" style="background:' + esc(r.color || '#6495ed') + ';">' + esc(r.initials || '★') + '</div>' +
             '<div class="review-card__info">' +
               '<div class="review-card__name">' + esc(r.name) + '</div>' +
               '<div class="review-card__date">' + esc(r.date) + '</div>' +
@@ -653,14 +651,34 @@
           '</div>' +
           '<div class="review-card__stars">' + starsSvg(r.stars || 5) + '</div>' +
           '<p class="review-card__text">' + esc(r.text) + '</p>' +
-          '<span class="review-card__badge">' + esc(r.product) + '</span>' +
+          (r.product ? '<span class="review-card__badge">' + esc(r.product) + '</span>' : '') +
         '</div>';
       }).join('');
+    }
+    function renderGrid() {
+      var reviews = getReviews().filter(function(r) { return r.published !== false; });
+      renderList(reviews);
     }
     renderGrid();
     window.addEventListener('storage', function(e) {
       if (e.key === 'nexus_reviews') renderGrid();
     });
+
+    /* ── Feedbacks 5★ en direct depuis SellAuth (via /api/feedbacks) ──
+       Si la fonction serveur est configurée (clé API SellAuth), on remplace les
+       avis locaux par les vrais feedbacks 5★. Sinon (501/erreur), on garde les
+       avis locaux/par défaut ci-dessus — aucune régression. */
+    (function loadSellAuthFeedbacks() {
+      fetch('/api/feedbacks', { headers: { 'Accept': 'application/json' } })
+        .then(function(r) { return r.ok ? r.json() : null; })
+        .then(function(data) {
+          if (!data || !data.ok || !Array.isArray(data.reviews) || !data.reviews.length) return;
+          renderList(data.reviews);
+          var sumRating = document.getElementById('summaryRating');
+          if (sumRating) sumRating.textContent = (data.average || 5).toFixed ? Number(data.average || 5).toFixed(2) : '5.00';
+        })
+        .catch(function() { /* hors-ligne ou non configuré : on garde les avis locaux */ });
+    })();
   })();
   </script>
   <script>
