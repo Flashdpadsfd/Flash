@@ -2034,7 +2034,9 @@ body.nx-no-entrance .product-card { animation: none !important; }
 .pdv3-btn-checkout:disabled, .pdv3-btn-cart:disabled { opacity: .4; cursor: not-allowed; }
 
 /* ── Responsive ── */
-@media (max-width: 1100px) {
+/* Garde la sidebar de catégories visible aussi longtemps que la page Shop (≤1023px),
+   pour qu'en cliquant un produit on voie toujours les catégories. */
+@media (max-width: 1023px) {
   .pdv3-cats { display: none; }
   .pdv3-body { grid-template-columns: minmax(0,1fr) 360px; }
 }
