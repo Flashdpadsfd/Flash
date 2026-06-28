@@ -433,30 +433,50 @@
         var k = String(catKey).toLowerCase();
         return String(c.id).toLowerCase() === k || String(c.name || '').toLowerCase() === k;
       }
-      function catIconHtml(c) {
-        return c.image
-          ? '<span class="sidebar__item-icon sidebar__item-icon--img"><img src="' + esc(c.image) + '" alt=""></span>'
-          : '<span class="sidebar__item-icon">' + esc(c.icon || '📦') + '</span>';
-      }
       var cats = getCats();
 
       if (cats.length) {
-        /* Catégorie/marque SANS sous-catégorie = lien plat avec logo → ouvre la page Shop
-           filtrée sur cette marque (ses produits en cartes). Marque courante surlignée. */
-        function catItemHtml(c) {
-          return '<a class="sidebar__item' + (isActive(c) ? ' active' : '') + '" href="preview-products' + pext + '?cat=' + encodeURIComponent(c.id) + '">' +
-            catIconHtml(c) + esc(c.name) + '</a>';
+        /* Ligne « produit » → ouvre la fiche de ce produit, en gardant la même sidebar de
+           catégories (on voit donc toujours les catégories). Sidebar épurée : pas d'icône.
+           Produit courant surligné. */
+        function prodLinkHtml(p, isChild) {
+          var act = String(p.id) === String(pid) ? ' active' : '';
+          return '<a class="sidebar__item sidebar__item--noicon' + (isChild ? ' sidebar__item--child' : '') + act + '" href="preview-product' + pext + '?id=' + encodeURIComponent(p.id) + '">' +
+            esc(p.name) + '</a>';
         }
-        /* Rendu récursif. Catégorie AVEC sous-catégories = section repliable (ex : STREAMING).
-           Catégorie SANS sous-catégorie = item plat avec logo (ex : Twitch). La sidebar
-           n'affiche QUE des catégories : les produits apparaissent en cartes sur la page Shop. */
+        /* Un produit est « enfant » s'il pointe vers un produit parent existant. */
+        function prodHasParent(p) {
+          return p.parentProduct && allProds.some(function(x) { return String(x.id) === String(p.parentProduct); });
+        }
+        /* Un produit qui a des enfants reste un LIEN produit normal ; ses enfants s'affichent
+           comme des liens produit indentés juste en dessous. Pas de section ni de chevron :
+           ce n'est PAS une sous-catégorie, juste des produits dans un produit. */
+        function prodEntryHtml(p) {
+          var children = allProds.filter(function(c) { return String(c.parentProduct) === String(p.id); });
+          if (!children.length) return prodLinkHtml(p);
+          return prodLinkHtml(p) + children.map(function(c) { return prodLinkHtml(c, true); }).join('');
+        }
+        /* Rendu récursif (identique à la page Shop) : une catégorie qui contient des
+           sous-catégories et/ou des produits devient une section repliable contenant ses
+           produits. On peut donc créer p.ex. « Negjxx » et y ranger plusieurs produits.
+           Vide → en-tête seul (lien vers liste filtrée). */
         function renderNode(c, depth, seen) {
           seen = seen || {};
           if (seen[c.id] || depth > 6) return '';   /* garde-fou anti-boucle */
           seen[c.id] = true;
           var subs = cats.filter(function(s) { return s.parent === c.id; });
-          if (!subs.length) return catItemHtml(c);
-          var inner = subs.map(function(s) { return renderNode(s, depth + 1, seen); }).join('');
+          /* Les produits enfants ne s'affichent QUE dans le groupe de leur parent. */
+          var directProds = allProds.filter(function(p) { return String(p.category) === String(c.id) && !prodHasParent(p); });
+          var inner = subs.map(function(s) { return renderNode(s, depth + 1, seen); }).join('') +
+            directProds.map(prodEntryHtml).join('');
+          if (!inner) {
+            return '<div class="sidebar__section' + (depth > 0 ? ' sidebar__section--nested' : '') + '">' +
+              '<a class="sidebar__section-header sidebar__section-header--leaf' + (isActive(c) ? ' active' : '') + '" href="preview-products' + pext + '?cat=' + encodeURIComponent(c.id) + '">' +
+                '<span class="sidebar__section-title"><span class="sidebar__dot"></span>' + esc(c.name) + '</span>' +
+                '<span class="sidebar__line"></span>' +
+              '</a>' +
+            '</div>';
+          }
           var bodyId = 'pdCatSec-' + c.id;
           return '<div class="sidebar__section' + (depth > 0 ? ' sidebar__section--nested' : '') + '">' +
             '<div class="sidebar__section-header" onclick="toggleSection(\'' + bodyId + '\')">' +
