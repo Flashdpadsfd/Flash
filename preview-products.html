@@ -182,48 +182,28 @@
       return String(s == null ? '' : s)
         .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
-    function getProds() {
-      try { return JSON.parse(localStorage.getItem('nexus_products')) || []; } catch(e) { return []; }
+    /* Icône/logo d'une catégorie (image uploadée → logo de marque, sinon emoji). */
+    function catIconHtml(c) {
+      return c.image
+        ? '<span class="sidebar__item-icon sidebar__item-icon--img"><img src="' + esc(c.image) + '" alt=""></span>'
+        : '<span class="sidebar__item-icon">' + esc(c.icon || '📦') + '</span>';
     }
-    /* Produit rattaché à la catégorie → item qui FILTRE la grille sur ce produit
-       (reste sur la page, comme l'écran). Sidebar épurée : pas d'icône sur les lignes produit. */
-    function prodItemHtml(p, isChild) {
-      return '<div class="sidebar__item sidebar__item--noicon' + (isChild ? ' sidebar__item--child' : '') + '" data-product-id="' + esc(p.id) + '" data-label="' + esc(p.name) + '">' +
-        esc(p.name) + '</div>';
+    /* Catégorie/marque SANS sous-catégorie = item plat cliquable avec son logo. Cliquer
+       filtre la grille → ses produits s'affichent en cartes (ex : Twitch, Netflix). */
+    function catItemHtml(cat) {
+      return '<div class="sidebar__item" data-cat="' + esc(cat.id) + '" data-label="' + esc(cat.name) + '">' +
+        catIconHtml(cat) + esc(cat.name) + '</div>';
     }
-    /* Un produit est « enfant » s'il pointe vers un produit parent existant. */
-    function prodHasParent(p, prods) {
-      return p.parentProduct && prods.some(function(x) { return String(x.id) === String(p.parentProduct); });
-    }
-    /* Un produit qui a des enfants reste une LIGNE produit normale ; ses enfants
-       s'affichent comme des lignes produit indentées juste en dessous. Pas de section
-       ni de chevron : ce n'est PAS une sous-catégorie, juste des produits dans un produit. */
-    function renderProdEntry(p, prods) {
-      var children = prods.filter(function(c) { return String(c.parentProduct) === String(p.id); });
-      if (!children.length) return prodItemHtml(p);
-      return prodItemHtml(p) + children.map(function(c) { return prodItemHtml(c, true); }).join('');
-    }
-    /* Rendu récursif : une catégorie (racine OU sous-catégorie) qui contient des
-       sous-catégories et/ou des produits devient une section repliable contenant
-       ses produits. On peut donc créer p.ex. « Negjxx » et y ranger plusieurs produits.
-       Catégorie vide = en-tête seul cliquable (filtre la grille). */
-    function renderNode(cat, cats, prods, depth, seen) {
+    /* Rendu récursif. Catégorie AVEC sous-catégories = section repliable (ex : STREAMING).
+       Catégorie SANS sous-catégorie = item plat avec logo (ex : Twitch). La sidebar
+       n'affiche QUE des catégories : les produits apparaissent en cartes dans la grille. */
+    function renderNode(cat, cats, depth, seen) {
       seen = seen || {};
       if (seen[cat.id] || depth > 6) return '';   /* garde-fou anti-boucle */
       seen[cat.id] = true;
       var subs = cats.filter(function(s) { return s.parent === cat.id; });
-      /* Les produits enfants ne s'affichent QUE dans le groupe de leur parent. */
-      var directProds = prods.filter(function(p) { return String(p.category) === String(cat.id) && !prodHasParent(p, prods); });
-      var inner = subs.map(function(s) { return renderNode(s, cats, prods, depth + 1, seen); }).join('') +
-        directProds.map(function(p) { return renderProdEntry(p, prods); }).join('');
-      if (!inner) {
-        return '<div class="sidebar__section' + (depth > 0 ? ' sidebar__section--nested' : '') + '">' +
-          '<div class="sidebar__section-header sidebar__section-header--leaf" data-cat="' + cat.id + '" data-label="' + esc(cat.name) + '">' +
-            '<span class="sidebar__section-title"><span class="sidebar__dot"></span>' + esc(cat.name) + '</span>' +
-            '<span class="sidebar__line"></span>' +
-          '</div>' +
-        '</div>';
-      }
+      if (!subs.length) return catItemHtml(cat);
+      var inner = subs.map(function(s) { return renderNode(s, cats, depth + 1, seen); }).join('');
       var bodyId = 'catsec-' + cat.id;
       return '<div class="sidebar__section' + (depth > 0 ? ' sidebar__section--nested' : '') + '">' +
         '<div class="sidebar__section-header" onclick="toggleSection(\'' + bodyId + '\')">' +
@@ -238,11 +218,10 @@
       var wrap = document.getElementById('catSections');
       if (!wrap) return;
       var cats = getCats();
-      var prods = getProds();
       var roots = cats.filter(function(c) {
         return !c.parent || !cats.some(function(p) { return p.id === c.parent; });
       });
-      wrap.innerHTML = roots.map(function(c) { return renderNode(c, cats, prods, 0, {}); }).join('');
+      wrap.innerHTML = roots.map(function(c) { return renderNode(c, cats, 0, {}); }).join('');
     }
     renderCats();
     window.addEventListener('storage', function(e) {
