@@ -1820,9 +1820,15 @@ body.nx-no-entrance .product-card { animation: none !important; }
    PRODUCT DETAIL v3 — SCREENSHOT MATCH
 ══════════════════════════════════════════════ */
 
-/* Pleine largeur comme la page Shop (.shop-layout) : en cliquant un produit, la fiche
-   prend toute la page et non une moitié centrée. */
-.pdv3-page { width: 100%; padding: 64px 64px 80px; }
+/* Layout identique à la page Shop (.shop-layout) : sidebar catégories à gauche en
+   colonne pleine hauteur, et tout le contenu (hero + produit + achat) à sa droite. */
+.pdv3-page {
+  display: flex; align-items: flex-start;
+  width: 100%; gap: 0;
+  padding: 52px 64px 80px;
+  min-height: 100vh;
+}
+.pdv3-content { flex: 1; min-width: 0; padding-left: 28px; }
 
 /* ── Hero ── */
 .pdv3-hero {
@@ -1873,14 +1879,23 @@ body.nx-no-entrance .product-card { animation: none !important; }
 }
 .pdv3-hero__pills .pdv3-pill:first-child svg { color: #34d399; }
 
-/* ── Two-col body ── */
-/* Colonne catégories élargie (240px = comme la page Shop) et bien séparée, pour qu'elle
-   soit vraiment une sidebar latérale qui prend de la place. */
-.pdv3-body { display: grid; grid-template-columns: 240px minmax(0,1fr) 360px; gap: 32px; align-items: start; }
+/* ── Two-col body (contenu produit | achat) ── */
+.pdv3-body { display: grid; grid-template-columns: minmax(0,1fr) 360px; gap: 32px; align-items: start; }
 .pdv3-main { display: flex; flex-direction: column; gap: 18px; }
 
-/* ── Categories sidebar (left) — reuses shop .sidebar__* item styles ── */
-.pdv3-cats { position: sticky; top: 72px; align-self: start; }
+/* ── Categories sidebar (left) — colonne pleine hauteur, identique à .sidebar (Shop) ── */
+.pdv3-cats {
+  width: 240px; flex-shrink: 0;
+  position: sticky; top: 52px;
+  height: calc(100vh - 52px);
+  overflow-y: auto; overflow-x: hidden;
+  padding: 16px 0 40px;
+  border-right: 1px solid rgba(255,255,255,.07);
+  scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.1) transparent;
+}
+.pdv3-cats::-webkit-scrollbar { width: 4px; }
+.pdv3-cats::-webkit-scrollbar-track { background: transparent; }
+.pdv3-cats::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 2px; }
 .pdv3-cats__list { display: block; }
 .pdv3-cats .sidebar__item { text-decoration: none; }
 
@@ -2042,7 +2057,7 @@ body.nx-no-entrance .product-card { animation: none !important; }
    pour qu'en cliquant un produit on voie toujours les catégories. */
 @media (max-width: 1023px) {
   .pdv3-cats { display: none; }
-  .pdv3-body { grid-template-columns: minmax(0,1fr) 360px; }
+  .pdv3-content { padding-left: 0; }
 }
 @media (max-width: 1000px) {
   .pdv3-body { grid-template-columns: 1fr; }

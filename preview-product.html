@@ -75,7 +75,21 @@
   </div>
 
   <!-- ─── PAGE ─── -->
+  <!-- Layout identique à la page Shop : sidebar catégories à gauche (pleine hauteur),
+       et tout le reste (fil d'Ariane + hero + contenu + achat) dans la colonne de droite. -->
   <div class="pdv3-page">
+
+    <!-- ── CATEGORIES (left) — même sidebar que la page Shop ── -->
+    <aside class="pdv3-cats" id="pdCatsAside">
+      <div class="sidebar__search">
+        <svg class="sidebar__search-icon" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input class="sidebar__search-input" id="pdSearchInput" type="text" placeholder="Search products…" autocomplete="off" />
+      </div>
+      <nav class="pdv3-cats__list" id="pdCatsList"></nav>
+    </aside>
+
+    <!-- ── COLONNE DROITE (hero + contenu) ── -->
+    <div class="pdv3-content">
 
     <!-- ── BREADCRUMB ── -->
     <div class="pdv3-breadcrumb">
@@ -101,17 +115,8 @@
       </div>
     </div>
 
-    <!-- ── BODY (cats | main | purchase) ── -->
+    <!-- ── BODY (main | purchase) ── -->
     <div class="pdv3-body">
-
-      <!-- ── CATEGORIES (left) — même sidebar que la page Shop ── -->
-      <aside class="pdv3-cats" id="pdCatsAside">
-        <div class="sidebar__search">
-          <svg class="sidebar__search-icon" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
-          <input class="sidebar__search-input" id="pdSearchInput" type="text" placeholder="Search products…" autocomplete="off" />
-        </div>
-        <nav class="pdv3-cats__list" id="pdCatsList"></nav>
-      </aside>
 
       <!-- ── MAIN CONTENT ── -->
       <main class="pdv3-main">
@@ -217,6 +222,7 @@
       </aside>
 
     </div>
+    </div><!-- /.pdv3-content -->
   </div>
 
   <!-- ─── CART PANEL ─── -->
