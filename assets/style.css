@@ -675,6 +675,17 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
   height: 1px; margin: 10px 12px 14px;
   background: rgba(255,255,255,.07);
 }
+/* Section imbriquée (sous-catégorie qui contient des produits) : décalée vers la droite,
+   en-tête en casse normale pour la distinguer d'une catégorie racine. */
+.sidebar__section--nested { margin-bottom: 8px; }
+.sidebar__section--nested > .sidebar__section-body { margin-left: 12px; }
+.sidebar__section--nested > .sidebar__section-header { padding-left: 14px; }
+.sidebar__section--nested > .sidebar__section-header .sidebar__section-title {
+  text-transform: none; letter-spacing: 0;
+  font-size: 13px; font-weight: 500; color: rgba(255,255,255,.72);
+}
+.sidebar__section--nested > .sidebar__section-header:hover .sidebar__section-title { color: #fff; }
+
 .sidebar__item--sub { margin-left: 22px; font-size: 12.5px; }
 .sidebar__item--sub .sidebar__item-icon { width: 20px; height: 20px; font-size: 10px; border-radius: 5px; }
 .sidebar__item-icon--img { overflow: hidden; padding: 0; background: #18181b; }
