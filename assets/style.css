@@ -1874,7 +1874,9 @@ body.nx-no-entrance .product-card { animation: none !important; }
 .pdv3-hero__pills .pdv3-pill:first-child svg { color: #34d399; }
 
 /* ── Two-col body ── */
-.pdv3-body { display: grid; grid-template-columns: 200px minmax(0,1fr) 360px; gap: 20px; align-items: start; }
+/* Colonne catégories élargie (240px = comme la page Shop) et bien séparée, pour qu'elle
+   soit vraiment une sidebar latérale qui prend de la place. */
+.pdv3-body { display: grid; grid-template-columns: 240px minmax(0,1fr) 360px; gap: 32px; align-items: start; }
 .pdv3-main { display: flex; flex-direction: column; gap: 18px; }
 
 /* ── Categories sidebar (left) — reuses shop .sidebar__* item styles ── */
