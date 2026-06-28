@@ -197,6 +197,12 @@
         </div>
 
 
+        <!-- Variantes (affichées seulement si le produit en a) -->
+        <div class="pdv3-variants" id="pdVariantsSection" style="display:none;">
+          <div class="pdv3-qty-lbl">VARIANTE</div>
+          <div class="pdv3-variants-grid" id="pdVariants"></div>
+        </div>
+
         <!-- Quantity -->
         <div class="pdv3-qty-section">
           <div class="pdv3-qty-lbl">QUANTITY</div>
@@ -311,6 +317,13 @@
 
     var sym = SYM[p.currency] || '€';
     var qty = 1;
+
+    /* ── Variantes (options du produit : nom + prix) ── */
+    var variants = (Array.isArray(p.variants) ? p.variants : []).filter(function(v) { return v && String(v.name || '').trim() !== ''; });
+    var hasVariants = variants.length > 0;
+    var selVariant = 0;
+    /* Prix unitaire de base = prix de la variante choisie, sinon prix du produit */
+    function unitBasePrice() { return hasVariants ? Number(variants[selVariant].price) : Number(p.price); }
 
     document.title = 'FlashShp — ' + p.name;
 
@@ -574,11 +587,13 @@
 
     function updateSummary() {
       var tier = getActiveTier(qty);
-      var unitPrice = p.price * (1 - tier.disc);
+      var base = unitBasePrice();
+      var unitPrice = base * (1 - tier.disc);
       var sub = unitPrice * qty;
 
       document.getElementById('pdQtyVal').textContent = qty;
       document.getElementById('pdQtyDisplay').textContent = qty;
+      document.getElementById('pdPrice').textContent = sym + base.toFixed(2);
       document.getElementById('pdSidePrice').textContent = sym + unitPrice.toFixed(2);
       document.getElementById('pdSubtotal').textContent = sym + sub.toFixed(2);
       document.getElementById('pdTotal').textContent = sym + sub.toFixed(2);
@@ -607,6 +622,35 @@
       if (pdVolHint) pdVolHint.textContent = hint;
     }
 
+    /* ── Variant pills ── */
+    function esc2(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    (function renderVariants() {
+      if (!hasVariants) return;
+      var sec = document.getElementById('pdVariantsSection');
+      var grid = document.getElementById('pdVariants');
+      if (!sec || !grid) return;
+      sec.style.display = '';
+      grid.innerHTML = variants.map(function(v, i) {
+        return '<button type="button" class="pdv3-variant' + (i === selVariant ? ' pdv3-variant--active' : '') + '" data-vi="' + i + '">' +
+          '<span class="pdv3-variant__name">' + esc2(v.name) + '</span>' +
+          '<span class="pdv3-variant__price">' + sym + Number(v.price).toFixed(2) + '</span>' +
+        '</button>';
+      }).join('');
+      grid.querySelectorAll('.pdv3-variant').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          selVariant = parseInt(btn.getAttribute('data-vi'), 10) || 0;
+          grid.querySelectorAll('.pdv3-variant').forEach(function(b) {
+            b.classList.toggle('pdv3-variant--active', b === btn);
+          });
+          /* Le nom affiché côté récap inclut la variante */
+          document.getElementById('pdSideName').textContent = p.name + ' — ' + variants[selVariant].name;
+          updateSummary();
+        });
+      });
+      /* État initial : nom récap avec la 1re variante */
+      document.getElementById('pdSideName').textContent = p.name + ' — ' + variants[selVariant].name;
+    })();
+
     updateSummary();
 
     document.getElementById('pdQtyMinus').addEventListener('click', function() {
@@ -623,7 +667,7 @@
       buyBtn.textContent = 'Out of Stock';
     }
     buyBtn.addEventListener('click', function() {
-      window.location.href = 'checkout?id=' + pid;
+      window.location.href = 'checkout?id=' + pid + (hasVariants ? '&variant=' + selVariant : '');
     });
 
     /* ── Add to Cart ── */
@@ -632,9 +676,13 @@
     cartBtn2.addEventListener('click', function() {
       var cart = [];
       try { cart = JSON.parse(localStorage.getItem('nexus_cart')) || []; } catch(e) {}
-      var ex = cart.find(function(i){ return i.id === pid; });
+      var vName  = hasVariants ? variants[selVariant].name : null;
+      var vPrice = unitBasePrice();
+      var dispName = vName ? (p.name + ' — ' + vName) : p.name;
+      /* Une variante distincte = ligne de panier distincte (même produit, variante différente) */
+      var ex = cart.find(function(i){ return i.id === pid && (i.variant == null ? null : String(i.variant)) === (hasVariants ? String(selVariant) : null); });
       if (ex) { ex.qty += qty; } else {
-        cart.push({ id: pid, name: p.name, icon: p.icon || '📦', price: p.price, currency: p.currency || 'EUR', qty: qty });
+        cart.push({ id: pid, name: dispName, icon: p.icon || '📦', price: vPrice, currency: p.currency || 'EUR', qty: qty, variant: hasVariants ? selVariant : null, variantName: vName });
       }
       localStorage.setItem('nexus_cart', JSON.stringify(cart));
       if (window._nexusUpdateCartCount) window._nexusUpdateCartCount();

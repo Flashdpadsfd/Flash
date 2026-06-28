@@ -59,6 +59,7 @@
   };
   var CURRENCY_SYMBOLS = { EUR: '€', USD: '$', GBP: '£' };
   var _customFields = [];
+  var _variants = [];
 
   /* ── Product page : System Specs + Service Guarantee ── */
   var DEFAULT_PAGE_GUARANTEES = [
@@ -671,6 +672,38 @@
     }).join('');
   }
 
+  /* ── Variantes (options du produit : nom + prix) ── */
+  window.addVariant = function () {
+    _variants.push({ name: '', price: '' });
+    renderVariants();
+  };
+  window.removeVariant = function (idx) {
+    _variants.splice(idx, 1);
+    renderVariants();
+  };
+  function renderVariants() {
+    var el = document.getElementById('variantsList');
+    if (!el) return;
+    window._variants = _variants; /* expose pour les handlers inline */
+    var sym = CURRENCY_SYMBOLS[document.getElementById('fCurrency') ? document.getElementById('fCurrency').value : 'EUR'] || '€';
+    if (!_variants.length) {
+      el.innerHTML = '<p style="font-size:12px;color:var(--text-muted);padding:8px 0;">Aucune variante — le produit utilise son prix principal.</p>';
+      return;
+    }
+    el.innerHTML = _variants.map(function(v, i) {
+      return '<div class="cf-item">' +
+        '<input type="text" placeholder="Nom (ex. 1 mois)" value="' + esc(v.name || '') + '" ' +
+          'oninput="_variants[' + i + '].name=this.value" style="font-size:13px;" />' +
+        '<div class="input-prefix-wrap" style="width:120px;flex:none;">' +
+          '<span class="input-prefix">' + sym + '</span>' +
+          '<input type="number" step="0.01" min="0" placeholder="9.99" value="' + esc(v.price != null ? v.price : '') + '" ' +
+            'oninput="_variants[' + i + '].price=this.value" class="input--prefixed" style="font-size:13px;" />' +
+        '</div>' +
+        '<button type="button" class="a-btn a-btn--icon" onclick="removeVariant(' + i + ')" style="color:var(--red);font-size:14px;" title="Supprimer">×</button>' +
+      '</div>';
+    }).join('');
+  }
+
   /* ── Product Page : System Specs editor ── */
   window._pageSpecs = [];
   window._pageGuarantees = [];
@@ -784,6 +817,10 @@
     _customFields = (p && Array.isArray(p.customFields)) ? JSON.parse(JSON.stringify(p.customFields)) : [];
     renderCustomFields();
 
+    /* Variantes */
+    _variants = (p && Array.isArray(p.variants)) ? JSON.parse(JSON.stringify(p.variants)) : [];
+    renderVariants();
+
     /* Product page : specs + guarantees */
     window._pageSpecs = (p && Array.isArray(p.pageSpecs))
       ? JSON.parse(JSON.stringify(p.pageSpecs))
@@ -896,6 +933,7 @@
     var sym = CURRENCY_SYMBOLS[document.getElementById('fCurrency').value] || '€';
     document.getElementById('pricePrefix').textContent = sym;
     document.getElementById('origPricePrefix').textContent = sym;
+    renderVariants(); /* met à jour le symbole devant le prix des variantes */
   };
 
   /* ── Deliverable indicator ── */
@@ -958,6 +996,10 @@
       outOfStock:   document.getElementById('fOutOfStock').value || 'show',
       deliveryNote: document.getElementById('fDeliveryNote').value.trim(),
       customFields: JSON.parse(JSON.stringify(_customFields)),
+      /* Variantes : on ne garde que celles qui ont un nom, prix normalisé en nombre */
+      variants: _variants
+        .filter(function(v) { return String(v.name || '').trim() !== ''; })
+        .map(function(v) { return { name: String(v.name).trim(), price: Number(v.price) || 0 }; }),
       /* product page (system specs + service guarantee) */
       pageSpecs: window._pageSpecs.filter(function(s) { return ((s.k || '').trim() || (s.v || '').trim()); }),
       pageGuarantees: window._pageGuarantees.filter(function(g) { return (g.title || '').trim(); }),

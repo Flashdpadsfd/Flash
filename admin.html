@@ -1890,6 +1890,22 @@
           </div>
         </div>
 
+        <!-- ══ Variantes : options du produit (nom + prix), ex. 1 mois / 3 mois ══ -->
+        <div class="form-section">
+          <div class="form-section__header">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+            Variantes <span class="f-optional" style="text-transform:none;letter-spacing:0;">(optionnel)</span>
+          </div>
+          <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;line-height:1.6;">
+            Ajoutez des variantes (ex. « 1 mois », « 3 mois »), chacune avec son prix. Le client choisit la variante sur la fiche produit et le prix s'adapte. Laissez vide pour un produit sans variante.
+          </p>
+          <div id="variantsList"></div>
+          <button type="button" class="a-btn a-btn--ghost" onclick="addVariant()" style="margin-top:12px;font-size:12px;gap:5px;">
+            <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Ajouter une variante
+          </button>
+        </div>
+
         <div class="form-section" style="margin-bottom:0;">
           <div class="form-section__header">
             <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>

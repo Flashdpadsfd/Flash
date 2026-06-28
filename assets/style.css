@@ -2040,6 +2040,27 @@ body.nx-no-entrance .product-card { animation: none !important; }
 .pdv3-vol-hint { font-size: 12px; color: rgba(255,255,255,.38); text-align: center; }
 
 /* ── Qty section ── */
+/* ── Variantes (sélecteur sur la fiche produit) ── */
+.pdv3-variants { padding: 14px 20px 4px; border-top: 1px solid rgba(255,255,255,.07); }
+.pdv3-variants .pdv3-qty-lbl { display: block; margin-bottom: 10px; }
+.pdv3-variants-grid { display: flex; flex-direction: column; gap: 8px; }
+.pdv3-variant {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  width: 100%; padding: 10px 14px; border-radius: 9px;
+  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1);
+  color: #fff; cursor: pointer; text-align: left;
+  font-family: Inter, sans-serif; font-size: 13px;
+  transition: background 150ms ease, border-color 150ms ease, transform 150ms ease;
+}
+.pdv3-variant:hover { background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.2); }
+.pdv3-variant__name { font-weight: 500; }
+.pdv3-variant__price { font-weight: 700; color: rgba(255,255,255,.85); }
+.pdv3-variant--active {
+  background: rgba(255,255,255,.10); border-color: rgba(255,255,255,.55);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.25);
+}
+.pdv3-variant--active .pdv3-variant__price { color: #fff; }
+
 .pdv3-qty-section { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-top: 1px solid rgba(255,255,255,.07); }
 .pdv3-qty-lbl { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.4); }
 .pdv3-qty-ctrl { display: flex; align-items: center; gap: 10px; }

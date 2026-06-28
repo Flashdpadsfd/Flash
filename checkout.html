@@ -795,6 +795,20 @@
   var product = allProds.find(function(x) { return x.id === pid; });
   if (!product) { window.location.href = 'preview-products.html'; return; }
 
+  /* ── Variante choisie (?variant=index) : surcharge le nom affiché + le prix unitaire ── */
+  (function applyVariant() {
+    var vi = params.get('variant');
+    if (vi == null || vi === '') return;
+    var idx = parseInt(vi, 10);
+    var vlist = Array.isArray(product.variants) ? product.variants : [];
+    if (!vlist[idx]) return;
+    /* Copie locale pour ne pas muter le produit stocké ; tout l'aval lit product.name/price */
+    product = Object.assign({}, product, {
+      name: product.name + ' — ' + vlist[idx].name,
+      price: Number(vlist[idx].price)
+    });
+  })();
+
   var selectedPM = null;
   var appliedPromo = null;
   var orderData = null; // { invoiceId, email, cryptoKey, amount, address, deliverable, orderMs }

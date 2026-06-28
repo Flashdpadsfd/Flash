@@ -518,9 +518,11 @@ window.NX_ICONS = function (name) {
       if (cb) cb.addEventListener('click', function() {
         var c = getCart();
         if (!c[0]) return;
+        var v = c[0].variant;
+        var vp = (v != null && v !== '') ? '&variant=' + encodeURIComponent(v) : '';
         if (window._closeCart) window._closeCart();
-        if (window._nexusOpenCheckout) window._nexusOpenCheckout(c[0].id);
-        else window.location.href = 'checkout.html?product=' + encodeURIComponent(c[0].id);
+        if (window._nexusOpenCheckout) window._nexusOpenCheckout(c[0].id, v);
+        else window.location.href = 'checkout?id=' + encodeURIComponent(c[0].id) + vp;
       });
     }
   };
@@ -957,11 +959,17 @@ window.NX_ICONS = function (name) {
       });
     });
 
-    window._nexusOpenCheckout = function (productId) {
+    window._nexusOpenCheckout = function (productId, variantIdx) {
       _pid = productId;
       var prods = getProds();
       var p = prods.find(function (x) { return x.id === productId; });
       if (!p) return;
+      /* Variante choisie : surcharge nom + prix pour l'affichage du checkout */
+      var vlist = Array.isArray(p.variants) ? p.variants : [];
+      if (variantIdx != null && variantIdx !== '' && vlist[parseInt(variantIdx, 10)]) {
+        var v = vlist[parseInt(variantIdx, 10)];
+        p = Object.assign({}, p, { name: p.name + ' — ' + v.name, price: Number(v.price) });
+      }
       var sym = SYM[p.currency] || '€';
       var price = Number(p.price).toFixed(2);
 
