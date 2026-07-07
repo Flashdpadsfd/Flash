@@ -109,7 +109,7 @@ module.exports = async function (req, res) {
     var collected = [];
     for (var page = 1; page <= MAX_PAGES; page++) {
       var url = SELLAUTH_BASE + '/shops/' + encodeURIComponent(shopId) +
-        '/feedbacks?rating=5&perPage=' + PER_PAGE + '&page=' + page +
+        '/feedbacks?perPage=' + PER_PAGE + '&page=' + page +
         '&orderColumn=created_at&orderDirection=desc';
       var r = await fetch(url, { headers: headers });
       if (!r.ok) {
@@ -123,16 +123,19 @@ module.exports = async function (req, res) {
       if (list.length < PER_PAGE) break; /* dernière page atteinte */
     }
 
-    /* Garde tous les 5★ (y compris les avis AUTOMATIQUES après 7 jours, qui n'ont pas
-       de message → on met un texte neutre par défaut). Map vers la forme « avis » du site. */
+    /* Garde TOUS les avis (toutes notes 1★→5★, y compris les avis AUTOMATIQUES
+       après 7 jours, qui n'ont pas de message → on met un texte neutre par défaut).
+       Map vers la forme « avis » du site. */
     var reviews = collected
       .filter(function (f) {
-        return Number(f.rating) === 5 && !f.deleted_at;
+        var r = Number(f.rating);
+        return r >= 1 && r <= 5 && !f.deleted_at;
       })
       .map(function (f) {
         var email = emailOf(f);
         var name = maskedName(email);
         var msg = String(f.message || '').trim();
+        var stars = Math.max(1, Math.min(5, Math.round(Number(f.rating)) || 5));
         return {
           id: f.id,
           name: name,
@@ -141,7 +144,7 @@ module.exports = async function (req, res) {
           date: monthYear(f.created_at),
           createdAt: f.created_at || null,
           product: productOf(f),
-          stars: 5,
+          stars: stars,
           automatic: !!f.is_automatic,
           reply: String(f.reply || ''),
           text: msg ? msg.slice(0, 600) : 'Automatic after 7 days'
@@ -153,9 +156,14 @@ module.exports = async function (req, res) {
        (récent d'abord) est conservé à l'intérieur de chaque groupe. */
     reviews.sort(function (a, b) { return (a.automatic ? 1 : 0) - (b.automatic ? 1 : 0); });
 
+    /* Moyenne réelle sur toutes les notes récupérées (arrondie à 0,1). */
+    var sum = 0;
+    for (var k = 0; k < reviews.length; k++) sum += reviews[k].stars;
+    var average = reviews.length ? Math.round((sum / reviews.length) * 10) / 10 : 0;
+
     /* Cache CDN 5 min (réduit les appels API + accélère la page). */
     res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
-    res.status(200).json({ ok: true, count: reviews.length, average: reviews.length ? 5 : 0, reviews: reviews });
+    res.status(200).json({ ok: true, count: reviews.length, average: average, reviews: reviews });
   } catch (e) {
     console.error('[FlashShp] SellAuth feedbacks failed:', e && e.message);
     res.status(502).json({ error: 'Fetch failed' });
