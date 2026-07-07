@@ -16,7 +16,7 @@
 
 var SELLAUTH_BASE = 'https://api.sellauth.com/v1';
 var PER_PAGE = 100;     // max autorisé par l'API
-var MAX_PAGES = 5;      // garde-fou : jusqu'à 500 avis
+var MAX_PAGES = 40;     // garde-fou : jusqu'à 4000 avis (on suit last_page de l'API)
 
 /* ── Anti-abus : n'accepter que les appels venant de nos propres pages ── */
 function hostFrom(value) {
@@ -105,22 +105,34 @@ module.exports = async function (req, res) {
     'Accept': 'application/json'
   };
 
+  var pageUrl = function (page) {
+    return SELLAUTH_BASE + '/shops/' + encodeURIComponent(shopId) +
+      '/feedbacks?perPage=' + PER_PAGE + '&page=' + page +
+      '&orderColumn=created_at&orderDirection=desc';
+  };
+
   try {
     var collected = [];
-    for (var page = 1; page <= MAX_PAGES; page++) {
-      var url = SELLAUTH_BASE + '/shops/' + encodeURIComponent(shopId) +
-        '/feedbacks?perPage=' + PER_PAGE + '&page=' + page +
-        '&orderColumn=created_at&orderDirection=desc';
-      var r = await fetch(url, { headers: headers });
-      if (!r.ok) {
-        if (page === 1) { res.status(502).json({ error: 'SellAuth error ' + r.status }); return; }
-        break; /* on garde ce qu'on a déjà */
-      }
-      var json = await r.json();
-      var list = extractList(json);
-      if (!list.length) break;
-      collected = collected.concat(list);
-      if (list.length < PER_PAGE) break; /* dernière page atteinte */
+
+    /* 1re page : on récupère les données ET le nombre total de pages (last_page). */
+    var first = await fetch(pageUrl(1), { headers: headers });
+    if (!first.ok) { res.status(502).json({ error: 'SellAuth error ' + first.status }); return; }
+    var firstJson = await first.json();
+    collected = collected.concat(extractList(firstJson));
+
+    var lastPage = Number(firstJson && firstJson.last_page) || 1;
+    if (lastPage > MAX_PAGES) lastPage = MAX_PAGES; /* garde-fou */
+
+    /* Pages restantes récupérées EN PARALLÈLE (évite un timeout sur 13+ pages). */
+    if (lastPage > 1) {
+      var rest = [];
+      for (var p = 2; p <= lastPage; p++) rest.push(p);
+      var pages = await Promise.all(rest.map(function (page) {
+        return fetch(pageUrl(page), { headers: headers })
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .catch(function () { return null; });
+      }));
+      pages.forEach(function (json) { if (json) collected = collected.concat(extractList(json)); });
     }
 
     /* Garde TOUS les avis (toutes notes 1★→5★, y compris les avis AUTOMATIQUES

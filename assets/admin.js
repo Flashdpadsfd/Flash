@@ -1454,7 +1454,9 @@
         '</td>' +
         '<td>' +
           (r._synced
-            ? '<span style="font-size:11px;color:rgba(255,255,255,.35);white-space:nowrap;">SellAuth · read-only</span>'
+            ? '<div class="action-group">' +
+                '<button class="a-btn a-btn--icon" onclick="deleteSyncedReview(' + r.id + ')" style="color:var(--red);" title="Supprimer sur SellAuth"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg></button>' +
+              '</div>'
             : '<div class="action-group">' +
                 '<button class="a-btn a-btn--icon" onclick="openReviewModal(' + r.id + ')" title="Edit"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>' +
                 '<button class="a-btn a-btn--icon" onclick="deleteReview(' + r.id + ')" style="color:var(--red);" title="Delete"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg></button>' +
@@ -1551,6 +1553,45 @@
     setReviews(getReviews().filter(function(r) { return r.id !== id; }));
     renderReviews();
     toast('Feedback deleted.');
+  };
+
+  /* Secret admin pour supprimer un avis SellAuth (demandé une fois, mémorisé). */
+  function getSaSecret(forcePrompt) {
+    var s = localStorage.getItem('nexus_sa_secret') || '';
+    if (!s || forcePrompt) {
+      s = (window.prompt('Secret admin (ADMIN_SECRET) pour supprimer sur SellAuth :', '') || '').trim();
+      if (s) localStorage.setItem('nexus_sa_secret', s);
+    }
+    return s;
+  }
+
+  /* Supprime un vrai avis SellAuth via /api/feedback-delete (réservé admin). */
+  window.deleteSyncedReview = function(id) {
+    if (!confirm('Supprimer définitivement cet avis sur SellAuth ? Cette action est irréversible.')) return;
+    var secret = getSaSecret(false);
+    if (!secret) { toast('Suppression annulée (secret requis).'); return; }
+    fetch('/api/feedback-delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-secret': secret },
+      body: JSON.stringify({ id: id })
+    })
+      .then(function(r) { return r.json().then(function(j) { return { ok: r.ok, status: r.status, body: j }; }); })
+      .then(function(res) {
+        if (res.ok && res.body && res.body.ok) {
+          if (_apiReviews) _apiReviews = _apiReviews.filter(function(r) { return r.id !== id; });
+          renderReviews();
+          toast('Avis supprimé sur SellAuth.');
+          return;
+        }
+        if (res.status === 401) {
+          localStorage.removeItem('nexus_sa_secret'); /* mauvais secret → on le redemandera */
+          toast('Secret admin incorrect. Réessayez.');
+          return;
+        }
+        if (res.status === 501) { toast('Suppression non configurée (ADMIN_SECRET manquant côté serveur).'); return; }
+        toast('Échec de la suppression (' + res.status + ').');
+      })
+      .catch(function() { toast('Erreur réseau lors de la suppression.'); });
   };
 
   /* ── Payment Methods ── */
