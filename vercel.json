@@ -1,4 +1,10 @@
 {
+  "redirects": [
+    { "source": "/:path*", "has": [{ "type": "host", "value": "flashshp.fr" }],      "destination": "https://flashshp.vercel.app/:path*", "permanent": false },
+    { "source": "/:path*", "has": [{ "type": "host", "value": "www.flashshp.fr" }],  "destination": "https://flashshp.vercel.app/:path*", "permanent": false },
+    { "source": "/:path*", "has": [{ "type": "host", "value": "flashshp.xyz" }],     "destination": "https://flashshp.vercel.app/:path*", "permanent": false },
+    { "source": "/:path*", "has": [{ "type": "host", "value": "www.flashshp.xyz" }], "destination": "https://flashshp.vercel.app/:path*", "permanent": false }
+  ],
   "rewrites": [
     { "source": "/",                  "destination": "/preview.html" },
     { "source": "/admin",             "destination": "/admin.html" },

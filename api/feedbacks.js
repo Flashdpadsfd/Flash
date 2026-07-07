@@ -123,28 +123,35 @@ module.exports = async function (req, res) {
       if (list.length < PER_PAGE) break; /* dernière page atteinte */
     }
 
-    /* Garde uniquement les 5★ avec un message ; map vers la forme « avis » du site. */
+    /* Garde tous les 5★ (y compris les avis AUTOMATIQUES après 7 jours, qui n'ont pas
+       de message → on met un texte neutre par défaut). Map vers la forme « avis » du site. */
     var reviews = collected
       .filter(function (f) {
-        return Number(f.rating) === 5 &&
-               !f.deleted_at &&
-               String(f.message || '').trim() !== '';
+        return Number(f.rating) === 5 && !f.deleted_at;
       })
       .map(function (f) {
         var email = emailOf(f);
         var name = maskedName(email);
+        var msg = String(f.message || '').trim();
         return {
           id: f.id,
           name: name,
           initials: initialsOf(email, name),
           color: PALETTE[hashCode(email || String(f.id)) % PALETTE.length],
           date: monthYear(f.created_at),
+          createdAt: f.created_at || null,
           product: productOf(f),
           stars: 5,
+          automatic: !!f.is_automatic,
           reply: String(f.reply || ''),
-          text: String(f.message || '').slice(0, 600)
+          text: msg ? msg.slice(0, 600) : 'Automatic after 7 days'
         };
       });
+
+    /* Met en avant les vrais témoignages (avec message) ; les avis automatiques
+       (sans message) passent après. Le tri de V8 est stable → l'ordre par date
+       (récent d'abord) est conservé à l'intérieur de chaque groupe. */
+    reviews.sort(function (a, b) { return (a.automatic ? 1 : 0) - (b.automatic ? 1 : 0); });
 
     /* Cache CDN 5 min (réduit les appels API + accélère la page). */
     res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');

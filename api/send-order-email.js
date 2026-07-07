@@ -103,8 +103,8 @@ module.exports = function (req, res) {
   var productName = escHtml(String(body.productName || '').slice(0, 128));
   var deliverable = escHtml(String(body.deliverable || '').slice(0, 2000));
   var storeName   = escHtml(String(body.storeName   || 'FlashShp').slice(0, 64));
-  var storeUrl    = String(body.storeUrl || 'https://nexus-theme-iota.vercel.app/').slice(0, 200);
-  if (!/^https?:\/\//.test(storeUrl)) storeUrl = 'https://nexus-theme-iota.vercel.app/';
+  var storeUrl    = String(body.storeUrl || 'https://flashshp.vercel.app/').slice(0, 200);
+  if (!/^https?:\/\//.test(storeUrl)) storeUrl = 'https://flashshp.vercel.app/';
   storeUrl = escHtml(storeUrl);
   var subject     = oneLine(String(body.subject || 'Your Order is Ready!')).slice(0, 150) || 'Your Order is Ready!';
 

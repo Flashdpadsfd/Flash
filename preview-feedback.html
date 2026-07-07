@@ -169,6 +169,85 @@
       height: 40px;
       background: rgba(255,255,255,.1);
     }
+
+    /* ═══ LunarCheats-style reviews ═══ */
+    :root { --rv-accent:#6d5cf5; --rv-star:#f5b423; }
+    .rv-hero { position:relative; padding:130px 24px 26px; text-align:center; overflow:hidden; }
+    .rv-hero::before { content:''; position:absolute; left:50%; top:-40px; width:920px; height:520px; transform:translateX(-50%);
+      background:radial-gradient(ellipse at center, rgba(109,92,245,.22), transparent 62%); pointer-events:none; }
+    .rv-hero__pill { position:relative; display:inline-flex; align-items:center; gap:8px; padding:7px 16px; border-radius:999px;
+      background:rgba(109,92,245,.12); border:1px solid rgba(109,92,245,.34); color:#bcb0ff;
+      font-size:12px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; margin-bottom:22px; }
+    .rv-hero__title { position:relative; font-family:Inter,sans-serif; font-size:clamp(46px,8vw,84px); font-weight:800;
+      letter-spacing:-2px; line-height:1; margin:0; color:#fff; }
+
+    .reviews-wrap { max-width:1240px; }
+    .rv-panel { display:flex; align-items:center; gap:26px; flex-wrap:wrap;
+      background:rgba(255,255,255,.025); border:1px solid rgba(255,255,255,.07); border-radius:20px; padding:22px 26px; margin-bottom:30px; }
+    .rv-score { display:flex; align-items:center; gap:24px; }
+    .rv-score__num { text-align:center; flex-shrink:0; }
+    .rv-score__val { font-size:38px; font-weight:800; color:#fff; line-height:1; }
+    .rv-score__stars { display:flex; gap:2px; justify-content:center; margin:6px 0 4px; }
+    .rv-score__stars svg { color:var(--rv-star); }
+    .rv-score__out { font-size:11px; color:rgba(255,255,255,.4); }
+    .rv-dist { display:flex; flex-direction:column; gap:5px; min-width:236px; }
+    .rv-dist__row { display:flex; align-items:center; gap:8px; font-size:12px; }
+    .rv-dist__lbl { display:inline-flex; align-items:center; gap:3px; width:26px; color:rgba(255,255,255,.7); font-weight:600; }
+    .rv-dist__lbl svg { color:var(--rv-star); }
+    .rv-dist__bar { flex:1; height:7px; border-radius:4px; background:rgba(255,255,255,.06); overflow:hidden; }
+    .rv-dist__fill { display:block; height:100%; border-radius:4px; }
+    .rv-dist__count { width:18px; text-align:right; color:#fff; font-weight:600; }
+    .rv-dist__pct { width:44px; color:rgba(255,255,255,.32); }
+    .rv-divider { width:1px; align-self:stretch; background:rgba(255,255,255,.08); }
+    .rv-filters { display:flex; align-items:center; gap:8px; flex-wrap:wrap; flex:1; }
+    .rv-pills { display:flex; gap:8px; flex-wrap:wrap; }
+    .rv-dd { position:relative; }
+    .rv-dd__btn { display:inline-flex; align-items:center; gap:8px; padding:9px 14px; border-radius:11px;
+      background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1); color:#fff; font-size:13px; font-weight:500;
+      font-family:Inter,sans-serif; cursor:pointer; }
+    .rv-dd__menu { position:absolute; top:calc(100% + 6px); left:0; min-width:190px; z-index:30;
+      background:#141417; border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:6px; display:none;
+      max-height:300px; overflow:auto; box-shadow:0 18px 44px rgba(0,0,0,.55); }
+    .rv-dd.open .rv-dd__menu { display:block; }
+    .rv-dd__opt { padding:8px 10px; border-radius:8px; font-size:13px; color:rgba(255,255,255,.78); cursor:pointer; white-space:nowrap; }
+    .rv-dd__opt:hover, .rv-dd__opt.active { background:rgba(109,92,245,.2); color:#fff; }
+    .rv-pill { display:inline-flex; align-items:center; gap:5px; padding:9px 13px; border-radius:11px;
+      background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1); color:rgba(255,255,255,.8);
+      font-size:13px; font-weight:600; font-family:Inter,sans-serif; cursor:pointer; }
+    .rv-pill svg { color:var(--rv-star); }
+    .rv-pill.active { background:var(--rv-accent); border-color:var(--rv-accent); color:#fff; box-shadow:0 6px 18px rgba(109,92,245,.4); }
+    .rv-pill.active svg { color:#fff; }
+    .rv-sort { display:flex; align-items:center; gap:8px; margin-left:auto; }
+    .rv-sort__btn { padding:9px 16px; border-radius:11px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1);
+      color:rgba(255,255,255,.7); font-size:13px; font-weight:600; font-family:Inter,sans-serif; cursor:pointer; }
+    .rv-sort__btn.active { background:var(--rv-accent); border-color:var(--rv-accent); color:#fff; box-shadow:0 6px 18px rgba(109,92,245,.4); }
+    .rv-count { font-size:13px; color:rgba(255,255,255,.4); margin-bottom:16px; }
+    .rv-count b { color:#fff; font-weight:700; }
+
+    .rv-grid { columns:3; column-gap:18px; }
+    @media (max-width:900px){ .rv-grid{columns:2;} .rv-divider{display:none;} }
+    @media (max-width:580px){ .rv-grid{columns:1;} .rv-sort{margin-left:0;} }
+    .rv-card { break-inside:avoid; background:rgba(255,255,255,.025); border:1px solid rgba(255,255,255,.07);
+      border-radius:16px; padding:18px; margin-bottom:18px; transition:border-color .2s ease, background .2s ease; }
+    .rv-card:hover { background:rgba(255,255,255,.045); border-color:rgba(255,255,255,.14); }
+    .rv-card__top { display:flex; align-items:flex-start; gap:11px; margin-bottom:11px; }
+    .rv-card__avatar { width:40px; height:40px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center;
+      font-size:15px; font-weight:700; color:#fff; }
+    .rv-card__id { flex:1; min-width:0; }
+    .rv-card__name { font-size:14px; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .rv-card__date { font-size:12px; color:rgba(255,255,255,.36); margin-top:1px; }
+    .rv-verified { display:inline-flex; align-items:center; gap:4px; flex-shrink:0; font-size:11px; font-weight:600; padding:3px 9px; border-radius:999px; }
+    .rv-card__stars { display:flex; gap:2px; margin-bottom:9px; }
+    .rv-card__stars svg { color:var(--rv-star); }
+    .rv-card__text { font-size:13.5px; color:rgba(255,255,255,.62); line-height:1.6; margin:0 0 14px; word-wrap:break-word; }
+    .rv-card__footer { display:flex; align-items:center; justify-content:space-between; gap:10px;
+      background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06); border-radius:10px; padding:9px 12px; }
+    .rv-card__product { display:flex; align-items:center; gap:8px; font-size:13px; color:rgba(255,255,255,.8); font-weight:500; min-width:0; }
+    .rv-card__product svg { color:rgba(255,255,255,.45); flex-shrink:0; }
+    .rv-card__product span { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .rv-card__view { font-size:12px; color:rgba(255,255,255,.4); white-space:nowrap; text-decoration:none; transition:color .2s ease; flex-shrink:0; }
+    .rv-card__view:hover { color:#fff; }
+    .rv-empty { text-align:center; color:rgba(255,255,255,.4); padding:60px 0; font-size:14px; }
   </style>
 </head>
 <body>
@@ -245,44 +324,45 @@
   </div>
 
   <!-- ─── HERO ─── -->
-  <div class="reviews-hero">
-    <div class="reviews-hero__eyebrow">
-      <div class="reviews-hero__eyebrow-line"></div>
-      <span class="reviews-hero__eyebrow-text">Verified Customers</span>
-      <div class="reviews-hero__eyebrow-line"></div>
-    </div>
-    <div class="reviews-hero__stars">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-    </div>
-    <h1 class="reviews-hero__title">What Our Customers Say</h1>
-    <p class="reviews-hero__sub">Real reviews from real customers. Every review below is verified and 5-star rated.</p>
+  <div class="rv-hero">
+    <div class="rv-hero__pill">✦&nbsp;<span id="rvHeroPillText">What people say about us?</span>&nbsp;✦</div>
+    <h1 class="rv-hero__title" id="rvHeroTitle">Reviews</h1>
   </div>
 
   <!-- ─── SUMMARY ─── -->
   <div class="reviews-wrap">
-    <div class="reviews-summary reveal">
-      <div class="reviews-summary__item">
-        <span class="reviews-summary__value" id="summaryRating">4.96</span>
-        <span class="reviews-summary__label">Average Rating</span>
+    <!-- ─── SUMMARY + FILTERS PANEL ─── -->
+    <div class="rv-panel">
+      <div class="rv-score">
+        <div class="rv-score__num">
+          <div class="rv-score__val" id="rvAvg">5.0</div>
+          <div class="rv-score__stars" id="rvAvgStars"></div>
+          <div class="rv-score__out">out of 5</div>
+        </div>
+        <div class="rv-dist" id="rvDist"></div>
       </div>
-      <div class="reviews-summary__divider"></div>
-      <div class="reviews-summary__item">
-        <span class="reviews-summary__value" id="reviewCount">12</span>
-        <span class="reviews-summary__label">Total Reviews</span>
-      </div>
-      <div class="reviews-summary__divider"></div>
-      <div class="reviews-summary__item">
-        <span class="reviews-summary__value">100%</span>
-        <span class="reviews-summary__label">5-Star Reviews</span>
+      <div class="rv-divider"></div>
+      <div class="rv-filters">
+        <div class="rv-dd" id="rvProductDd">
+          <button class="rv-dd__btn" id="rvProductBtn" type="button">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+            <span id="rvProductLbl">All Products</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="opacity:.5"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="rv-dd__menu" id="rvProductMenu"></div>
+        </div>
+        <div class="rv-pills" id="rvStarPills"></div>
+        <div class="rv-sort">
+          <button class="rv-sort__btn active" data-sort="recent" type="button">Recent</button>
+          <button class="rv-sort__btn" data-sort="oldest" type="button">Oldest</button>
+        </div>
       </div>
     </div>
 
+    <div class="rv-count"><b id="rvCount">0</b> Reviews</div>
+
     <!-- ─── REVIEWS GRID ─── -->
-    <div class="reviews-grid reveal" id="reviewsGrid"><!-- rendered by script -->
+    <div class="rv-grid" id="reviewsGrid"><!-- rendered by script -->
 
       <div class="review-card">
         <div class="review-card__header">
@@ -628,54 +708,135 @@
       try { return JSON.parse(localStorage.getItem('nexus_reviews')) || DEFAULT_REVIEWS; } catch(e) { return DEFAULT_REVIEWS; }
     }
     function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-    function starsSvg(n) {
-      var FULL  = '<svg width="13" height="13" viewBox="0 0 24 24" fill="#f5a623"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
-      var EMPTY = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
-      var html = '';
-      for (var i = 1; i <= 5; i++) html += (i <= n ? FULL : EMPTY);
-      return html;
+    var STAR_F = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
+    var STAR_E = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
+    function star(sz, empty) { return (empty ? STAR_E : STAR_F).replace('width="14" height="14"', 'width="' + sz + '" height="' + sz + '"'); }
+    function starsRow(n, sz) { sz = sz || 14; var h = ''; for (var i = 1; i <= 5; i++) h += star(sz, i > n); return h; }
+
+    var DIST_COLORS = { 5:'#34d399', 4:'#60a5fa', 3:'#facc15', 2:'#fb923c', 1:'#f87171' };
+    var PALETTE = ['#e50914','#1db954','#6495ed','#ffa01e','#9b59b6','#1abc9c','#e74c3c','#3498db','#f39c12','#00b4d8','#64c864','#6d5cf5'];
+    var VERIF = ['#34d399','#60a5fa','#a78bff','#fb923c','#f472b6'];
+    function hash(s) { var h = 0; s = String(s); for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h; }
+    function initialOf(r) { if (r.initials) return r.initials; var n = String(r.name || '?').replace(/[^a-zA-Z0-9]/g,''); return (n.charAt(0) || '?').toUpperCase(); }
+    function tsOf(r) { if (r.createdAt) { var d = new Date(r.createdAt); if (!isNaN(d.getTime())) return d.getTime(); } return 0; }
+    function relDate(r) {
+      if (r.createdAt) {
+        var d = new Date(r.createdAt);
+        if (!isNaN(d.getTime())) {
+          var days = Math.floor((Date.now() - d.getTime()) / 86400000);
+          if (days <= 0) return 'Today';
+          if (days === 1) return 'Yesterday';
+          if (days < 30) return days + ' days ago';
+          var mo = Math.floor(days / 30); if (mo < 12) return 'about ' + mo + ' month' + (mo > 1 ? 's' : '') + ' ago';
+          var yr = Math.floor(days / 365); return 'about ' + yr + ' year' + (yr > 1 ? 's' : '') + ' ago';
+        }
+      }
+      return r.date || '';
     }
-    function renderList(reviews) {
+
+    var ALL = [];
+    var fProduct = 'all', fStars = 'all', sortBy = 'recent';
+
+    function renderPanel() {
+      var total = ALL.length;
+      var counts = {1:0,2:0,3:0,4:0,5:0}, sum = 0;
+      ALL.forEach(function(r) { var s = Math.max(1, Math.min(5, Math.round(r.stars || 5))); counts[s]++; sum += s; });
+      var avg = total ? (sum / total) : 0;
+      document.getElementById('rvAvg').textContent = avg.toFixed(1);
+      document.getElementById('rvAvgStars').innerHTML = starsRow(Math.round(avg), 15);
+      var rows = '';
+      for (var s = 5; s >= 1; s--) {
+        var c = counts[s], pct = total ? Math.round(c / total * 100) : 0;
+        rows += '<div class="rv-dist__row">' +
+          '<span class="rv-dist__lbl">' + s + ' ' + star(11) + '</span>' +
+          '<span class="rv-dist__bar"><span class="rv-dist__fill" style="width:' + pct + '%;background:' + DIST_COLORS[s] + ';"></span></span>' +
+          '<span class="rv-dist__count">' + c + '</span>' +
+          '<span class="rv-dist__pct">(' + pct + '%)</span>' +
+        '</div>';
+      }
+      document.getElementById('rvDist').innerHTML = rows;
+      var prods = {}; ALL.forEach(function(r) { if (r.product) prods[r.product] = 1; });
+      var names = Object.keys(prods).sort();
+      document.getElementById('rvProductMenu').innerHTML =
+        '<div class="rv-dd__opt' + (fProduct === 'all' ? ' active' : '') + '" data-prod="all">All Products</div>' +
+        names.map(function(n) { return '<div class="rv-dd__opt' + (fProduct === n ? ' active' : '') + '" data-prod="' + esc(n) + '">' + esc(n) + '</div>'; }).join('');
+      document.getElementById('rvProductLbl').textContent = fProduct === 'all' ? 'All Products' : fProduct;
+    }
+
+    function applyFilters() {
+      var list = ALL.filter(function(r) {
+        if (fProduct !== 'all' && r.product !== fProduct) return false;
+        if (fStars !== 'all' && Math.round(r.stars || 5) !== Number(fStars)) return false;
+        return true;
+      });
+      list.sort(function(a, b) {
+        if (sortBy === 'oldest') return tsOf(a) - tsOf(b);
+        /* « Recent » (défaut) : les vrais témoignages (avec message) d'abord, puis par date décroissante */
+        var am = a.automatic ? 1 : 0, bm = b.automatic ? 1 : 0;
+        if (am !== bm) return am - bm;
+        return tsOf(b) - tsOf(a);
+      });
+      document.getElementById('rvCount').textContent = list.length;
       var grid = document.getElementById('reviewsGrid');
-      if (!grid) return;
-      var count = document.getElementById('reviewCount');
-      if (count) count.textContent = reviews.length;
-      grid.innerHTML = reviews.map(function(r) {
-        return '<div class="review-card">' +
-          '<div class="review-card__header">' +
-            '<div class="review-card__avatar" style="background:' + esc(r.color || '#6495ed') + ';">' + esc(r.initials || '★') + '</div>' +
-            '<div class="review-card__info">' +
-              '<div class="review-card__name">' + esc(r.name) + '</div>' +
-              '<div class="review-card__date">' + esc(r.date) + '</div>' +
-            '</div>' +
+      if (!list.length) { grid.innerHTML = '<div class="rv-empty">No reviews to show for this filter.</div>'; return; }
+      grid.innerHTML = list.map(function(r) {
+        var vc = VERIF[hash(r.name || String(r.id)) % VERIF.length];
+        var col = r.color || PALETTE[hash(r.name || String(r.id)) % PALETTE.length];
+        return '<div class="rv-card">' +
+          '<div class="rv-card__top">' +
+            '<div class="rv-card__avatar" style="background:' + esc(col) + ';">' + esc(initialOf(r)) + '</div>' +
+            '<div class="rv-card__id"><div class="rv-card__name">' + esc(r.name) + '</div><div class="rv-card__date">' + esc(relDate(r)) + '</div></div>' +
+            '<span class="rv-verified" style="background:' + vc + '22;border:1px solid ' + vc + '55;color:' + vc + ';"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>Verified</span>' +
           '</div>' +
-          '<div class="review-card__stars">' + starsSvg(r.stars || 5) + '</div>' +
-          '<p class="review-card__text">' + esc(r.text) + '</p>' +
-          (r.product ? '<span class="review-card__badge">' + esc(r.product) + '</span>' : '') +
+          '<div class="rv-card__stars">' + starsRow(r.stars || 5) + '</div>' +
+          '<p class="rv-card__text">' + esc(r.text) + '</p>' +
+          (r.product
+            ? '<div class="rv-card__footer"><span class="rv-card__product"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg><span>' + esc(r.product) + '</span></span><a class="rv-card__view" href="preview-products.html">View →</a></div>'
+            : '') +
         '</div>';
       }).join('');
     }
-    function renderGrid() {
-      var reviews = getReviews().filter(function(r) { return r.published !== false; });
-      renderList(reviews);
-    }
-    renderGrid();
-    window.addEventListener('storage', function(e) {
-      if (e.key === 'nexus_reviews') renderGrid();
+
+    function renderAll() { renderPanel(); applyFilters(); }
+
+    /* Pills d'étoiles (All / 5 / 4 / 3 / 2 / 1) */
+    (function() {
+      var wrap = document.getElementById('rvStarPills');
+      if (!wrap) return;
+      var html = '<button class="rv-pill active" data-stars="all" type="button">All</button>';
+      [5,4,3,2,1].forEach(function(s) { html += '<button class="rv-pill" data-stars="' + s + '" type="button">' + s + ' ' + star(12) + '</button>'; });
+      wrap.innerHTML = html;
+    })();
+
+    /* Interactions (délégation) */
+    document.addEventListener('click', function(e) {
+      var dd = document.getElementById('rvProductDd');
+      var opt = e.target.closest && e.target.closest('.rv-dd__opt');
+      if (opt) { fProduct = opt.getAttribute('data-prod'); if (dd) dd.classList.remove('open'); renderPanel(); applyFilters(); return; }
+      if (e.target.closest && e.target.closest('#rvProductBtn')) { if (dd) dd.classList.toggle('open'); return; }
+      if (dd && e.target.closest && !e.target.closest('#rvProductDd')) dd.classList.remove('open');
+      var pill = e.target.closest && e.target.closest('.rv-pill');
+      if (pill) { document.querySelectorAll('.rv-pill').forEach(function(p) { p.classList.remove('active'); }); pill.classList.add('active'); fStars = pill.getAttribute('data-stars'); applyFilters(); return; }
+      var sb = e.target.closest && e.target.closest('.rv-sort__btn');
+      if (sb) { document.querySelectorAll('.rv-sort__btn').forEach(function(b) { b.classList.remove('active'); }); sb.classList.add('active'); sortBy = sb.getAttribute('data-sort'); applyFilters(); return; }
     });
 
-    /* ── Feedbacks 5★ en direct depuis SellAuth (via /api/feedbacks) ──
-       Si la fonction serveur est configurée (clé API SellAuth), on remplace les
-       avis locaux par les vrais feedbacks 5★. Sinon (501/erreur), on garde les
-       avis locaux/par défaut ci-dessus — aucune régression. */
+    /* Chargement : avis locaux/démo d'abord, puis vrais feedbacks SellAuth */
+    ALL = getReviews().filter(function(r) { return r.published !== false; });
+    renderAll();
+    window.addEventListener('storage', function(e) {
+      if (e.key === 'nexus_reviews') { ALL = getReviews().filter(function(r) { return r.published !== false; }); renderAll(); }
+    });
+
     (function loadSellAuthFeedbacks() {
       fetch('/api/feedbacks', { headers: { 'Accept': 'application/json' } })
         .then(function(r) { return r.ok ? r.json() : null; })
         .then(function(data) {
           if (!data || !data.ok || !Array.isArray(data.reviews) || !data.reviews.length) return;
-          renderList(data.reviews);
-          var sumRating = document.getElementById('summaryRating');
-          if (sumRating) sumRating.textContent = (data.average || 5).toFixed ? Number(data.average || 5).toFixed(2) : '5.00';
+          ALL = data.reviews;
+          fProduct = 'all'; fStars = 'all';
+          document.querySelectorAll('.rv-pill').forEach(function(p, i) { p.classList.toggle('active', i === 0); });
+          renderAll();
         })
         .catch(function() { /* hors-ligne ou non configuré : on garde les avis locaux */ });
     })();
@@ -701,10 +862,8 @@
     function applyContent(c) {
       if (!c) return;
       if (c.siteName)       document.querySelectorAll('.nav__logo, .drawer__logo, .footer__logo').forEach(function(el) { el.textContent = c.siteName; });
-      if (c.reviewsEyebrow) { var e = document.querySelector('.reviews-hero__eyebrow-text'); if (e) e.textContent = c.reviewsEyebrow; }
-      if (c.reviewsTitle)   { var e = document.querySelector('.reviews-hero__title'); if (e) e.textContent = c.reviewsTitle; }
-      if (c.reviewsSub)     { var e = document.querySelector('.reviews-hero__sub'); if (e) e.textContent = c.reviewsSub; }
-      if (c.reviewsRating)  { var e = document.getElementById('summaryRating'); if (e) e.textContent = c.reviewsRating; }
+      if (c.reviewsEyebrow) { var e = document.getElementById('rvHeroPillText'); if (e) e.textContent = c.reviewsEyebrow; }
+      if (c.reviewsTitle)   { var e = document.getElementById('rvHeroTitle'); if (e) e.textContent = c.reviewsTitle; }
       if (c.footerDesc)     document.querySelectorAll('.footer__desc').forEach(function(el) { el.innerHTML  = c.footerDesc; });
       if (c.footerCopy)     document.querySelectorAll('.footer__copy').forEach(function(el) { el.textContent = c.footerCopy; });
     }
