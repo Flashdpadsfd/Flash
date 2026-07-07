@@ -111,6 +111,35 @@
     try { return JSON.parse(localStorage.getItem('nexus_reviews')) || DEFAULT_REVIEWS; } catch(e) { return DEFAULT_REVIEWS; }
   }
   function setReviews(r) { localStorage.setItem('nexus_reviews', JSON.stringify(r)); }
+
+  /* ── Sync des vrais avis SellAuth (via /api/feedbacks) ──
+     Quand l'API est configurée, l'admin affiche les mêmes avis que la boutique
+     (lecture seule). Sinon on retombe sur les avis locaux (nexus_reviews). */
+  var _apiReviews = null;   // null = pas encore chargé ; [] = chargé mais vide
+  var _apiSyncing = false;
+  function activeReviews() {
+    return (_apiReviews && _apiReviews.length) ? _apiReviews : getReviews();
+  }
+  function isSyncedView() { return !!(_apiReviews && _apiReviews.length); }
+  function syncFeedbacks(cb) {
+    if (_apiSyncing) return;
+    _apiSyncing = true;
+    fetch('/api/feedbacks', { headers: { 'Accept': 'application/json' } })
+      .then(function(r) { return r.ok ? r.json() : null; })
+      .then(function(data) {
+        if (data && data.ok && Array.isArray(data.reviews)) {
+          _apiReviews = data.reviews.map(function(r) {
+            return Object.assign({}, r, { _synced: true, published: true });
+          });
+        }
+      })
+      .catch(function() { /* non configuré / hors-ligne : on garde les avis locaux */ })
+      .then(function() {
+        if (_apiReviews === null) _apiReviews = []; // marque « essayé » → pas de re-fetch en boucle
+        _apiSyncing = false;
+        if (typeof cb === 'function') cb();
+      });
+  }
   function getPayments() {
     try { return JSON.parse(localStorage.getItem('nexus_payments')) || {}; } catch(e) { return {}; }
   }
@@ -1319,7 +1348,7 @@
   }
 
   function renderFeedbackStats() {
-    var reviews = getReviews();
+    var reviews = activeReviews();
     var total     = reviews.length;
     var published = reviews.filter(function(r) { return r.published !== false; }).length;
     var pending   = reviews.filter(function(r) { return !r.reply; }).length;
@@ -1381,8 +1410,21 @@
   window.setReviewStar = function(n) { _rvStars = n; renderStarPicker(n); };
 
   function renderReviews() {
+    /* Lance la synchro SellAuth (une fois) puis re-render quand c'est prêt. */
+    if (_apiReviews === null && !_apiSyncing) syncFeedbacks(renderReviews);
     renderFeedbackStats();
-    var reviews = getReviews();
+    var synced = isSyncedView();
+    var reviews = activeReviews();
+
+    /* En mode synchronisé : avis en lecture seule (gérés sur SellAuth). */
+    var addBtn = document.getElementById('fbAddBtn');
+    if (addBtn) addBtn.style.display = synced ? 'none' : '';
+    var note = document.getElementById('fbSyncNote');
+    if (note) {
+      if (synced) { note.style.display = 'inline-flex'; note.textContent = '● Synced from SellAuth'; note.style.color = '#1db954'; }
+      else { note.style.display = 'none'; }
+    }
+
     var tbody = document.getElementById('reviewsTbody');
     if (!tbody) return;
     if (!reviews.length) {
@@ -1411,10 +1453,12 @@
           '</span>' +
         '</td>' +
         '<td>' +
-          '<div class="action-group">' +
-            '<button class="a-btn a-btn--icon" onclick="openReviewModal(' + r.id + ')" title="Edit"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>' +
-            '<button class="a-btn a-btn--icon" onclick="deleteReview(' + r.id + ')" style="color:var(--red);" title="Delete"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg></button>' +
-          '</div>' +
+          (r._synced
+            ? '<span style="font-size:11px;color:rgba(255,255,255,.35);white-space:nowrap;">SellAuth · read-only</span>'
+            : '<div class="action-group">' +
+                '<button class="a-btn a-btn--icon" onclick="openReviewModal(' + r.id + ')" title="Edit"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>' +
+                '<button class="a-btn a-btn--icon" onclick="deleteReview(' + r.id + ')" style="color:var(--red);" title="Delete"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg></button>' +
+              '</div>') +
         '</td>' +
       '</tr>';
     }).join('');
@@ -2087,15 +2131,14 @@
     /* ── Customer Feedback ── */
     var feedbackEl = document.getElementById('odFeedback');
     if (feedbackEl) {
-      var reviews = [];
-      try { reviews = JSON.parse(localStorage.getItem('nexus_reviews') || '[]'); } catch(e) {}
+      var reviews = activeReviews();
       var related = reviews.filter(function(r) { return r.email === o.email || r.product === o.productName; });
       if (!related.length) {
         feedbackEl.innerHTML = '<p style="color:rgba(255,255,255,.3);font-size:13px;padding:12px 0;">No feedback submitted yet.</p>';
       } else {
         feedbackEl.innerHTML = related.map(function(r) {
           var stars = '';
-          for (var i = 0; i < (r.rating || 5); i++) stars += '★';
+          for (var i = 0; i < (r.stars || r.rating || 5); i++) stars += '★';
           return '<div style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06);">' +
             '<div style="color:#f59e0b;font-size:13px;">' + stars + '</div>' +
             '<div style="font-size:13px;margin-top:4px;">' + esc(r.text || '') + '</div>' +

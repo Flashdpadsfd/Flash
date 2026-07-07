@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FlashShp — Connexion</title>
+  <meta name="robots" content="noindex" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/style.css?v=15" />
+  <style>
+    .cl-wrap { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; position:relative; overflow:hidden; }
+    .cl-wrap::before { content:''; position:absolute; left:50%; top:-10%; width:900px; height:520px; transform:translateX(-50%);
+      background:radial-gradient(ellipse at center, rgba(255,255,255,.08), transparent 62%); pointer-events:none; }
+    .cl-card { position:relative; width:100%; max-width:420px; background:rgba(255,255,255,.025);
+      border:1px solid rgba(255,255,255,.09); border-radius:20px; padding:38px 32px; text-align:center;
+      box-shadow:0 24px 60px rgba(0,0,0,.45); }
+    .cl-logo { font-family:Inter,sans-serif; font-size:26px; font-weight:800; letter-spacing:-.5px; margin-bottom:6px; }
+    .cl-logo span { background:linear-gradient(135deg,#8a909c 0%,#ffffff 100%); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+    .cl-title { font-size:19px; font-weight:700; margin:14px 0 6px; }
+    .cl-sub { font-size:13.5px; color:rgba(255,255,255,.5); line-height:1.6; margin-bottom:26px; }
+    .cl-btn { display:flex; align-items:center; justify-content:center; gap:10px; width:100%; height:48px; border-radius:12px;
+      font-family:Inter,sans-serif; font-size:15px; font-weight:600; cursor:pointer; text-decoration:none;
+      background:linear-gradient(135deg,#5b616e 0%,#f6f7f9 100%); color:#16171b; border:1px solid transparent;
+      box-shadow:0 8px 22px rgba(0,0,0,.35); transition:transform .15s ease, box-shadow .2s ease; }
+    .cl-btn:hover { transform:translateY(-1px); box-shadow:0 12px 28px rgba(0,0,0,.45); }
+    .cl-btn svg { flex-shrink:0; }
+    .cl-note { margin-top:18px; font-size:12px; color:rgba(255,255,255,.38); line-height:1.6; }
+    .cl-err { margin-bottom:20px; font-size:13px; padding:10px 14px; border-radius:10px;
+      background:rgba(248,113,113,.12); border:1px solid rgba(248,113,113,.3); color:#fda4a4; display:none; }
+    .cl-err.show { display:block; }
+    .cl-ok { margin-bottom:20px; font-size:13px; padding:10px 14px; border-radius:10px;
+      background:rgba(52,211,153,.12); border:1px solid rgba(52,211,153,.3); color:#86efac; display:none; }
+    .cl-ok.show { display:block; }
+    .cl-back { margin-top:22px; display:inline-block; font-size:12.5px; color:rgba(255,255,255,.4); }
+    .cl-back:hover { color:#fff; }
+  </style>
+</head>
+<body>
+  <div class="cl-wrap">
+    <div class="cl-card">
+      <div class="cl-logo">Flash<span>Shp</span></div>
+      <div class="cl-title">Espace client</div>
+      <div class="cl-sub">Connectez-vous avec Discord pour retrouver l'historique de vos commandes.</div>
+
+      <div class="cl-err" id="clErr"></div>
+      <div class="cl-ok" id="clOk">Vous avez été déconnecté.</div>
+
+      <a class="cl-btn" href="/api/auth-discord" id="clDiscord">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.317 4.369a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.211.375-.445.865-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.1 13.1 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.009c.12.099.245.198.372.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.891.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.056c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.331c-1.183 0-2.157-1.086-2.157-2.42 0-1.332.955-2.418 2.157-2.418 1.21 0 2.176 1.096 2.157 2.42 0 1.332-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.086-2.157-2.42 0-1.332.955-2.418 2.157-2.418 1.21 0 2.176 1.096 2.157 2.42 0 1.332-.946 2.418-2.157 2.418z"/></svg>
+        Se connecter avec Discord
+      </a>
+
+      <div class="cl-note">Nous utilisons uniquement votre e-mail Discord pour retrouver vos commandes. Aucun mot de passe stocké.</div>
+
+      <a class="cl-back" href="/">← Retour à la boutique</a>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    var params = new URLSearchParams(location.search);
+    var ERRORS = {
+      missing_code: "La connexion a été annulée. Réessayez.",
+      bad_state: "Session de connexion expirée. Réessayez.",
+      token_exchange: "Impossible de valider la connexion Discord.",
+      userinfo: "Impossible de lire votre profil Discord.",
+      no_email: "Votre compte Discord n'a pas d'e-mail vérifié. Vérifiez votre e-mail sur Discord puis réessayez.",
+      access_denied: "Vous avez refusé l'autorisation Discord.",
+      server: "Une erreur est survenue. Réessayez plus tard."
+    };
+    var err = params.get('error');
+    if (err) {
+      var box = document.getElementById('clErr');
+      box.textContent = ERRORS[err] || ("Erreur de connexion (" + err + ").");
+      box.classList.add('show');
+    }
+    if (params.get('loggedout')) document.getElementById('clOk').classList.add('show');
+  })();
+  </script>
+</body>
+</html>

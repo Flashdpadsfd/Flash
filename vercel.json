@@ -12,7 +12,9 @@
     { "source": "/product",           "destination": "/preview-product.html" },
     { "source": "/reviews",           "destination": "/preview-feedback.html" },
     { "source": "/invoice",           "destination": "/invoice.html" },
-    { "source": "/checkout",          "destination": "/checkout.html" }
+    { "source": "/checkout",          "destination": "/checkout.html" },
+    { "source": "/login",             "destination": "/client-login.html" },
+    { "source": "/account",           "destination": "/client-dashboard.html" }
   ],
   "headers": [
     {

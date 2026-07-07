@@ -352,10 +352,13 @@
       <div class="page" id="page-reviews">
         <div class="page-header">
           <h1>Feedbacks</h1>
-          <button class="a-btn a-btn--primary" onclick="openReviewModal(null)">
-            <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Add Feedback
-          </button>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span id="fbSyncNote" style="display:none;font-size:12px;color:rgba(255,255,255,.5);align-items:center;gap:6px;"></span>
+            <button id="fbAddBtn" class="a-btn a-btn--primary" onclick="openReviewModal(null)">
+              <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add Feedback
+            </button>
+          </div>
         </div>
 
         <!-- KPI Cards -->

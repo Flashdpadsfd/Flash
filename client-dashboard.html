@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FlashShp — Mon espace</title>
+  <meta name="robots" content="noindex" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/style.css?v=15" />
+  <style>
+    .db-top { display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;
+      padding:20px 24px; border-bottom:1px solid rgba(255,255,255,.07); position:sticky; top:0; z-index:10;
+      background:rgba(9,9,11,.85); backdrop-filter:blur(10px); }
+    .db-logo { font-family:Inter,sans-serif; font-size:20px; font-weight:800; letter-spacing:-.5px; }
+    .db-logo span { background:linear-gradient(135deg,#8a909c 0%,#ffffff 100%); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+    .db-user { display:flex; align-items:center; gap:12px; }
+    .db-avatar { width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg,#5b616e,#f6f7f9); color:#16171b;
+      display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; overflow:hidden; }
+    .db-avatar img { width:100%; height:100%; object-fit:cover; }
+    .db-uname { font-size:14px; font-weight:600; }
+    .db-logout { font-size:13px; padding:8px 14px; border-radius:9px; background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.12); color:rgba(255,255,255,.8); text-decoration:none; }
+    .db-logout:hover { background:rgba(255,255,255,.1); color:#fff; }
+
+    .db-wrap { max-width:1000px; margin:0 auto; padding:34px 24px 80px; }
+    .db-hello { font-size:26px; font-weight:800; letter-spacing:-.6px; margin-bottom:4px; }
+    .db-mail { font-size:13.5px; color:rgba(255,255,255,.45); margin-bottom:28px; }
+
+    .db-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:30px; }
+    @media (max-width:620px){ .db-stats{ grid-template-columns:1fr; } }
+    .db-stat { background:rgba(255,255,255,.025); border:1px solid rgba(255,255,255,.08); border-radius:16px; padding:18px 20px; }
+    .db-stat__lbl { font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:rgba(255,255,255,.4); font-weight:600; }
+    .db-stat__val { font-size:28px; font-weight:800; margin-top:8px;
+      background:linear-gradient(135deg,#9aa0ac 0%,#ffffff 100%); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+
+    .db-section-title { font-size:15px; font-weight:700; margin-bottom:14px; }
+    .db-orders { display:flex; flex-direction:column; gap:12px; }
+    .db-order { display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+      background:rgba(255,255,255,.025); border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:16px 18px; }
+    .db-order__main { flex:1; min-width:180px; }
+    .db-order__prod { font-size:14.5px; font-weight:600; }
+    .db-order__meta { font-size:12.5px; color:rgba(255,255,255,.42); margin-top:3px; }
+    .db-order__price { font-size:15px; font-weight:700; white-space:nowrap; }
+    .db-badge { font-size:11px; font-weight:700; padding:4px 10px; border-radius:999px; white-space:nowrap; text-transform:capitalize; }
+    .db-badge--completed { background:rgba(52,211,153,.14); color:#6ee7b7; border:1px solid rgba(52,211,153,.28); }
+    .db-badge--pending   { background:rgba(250,204,21,.14); color:#fde047; border:1px solid rgba(250,204,21,.28); }
+    .db-badge--other     { background:rgba(255,255,255,.08); color:rgba(255,255,255,.7); border:1px solid rgba(255,255,255,.16); }
+    .db-empty { text-align:center; color:rgba(255,255,255,.45); padding:56px 20px; font-size:14px;
+      background:rgba(255,255,255,.02); border:1px dashed rgba(255,255,255,.1); border-radius:16px; }
+    .db-loading { text-align:center; color:rgba(255,255,255,.4); padding:70px 0; font-size:14px; }
+    .db-note { margin-top:18px; font-size:12px; color:rgba(255,255,255,.35); }
+  </style>
+</head>
+<body>
+  <div class="db-top">
+    <div class="db-logo">Flash<span>Shp</span></div>
+    <div class="db-user">
+      <div class="db-avatar" id="dbAvatar">?</div>
+      <span class="db-uname" id="dbUname">…</span>
+      <a class="db-logout" href="/api/logout">Déconnexion</a>
+    </div>
+  </div>
+
+  <div class="db-wrap">
+    <div id="dbContent">
+      <div class="db-loading">Chargement de votre espace…</div>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]; }); }
+    function euro(n, cur) {
+      if (n == null || isNaN(n)) return '';
+      try { return new Intl.NumberFormat('fr-FR', { style:'currency', currency: cur || 'EUR' }).format(n); }
+      catch (e) { return n.toFixed(2) + ' ' + (cur || 'EUR'); }
+    }
+    function fmtDate(iso) {
+      if (!iso) return '';
+      var d = new Date(iso); if (isNaN(d.getTime())) return '';
+      return d.toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'numeric' });
+    }
+    function badgeClass(s) {
+      s = String(s || '').toLowerCase();
+      if (s === 'completed') return 'db-badge--completed';
+      if (s === 'pending' || s === 'processing') return 'db-badge--pending';
+      return 'db-badge--other';
+    }
+    function statusLabel(s) {
+      var map = { completed:'Terminée', pending:'En attente', processing:'En cours', cancelled:'Annulée', refunded:'Remboursée' };
+      return map[String(s || '').toLowerCase()] || (s || '—');
+    }
+
+    fetch('/api/me', { headers: { 'Accept': 'application/json' }, credentials: 'same-origin' })
+      .then(function (r) {
+        if (r.status === 401) { location.href = '/login'; return null; }
+        return r.ok ? r.json() : null;
+      })
+      .then(function (data) {
+        if (!data) return;
+        render(data);
+      })
+      .catch(function () {
+        document.getElementById('dbContent').innerHTML =
+          '<div class="db-empty">Impossible de charger votre espace. Réessayez plus tard.</div>';
+      });
+
+    function render(data) {
+      var u = data.user || {};
+      var orders = data.orders || [];
+
+      // En-tête utilisateur
+      var av = document.getElementById('dbAvatar');
+      if (u.avatar) av.innerHTML = '<img src="' + esc(u.avatar) + '" alt="" />';
+      else av.textContent = (String(u.username || '?').charAt(0) || '?').toUpperCase();
+      document.getElementById('dbUname').textContent = u.username || 'Client';
+
+      var completed = orders.filter(function (o) { return String(o.status).toLowerCase() === 'completed'; });
+      var totalSpent = completed.reduce(function (s, o) { return s + (o.price || 0); }, 0);
+      var currency = orders.length && orders[0].currency ? orders[0].currency : 'EUR';
+
+      var html = '';
+      html += '<div class="db-hello">Bonjour, ' + esc(u.username || 'Client') + ' 👋</div>';
+      html += '<div class="db-mail">' + esc(u.email || '') + '</div>';
+
+      html += '<div class="db-stats">' +
+        '<div class="db-stat"><div class="db-stat__lbl">Commandes</div><div class="db-stat__val">' + orders.length + '</div></div>' +
+        '<div class="db-stat"><div class="db-stat__lbl">Terminées</div><div class="db-stat__val">' + completed.length + '</div></div>' +
+        '<div class="db-stat"><div class="db-stat__lbl">Total dépensé</div><div class="db-stat__val">' + esc(euro(totalSpent, currency)) + '</div></div>' +
+      '</div>';
+
+      html += '<div class="db-section-title">Historique des commandes</div>';
+
+      if (data.ordersAvailable === false) {
+        html += '<div class="db-empty">L\'historique des commandes est momentanément indisponible.</div>';
+      } else if (!orders.length) {
+        html += '<div class="db-empty">Aucune commande trouvée pour l\'e-mail <b>' + esc(u.email || '') + '</b>.<br>Assurez-vous d\'avoir commandé avec cet e-mail.</div>';
+      } else {
+        html += '<div class="db-orders">' + orders.map(function (o) {
+          var prods = (o.products && o.products.length) ? o.products.join(', ') : 'Commande #' + o.id;
+          var metaBits = [];
+          if (o.createdAt) metaBits.push(fmtDate(o.createdAt));
+          if (o.gateway) metaBits.push(o.gateway);
+          metaBits.push('#' + o.id);
+          var link = o.uniqueId ? ' · <a href="/invoice?id=' + esc(o.uniqueId) + '" style="color:rgba(255,255,255,.6);">Voir la facture</a>' : '';
+          return '<div class="db-order">' +
+            '<div class="db-order__main">' +
+              '<div class="db-order__prod">' + esc(prods) + '</div>' +
+              '<div class="db-order__meta">' + esc(metaBits.join(' · ')) + link + '</div>' +
+            '</div>' +
+            '<span class="db-badge ' + badgeClass(o.status) + '">' + esc(statusLabel(o.status)) + '</span>' +
+            '<div class="db-order__price">' + esc(euro(o.price, o.currency)) + '</div>' +
+          '</div>';
+        }).join('') + '</div>';
+      }
+
+      html += '<div class="db-note">Les commandes sont reliées à votre e-mail Discord (' + esc(u.email || '') + ').</div>';
+
+      document.getElementById('dbContent').innerHTML = html;
+    }
+  })();
+  </script>
+</body>
+</html>
