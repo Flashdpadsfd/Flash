@@ -27,6 +27,10 @@ function isAllowedOrigin(req) {
   if (!src) return false;
   var host = hostFrom(src);
   if (!host) return false;
+  /* Same-origin (hôte de l'Origin == hôte servant la page) : marche sur
+     n'importe quel domaine (Hostinger, domaine perso…), sans config. */
+  var selfHost = String((req.headers && req.headers.host) || '').toLowerCase().split(':')[0];
+  if (selfHost && host === selfHost) return true;
   if (host === 'localhost' || host === '127.0.0.1') return true;
   if (/^nexus-theme[a-z0-9-]*\.vercel\.app$/.test(host)) return true;
   if (/^flashshp[a-z0-9-]*\.vercel\.app$/.test(host)) return true;

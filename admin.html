@@ -545,6 +545,19 @@
             <input type="text" placeholder="Rechercher email, produit…" id="customersSearch" oninput="filterCustomers(this.value)" />
           </div>
         </div>
+        <!-- Comptes connectés via Discord (notre stockage, indépendant de SellAuth) -->
+        <div class="section-title" style="margin:4px 0 8px;display:flex;align-items:center;gap:8px;">
+          🟢 Comptes connectés <span id="loginsCount" style="font-weight:400;color:rgba(255,255,255,.45);font-size:13px;">—</span>
+          <button class="db-btn db-btn--icon" onclick="renderLogins(true)" title="Rafraîchir" style="margin-left:auto;">↻</button>
+        </div>
+        <div class="table-wrap" style="margin-bottom:26px;">
+          <table class="a-table">
+            <thead><tr><th>Client</th><th>Email</th><th>Connexions</th><th>Dernière connexion</th><th></th></tr></thead>
+            <tbody id="loginsTbody"></tbody>
+          </table>
+        </div>
+
+        <div class="section-title" style="margin:4px 0 8px;">🛒 Clients (via commandes)</div>
         <div class="table-wrap">
           <table class="a-table">
             <thead><tr><th>Client</th><th>Email</th><th>Commandes</th><th>Total dépensé</th><th>Dernier achat</th><th>Produits</th></tr></thead>

@@ -35,6 +35,17 @@
     .cl-ok.show { display:block; }
     .cl-back { margin-top:22px; display:inline-block; font-size:12.5px; color:rgba(255,255,255,.4); }
     .cl-back:hover { color:#fff; }
+    .cl-divider { display:flex; align-items:center; gap:12px; margin:22px 0; color:rgba(255,255,255,.35); font-size:12px; }
+    .cl-divider::before, .cl-divider::after { content:''; flex:1; height:1px; background:rgba(255,255,255,.1); }
+    .cl-input { width:100%; height:46px; border-radius:12px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.12);
+      color:#fff; font-family:Inter,sans-serif; font-size:15px; padding:0 14px; margin-bottom:12px; text-align:center; }
+    .cl-input:focus { outline:none; border-color:rgba(255,255,255,.35); background:rgba(255,255,255,.06); }
+    .cl-input--code { letter-spacing:8px; font-weight:700; font-size:20px; }
+    .cl-btn--ghost { background:transparent; color:rgba(255,255,255,.85); border:1px solid rgba(255,255,255,.18); box-shadow:none; }
+    .cl-btn--ghost:hover { background:rgba(255,255,255,.06); }
+    .cl-btn[disabled] { opacity:.55; cursor:not-allowed; transform:none; }
+    .cl-linkbtn { margin-top:14px; background:none; border:none; color:rgba(255,255,255,.45); font-size:12.5px; cursor:pointer; font-family:Inter,sans-serif; }
+    .cl-linkbtn:hover { color:#fff; text-decoration:underline; }
   </style>
 </head>
 <body>
@@ -52,7 +63,23 @@
         Se connecter avec Discord
       </a>
 
-      <div class="cl-note">Nous utilisons uniquement votre e-mail Discord pour retrouver vos commandes. Aucun mot de passe stocké.</div>
+      <div class="cl-divider">ou par e-mail</div>
+
+      <!-- Étape 1 : saisie de l'e-mail -->
+      <form id="clEmailForm" autocomplete="on">
+        <input class="cl-input" type="email" id="clEmail" placeholder="votre@email.com" required autocomplete="email" />
+        <button class="cl-btn" type="submit" id="clSendBtn">Recevoir un code</button>
+      </form>
+
+      <!-- Étape 2 : saisie du code (masquée au départ) -->
+      <form id="clCodeForm" style="display:none;" autocomplete="off">
+        <input class="cl-input cl-input--code" type="text" id="clCode" inputmode="numeric" maxlength="6"
+               placeholder="000000" autocomplete="one-time-code" pattern="[0-9]{6}" />
+        <button class="cl-btn" type="submit" id="clVerifyBtn">Se connecter</button>
+        <button class="cl-linkbtn" type="button" id="clResetBtn">← Changer d'e-mail / renvoyer</button>
+      </form>
+
+      <div class="cl-note">Aucun mot de passe. Nous utilisons votre e-mail uniquement pour retrouver vos commandes.</div>
 
       <a class="cl-back" href="/">← Retour à la boutique</a>
     </div>
@@ -70,13 +97,77 @@
       access_denied: "Vous avez refusé l'autorisation Discord.",
       server: "Une erreur est survenue. Réessayez plus tard."
     };
+    var errBox = document.getElementById('clErr');
+    var okBox = document.getElementById('clOk');
     var err = params.get('error');
     if (err) {
-      var box = document.getElementById('clErr');
-      box.textContent = ERRORS[err] || ("Erreur de connexion (" + err + ").");
-      box.classList.add('show');
+      errBox.textContent = ERRORS[err] || ("Erreur de connexion (" + err + ").");
+      errBox.classList.add('show');
     }
-    if (params.get('loggedout')) document.getElementById('clOk').classList.add('show');
+    if (params.get('loggedout')) okBox.classList.add('show');
+
+    /* ── Connexion par e-mail (code OTP) ── */
+    function showErr(msg) { okBox.classList.remove('show'); errBox.textContent = msg; errBox.classList.add('show'); }
+    function showOk(msg) { errBox.classList.remove('show'); okBox.textContent = msg; okBox.classList.add('show'); }
+
+    var emailForm = document.getElementById('clEmailForm');
+    var codeForm = document.getElementById('clCodeForm');
+    var emailInput = document.getElementById('clEmail');
+    var codeInput = document.getElementById('clCode');
+    var sendBtn = document.getElementById('clSendBtn');
+    var verifyBtn = document.getElementById('clVerifyBtn');
+    var currentEmail = '';
+
+    emailForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var email = (emailInput.value || '').trim().toLowerCase();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { showErr('E-mail invalide.'); return; }
+      sendBtn.disabled = true; sendBtn.textContent = 'Envoi…';
+      fetch('/api/auth-email-request', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: email })
+      })
+        .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, status: r.status, body: j }; }); })
+        .then(function (res) {
+          if (res.ok && res.body && res.body.ok) {
+            currentEmail = email;
+            emailForm.style.display = 'none';
+            codeForm.style.display = 'block';
+            showOk('Code envoyé à ' + email + '. Vérifiez vos e-mails (et les spams).');
+            codeInput.focus();
+            return;
+          }
+          if (res.status === 429) { showErr(res.body.error || 'Trop de demandes, réessayez dans une minute.'); }
+          else if (res.status === 501) { showErr('La connexion par e-mail n\'est pas encore activée. Utilisez Discord.'); }
+          else { showErr((res.body && res.body.error) || 'Envoi impossible. Réessayez.'); }
+        })
+        .catch(function () { showErr('Erreur réseau. Réessayez.'); })
+        .then(function () { sendBtn.disabled = false; sendBtn.textContent = 'Recevoir un code'; });
+    });
+
+    codeForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var code = (codeInput.value || '').trim();
+      if (!/^[0-9]{6}$/.test(code)) { showErr('Le code fait 6 chiffres.'); return; }
+      verifyBtn.disabled = true; verifyBtn.textContent = 'Connexion…';
+      fetch('/api/auth-email-verify', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: currentEmail, code: code })
+      })
+        .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, status: r.status, body: j }; }); })
+        .then(function (res) {
+          if (res.ok && res.body && res.body.ok) { showOk('Connecté ! Redirection…'); location.href = '/'; return; }
+          showErr((res.body && res.body.error) || 'Code invalide.');
+          verifyBtn.disabled = false; verifyBtn.textContent = 'Se connecter';
+        })
+        .catch(function () { showErr('Erreur réseau. Réessayez.'); verifyBtn.disabled = false; verifyBtn.textContent = 'Se connecter'; });
+    });
+
+    document.getElementById('clResetBtn').addEventListener('click', function () {
+      codeForm.style.display = 'none';
+      emailForm.style.display = 'block';
+      codeInput.value = '';
+      errBox.classList.remove('show'); okBox.classList.remove('show');
+      emailInput.focus();
+    });
   })();
   </script>
 </body>

@@ -291,7 +291,7 @@
     if (name === 'reviews') renderReviews();
     if (name === 'promos') renderPromos();
     if (name === 'orders') renderOrders();
-    if (name === 'customers') renderCustomers();
+    if (name === 'customers') { renderLogins(); renderCustomers(); }
     if (name === 'payments') renderPayments();
     if (name === 'content') loadContentForm();
     if (name === 'stats') loadStatsForm();
@@ -2350,6 +2350,162 @@
   }
 
   window.filterCustomers = function(q) { renderCustomers(q); };
+
+  /* ── Comptes connectés via Discord (stockage propre, indépendant SellAuth) ── */
+  function fmtDateTime(iso) {
+    if (!iso) return '—';
+    var d = new Date(iso);
+    if (isNaN(d)) return '—';
+    return d.toLocaleString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  }
+  function loginAvatar(c) {
+    if (c.avatar) return '<img src="' + esc(c.avatar) + '" alt="" width="28" height="28" style="border-radius:50%;object-fit:cover;" onerror="this.style.display=\'none\'">';
+    var initials = String(c.username || c.email || '?').slice(0, 2).toUpperCase();
+    return '<div class="customer-avatar">' + esc(initials) + '</div>';
+  }
+
+  /* Secret admin sans prompt intempestif : on ne demande que si interactive. */
+  function loginsSecret(interactive) {
+    var s = localStorage.getItem('nexus_sa_secret') || '';
+    if (!s && interactive) s = getSaSecret(false); /* getSaSecret prompte + mémorise */
+    return s;
+  }
+
+  window.renderLogins = function(interactive) {
+    var tbody = document.getElementById('loginsTbody');
+    var countEl = document.getElementById('loginsCount');
+    if (!tbody) return;
+
+    var secret = loginsSecret(interactive);
+    if (!secret) {
+      if (countEl) countEl.textContent = '';
+      tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state">' + AICON('users') +
+        '<div class="empty-state__title">Connexions verrouillées</div>' +
+        '<div class="empty-state__sub">Secret admin requis. ' +
+        '<a onclick="renderLogins(true)" style="cursor:pointer;text-decoration:underline;">Déverrouiller</a></div>' +
+        '</div></td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:rgba(255,255,255,.4);padding:22px;">Chargement…</td></tr>';
+
+    fetch('/api/admin-clients', { headers: { 'x-admin-secret': secret } })
+      .then(function(r) { return r.json().then(function(j) { return { status: r.status, body: j }; }); })
+      .then(function(res) {
+        if (res.status === 401) {
+          localStorage.removeItem('nexus_sa_secret');
+          if (countEl) countEl.textContent = '';
+          tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state">' + AICON('users') +
+            '<div class="empty-state__title">Secret admin incorrect</div>' +
+            '<div class="empty-state__sub"><a onclick="renderLogins(true)" style="cursor:pointer;text-decoration:underline;">Réessayer</a></div>' +
+            '</div></td></tr>';
+          return;
+        }
+        if (res.status === 501) {
+          if (countEl) countEl.textContent = '';
+          tbody.innerHTML = emptyRow(5, 'users', 'Non configuré', 'ADMIN_SECRET manquant côté serveur.');
+          return;
+        }
+        if (!res.body || res.body.storeAvailable === false) {
+          if (countEl) countEl.textContent = '';
+          tbody.innerHTML = emptyRow(5, 'users', 'Stockage non provisionné',
+            'Ajoutez Upstash Redis (KV) dans Vercel → Storage pour enregistrer les connexions.');
+          return;
+        }
+        var clients = (res.body && res.body.clients) || [];
+        if (countEl) countEl.textContent = clients.length + ' compte' + (clients.length > 1 ? 's' : '');
+        if (!clients.length) {
+          tbody.innerHTML = emptyRow(5, 'users', 'Aucune connexion', 'Les comptes apparaîtront dès la première connexion Discord.');
+          return;
+        }
+        tbody.innerHTML = clients.map(function(c) {
+          return '<tr>' +
+            '<td><div style="display:flex;align-items:center;gap:10px;">' + loginAvatar(c) +
+              '<span style="font-weight:500;">' + esc(c.username || 'Client') + '</span>' +
+            '</div></td>' +
+            '<td style="color:rgba(255,255,255,.5);font-size:13px;">' + esc(c.email || '—') + '</td>' +
+            '<td style="font-weight:600;">' + (c.loginCount || 1) + '</td>' +
+            '<td style="color:rgba(255,255,255,.5);font-size:13px;">' + fmtDateTime(c.lastSeen) + '</td>' +
+            '<td style="text-align:right;"><button class="db-btn db-btn--icon" onclick="viewClientOrders(\'' + esc(c.id) + '\')">Commandes →</button></td>' +
+          '</tr>';
+        }).join('');
+      })
+      .catch(function() {
+        if (countEl) countEl.textContent = '';
+        tbody.innerHTML = emptyRow(5, 'users', 'Erreur réseau', 'Impossible de charger les connexions.');
+      });
+  };
+
+  /* Modale légère autonome pour le détail d'un client. */
+  function openClientModal(inner) {
+    var old = document.getElementById('clientModalOverlay');
+    if (old) old.remove();
+    var ov = document.createElement('div');
+    ov.id = 'clientModalOverlay';
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+    ov.onclick = function(e) { if (e.target === ov) ov.remove(); };
+    var box = document.createElement('div');
+    box.style.cssText = 'background:#15151b;border:1px solid rgba(255,255,255,.1);border-radius:14px;max-width:560px;width:100%;max-height:82vh;overflow:auto;padding:22px;';
+    box.innerHTML = inner;
+    ov.appendChild(box);
+    document.body.appendChild(ov);
+  }
+  window.closeClientModal = function() {
+    var ov = document.getElementById('clientModalOverlay');
+    if (ov) ov.remove();
+  };
+
+  window.viewClientOrders = function(id) {
+    var secret = loginsSecret(true);
+    if (!secret) return;
+    openClientModal('<div style="text-align:center;color:rgba(255,255,255,.5);padding:30px;">Chargement…</div>');
+    fetch('/api/admin-clients?id=' + encodeURIComponent(id), { headers: { 'x-admin-secret': secret } })
+      .then(function(r) { return r.json().then(function(j) { return { status: r.status, body: j }; }); })
+      .then(function(res) {
+        if (res.status === 401) { localStorage.removeItem('nexus_sa_secret'); closeClientModal(); toast('Secret admin incorrect.'); return; }
+        if (res.status !== 200 || !res.body || !res.body.client) { closeClientModal(); toast('Client introuvable.'); return; }
+        var c = res.body.client;
+        var orders = res.body.orders || [];
+        var head = '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">' + loginAvatar(c) +
+          '<div><div style="font-weight:600;font-size:16px;">' + esc(c.username || 'Client') + '</div>' +
+          '<div style="color:rgba(255,255,255,.5);font-size:13px;">' + esc(c.email || '') + '</div></div>' +
+          '<button class="db-btn db-btn--icon" style="margin-left:auto;" onclick="closeClientModal()">✕</button></div>' +
+          '<div style="display:flex;gap:18px;font-size:12px;color:rgba(255,255,255,.5);margin-bottom:16px;flex-wrap:wrap;">' +
+            '<span>ID Discord : <b style="color:#fff;">' + esc(c.id) + '</b></span>' +
+            '<span>Connexions : <b style="color:#fff;">' + (c.loginCount || 1) + '</b></span>' +
+            '<span>1ʳᵉ : <b style="color:#fff;">' + fmtDateTime(c.firstSeen) + '</b></span>' +
+            '<span>Dernière : <b style="color:#fff;">' + fmtDateTime(c.lastSeen) + '</b></span>' +
+          '</div>';
+
+        var body;
+        if (res.body.ordersAvailable === false) {
+          body = '<div class="empty-state">' + AICON('receipt') +
+            '<div class="empty-state__title">Commandes indisponibles</div>' +
+            '<div class="empty-state__sub">SellAuth non configuré côté serveur.</div></div>';
+        } else if (!orders.length) {
+          body = '<div class="empty-state">' + AICON('receipt') +
+            '<div class="empty-state__title">Aucune commande</div>' +
+            '<div class="empty-state__sub">Ce client n\'a pas encore commandé.</div></div>';
+        } else {
+          body = '<div class="section-title" style="margin-bottom:8px;">' + orders.length + ' commande' + (orders.length > 1 ? 's' : '') + '</div>' +
+            orders.map(function(o) {
+              var prods = (o.products || []).join(', ') || '—';
+              var price = o.price != null ? (o.currency === 'EUR' ? '€' : (o.currency + ' ')) + Number(o.price).toFixed(2) : '—';
+              return '<div style="border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px;margin-bottom:8px;">' +
+                '<div style="display:flex;justify-content:space-between;gap:10px;">' +
+                  '<span style="font-weight:500;">' + esc(prods) + '</span>' +
+                  '<span style="font-weight:600;color:#a78bfa;white-space:nowrap;">' + price + '</span>' +
+                '</div>' +
+                '<div style="display:flex;justify-content:space-between;gap:10px;margin-top:6px;font-size:12px;color:rgba(255,255,255,.45);">' +
+                  '<span>' + esc(o.status || '') + (o.gateway ? ' · ' + esc(o.gateway) : '') + '</span>' +
+                  '<span>' + fmtDateTime(o.createdAt) + '</span>' +
+                '</div></div>';
+            }).join('');
+        }
+        openClientModal(head + body);
+      })
+      .catch(function() { closeClientModal(); toast('Erreur réseau.'); });
+  };
 
   /* ── Links ── */
   function loadLinksForm() {

@@ -57,6 +57,10 @@ function isAllowedOrigin(req) {
   if (!src) return false;
   var host = hostFrom(src);
   if (!host) return false;
+  /* Same-origin (hôte de l'Origin == hôte servant la page) : marche sur
+     n'importe quel domaine (Hostinger, domaine perso…), sans config. */
+  var selfHost = String((req.headers && req.headers.host) || '').toLowerCase().split(':')[0];
+  if (selfHost && host === selfHost) return true;
   if ((host === 'localhost' || host === '127.0.0.1') && process.env.NODE_ENV !== 'production') return true;
   /* Project-scoped: only OUR deployments (prod + preview), not every tenant
      of the multi-tenant vercel.app root. */

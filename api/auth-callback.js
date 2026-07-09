@@ -70,6 +70,21 @@ module.exports = async function (req, res) {
       ? 'https://cdn.discordapp.com/avatars/' + u.id + '/' + u.avatar + '.png?size=128'
       : null;
 
+    /* 3bis. On enregistre le client dans NOTRE stockage (indépendant de
+       SellAuth) pour pouvoir lister les connexions dans l'admin. Best-effort :
+       si le store n'est pas configuré ou échoue, le login continue quand même. */
+    try {
+      await require('./_store.js').recordClient({
+        id: u.id,
+        username: u.global_name || u.username || 'Client',
+        avatar: avatar,
+        email: String(u.email).toLowerCase(),
+        provider: 'discord'
+      });
+    } catch (e) {
+      console.error('[FlashShp] login record failed:', e && e.message);
+    }
+
     /* 4. Session signée (efface aussi le cookie de state). */
     session.setSession(res, {
       sub: u.id,
@@ -83,7 +98,8 @@ module.exports = async function (req, res) {
     arr.push(session.buildCookie(session.STATE_COOKIE, '', 0));
     res.setHeader('Set-Cookie', arr);
 
-    redirect(res, '/account');
+    /* On revient sur la boutique : le menu compte y apparaît une fois connecté. */
+    redirect(res, '/');
   } catch (e) {
     console.error('[FlashShp] Discord callback failed:', e && e.message);
     redirect(res, '/login?error=server');

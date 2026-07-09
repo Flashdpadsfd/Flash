@@ -1,7 +1,18 @@
 {
   "name": "nexus-theme",
   "private": true,
+  "version": "1.0.0",
+  "description": "FlashShp storefront + client area (standalone Node/Express server).",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "mysql2": "^3.11.5",
     "nodemailer": "^6.9.16"
   }
 }
