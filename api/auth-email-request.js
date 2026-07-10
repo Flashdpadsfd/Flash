@@ -4,16 +4,16 @@
    1. Vérifie l'origine (garde same-origin).
    2. Génère un code à 6 chiffres, le stocke dans Upstash (expire 10 min).
    3. Anti-spam : 1 envoi max / 60 s par email.
-   4. Envoie le code par email (Gmail SMTP / nodemailer).
+   4. Envoie le code par email via le mailer partagé (SMTP Hostinger/Gmail).
 
    Variables d'environnement :
-   - GMAIL_USER, GMAIL_APP_PASSWORD : compte d'envoi (comme send-order-email).
+   - SMTP_HOST/USER/PASS (ou GMAIL_USER/GMAIL_APP_PASSWORD) : voir _mailer.js.
    - FROM_NAME (optionnel) : nom d'expéditeur (défaut FlashShp).
-   - KV_* (Upstash) : stockage du code.
+   - DB_* (MySQL) : stockage du code (via _store.js).
    Réponses : 200 {ok}, 429 (cooldown), 501 (non configuré), 400 (email invalide). */
 
 var crypto = require('crypto');
-var nodemailer = require('nodemailer');
+var mailer = require('./_mailer.js');
 var store = require('./_store.js');
 
 var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -61,9 +61,7 @@ module.exports = async function (req, res) {
   if (req.method !== 'POST') { res.status(405).json({ error: 'Method not allowed' }); return; }
   if (!isAllowedOrigin(req)) { res.status(403).json({ error: 'Forbidden' }); return; }
 
-  var user = process.env.GMAIL_USER;
-  var pass = process.env.GMAIL_APP_PASSWORD;
-  if (!user || !pass) { res.status(501).json({ error: 'Email login not configured' }); return; }
+  if (!mailer.available()) { res.status(501).json({ error: 'Email login not configured' }); return; }
   if (!store.available()) { res.status(501).json({ error: 'Store not configured' }); return; }
 
   var body = await readBody(req);
@@ -79,9 +77,7 @@ module.exports = async function (req, res) {
     var code = String(crypto.randomInt(0, 1000000)).padStart(6, '0');
     await store.saveOtp(email, code);
 
-    var transporter = nodemailer.createTransport({ service: 'gmail', auth: { user: user, pass: pass } });
-    await transporter.sendMail({
-      from: { name: String(process.env.FROM_NAME || 'FlashShp').replace(/[\r\n]/g, ' '), address: user },
+    await mailer.send({
       to: email,
       subject: 'Votre code de connexion FlashShp : ' + code,
       html: codeEmailHtml(code)

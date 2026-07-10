@@ -18,7 +18,7 @@
    Tant que GMAIL_USER/GMAIL_APP_PASSWORD ne sont pas definies, la fonction
    repond 501 et le site retombe automatiquement sur EmailJS. */
 
-var nodemailer = require('nodemailer');
+var mailer = require('./_mailer.js');
 var emailCfg = require('../assets/email-config.js');
 
 var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -85,9 +85,7 @@ module.exports = function (req, res) {
     return;
   }
 
-  var user = process.env.GMAIL_USER;
-  var pass = process.env.GMAIL_APP_PASSWORD;
-  if (!user || !pass) {
+  if (!mailer.available()) {
     res.status(501).json({ error: 'SMTP not configured' });
     return;
   }
@@ -107,8 +105,8 @@ module.exports = function (req, res) {
   var productName = escHtml(String(body.productName || '').slice(0, 128));
   var deliverable = escHtml(String(body.deliverable || '').slice(0, 2000));
   var storeName   = escHtml(String(body.storeName   || 'FlashShp').slice(0, 64));
-  var storeUrl    = String(body.storeUrl || 'https://flashshp.vercel.app/').slice(0, 200);
-  if (!/^https?:\/\//.test(storeUrl)) storeUrl = 'https://flashshp.vercel.app/';
+  var storeUrl    = String(body.storeUrl || 'https://flashshp.fr/').slice(0, 200);
+  if (!/^https?:\/\//.test(storeUrl)) storeUrl = 'https://flashshp.fr/';
   storeUrl = escHtml(storeUrl);
   var subject     = oneLine(String(body.subject || 'Your Order is Ready!')).slice(0, 150) || 'Your Order is Ready!';
 
@@ -126,22 +124,14 @@ module.exports = function (req, res) {
   var html = emailCfg.template.replace(/\{\{(invoice_id|product_name|deliverable|customer_email|store_name|store_url)\}\}/g,
     function (_m, key) { return fields[key]; });
 
-  var transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: { user: user, pass: pass }
-  });
-
-  transporter.sendMail({
-    from: { name: oneLine(process.env.FROM_NAME || 'FlashShp'), address: user },
+  mailer.send({
     to: to,
     subject: subject,
     html: html
-  }, function (err) {
-    if (err) {
-      console.error('[FlashShp] SMTP send failed:', err && err.message);
-      res.status(502).json({ error: 'Send failed' });
-      return;
-    }
+  }).then(function () {
     res.status(200).json({ ok: true });
+  }).catch(function (err) {
+    console.error('[FlashShp] SMTP send failed:', err && err.message);
+    res.status(502).json({ error: 'Send failed' });
   });
 };
