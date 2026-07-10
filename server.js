@@ -40,27 +40,59 @@ app.use(function (req, res, next) {
 
 /* ── Routes API : /api/<name> → api/<name>.js ──
    Le nom est strictement [a-z0-9-] : exclut les helpers _session.js / _store.js
-   et empêche tout accès à d'autres fichiers. */
+   et empêche tout accès à d'autres fichiers.
+
+   IMPORTANT : sous Hostinger, un require() de handler au fil des requêtes peut
+   échouer par intermittence avec « open EEXIST » (course sur le cache de
+   compilation Node). On charge donc chaque handler UNE fois, avec réessai sur
+   EEXIST, et on les précharge au démarrage (passe séquentielle). */
 var API_DIR = path.join(__dirname, 'api');
+var API_CACHE = {};
+
+function loadHandler(name) {
+  if (Object.prototype.hasOwnProperty.call(API_CACHE, name)) return API_CACHE[name];
+  var file = path.join(API_DIR, name + '.js');
+  if (!fs.existsSync(file)) { API_CACHE[name] = null; return null; }
+  var lastErr;
+  for (var i = 0; i < 6; i++) {
+    try {
+      var h = require(file);
+      API_CACHE[name] = (typeof h === 'function') ? h : null;
+      return API_CACHE[name];
+    } catch (e) {
+      lastErr = e;
+      if (!/EEXIST/i.test((e && e.message) || '')) break;
+      try { delete require.cache[require.resolve(file)]; } catch (x) {}
+    }
+  }
+  console.error('[FlashShp] load api failed', name, lastErr && (lastErr.stack || lastErr.message));
+  return null; /* non caché : on retentera à la prochaine requête */
+}
+
+/* Préchargement au démarrage : évite les require concurrents par requête. */
+try {
+  fs.readdirSync(API_DIR).forEach(function (f) {
+    var m = /^([a-z0-9-]+)\.js$/.exec(f);
+    if (m) loadHandler(m[1]);
+  });
+} catch (e) { console.error('[FlashShp] preload api failed', e && e.message); }
+
 app.all('/api/:name', function (req, res) {
   var name = String(req.params.name || '');
   if (!/^[a-z0-9-]+$/.test(name)) { res.status(404).json({ error: 'Not found' }); return; }
-  var file = path.join(API_DIR, name + '.js');
-  if (!fs.existsSync(file)) { res.status(404).json({ error: 'Not found' }); return; }
-  var handler;
-  try { handler = require(file); } catch (e) {
-    console.error('[FlashShp] load api failed', name, e && e.message);
-    res.status(500).json({ error: 'Server error' });
+  var handler = loadHandler(name);
+  if (typeof handler !== 'function') {
+    res.status(fs.existsSync(path.join(API_DIR, name + '.js')) ? 500 : 404)
+       .json({ error: fs.existsSync(path.join(API_DIR, name + '.js')) ? 'Server error' : 'Not found' });
     return;
   }
-  if (typeof handler !== 'function') { res.status(404).json({ error: 'Not found' }); return; }
   try {
     Promise.resolve(handler(req, res)).catch(function (err) {
-      console.error('[FlashShp] api error', name, err && err.message);
+      console.error('[FlashShp] api error', name, err && (err.stack || err.message));
       if (!res.headersSent) res.status(500).json({ error: 'Server error' });
     });
   } catch (err) {
-    console.error('[FlashShp] api throw', name, err && err.message);
+    console.error('[FlashShp] api throw', name, err && (err.stack || err.message));
     if (!res.headersSent) res.status(500).json({ error: 'Server error' });
   }
 });
