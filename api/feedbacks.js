@@ -99,8 +99,8 @@ module.exports = async function (req, res) {
   if (req.method !== 'GET') { res.status(405).json({ error: 'Method not allowed' }); return; }
   if (!isAllowedOrigin(req)) { res.status(403).json({ error: 'Forbidden' }); return; }
 
-  var apiKey = process.env.SELLAUTH_API_KEY;
-  var shopId = process.env.SELLAUTH_SHOP_ID;
+  var apiKey = String(process.env.SELLAUTH_API_KEY || '').trim();
+  var shopId = String(process.env.SELLAUTH_SHOP_ID || '').trim();
   if (!apiKey || !shopId) { res.status(501).json({ error: 'SellAuth not configured' }); return; }
 
   var headers = {
