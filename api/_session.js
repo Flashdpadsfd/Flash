@@ -14,7 +14,7 @@ var crypto = require('crypto');
 
 var COOKIE_NAME = 'fs_session';
 var STATE_COOKIE = 'fs_oauth_state';
-var MAX_AGE = 60 * 60 * 24 * 7; // 7 jours
+var MAX_AGE = 60 * 60 * 24; // 24 heures — déconnexion auto au bout d'un jour
 
 function b64url(buf) {
   return Buffer.from(buf).toString('base64')
