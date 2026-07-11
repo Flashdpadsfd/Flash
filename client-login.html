@@ -12,7 +12,14 @@
     :root{ --bg:#08080a; --bd:rgba(255,255,255,.1); --bd2:rgba(255,255,255,.2); --mut:rgba(255,255,255,.5); }
     *{box-sizing:border-box;}
     body{margin:0;background:var(--bg);color:#fff;font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;}
-    .cl-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;position:relative;overflow:hidden;}
+
+    /* Fond : la boutique en direct, floutée derrière la carte de connexion. */
+    .cl-bg{position:fixed;inset:0;width:100%;height:100%;border:0;pointer-events:none;z-index:0;
+      filter:blur(16px) brightness(.45) saturate(1.1);transform:scale(1.1);opacity:.9;}
+    .cl-bg-tint{position:fixed;inset:0;z-index:1;pointer-events:none;
+      background:radial-gradient(ellipse at 50% 30%, rgba(8,8,10,.35), rgba(6,6,9,.72) 70%);}
+
+    .cl-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;position:relative;overflow:hidden;z-index:2;}
     .cl-wrap::before{content:'';position:absolute;left:50%;top:-12%;width:820px;height:480px;transform:translateX(-50%);
       background:radial-gradient(ellipse at center, rgba(255,255,255,.06), transparent 62%);pointer-events:none;}
     .cl-card{position:relative;width:100%;max-width:410px;background:rgba(255,255,255,.02);border:1px solid var(--bd);
@@ -54,10 +61,12 @@
     .cl-msg{margin-bottom:18px;font-size:13px;padding:11px 14px;border-radius:11px;display:none;text-align:center;}
     .cl-msg.show{display:block;}
     .cl-msg--err{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.28);color:#fda4a4;}
-    .cl-msg--ok{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.28);color:#86efac;}
+    .cl-msg--ok{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);color:rgba(255,255,255,.72);}
   </style>
 </head>
 <body>
+  <iframe class="cl-bg" src="/" tabindex="-1" aria-hidden="true" scrolling="no" loading="eager"></iframe>
+  <div class="cl-bg-tint"></div>
   <div class="cl-wrap">
     <div class="cl-card">
       <div class="cl-logo">Flash<span>Shp</span></div>
@@ -164,6 +173,8 @@
     function toStep2(email){
       currentEmail = email;
       document.getElementById('clVMail').textContent = email;
+      /* Step 2 explique déjà « We sent a code to… » : pas de bandeau redondant. */
+      okBox.classList.remove('show'); errBox.classList.remove('show');
       step1.style.display = 'none';
       step2.style.display = 'block';
       setTimeout(function(){ otp[0].focus(); }, 60);
