@@ -137,6 +137,30 @@
       transition:opacity .2s, transform .2s;pointer-events:none;}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(-4px);}
     [hidden]{display:none !important;}
+
+    /* Order detail modal */
+    .ov{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(3px);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .18s;}
+    .ov.show{opacity:1;pointer-events:auto;}
+    .modal{background:#0f1014;border:1px solid var(--bd-2);border-radius:18px;max-width:560px;width:100%;max-height:86vh;overflow:auto;
+      transform:translateY(8px);transition:transform .18s;}
+    .ov.show .modal{transform:none;}
+    .modal__head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:20px 22px;border-bottom:1px solid var(--bd);position:sticky;top:0;background:#0f1014;}
+    .modal__title{font-size:17px;font-weight:700;display:flex;align-items:center;gap:10px;}
+    .modal__x{width:32px;height:32px;border-radius:9px;border:1px solid var(--bd);background:var(--panel-2);color:var(--mut);cursor:pointer;font-size:16px;line-height:1;}
+    .modal__x:hover{color:#fff;}
+    .modal__body{padding:20px 22px 24px;}
+    .modal__meta{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:12.5px;color:var(--mut);margin-bottom:18px;}
+    .modal__meta b{color:#fff;font-weight:600;}
+    .deliv{border:1px solid var(--bd);border-radius:13px;padding:14px 16px;margin-bottom:12px;background:var(--panel);}
+    .deliv__name{font-size:14px;font-weight:700;margin-bottom:10px;display:flex;justify-content:space-between;gap:10px;align-items:center;}
+    .deliv__qty{font-size:11.5px;color:var(--mut-2);font-weight:600;}
+    .deliv__pre{margin:0;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;line-height:1.6;white-space:pre-wrap;word-break:break-word;
+      background:#08080a;border:1px solid var(--bd);border-radius:10px;padding:12px 14px;color:#e6e6e6;max-height:220px;overflow:auto;}
+    .deliv__copy{margin-top:10px;display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;padding:7px 13px;border-radius:9px;
+      background:var(--panel-2);border:1px solid var(--bd);color:rgba(255,255,255,.85);cursor:pointer;font-family:inherit;}
+    .deliv__copy:hover{background:rgba(255,255,255,.09);color:#fff;}
+    .deliv__none{font-size:13px;color:var(--mut);padding:6px 0;}
+    .modal__loading{text-align:center;color:var(--mut-2);padding:40px 0;font-size:14px;}
   </style>
 </head>
 <body>
@@ -262,6 +286,19 @@
   <div class="loading" id="loading">Loading your account…</div>
   <div class="toast" id="toast"></div>
 
+  <div class="ov" id="ov">
+    <div class="modal">
+      <div class="modal__head">
+        <div class="modal__title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          <span id="modalTitle">Order</span>
+        </div>
+        <button class="modal__x" onclick="closeModal()" aria-label="Close">✕</button>
+      </div>
+      <div class="modal__body" id="modalBody"></div>
+    </div>
+  </div>
+
   <script>
   (function () {
     var ORDERS = [];
@@ -274,7 +311,6 @@
 
     function orderCard(o){
       var prods = (o.products && o.products.length) ? o.products.join(', ') : ('Order #'+o.id);
-      var href = o.uniqueId ? ('/invoice?id='+encodeURIComponent(o.uniqueId)) : null;
       var inner =
         '<div class="order__ico">'+check()+'</div>'+
         '<div class="order__main">'+
@@ -284,8 +320,7 @@
           '<div class="order__date">'+esc(fmtDate(o.createdAt))+'</div>'+
         '</div>'+
         '<div class="order__price">'+esc(money(o.price,o.currency))+'</div>'+ chev();
-      if(href) return '<a class="order" href="'+href+'">'+inner+'</a>';
-      return '<div class="order">'+inner+'</div>';
+      return '<div class="order" style="cursor:pointer;" onclick="viewOrder(\''+esc(o.id)+'\')">'+inner+'</div>';
     }
 
     window.go = function(view){
@@ -300,6 +335,61 @@
       box.innerHTML = list.length ? list.map(orderCard).join('') : '<div class="empty">No orders match your search.</div>';
     };
     window.topUp = function(){ toast('💳 Wallet top-up is coming soon — for now, purchase directly on the store.'); };
+
+    var MODAL_PRODUCTS = [];
+    window.viewOrder = function(id){
+      var ov=document.getElementById('ov'), body=document.getElementById('modalBody');
+      document.getElementById('modalTitle').textContent='Order #'+id;
+      body.innerHTML='<div class="modal__loading">Loading your delivery…</div>';
+      ov.classList.add('show');
+      fetch('/api/order?id='+encodeURIComponent(id),{headers:{'Accept':'application/json'},credentials:'same-origin'})
+        .then(function(r){ return r.json().then(function(j){ return {status:r.status, body:j}; }).catch(function(){ return {status:r.status, body:null}; }); })
+        .then(function(res){
+          if(res.status===401){ location.href='/login'; return; }
+          if(res.status!==200 || !res.body || !res.body.ok){
+            var msg = (res.status===403)?'This order is not linked to your account.'
+              : (res.status===404)?'Order not found.'
+              : (res.status===501)?'Order details are not available right now.'
+              : ((res.body&&res.body.error)||'Could not load this order.');
+            body.innerHTML='<div class="deliv__none">'+esc(msg)+'</div>';
+            return;
+          }
+          renderOrderModal(res.body);
+        })
+        .catch(function(){ body.innerHTML='<div class="deliv__none">Network error. Please try again.</div>'; });
+    };
+
+    function renderOrderModal(o){
+      MODAL_PRODUCTS = o.products || [];
+      var isCompleted = String(o.status||'').toLowerCase()==='completed';
+      var meta='<div class="modal__meta">'+
+        '<span>Status: <b>'+esc(o.status||'—')+'</b></span>'+
+        (o.price!=null?'<span>Total: <b>'+esc(money(o.price,o.currency))+'</b></span>':'')+
+        (o.createdAt?'<span>Date: <b>'+esc(fmtDate(o.createdAt))+'</b></span>':'')+
+      '</div>';
+      var blocks = MODAL_PRODUCTS.map(function(p,i){
+        var d=String(p.deliverable||'').trim();
+        var content = d
+          ? '<pre class="deliv__pre">'+esc(d)+'</pre><button class="deliv__copy" onclick="copyDeliv('+i+')">📋 Copy</button>'
+          : (isCompleted
+              ? '<div class="deliv__none">No delivery content stored for this item. If your product is missing, contact support with order #'+esc(o.id)+'.</div>'
+              : '<div class="deliv__none">This order is <b>'+esc(o.status||'pending')+'</b> — nothing delivered yet.</div>');
+        return '<div class="deliv"><div class="deliv__name"><span>'+esc(p.name||'Product')+'</span>'+
+          (p.quantity&&p.quantity>1?'<span class="deliv__qty">×'+esc(p.quantity)+'</span>':'')+
+          '</div>'+content+'</div>';
+      }).join('');
+      document.getElementById('modalBody').innerHTML = meta + (blocks || '<div class="deliv__none">No items on this order.</div>');
+    }
+
+    window.copyDeliv = function(i){
+      var p=MODAL_PRODUCTS[i]; if(!p)return;
+      var txt=String(p.deliverable||'');
+      if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(function(){toast('Copied to clipboard ✓');},function(){toast('Copy failed');}); }
+      else { toast('Copy not supported on this browser'); }
+    };
+    window.closeModal = function(){ document.getElementById('ov').classList.remove('show'); };
+    document.getElementById('ov').addEventListener('click', function(e){ if(e.target===this) closeModal(); });
+    document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeModal(); });
 
     var toastT;
     function toast(msg){ var t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(function(){t.classList.remove('show');},3200); }
