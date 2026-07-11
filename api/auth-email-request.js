@@ -49,12 +49,38 @@ function readBody(req) {
 }
 
 function codeEmailHtml(code) {
-  return '<div style="font-family:Inter,Arial,sans-serif;background:#0e0f13;color:#fff;padding:32px;border-radius:16px;max-width:440px;margin:auto;">' +
-    '<div style="font-size:22px;font-weight:800;letter-spacing:-.5px;margin-bottom:6px;">Flash<span style="color:#c9ccd3;">Shp</span></div>' +
-    '<div style="font-size:15px;color:rgba(255,255,255,.6);margin-bottom:22px;">Votre code de connexion</div>' +
-    '<div style="font-size:34px;font-weight:800;letter-spacing:8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:16px;text-align:center;">' + code + '</div>' +
-    '<div style="font-size:13px;color:rgba(255,255,255,.45);margin-top:20px;line-height:1.6;">Ce code expire dans 10 minutes. Si vous n\'êtes pas à l\'origine de cette demande, ignorez cet email — personne ne peut accéder à votre compte sans ce code.</div>' +
-    '</div>';
+  var spaced = String(code).split('').join('&nbsp;&nbsp;');
+  return '' +
+'<div style="margin:0;padding:28px 12px;background:#08080a;font-family:Inter,Arial,Helvetica,sans-serif;">' +
+'<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:0 auto;">' +
+  '<tr><td align="center" style="padding:8px 0 22px;">' +
+    '<span style="font-size:24px;font-weight:800;letter-spacing:-.5px;color:#ffffff;">Flash<span style="color:#9aa0ac;">Shp</span></span>' +
+  '</td></tr>' +
+  '<tr><td style="background:#0f1014;border:1px solid rgba(255,255,255,.09);border-radius:18px;overflow:hidden;">' +
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0">' +
+      '<tr><td style="padding:22px 28px;border-bottom:1px solid rgba(255,255,255,.07);text-align:center;">' +
+        '<span style="font-size:19px;font-weight:700;color:#ffffff;">&#128274; Your Login Code</span>' +
+      '</td></tr>' +
+      '<tr><td style="padding:28px 28px 8px;text-align:center;">' +
+        '<div style="font-size:14px;color:rgba(255,255,255,.6);margin-bottom:20px;">Use the code below to sign in to your <b style="color:#fff;">FlashShp</b> account:</div>' +
+        '<div style="font-size:34px;font-weight:800;letter-spacing:6px;color:#ffffff;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:20px 12px;">' + spaced + '</div>' +
+        '<div style="font-size:13px;color:rgba(255,255,255,.42);margin-top:18px;">This code expires in 10 minutes.</div>' +
+        '<div style="font-size:13px;color:rgba(255,255,255,.42);margin:6px 0 24px;">If you didn\'t request this code, you can safely ignore this email.</div>' +
+      '</td></tr>' +
+      '<tr><td style="padding:0 22px 22px;">' +
+        '<div style="background:rgba(250,204,21,.06);border:1px solid rgba(250,204,21,.2);border-radius:12px;padding:14px 16px;text-align:center;">' +
+          '<div style="font-size:13px;font-weight:700;color:#fde047;">&#9888;&#65039; Having an issue?</div>' +
+          '<div style="font-size:12.5px;color:rgba(255,255,255,.55);margin-top:5px;line-height:1.6;">Visit <a href="https://flashshp.fr" style="color:#fde047;text-decoration:none;">flashshp.fr</a> or contact our support — never share this code with anyone.</div>' +
+        '</div>' +
+      '</td></tr>' +
+    '</table>' +
+  '</td></tr>' +
+  '<tr><td align="center" style="padding:20px 0 4px;">' +
+    '<div style="font-size:11.5px;color:rgba(255,255,255,.3);">&#169; ' + new Date().getFullYear() + ' FlashShp. All rights reserved.</div>' +
+    '<div style="font-size:11.5px;color:rgba(255,255,255,.25);margin-top:3px;">This is an automated message.</div>' +
+  '</td></tr>' +
+'</table>' +
+'</div>';
 }
 
 module.exports = async function (req, res) {
@@ -79,7 +105,7 @@ module.exports = async function (req, res) {
 
     await mailer.send({
       to: email,
-      subject: 'Votre code de connexion FlashShp : ' + code,
+      subject: '🔐 Your Login Code - ' + code,
       html: codeEmailHtml(code)
     });
 
