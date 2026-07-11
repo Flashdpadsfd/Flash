@@ -540,6 +540,51 @@
       document.getElementById('rvProductLbl').textContent = fProduct === 'all' ? 'All Products' : fProduct;
     }
 
+    /* Rendu paginé : on n'injecte pas les 1000+ avis d'un coup (freeze + « spawn »),
+       on affiche par lots et on rajoute au fur et à mesure du défilement. */
+    var PAGE_SIZE = 24;
+    var CURRENT = [];   /* liste filtrée+triée courante */
+    var rendered = 0;   /* nombre d'avis déjà injectés dans la grille */
+
+    function cardHtml(r) {
+      var vc = VERIF[hash(r.name || String(r.id)) % VERIF.length];
+      var col = r.color || PALETTE[hash(r.name || String(r.id)) % PALETTE.length];
+      return '<div class="rv-card">' +
+        '<div class="rv-card__top">' +
+          '<div class="rv-card__avatar" style="background:' + esc(col) + ';">' + esc(initialOf(r)) + '</div>' +
+          '<div class="rv-card__id"><div class="rv-card__name">' + esc(r.name) + '</div><div class="rv-card__date">' + esc(relDate(r)) + '</div></div>' +
+          '<span class="rv-verified" style="background:' + vc + '22;border:1px solid ' + vc + '55;color:' + vc + ';"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>Verified</span>' +
+        '</div>' +
+        '<div class="rv-card__stars">' + starsRow(r.stars || 5) + '</div>' +
+        '<p class="rv-card__text">' + esc(r.text) + '</p>' +
+        (r.product
+          ? '<div class="rv-card__footer"><span class="rv-card__product"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg><span>' + esc(r.product) + '</span></span><a class="rv-card__view" href="preview-products.html">View →</a></div>'
+          : '') +
+      '</div>';
+    }
+
+    /* Ajoute le lot suivant à la grille (sans tout re-rendre). */
+    function renderMore() {
+      var grid = document.getElementById('reviewsGrid');
+      if (!grid) return;
+      var next = CURRENT.slice(rendered, rendered + PAGE_SIZE);
+      if (next.length) {
+        grid.insertAdjacentHTML('beforeend', next.map(cardHtml).join(''));
+        rendered += next.length;
+      }
+      var sen = document.getElementById('rvSentinel');
+      if (sen) sen.style.display = (rendered >= CURRENT.length) ? 'none' : 'block';
+    }
+
+    /* Continue à remplir tant que le contenu ne dépasse pas l'écran (sinon
+       l'observer de bas de page ne se déclencherait jamais au premier rendu). */
+    function ensureFilled() {
+      var guard = 0;
+      while (rendered < CURRENT.length &&
+             document.body.scrollHeight <= window.innerHeight + 400 &&
+             guard < 40) { renderMore(); guard++; }
+    }
+
     function applyFilters() {
       var list = ALL.filter(function(r) {
         if (fProduct !== 'all' && r.product !== fProduct) return false;
@@ -555,24 +600,36 @@
       });
       document.getElementById('rvCount').textContent = list.length;
       var grid = document.getElementById('reviewsGrid');
-      if (!list.length) { grid.innerHTML = '<div class="rv-empty">No reviews to show for this filter.</div>'; return; }
-      grid.innerHTML = list.map(function(r) {
-        var vc = VERIF[hash(r.name || String(r.id)) % VERIF.length];
-        var col = r.color || PALETTE[hash(r.name || String(r.id)) % PALETTE.length];
-        return '<div class="rv-card">' +
-          '<div class="rv-card__top">' +
-            '<div class="rv-card__avatar" style="background:' + esc(col) + ';">' + esc(initialOf(r)) + '</div>' +
-            '<div class="rv-card__id"><div class="rv-card__name">' + esc(r.name) + '</div><div class="rv-card__date">' + esc(relDate(r)) + '</div></div>' +
-            '<span class="rv-verified" style="background:' + vc + '22;border:1px solid ' + vc + '55;color:' + vc + ';"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>Verified</span>' +
-          '</div>' +
-          '<div class="rv-card__stars">' + starsRow(r.stars || 5) + '</div>' +
-          '<p class="rv-card__text">' + esc(r.text) + '</p>' +
-          (r.product
-            ? '<div class="rv-card__footer"><span class="rv-card__product"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg><span>' + esc(r.product) + '</span></span><a class="rv-card__view" href="preview-products.html">View →</a></div>'
-            : '') +
-        '</div>';
-      }).join('');
+      grid.innerHTML = '';
+      CURRENT = list; rendered = 0;
+      if (!list.length) {
+        grid.innerHTML = '<div class="rv-empty">No reviews to show for this filter.</div>';
+        var sen = document.getElementById('rvSentinel'); if (sen) sen.style.display = 'none';
+        return;
+      }
+      renderMore();     /* premier lot */
+      ensureFilled();   /* complète jusqu'à couvrir le viewport */
     }
+
+    /* Infinite scroll : charge le lot suivant quand on approche du bas de page. */
+    (function setupInfiniteScroll() {
+      var grid = document.getElementById('reviewsGrid');
+      if (!grid || document.getElementById('rvSentinel')) return;
+      var sentinel = document.createElement('div');
+      sentinel.id = 'rvSentinel';
+      sentinel.style.cssText = 'width:100%;height:1px;';
+      grid.parentNode.insertBefore(sentinel, grid.nextSibling);
+      if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function(entries) {
+          if (entries[0].isIntersecting) renderMore();
+        }, { rootMargin: '600px 0px' });
+        io.observe(sentinel);
+      } else {
+        window.addEventListener('scroll', function() {
+          if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 600) renderMore();
+        }, { passive: true });
+      }
+    })();
 
     function renderAll() { renderPanel(); applyFilters(); }
 
