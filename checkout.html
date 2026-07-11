@@ -502,7 +502,7 @@
               <div class="co-pm-opt__icon" style="background:#1e293b;">
                 <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" width="16" height="16"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
               </div>
-              <span class="co-pm-opt__label" id="balanceLbl">Balance<br><small style="font-size:10px;opacity:.5;">$0.00</small></span>
+              <span class="co-pm-opt__label" id="balanceLbl">Balance<br><small style="font-size:10px;opacity:.5;">€0.00</small></span>
             </button>
           </div>
 
@@ -819,7 +819,7 @@
   if (c.siteName) { document.getElementById('siteLogo').textContent = c.siteName; document.title = c.siteName + ' — Checkout'; }
 
   /* ── Render cart ── */
-  var sym = SYM[product.currency] || '€';
+  var sym = '€'; /* tout le site en € */
   var basePrice = Number(product.price);
 
   function getFinalPrice() {
@@ -958,8 +958,8 @@
 
   /* ── PayPal payment flow (official PayPal JS SDK) ── */
   function startPaypalPayment(email, invoiceId, fiatAmount) {
-    var currency = product.currency || 'EUR';
-    var sym2 = SYM[currency] || '€';
+    var currency = 'EUR'; /* paiements en euros */
+    var sym2 = '€'; /* tout le site en € */
 
     /* Breadcrumb */
     document.getElementById('bcCheckout').classList.remove('active');
@@ -1018,7 +1018,7 @@
     var btn = document.getElementById('continueBtn');
     btn.disabled = true; btn.textContent = 'Fetching live rate…';
 
-    var currency = product.currency || 'EUR';
+    var currency = 'EUR'; /* paiements en euros */
     var info = CRYPTO_INFO[coin];
     var cfg = getPayments()[coin];
 
@@ -1082,7 +1082,7 @@
     document.getElementById('confQR').src = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + encodeURIComponent(uri) + '&format=png&margin=0';
 
     /* Warning list */
-    var sym2 = SYM[currency] || '€';
+    var sym2 = '€'; /* tout le site en € */
     document.getElementById('confWarningList').innerHTML = [
       '<li>Send exactly <strong>' + od.amountStr + '</strong> (≈ ' + sym2 + Number(fiatAmount).toFixed(2) + ')</li>',
       '<li>Send only ' + info.name + ' to this address</li>',
@@ -1376,7 +1376,7 @@
       id: o.invoiceId, date: new Date().toISOString(),
       email: o.email, productId: product.id,
       productName: product.name, productIcon: product.icon || '📦',
-      price: o.fiatAmount, currency: product.currency || 'EUR',
+      price: o.fiatAmount, currency: 'EUR',
       deliverable: deliverable, status: 'completed',
       paymentMethod: o.paymentMethod, txHash: o.txHash
     });

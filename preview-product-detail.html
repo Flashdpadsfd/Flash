@@ -122,7 +122,7 @@
           </div>
           <div class="pd-header__right">
             <div class="pd-per-each">PER EACH</div>
-            <div class="pd-price" id="pdPrice">$0.00</div>
+            <div class="pd-price" id="pdPrice">€0.00</div>
           </div>
         </div>
 
@@ -249,13 +249,13 @@
             <div class="pd-panel-name" id="pdPanelName">Product Name</div>
             <div class="pd-panel-qty-label">Quantity: <span id="pdPanelQty">1</span></div>
           </div>
-          <div class="pd-panel-item-price" id="pdPanelItemPrice">$0.00</div>
+          <div class="pd-panel-item-price" id="pdPanelItemPrice">€0.00</div>
         </div>
 
         <div class="pd-panel-totals">
-          <div class="pd-total-row"><span>Subtotal</span><span id="pdSubtotal">$0.00</span></div>
-          <div class="pd-total-row"><span>Tax</span><span>$0.00</span></div>
-          <div class="pd-total-row pd-total-row--bold"><span>Total</span><span id="pdTotal">$0.00</span></div>
+          <div class="pd-total-row"><span>Subtotal</span><span id="pdSubtotal">€0.00</span></div>
+          <div class="pd-total-row"><span>Tax</span><span>€0.00</span></div>
+          <div class="pd-total-row pd-total-row--bold"><span>Total</span><span id="pdTotal">€0.00</span></div>
         </div>
 
         <div class="pd-panel-ssl">
@@ -421,7 +421,7 @@
 
     // Title / price
     if (el('pdTitle')) el('pdTitle').textContent = name;
-    if (el('pdPrice')) el('pdPrice').textContent = '$' + price.toFixed(2);
+    if (el('pdPrice')) el('pdPrice').textContent = '€' + price.toFixed(2);
 
     // Description
     if (desc && el('pdDesc')) el('pdDesc').textContent = desc;
@@ -442,11 +442,11 @@
 
     function updatePrices() {
       var total = (qty * price).toFixed(2);
-      if (el('pdSubtotal'))       el('pdSubtotal').textContent       = '$' + total;
-      if (el('pdTotal'))          el('pdTotal').textContent          = '$' + total;
+      if (el('pdSubtotal'))       el('pdSubtotal').textContent       = '€' + total;
+      if (el('pdTotal'))          el('pdTotal').textContent          = '€' + total;
       if (el('pdQtyVal'))         el('pdQtyVal').textContent         = qty;
       if (el('pdPanelQty'))       el('pdPanelQty').textContent       = qty;
-      if (el('pdPanelItemPrice')) el('pdPanelItemPrice').textContent = '$' + total;
+      if (el('pdPanelItemPrice')) el('pdPanelItemPrice').textContent = '€' + total;
 
       // Volume pricing dot position (0–94%)
       var dotPct = Math.min(qty / 1000 * 94, 94);

@@ -233,7 +233,7 @@
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20"/></svg>
               Available balance
             </div>
-            <div class="bal-card__val">$0.00<small>USD</small></div>
+            <div class="bal-card__val">€0.00<small>EUR</small></div>
           </div>
           <button class="btn-white" onclick="topUp()">Top Up Balance</button>
         </div>
@@ -260,7 +260,7 @@
           <div class="wallet-top">
             <div>
               <div class="bal-card__lbl">Total balance</div>
-              <div class="bal-card__val">$0.00<small>USD</small></div>
+              <div class="bal-card__val">€0.00<small>EUR</small></div>
             </div>
             <div class="secure">
               <span class="secure__ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
@@ -269,14 +269,14 @@
           </div>
           <div style="font-size:14px;font-weight:600;margin-bottom:4px;">Select Amount</div>
           <div class="amt-grid" id="amtGrid">
-            <button class="amt" data-amt="5">$5.00</button>
-            <button class="amt" data-amt="10">$10.00</button>
-            <button class="amt" data-amt="20">$20.00</button>
-            <button class="amt" data-amt="50">$50.00</button>
+            <button class="amt" data-amt="5">€5.00</button>
+            <button class="amt" data-amt="10">€10.00</button>
+            <button class="amt" data-amt="20">€20.00</button>
+            <button class="amt" data-amt="50">€50.00</button>
           </div>
           <div class="amt-custom">
-            <span>$</span>
-            <input type="number" id="customAmt" min="1" step="1" placeholder="Enter custom amount (min $1.00)" />
+            <span>€</span>
+            <input type="number" id="customAmt" min="1" step="1" placeholder="Enter custom amount (min €1.00)" />
           </div>
           <button class="btn-block" onclick="topUp()">Continue to Payment →</button>
           <div class="wallet-note">Add funds to your balance and use them on any order. Funds never expire.</div>
@@ -305,7 +305,7 @@
   (function () {
     var ORDERS = [];
     function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
-    function money(n,cur){ if(n==null||isNaN(n))return ''; var sym=(cur==='EUR')?'€':(cur==='USD'||!cur?'$':cur+' '); return sym+Number(n).toFixed(2); }
+    function money(n,cur){ if(n==null||isNaN(n))return ''; return '€'+Number(n).toFixed(2); /* tout le site en € */ }
     function fmtDate(iso){ if(!iso)return''; var d=new Date(iso); if(isNaN(d))return''; return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+' · '+d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}); }
     function badge(s){ s=String(s||'').toLowerCase(); if(s==='completed')return'badge--completed'; if(s==='pending'||s==='processing')return'badge--pending'; return'badge--other'; }
     function chev(){ return '<span class="order__chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></span>'; }

@@ -303,7 +303,7 @@
     var CURRENCY_SYMBOLS = { EUR: '€', USD: '$', GBP: '£' };
 
     function buildCard(p, index) {
-      var sym = CURRENCY_SYMBOLS[p.currency] || '$';
+      var sym = '€'; /* Boutique en euros : tout le site en € */
       var gradient = p.gradient || 'linear-gradient(135deg,#1a1a2e,#16213e)';
       var icon = p.icon || '📦';
 

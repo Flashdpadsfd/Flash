@@ -479,7 +479,7 @@
     document.querySelectorAll('.cry-coin').forEach(function (b) { b.classList.remove('cry-coin--active'); });
     document.querySelector('.cry-coin[data-coin="' + coin + '"]').classList.add('cry-coin--active');
 
-    var currency = product.currency || 'EUR';
+    var currency = 'EUR'; /* paiements en euros */
 
     convertToCrypto(product.price, currency, coin, function (err, result) {
       document.getElementById('cryStep1Loading').style.display = 'none';
@@ -608,7 +608,7 @@
         productName: product.name,
         productIcon: product.icon || '📦',
         price: product.price,
-        currency: product.currency || 'EUR',
+        currency: 'EUR',
         deliverable: deliverable,
         status: 'completed',
         paymentMethod: 'crypto',

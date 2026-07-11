@@ -192,7 +192,7 @@
         <!-- Subtotal / Tax / Total -->
         <div class="pdv3-sum-rows">
           <div class="pdv3-sum-row"><span>Subtotal</span><span id="pdSubtotal">—</span></div>
-          <div class="pdv3-sum-row"><span>Tax</span><span>$0.00</span></div>
+          <div class="pdv3-sum-row"><span>Tax</span><span>€0.00</span></div>
           <div class="pdv3-sum-row pdv3-sum-row--total"><span>Total</span><span id="pdTotal">—</span></div>
         </div>
 
@@ -315,7 +315,7 @@
     var p = allProds.find(function(x) { return x.id === pid; });
     if (!p) { window.location.href = 'preview-products.html'; return; }
 
-    var sym = SYM[p.currency] || '€';
+    var sym = '€'; /* Boutique en euros : tout le site en € */
     var qty = 1;
 
     /* ── Variantes (options du produit : nom + prix) ── */

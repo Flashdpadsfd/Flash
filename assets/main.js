@@ -479,7 +479,7 @@ window.NX_ICONS = function (name) {
     if (!body) return;
     var totalQty = cart.reduce(function(s,i){ return s+i.qty; }, 0);
     var total    = cart.reduce(function(s,i){ return s+i.price*i.qty; }, 0);
-    var sym      = cart.length ? (CART_SYM[cart[0].currency] || '$') : '$';
+    var sym      = '€'; /* tout le site en € */
     if (cntEl) cntEl.textContent = cart.length ? totalQty + (totalQty > 1 ? ' items' : ' item') : '';
     if (!cart.length) {
       body.innerHTML = '<div class="cart-panel__empty"><div class="cart-panel__empty-icon">🛒</div><div class="cart-panel__empty-text">Your cart is empty</div></div>';
@@ -487,7 +487,7 @@ window.NX_ICONS = function (name) {
       return;
     }
     body.innerHTML = cart.map(function(item, idx) {
-      var s = CART_SYM[item.currency] || '$';
+      var s = '€'; /* tout le site en € */
       return '<div class="cart-panel__item">'+
         '<span class="cart-panel__item-icon">'+cartItemIcon(item)+'</span>'+
         '<div class="cart-panel__item-info">'+
@@ -754,7 +754,7 @@ window.NX_ICONS = function (name) {
       var p = prods.find(function(x) { return x.id === _pid; });
       if (!p) return;
       var email = document.getElementById('coEmail') ? document.getElementById('coEmail').value.trim() : '';
-      var sym = SYM[p.currency] || '€';
+      var sym = '€'; /* tout le site en € */
       _whkPost('CART_ABANDON', {
         title: '🛒 Panier abandonné', color: 0xFEE75C,
         fields: [
@@ -876,7 +876,7 @@ window.NX_ICONS = function (name) {
             name: p.name,
             icon: p.icon || '📦',
             price: finalPriceForCrypto,
-            currency: p.currency || 'EUR',
+            currency: 'EUR',
             invoiceId: invoiceId,
             email: email,
             deliverable: delivForCrypto,
@@ -920,7 +920,7 @@ window.NX_ICONS = function (name) {
         if (idx !== -1) prods[idx] = p;
         saveProds(prods);
 
-        var sym = SYM[p.currency] || '€';
+        var sym = '€'; /* tout le site en € */
         var finalPrice = Number(p.price);
         if (_appliedPromo) {
           finalPrice = finalPrice * (1 - _appliedPromo.discount / 100);
@@ -930,7 +930,7 @@ window.NX_ICONS = function (name) {
             if (pi !== -1) { promos[pi].uses = (promos[pi].uses || 0) + 1; localStorage.setItem('nexus_promos', JSON.stringify(promos)); }
           } catch(e) {}
         }
-        addOrder({ id: invoiceId, date: new Date().toISOString(), email: email, productId: p.id, productName: p.name, productIcon: p.icon || '📦', productDesc: p.desc || '', price: finalPrice, currency: p.currency || 'EUR', deliverable: deliverable, status: 'completed', promoCode: _appliedPromo ? _appliedPromo.code : null, ip: geoD.ip || null, country: geoD.country_name || null, asn: geoD.org || null, browser: _uaParsed.browser, os: _uaParsed.os, userAgent: navigator.userAgent });
+        addOrder({ id: invoiceId, date: new Date().toISOString(), email: email, productId: p.id, productName: p.name, productIcon: p.icon || '📦', productDesc: p.desc || '', price: finalPrice, currency: 'EUR', deliverable: deliverable, status: 'completed', promoCode: _appliedPromo ? _appliedPromo.code : null, ip: geoD.ip || null, country: geoD.country_name || null, asn: geoD.org || null, browser: _uaParsed.browser, os: _uaParsed.os, userAgent: navigator.userAgent });
 
         /* Order confirmation email */
         _sendOrderEmail(email, invoiceId, p.name, deliverable);
@@ -970,7 +970,7 @@ window.NX_ICONS = function (name) {
         var v = vlist[parseInt(variantIdx, 10)];
         p = Object.assign({}, p, { name: p.name + ' — ' + v.name, price: Number(v.price) });
       }
-      var sym = SYM[p.currency] || '€';
+      var sym = '€'; /* tout le site en € */
       var price = Number(p.price).toFixed(2);
 
       /* Left: product row */

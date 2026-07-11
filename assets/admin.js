@@ -508,7 +508,7 @@
       ctx.beginPath(); ctx.moveTo(padL, gy); ctx.lineTo(padL + cW, gy); ctx.stroke();
       ctx.fillStyle = 'rgba(255,255,255,.25)'; ctx.textAlign = 'right';
       var tick = maxVal * g / 4;
-      ctx.fillText(mode === 'currency' ? ('$' + tick.toFixed(2)) : Math.round(tick), padL - 6, gy + 3);
+      ctx.fillText(mode === 'currency' ? ('€' + tick.toFixed(2)) : Math.round(tick), padL - 6, gy + 3);
     }
 
     if (buckets.length < 2) return;
@@ -634,7 +634,7 @@
       return;
     }
     tbody.innerHTML = products.map(function (p) {
-      var sym = CURRENCY_SYMBOLS[p.currency] || '$';
+      var sym = CURRENCY_SYMBOLS[p.currency] || '€';
       return '<tr>' +
         '<td style="display:flex;align-items:center;gap:10px;">' + letterThumb(p.name) + '<span class="prod-name">' + esc(p.name) + '</span></td>' +
         '<td>' + capitalize(p.category) + '</td>' +
@@ -3159,7 +3159,7 @@
       '<th>Code</th><th>Type</th><th>Discount</th><th>Uses</th><th>Max Uses</th><th>Expires</th><th>Actions</th>' +
       '</tr></thead><tbody>' +
       promos.map(function(p, i) {
-        var discLabel = p.type === 'fixed' ? ('$' + Number(p.discount||0).toFixed(2)) : ('-' + (p.discount||0) + '%');
+        var discLabel = p.type === 'fixed' ? ('€' + Number(p.discount||0).toFixed(2)) : ('-' + (p.discount||0) + '%');
         var exp = p.expirationDate ? p.expirationDate.replace('T',' ').slice(0,16) : '—';
         return '<tr>' +
           '<td><span style="font-weight:700;font-family:monospace;color:#fff;letter-spacing:.04em;">' + esc(p.code) + '</span></td>' +
@@ -3242,7 +3242,7 @@
     var hintEl = document.getElementById('promoDiscountHint');
     var presetsEl = document.getElementById('couponPresets');
     if (val === 'fixed') {
-      if (unitEl) unitEl.textContent = '$';
+      if (unitEl) unitEl.textContent = '€';
       if (hintEl) hintEl.textContent = 'Enter a fixed amount discount.';
       if (presetsEl) presetsEl.style.display = 'none';
     } else {
