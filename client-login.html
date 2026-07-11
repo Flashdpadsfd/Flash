@@ -1,87 +1,110 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FlashShp — Connexion</title>
+  <title>FlashShp — Sign in</title>
   <meta name="robots" content="noindex" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/style.css?v=15" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
   <style>
-    .cl-wrap { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; position:relative; overflow:hidden; }
-    .cl-wrap::before { content:''; position:absolute; left:50%; top:-10%; width:900px; height:520px; transform:translateX(-50%);
-      background:radial-gradient(ellipse at center, rgba(255,255,255,.08), transparent 62%); pointer-events:none; }
-    .cl-card { position:relative; width:100%; max-width:420px; background:rgba(255,255,255,.025);
-      border:1px solid rgba(255,255,255,.09); border-radius:20px; padding:38px 32px; text-align:center;
-      box-shadow:0 24px 60px rgba(0,0,0,.45); }
-    .cl-logo { font-family:Inter,sans-serif; font-size:26px; font-weight:800; letter-spacing:-.5px; margin-bottom:6px; }
-    .cl-logo span { background:linear-gradient(135deg,#8a909c 0%,#ffffff 100%); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
-    .cl-title { font-size:19px; font-weight:700; margin:14px 0 6px; }
-    .cl-sub { font-size:13.5px; color:rgba(255,255,255,.5); line-height:1.6; margin-bottom:26px; }
-    .cl-btn { display:flex; align-items:center; justify-content:center; gap:10px; width:100%; height:48px; border-radius:12px;
-      font-family:Inter,sans-serif; font-size:15px; font-weight:600; cursor:pointer; text-decoration:none;
-      background:linear-gradient(135deg,#5b616e 0%,#f6f7f9 100%); color:#16171b; border:1px solid transparent;
-      box-shadow:0 8px 22px rgba(0,0,0,.35); transition:transform .15s ease, box-shadow .2s ease; }
-    .cl-btn:hover { transform:translateY(-1px); box-shadow:0 12px 28px rgba(0,0,0,.45); }
-    .cl-btn svg { flex-shrink:0; }
-    .cl-note { margin-top:18px; font-size:12px; color:rgba(255,255,255,.38); line-height:1.6; }
-    .cl-err { margin-bottom:20px; font-size:13px; padding:10px 14px; border-radius:10px;
-      background:rgba(248,113,113,.12); border:1px solid rgba(248,113,113,.3); color:#fda4a4; display:none; }
-    .cl-err.show { display:block; }
-    .cl-ok { margin-bottom:20px; font-size:13px; padding:10px 14px; border-radius:10px;
-      background:rgba(52,211,153,.12); border:1px solid rgba(52,211,153,.3); color:#86efac; display:none; }
-    .cl-ok.show { display:block; }
-    .cl-back { margin-top:22px; display:inline-block; font-size:12.5px; color:rgba(255,255,255,.4); }
-    .cl-back:hover { color:#fff; }
-    .cl-divider { display:flex; align-items:center; gap:12px; margin:22px 0; color:rgba(255,255,255,.35); font-size:12px; }
-    .cl-divider::before, .cl-divider::after { content:''; flex:1; height:1px; background:rgba(255,255,255,.1); }
-    .cl-input { width:100%; height:46px; border-radius:12px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.12);
-      color:#fff; font-family:Inter,sans-serif; font-size:15px; padding:0 14px; margin-bottom:12px; text-align:center; }
-    .cl-input:focus { outline:none; border-color:rgba(255,255,255,.35); background:rgba(255,255,255,.06); }
-    .cl-input--code { letter-spacing:8px; font-weight:700; font-size:20px; }
-    .cl-btn--ghost { background:transparent; color:rgba(255,255,255,.85); border:1px solid rgba(255,255,255,.18); box-shadow:none; }
-    .cl-btn--ghost:hover { background:rgba(255,255,255,.06); }
-    .cl-btn[disabled] { opacity:.55; cursor:not-allowed; transform:none; }
-    .cl-linkbtn { margin-top:14px; background:none; border:none; color:rgba(255,255,255,.45); font-size:12.5px; cursor:pointer; font-family:Inter,sans-serif; }
-    .cl-linkbtn:hover { color:#fff; text-decoration:underline; }
+    :root{ --bg:#08080a; --bd:rgba(255,255,255,.1); --bd2:rgba(255,255,255,.2); --mut:rgba(255,255,255,.5); }
+    *{box-sizing:border-box;}
+    body{margin:0;background:var(--bg);color:#fff;font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;}
+    .cl-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;position:relative;overflow:hidden;}
+    .cl-wrap::before{content:'';position:absolute;left:50%;top:-12%;width:820px;height:480px;transform:translateX(-50%);
+      background:radial-gradient(ellipse at center, rgba(255,255,255,.06), transparent 62%);pointer-events:none;}
+    .cl-card{position:relative;width:100%;max-width:410px;background:rgba(255,255,255,.02);border:1px solid var(--bd);
+      border-radius:22px;padding:34px 30px;box-shadow:0 30px 70px rgba(0,0,0,.5);}
+    .cl-logo{font-size:23px;font-weight:800;letter-spacing:-.5px;text-align:center;}
+    .cl-logo span{background:linear-gradient(135deg,#8a909c,#fff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+    .cl-title{font-family:'Space Grotesk',Inter,sans-serif;font-size:21px;font-weight:600;text-align:center;margin:16px 0 6px;letter-spacing:-.3px;}
+    .cl-sub{font-size:13.5px;color:var(--mut);line-height:1.6;text-align:center;margin-bottom:24px;}
+    .cl-sub b{color:#fff;font-weight:600;}
+
+    .cl-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:48px;border-radius:13px;
+      font-family:Inter,sans-serif;font-size:14.5px;font-weight:600;cursor:pointer;text-decoration:none;border:1px solid transparent;
+      background:linear-gradient(135deg,#5b616e,#f6f7f9);color:#15161a;box-shadow:0 8px 22px rgba(0,0,0,.35);transition:transform .14s,box-shadow .2s,opacity .2s;}
+    .cl-btn:hover{transform:translateY(-1px);box-shadow:0 12px 28px rgba(0,0,0,.45);}
+    .cl-btn[disabled]{opacity:.55;cursor:not-allowed;transform:none;}
+    .cl-btn--discord{background:#5865F2;color:#fff;box-shadow:0 8px 22px rgba(88,101,242,.35);}
+
+    .cl-divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:rgba(255,255,255,.3);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;}
+    .cl-divider::before,.cl-divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.09);}
+    .cl-input{width:100%;height:48px;border-radius:13px;background:rgba(255,255,255,.04);border:1px solid var(--bd);
+      color:#fff;font-family:inherit;font-size:15px;padding:0 15px;margin-bottom:12px;text-align:center;}
+    .cl-input:focus{outline:none;border-color:var(--bd2);background:rgba(255,255,255,.06);}
+
+    /* OTP boxes */
+    .cl-otp{display:flex;gap:9px;justify-content:center;margin:6px 0 20px;}
+    .cl-otp input{width:46px;height:56px;border-radius:13px;background:rgba(255,255,255,.03);border:1.5px solid var(--bd);
+      color:#fff;font-family:'Space Grotesk',monospace;font-size:24px;font-weight:600;text-align:center;transition:border-color .12s,background .12s;}
+    .cl-otp input:focus{outline:none;border-color:#fff;background:rgba(255,255,255,.07);}
+    .cl-otp input.filled{border-color:var(--bd2);}
+    @media (max-width:380px){ .cl-otp input{width:40px;height:50px;font-size:21px;} }
+
+    .cl-link{margin-top:16px;display:block;width:100%;text-align:center;background:none;border:none;color:var(--mut);
+      font-size:13px;cursor:pointer;font-family:inherit;}
+    .cl-link:hover{color:#fff;}
+    .cl-back{margin-top:22px;display:block;text-align:center;font-size:12.5px;color:rgba(255,255,255,.38);}
+    .cl-back:hover{color:#fff;}
+    .cl-note{margin-top:16px;font-size:11.5px;color:rgba(255,255,255,.32);text-align:center;line-height:1.6;}
+
+    .cl-msg{margin-bottom:18px;font-size:13px;padding:11px 14px;border-radius:11px;display:none;text-align:center;}
+    .cl-msg.show{display:block;}
+    .cl-msg--err{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.28);color:#fda4a4;}
+    .cl-msg--ok{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.28);color:#86efac;}
   </style>
 </head>
 <body>
   <div class="cl-wrap">
     <div class="cl-card">
       <div class="cl-logo">Flash<span>Shp</span></div>
-      <div class="cl-title">Espace client</div>
-      <div class="cl-sub">Connectez-vous avec Discord pour retrouver l'historique de vos commandes.</div>
 
-      <div class="cl-err" id="clErr"></div>
-      <div class="cl-ok" id="clOk">Vous avez été déconnecté.</div>
+      <div class="cl-msg cl-msg--err" id="clErr"></div>
+      <div class="cl-msg cl-msg--ok" id="clOk">You have been signed out.</div>
 
-      <a class="cl-btn" href="/api/auth-discord" id="clDiscord">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.317 4.369a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.211.375-.445.865-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.1 13.1 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.009c.12.099.245.198.372.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.891.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.056c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.331c-1.183 0-2.157-1.086-2.157-2.42 0-1.332.955-2.418 2.157-2.418 1.21 0 2.176 1.096 2.157 2.42 0 1.332-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.086-2.157-2.42 0-1.332.955-2.418 2.157-2.418 1.21 0 2.176 1.096 2.157 2.42 0 1.332-.946 2.418-2.157 2.418z"/></svg>
-        Se connecter avec Discord
-      </a>
+      <!-- Step 1 : choose method -->
+      <div id="clStep1">
+        <div class="cl-title">Sign in to your account</div>
+        <div class="cl-sub">Access your orders and delivery history.</div>
 
-      <div class="cl-divider">ou par e-mail</div>
+        <a class="cl-btn cl-btn--discord" href="/api/auth-discord">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.317 4.369a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.211.375-.445.865-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.1 13.1 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.009c.12.099.245.198.372.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.891.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.056c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.331c-1.183 0-2.157-1.086-2.157-2.42 0-1.332.955-2.418 2.157-2.418 1.21 0 2.176 1.096 2.157 2.42 0 1.332-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.086-2.157-2.42 0-1.332.955-2.418 2.157-2.418 1.21 0 2.176 1.096 2.157 2.42 0 1.332-.946 2.418-2.157 2.418z"/></svg>
+          Continue with Discord
+        </a>
 
-      <!-- Étape 1 : saisie de l'e-mail -->
-      <form id="clEmailForm" autocomplete="on">
-        <input class="cl-input" type="email" id="clEmail" placeholder="votre@email.com" required autocomplete="email" />
-        <button class="cl-btn" type="submit" id="clSendBtn">Recevoir un code</button>
-      </form>
+        <div class="cl-divider">or with email</div>
 
-      <!-- Étape 2 : saisie du code (masquée au départ) -->
-      <form id="clCodeForm" style="display:none;" autocomplete="off">
-        <input class="cl-input cl-input--code" type="text" id="clCode" inputmode="numeric" maxlength="6"
-               placeholder="000000" autocomplete="one-time-code" pattern="[0-9]{6}" />
-        <button class="cl-btn" type="submit" id="clVerifyBtn">Se connecter</button>
-        <button class="cl-linkbtn" type="button" id="clResetBtn">← Changer d'e-mail / renvoyer</button>
-      </form>
+        <form id="clEmailForm" autocomplete="on">
+          <input class="cl-input" type="email" id="clEmail" placeholder="you@email.com" required autocomplete="email" />
+          <button class="cl-btn" type="submit" id="clSendBtn">Send me a code</button>
+        </form>
+        <div class="cl-note">No password needed. We only use your email to find your orders.</div>
+      </div>
 
-      <div class="cl-note">Aucun mot de passe. Nous utilisons votre e-mail uniquement pour retrouver vos commandes.</div>
+      <!-- Step 2 : verify code -->
+      <div id="clStep2" style="display:none;">
+        <div class="cl-title">Enter your code</div>
+        <div class="cl-sub">We sent a 6-digit code to <b id="clVMail"></b></div>
 
-      <a class="cl-back" href="/">← Retour à la boutique</a>
+        <form id="clCodeForm" autocomplete="off">
+          <div class="cl-otp" id="clOtp">
+            <input type="text" inputmode="numeric" maxlength="1" autocomplete="one-time-code" aria-label="Digit 1" />
+            <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 2" />
+            <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 3" />
+            <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 4" />
+            <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 5" />
+            <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 6" />
+          </div>
+          <button class="cl-btn" type="submit" id="clVerifyBtn">Verify &amp; sign in</button>
+          <button class="cl-link" type="button" id="clResend">Resend code</button>
+          <button class="cl-link" type="button" id="clReset" style="margin-top:4px;">← Use a different email</button>
+        </form>
+      </div>
+
+      <a class="cl-back" href="/">← Back to store</a>
     </div>
   </div>
 
@@ -89,82 +112,108 @@
   (function () {
     var params = new URLSearchParams(location.search);
     var ERRORS = {
-      missing_code: "La connexion a été annulée. Réessayez.",
-      bad_state: "Session de connexion expirée. Réessayez.",
-      token_exchange: "Impossible de valider la connexion Discord.",
-      userinfo: "Impossible de lire votre profil Discord.",
-      no_email: "Votre compte Discord n'a pas d'e-mail vérifié. Vérifiez votre e-mail sur Discord puis réessayez.",
-      access_denied: "Vous avez refusé l'autorisation Discord.",
-      server: "Une erreur est survenue. Réessayez plus tard."
+      missing_code: "Sign-in was cancelled. Please try again.",
+      bad_state: "Your sign-in session expired. Please try again.",
+      token_exchange: "Could not validate the Discord sign-in.",
+      userinfo: "Could not read your Discord profile.",
+      no_email: "Your Discord account has no verified email. Verify it on Discord, then try again.",
+      access_denied: "You declined the Discord authorization.",
+      server: "Something went wrong. Please try again later."
     };
     var errBox = document.getElementById('clErr');
     var okBox = document.getElementById('clOk');
-    var err = params.get('error');
-    if (err) {
-      errBox.textContent = ERRORS[err] || ("Erreur de connexion (" + err + ").");
-      errBox.classList.add('show');
-    }
-    if (params.get('loggedout')) okBox.classList.add('show');
-
-    /* ── Connexion par e-mail (code OTP) ── */
-    function showErr(msg) { okBox.classList.remove('show'); errBox.textContent = msg; errBox.classList.add('show'); }
-    function showOk(msg) { errBox.classList.remove('show'); okBox.textContent = msg; okBox.classList.add('show'); }
-
+    var step1 = document.getElementById('clStep1');
+    var step2 = document.getElementById('clStep2');
     var emailForm = document.getElementById('clEmailForm');
     var codeForm = document.getElementById('clCodeForm');
     var emailInput = document.getElementById('clEmail');
-    var codeInput = document.getElementById('clCode');
     var sendBtn = document.getElementById('clSendBtn');
     var verifyBtn = document.getElementById('clVerifyBtn');
+    var otp = Array.prototype.slice.call(document.querySelectorAll('#clOtp input'));
     var currentEmail = '';
+
+    if (params.get('error')) { errBox.textContent = ERRORS[params.get('error')] || ('Sign-in error (' + params.get('error') + ').'); errBox.classList.add('show'); }
+    if (params.get('loggedout')) okBox.classList.add('show');
+
+    function showErr(m){ okBox.classList.remove('show'); errBox.textContent=m; errBox.classList.add('show'); }
+    function showOk(m){ errBox.classList.remove('show'); okBox.textContent=m; okBox.classList.add('show'); }
+
+    /* ── OTP boxes behaviour ── */
+    function getCode(){ return otp.map(function(i){ return i.value; }).join(''); }
+    otp.forEach(function (box, idx) {
+      box.addEventListener('input', function () {
+        box.value = box.value.replace(/[^0-9]/g, '').slice(0, 1);
+        box.classList.toggle('filled', !!box.value);
+        if (box.value && idx < 5) otp[idx + 1].focus();
+        if (getCode().length === 6) codeForm.requestSubmit ? codeForm.requestSubmit() : submitCode();
+      });
+      box.addEventListener('keydown', function (e) {
+        if (e.key === 'Backspace' && !box.value && idx > 0) { otp[idx - 1].focus(); otp[idx - 1].value = ''; otp[idx - 1].classList.remove('filled'); e.preventDefault(); }
+        if (e.key === 'ArrowLeft' && idx > 0) otp[idx - 1].focus();
+        if (e.key === 'ArrowRight' && idx < 5) otp[idx + 1].focus();
+      });
+      box.addEventListener('paste', function (e) {
+        e.preventDefault();
+        var digits = (e.clipboardData || window.clipboardData).getData('text').replace(/[^0-9]/g, '').slice(0, 6).split('');
+        otp.forEach(function (b, i) { b.value = digits[i] || ''; b.classList.toggle('filled', !!b.value); });
+        (otp[Math.min(digits.length, 5)] || otp[5]).focus();
+        if (digits.length === 6) submitCode();
+      });
+    });
+
+    function toStep2(email){
+      currentEmail = email;
+      document.getElementById('clVMail').textContent = email;
+      step1.style.display = 'none';
+      step2.style.display = 'block';
+      setTimeout(function(){ otp[0].focus(); }, 60);
+    }
+
+    function requestCode(email, btn, label){
+      btn.disabled = true; btn.textContent = 'Sending…';
+      return fetch('/api/auth-email-request', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email: email }) })
+        .then(function(r){ return r.json().then(function(j){ return { ok:r.ok, status:r.status, body:j }; }); })
+        .then(function(res){
+          if (res.ok && res.body && res.body.ok) { showOk('Code sent to ' + email + '. Check your inbox (and spam).'); return true; }
+          if (res.status === 429) showErr((res.body && res.body.error) || 'Too many requests. Try again in a minute.');
+          else if (res.status === 501) showErr('Email sign-in is not enabled yet. Use Discord.');
+          else showErr((res.body && res.body.error) || 'Could not send the code. Try again.');
+          return false;
+        })
+        .catch(function(){ showErr('Network error. Please try again.'); return false; })
+        .then(function(ok){ btn.disabled = false; btn.textContent = label; return ok; });
+    }
 
     emailForm.addEventListener('submit', function (e) {
       e.preventDefault();
       var email = (emailInput.value || '').trim().toLowerCase();
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { showErr('E-mail invalide.'); return; }
-      sendBtn.disabled = true; sendBtn.textContent = 'Envoi…';
-      fetch('/api/auth-email-request', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: email })
-      })
-        .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, status: r.status, body: j }; }); })
-        .then(function (res) {
-          if (res.ok && res.body && res.body.ok) {
-            currentEmail = email;
-            emailForm.style.display = 'none';
-            codeForm.style.display = 'block';
-            showOk('Code envoyé à ' + email + '. Vérifiez vos e-mails (et les spams).');
-            codeInput.focus();
-            return;
-          }
-          if (res.status === 429) { showErr(res.body.error || 'Trop de demandes, réessayez dans une minute.'); }
-          else if (res.status === 501) { showErr('La connexion par e-mail n\'est pas encore activée. Utilisez Discord.'); }
-          else { showErr((res.body && res.body.error) || 'Envoi impossible. Réessayez.'); }
-        })
-        .catch(function () { showErr('Erreur réseau. Réessayez.'); })
-        .then(function () { sendBtn.disabled = false; sendBtn.textContent = 'Recevoir un code'; });
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { showErr('Please enter a valid email.'); return; }
+      requestCode(email, sendBtn, 'Send me a code').then(function(ok){ if (ok) toStep2(email); });
     });
 
-    codeForm.addEventListener('submit', function (e) {
-      e.preventDefault();
-      var code = (codeInput.value || '').trim();
-      if (!/^[0-9]{6}$/.test(code)) { showErr('Le code fait 6 chiffres.'); return; }
-      verifyBtn.disabled = true; verifyBtn.textContent = 'Connexion…';
-      fetch('/api/auth-email-verify', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: currentEmail, code: code })
-      })
-        .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, status: r.status, body: j }; }); })
-        .then(function (res) {
-          if (res.ok && res.body && res.body.ok) { showOk('Connecté ! Redirection…'); location.href = '/'; return; }
-          showErr((res.body && res.body.error) || 'Code invalide.');
-          verifyBtn.disabled = false; verifyBtn.textContent = 'Se connecter';
+    function submitCode(){
+      var code = getCode();
+      if (!/^[0-9]{6}$/.test(code)) { showErr('Enter the 6-digit code.'); return; }
+      verifyBtn.disabled = true; verifyBtn.textContent = 'Verifying…';
+      fetch('/api/auth-email-verify', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email: currentEmail, code: code }) })
+        .then(function(r){ return r.json().then(function(j){ return { ok:r.ok, status:r.status, body:j }; }); })
+        .then(function(res){
+          if (res.ok && res.body && res.body.ok) { showOk('Signed in! Redirecting…'); location.href = '/'; return; }
+          showErr((res.body && res.body.error) || 'Invalid code.');
+          otp.forEach(function(b){ b.value=''; b.classList.remove('filled'); }); otp[0].focus();
+          verifyBtn.disabled = false; verifyBtn.textContent = 'Verify & sign in';
         })
-        .catch(function () { showErr('Erreur réseau. Réessayez.'); verifyBtn.disabled = false; verifyBtn.textContent = 'Se connecter'; });
-    });
+        .catch(function(){ showErr('Network error. Please try again.'); verifyBtn.disabled = false; verifyBtn.textContent = 'Verify & sign in'; });
+    }
+    codeForm.addEventListener('submit', function (e) { e.preventDefault(); submitCode(); });
 
-    document.getElementById('clResetBtn').addEventListener('click', function () {
-      codeForm.style.display = 'none';
-      emailForm.style.display = 'block';
-      codeInput.value = '';
+    document.getElementById('clResend').addEventListener('click', function () {
+      if (!currentEmail) return;
+      requestCode(currentEmail, this, 'Resend code');
+    });
+    document.getElementById('clReset').addEventListener('click', function () {
+      step2.style.display = 'none'; step1.style.display = 'block';
+      otp.forEach(function(b){ b.value=''; b.classList.remove('filled'); });
       errBox.classList.remove('show'); okBox.classList.remove('show');
       emailInput.focus();
     });
