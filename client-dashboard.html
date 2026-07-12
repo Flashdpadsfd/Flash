@@ -219,7 +219,7 @@
 
     <!-- Main -->
     <main class="acc-main">
-      <div class="acc-stats">
+      <div class="acc-stats" id="accStats">
         <div class="stat stat--accent">
           <div class="stat__lbl">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
@@ -336,6 +336,7 @@
     window.go = function(view){
       document.querySelectorAll('.acc-menu__item').forEach(function(el){ el.classList.toggle('active', el.getAttribute('data-view')===view); });
       ['overview','orders','wallet'].forEach(function(v){ document.getElementById('view-'+v).hidden = (v!==view); });
+      var stats=document.getElementById('accStats'); if(stats) stats.style.display=(view==='overview')?'':'none';
       window.scrollTo(0,0);
     };
     window.filterOrders = function(q){
