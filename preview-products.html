@@ -381,7 +381,7 @@
           '</div>';
       }
 
-      return '<div class="product-card' + (p.image ? ' product-card--framed' : '') + '" style="--i:' + index + '" data-name="' + esc(p.name) + '" data-cat="' + esc(p.category) + '" data-price="' + p.price + '" data-product-id="' + p.id + '">' +
+      return '<div class="product-card" style="--i:' + index + '" data-name="' + esc(p.name) + '" data-cat="' + esc(p.category) + '" data-price="' + p.price + '" data-product-id="' + p.id + '">' +
         thumbHtml +
         '<div class="pc-info">' +
           '<div class="pc-info-top">' + stockHtml + ratingHtml + '</div>' +
