@@ -408,6 +408,19 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
 }
 .product-card.hidden { display: none; }
 
+/* ── Variante « image encadrée » ──────────────────────────────────────────
+   Quand le produit a une image custom, on l'affiche en bannière PROPRE (ratio
+   5/3) et on met les infos (titre/prix/stock) dans une barre pleine EN DESSOUS
+   au lieu d'un overlay. Évite de superposer le texte du thème à une image qui
+   contient déjà son propre texte/bouton. Les cartes sans image (dégradé)
+   gardent l'overlay d'origine. */
+.product-card--framed { aspect-ratio: auto; }
+.product-card--framed .pc-thumb { position: relative; inset: auto; aspect-ratio: 5/3; }
+.product-card--framed .pc-info {
+  position: relative; left: auto; right: auto; bottom: auto;
+  padding: 12px 14px 14px; background: #0e0e0e;
+}
+
 /* ── Thumbnail ── */
 .pc-thumb {
   position: absolute; inset: 0; overflow: hidden;
