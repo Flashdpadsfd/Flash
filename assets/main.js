@@ -210,6 +210,21 @@ window.NX_ICONS = function (name) {
       filterAndSort();
     } else if (_urlCat) {
       activeCat = _urlCat.toLowerCase();
+      /* Catégorie parente : inclure aussi les produits de ses sous-catégories. */
+      try {
+        var _allCats = JSON.parse(localStorage.getItem('nexus_categories') || '[]');
+        var _stack = [activeCat], _seenC = {};
+        while (_stack.length) {
+          var _cur = _stack.pop();
+          _allCats.forEach(function (c) {
+            if (String(c.parent).toLowerCase() === String(_cur) && !_seenC[c.id]) {
+              _seenC[c.id] = 1;
+              activeSubcats.push(String(c.id).toLowerCase());
+              _stack.push(String(c.id).toLowerCase());
+            }
+          });
+        }
+      } catch (e) {}
       document.querySelectorAll(CAT_FILTER_SELECTOR).forEach(function (i) {
         if ((i.dataset.cat || '').toLowerCase() === activeCat) i.classList.add('active');
       });

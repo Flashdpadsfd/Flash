@@ -479,25 +479,18 @@
           seen = seen || {};
           if (seen[c.id] || depth > 6) return '';   /* garde-fou anti-boucle */
           seen[c.id] = true;
-          var subs = cats.filter(function(s) { return s.parent === c.id; });
-          if (subs.length) {
-            var bodyId = 'pdCatSec-' + c.id;
-            var inner = subs.map(function(s) { return renderNode(s, depth + 1, seen); }).join('');
-            return '<div class="sidebar__section' + (depth > 0 ? ' sidebar__section--nested' : '') + '">' +
-              '<div class="sidebar__section-header" onclick="toggleSection(\'' + bodyId + '\')">' +
-                '<span class="sidebar__section-title">' + catIcon(c) + esc(c.name) + '</span>' +
-                '<span class="sidebar__line"></span>' +
-                '<svg class="sidebar__section-arrow" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>' +
-              '</div>' +
-              '<div class="sidebar__section-body" id="' + bodyId + '">' + inner + '</div>' +
-            '</div>';
-          }
-          return '<div class="sidebar__section' + (depth > 0 ? ' sidebar__section--nested' : '') + '">' +
-            '<a class="sidebar__section-header sidebar__section-header--leaf' + (isActive(c) ? ' active' : '') + '" href="/products?cat=' + encodeURIComponent(c.id) + '">' +
-              '<span class="sidebar__section-title"><span class="sidebar__dot"></span>' + esc(c.name) + '</span>' +
+          var subs = cats.filter(function(s) { return String(s.parent) === String(c.id); });
+          /* Chaque catégorie = lien vers /products?cat=ID (la grille filtre alors sur
+             ses produits + ceux de ses sous-catégories). Sous-catégories imbriquées
+             juste en dessous, toujours visibles. */
+          var header = '<a class="sidebar__section-header sidebar__section-header--leaf' + (isActive(c) ? ' active' : '') + '" href="/products?cat=' + encodeURIComponent(c.id) + '">' +
+              '<span class="sidebar__section-title">' + catIcon(c) + esc(c.name) + '</span>' +
               '<span class="sidebar__line"></span>' +
-            '</a>' +
-          '</div>';
+            '</a>';
+          var body = subs.length
+            ? '<div class="sidebar__section-body">' + subs.map(function(s) { return renderNode(s, depth + 1, seen); }).join('') + '</div>'
+            : '';
+          return '<div class="sidebar__section' + (depth > 0 ? ' sidebar__section--nested' : '') + '">' + header + body + '</div>';
         }
         var roots = cats.filter(function(c) {
           return !c.parent || !cats.some(function(p) { return p.id === c.parent; });
