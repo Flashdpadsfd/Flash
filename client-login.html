@@ -126,6 +126,7 @@
     var verifyBtn = document.getElementById('clVerifyBtn');
     var otp = Array.prototype.slice.call(document.querySelectorAll('#clOtp input'));
     var currentEmail = '';
+    var verifying = false;   /* garde anti-double-envoi (évite un "Network error" fantôme) */
 
     if (params.get('error')) { errBox.textContent = ERRORS[params.get('error')] || ('Sign-in error (' + params.get('error') + ').'); errBox.classList.add('show'); }
     if (params.get('loggedout')) okBox.classList.add('show');
@@ -189,8 +190,10 @@
     });
 
     function submitCode(){
+      if (verifying) return;                 /* une seule vérification à la fois */
       var code = getCode();
       if (!/^[0-9]{6}$/.test(code)) { showErr('Enter the 6-digit code.'); return; }
+      verifying = true;
       verifyBtn.disabled = true; verifyBtn.textContent = 'Verifying…';
       fetch('/api/auth-email-verify', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email: currentEmail, code: code }) })
         .then(function(r){ return r.json().then(function(j){ return { ok:r.ok, status:r.status, body:j }; }); })
@@ -198,9 +201,9 @@
           if (res.ok && res.body && res.body.ok) { showOk('Signed in! Redirecting…'); location.href = '/'; return; }
           showErr((res.body && res.body.error) || 'Invalid code.');
           otp.forEach(function(b){ b.value=''; b.classList.remove('filled'); }); otp[0].focus();
-          verifyBtn.disabled = false; verifyBtn.textContent = 'Verify & sign in';
+          verifying = false; verifyBtn.disabled = false; verifyBtn.textContent = 'Verify & sign in';
         })
-        .catch(function(){ showErr('Network error. Please try again.'); verifyBtn.disabled = false; verifyBtn.textContent = 'Verify & sign in'; });
+        .catch(function(){ showErr('Network error. Please try again.'); verifying = false; verifyBtn.disabled = false; verifyBtn.textContent = 'Verify & sign in'; });
     }
     codeForm.addEventListener('submit', function (e) { e.preventDefault(); submitCode(); });
 
