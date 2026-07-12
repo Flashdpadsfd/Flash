@@ -17,6 +17,44 @@
 var SELLAUTH_BASE = 'https://api.sellauth.com/v1';
 var PER_PAGE = 100;     // max autorisé par l'API
 var MAX_PAGES = 40;     // garde-fou : jusqu'à 4000 avis (on suit last_page de l'API)
+var CONCURRENCY = 4;    // pages récupérées en parallèle par lot (évite le rate-limit)
+
+/* ── Cache mémoire (le serveur Hostinger est un process persistant) ──
+   Sans cache, CHAQUE visite déclenchait ~13 appels SellAuth en parallèle →
+   rate-limit → des pages échouaient et étaient silencieusement ignorées
+   (« count » qui varie : 1245, 845…), voire la page 1 en échec → 502 → la
+   page Avis retombait sur ses 12 avis démo. On mémorise le dernier résultat
+   COMPLET et on le ressert quelques minutes sans rappeler SellAuth. */
+var CACHE_FRESH_MS = 5 * 60 * 1000;    // sert le cache sans rappeler SellAuth
+var CACHE_STALE_MS = 60 * 60 * 1000;   // si SellAuth tombe : sert le cache jusqu'à 1h
+var _cache = { at: 0, payload: null, complete: false };
+
+function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+/* fetch JSON avec retries : 429 / 5xx = transitoire → on réessaie (backoff). */
+async function fetchJson(url, headers, tries) {
+  tries = tries || 3;
+  for (var i = 0; i < tries; i++) {
+    try {
+      var r = await fetch(url, { headers: headers });
+      if (r.ok) return await r.json();
+      if (r.status !== 429 && r.status < 500) return null; // 4xx définitif : inutile de réessayer
+    } catch (e) { /* erreur réseau : on réessaie */ }
+    if (i < tries - 1) await sleep(250 * (i + 1));
+  }
+  return null;
+}
+
+/* Récupère plusieurs pages par petits lots (au lieu de 13 d'un coup). */
+async function fetchPages(pages, urlOf, headers) {
+  var out = [];
+  for (var i = 0; i < pages.length; i += CONCURRENCY) {
+    var batch = pages.slice(i, i + CONCURRENCY);
+    var got = await Promise.all(batch.map(function (p) { return fetchJson(urlOf(p), headers, 3); }));
+    out = out.concat(got);
+  }
+  return out;
+}
 
 /* ── Anti-abus : n'accepter que les appels venant de nos propres pages ── */
 function hostFrom(value) {
@@ -103,6 +141,17 @@ module.exports = async function (req, res) {
   var shopId = String(process.env.SELLAUTH_SHOP_ID || '').trim();
   if (!apiKey || !shopId) { res.status(501).json({ error: 'SellAuth not configured' }); return; }
 
+  var now = Date.now();
+  var send = function (payload) {
+    res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
+    res.status(200).json(payload);
+  };
+
+  /* Cache frais ET complet → on répond direct, aucun appel SellAuth. */
+  if (_cache.payload && _cache.complete && (now - _cache.at) < CACHE_FRESH_MS) {
+    return send(_cache.payload);
+  }
+
   var headers = {
     'Authorization': 'Bearer ' + apiKey,
     'Content-Type': 'application/json',
@@ -117,27 +166,33 @@ module.exports = async function (req, res) {
 
   try {
     var collected = [];
+    var missing = 0;
 
     /* 1re page : on récupère les données ET le nombre total de pages (last_page). */
-    var first = await fetch(pageUrl(1), { headers: headers });
-    if (!first.ok) { res.status(502).json({ error: 'SellAuth error ' + first.status }); return; }
-    var firstJson = await first.json();
+    var firstJson = await fetchJson(pageUrl(1), headers, 4);
+    if (!firstJson) {
+      /* SellAuth injoignable : on ressert le dernier bon cache plutôt qu'une
+         erreur (qui ferait retomber la page sur ses 12 avis démo). */
+      if (_cache.payload && (now - _cache.at) < CACHE_STALE_MS) return send(_cache.payload);
+      res.status(502).json({ error: 'SellAuth unreachable' }); return;
+    }
     collected = collected.concat(extractList(firstJson));
 
     var lastPage = Number(firstJson && firstJson.last_page) || 1;
     if (lastPage > MAX_PAGES) lastPage = MAX_PAGES; /* garde-fou */
 
-    /* Pages restantes récupérées EN PARALLÈLE (évite un timeout sur 13+ pages). */
+    /* Pages restantes : par petits lots, avec retries. On COMPTE les pages
+       échouées (missing) pour savoir si le résultat est complet. */
     if (lastPage > 1) {
       var rest = [];
       for (var p = 2; p <= lastPage; p++) rest.push(p);
-      var pages = await Promise.all(rest.map(function (page) {
-        return fetch(pageUrl(page), { headers: headers })
-          .then(function (r) { return r.ok ? r.json() : null; })
-          .catch(function () { return null; });
-      }));
-      pages.forEach(function (json) { if (json) collected = collected.concat(extractList(json)); });
+      var pages = await fetchPages(rest, pageUrl, headers);
+      pages.forEach(function (json) {
+        if (json) collected = collected.concat(extractList(json));
+        else missing++;
+      });
     }
+    var complete = (missing === 0);
 
     /* Garde TOUS les avis (toutes notes 1★→5★, y compris les avis AUTOMATIQUES
        après 7 jours, qui n'ont pas de message → on met un texte neutre par défaut).
@@ -177,11 +232,26 @@ module.exports = async function (req, res) {
     for (var k = 0; k < reviews.length; k++) sum += reviews[k].stars;
     var average = reviews.length ? Math.round((sum / reviews.length) * 10) / 10 : 0;
 
-    /* Cache CDN 5 min (réduit les appels API + accélère la page). */
-    res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
-    res.status(200).json({ ok: true, count: reviews.length, average: average, reviews: reviews });
+    var payload = { ok: true, count: reviews.length, average: average, reviews: reviews, complete: complete };
+
+    if (complete) {
+      /* Résultat complet → on le met en cache et on le sert. */
+      _cache = { at: now, payload: payload, complete: true };
+      return send(payload);
+    }
+
+    /* Incomplet (des pages SellAuth ont échoué malgré les retries) : on
+       n'écrase PAS un bon cache. On ressert le dernier résultat complet s'il
+       n'est pas trop vieux ; sinon on renvoie ce qu'on a (mieux que 12 démos)
+       en le mettant en cache très court pour réessayer vite. */
+    if (_cache.payload && _cache.complete && (now - _cache.at) < CACHE_STALE_MS) {
+      return send(_cache.payload);
+    }
+    _cache = { at: now - (CACHE_FRESH_MS - 30000), payload: payload, complete: false };
+    return send(payload);
   } catch (e) {
     console.error('[FlashShp] SellAuth feedbacks failed:', e && e.message);
+    if (_cache.payload && (Date.now() - _cache.at) < CACHE_STALE_MS) return send(_cache.payload);
     res.status(502).json({ error: 'Fetch failed' });
   }
 };
