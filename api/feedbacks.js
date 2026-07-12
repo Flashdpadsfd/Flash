@@ -230,7 +230,7 @@ module.exports = async function (req, res) {
     /* Moyenne réelle sur toutes les notes récupérées (arrondie à 0,1). */
     var sum = 0;
     for (var k = 0; k < reviews.length; k++) sum += reviews[k].stars;
-    var average = reviews.length ? Math.round((sum / reviews.length) * 10) / 10 : 0;
+    var average = reviews.length ? Math.floor((sum / reviews.length) * 10) / 10 : 0;  /* tronqué : pas d'arrondi vers le haut */
 
     var payload = { ok: true, count: reviews.length, average: average, reviews: reviews, complete: complete };
 

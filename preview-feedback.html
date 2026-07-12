@@ -519,7 +519,10 @@
       var counts = {1:0,2:0,3:0,4:0,5:0}, sum = 0;
       ALL.forEach(function(r) { var s = Math.max(1, Math.min(5, Math.round(r.stars || 5))); counts[s]++; sum += s; });
       var avg = total ? (sum / total) : 0;
-      document.getElementById('rvAvg').textContent = avg.toFixed(1);
+      /* Tronque à 1 décimale (pas d'arrondi vers le haut) : 4.95 → « 4.9 », pas
+         « 5.0 ». Un 5.0 ne s'affiche donc que si la moyenne est réellement 5. */
+      var avgShown = Math.floor(avg * 10) / 10;
+      document.getElementById('rvAvg').textContent = avgShown.toFixed(1);
       document.getElementById('rvAvgStars').innerHTML = starsRow(Math.round(avg), 15);
       var rows = '';
       for (var s = 5; s >= 1; s--) {
