@@ -337,6 +337,22 @@
        ses sous-produits. On masque le corps checkout et on affiche les enfants
        en cartes cliquables (le clic est géré par main.js → /products-<slug>).
        La sidebar catégories + le hero restent affichés. */
+    /* Note moyenne d'un produit à partir des avis publiés (par id, sinon par nom). */
+    var _grReviews = [];
+    try { _grReviews = JSON.parse(localStorage.getItem('nexus_reviews')) || []; } catch(e) {}
+    function _grStars(r) { var v = Number(r.stars != null ? r.stars : (r.rating != null ? r.rating : 5)); if (!isFinite(v)) v = 5; return Math.max(0, Math.min(5, Math.round(v))); }
+    function _grRating(c) {
+      var nm = String(c.name || '').toLowerCase().trim();
+      var m = _grReviews.filter(function(r) {
+        if (r.published === false) return false;
+        if (r.productId != null && String(r.productId) === String(c.id)) return true;
+        if (nm && r.product && String(r.product).toLowerCase().trim() === nm) return true;
+        return false;
+      });
+      return m.length ? { count: m.length, avg: m.reduce(function(s, r) { return s + _grStars(r); }, 0) / m.length } : { count: 0, avg: 0 };
+    }
+    /* Carte "dailystore" : dégradé + logo centré + infos en overlay en bas
+       (stock, note, titre, prix). Le clic est géré par main.js → /products-<slug>. */
     function groupCardHtml(c) {
       var gradient = c.gradient || 'linear-gradient(135deg,#1a1a2e,#16213e)';
       var icon = c.icon || '📦';
@@ -344,24 +360,22 @@
       var stockHtml = inStock
         ? '<span class="pc-stock pc-stock--in">In stock</span>'
         : '<span class="pc-stock pc-stock--out">Out of stock</span>';
+      var rt = _grRating(c);
+      var ratingHtml = rt.count
+        ? '<span class="pc-rating">' + rt.avg.toFixed(1) + ' <span class="pc-rating-count">(' + rt.count + ')</span></span>'
+        : '';
       var priceHtml = c.origPrice
         ? '<span class="pc-price-orig">€' + Number(c.origPrice).toFixed(2) + '</span><span class="pc-price">€' + Number(c.price || 0).toFixed(2) + '</span>'
         : '<span class="pc-price">€' + Number(c.price || 0).toFixed(2) + '</span>';
-      var nameParts = (c.name || '').split(' ');
-      var big1 = nameParts[0] || '', big2 = nameParts.slice(1).join(' ') || '';
-      var thumb;
-      if (c.image) {
-        thumb = '<div class="pc-thumb pc-thumb--img"><img class="pc-img" src="' + esc(c.image) + '" alt="' + esc(c.name) + '" loading="lazy"></div>';
-      } else {
-        thumb = '<div class="pc-thumb" style="background:' + gradient + ';">' +
-          '<div class="pc-big-text">' + esc(big1) + (big2 ? '<br>' + esc(big2) : '') + '</div>' +
-          '<div class="pc-visual">' + icon + '</div>' +
-        '</div>';
-      }
-      return '<div class="product-card' + (c.image ? ' product-card--framed' : '') + '" data-name="' + esc(c.name) + '" data-cat="' + esc(c.category || '') + '" data-price="' + (c.price || 0) + '" data-product-id="' + c.id + '">' +
-        thumb +
+      var visual = c.image
+        ? '<img class="pc-logo" src="' + esc(c.image) + '" alt="' + esc(c.name) + '" loading="lazy">'
+        : '<span class="pc-logo pc-logo--emoji">' + icon + '</span>';
+      return '<div class="product-card" data-name="' + esc(c.name) + '" data-cat="' + esc(c.category || '') + '" data-price="' + (c.price || 0) + '" data-product-id="' + c.id + '">' +
+        '<div class="pc-thumb" style="background:' + gradient + ';">' +
+          '<div class="pc-logo-wrap">' + visual + '</div>' +
+        '</div>' +
         '<div class="pc-info">' +
-          '<div class="pc-info-top">' + stockHtml + '</div>' +
+          '<div class="pc-info-top">' + stockHtml + ratingHtml + '</div>' +
           '<div class="pc-title">' + esc(c.name) + '</div>' +
           '<div class="pc-price-row">' + priceHtml + '</div>' +
         '</div>' +

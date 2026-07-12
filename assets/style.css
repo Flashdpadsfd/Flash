@@ -421,6 +421,26 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
   padding: 12px 14px 14px; background: #0e0e0e;
 }
 
+/* ── Logo centré sur le dégradé (style dailystore) ────────────────────────
+   Le visuel/logo du produit est contenu au centre du dégradé, et les infos
+   (stock/note/titre/prix) restent en overlay en bas. Utilisé par les cartes
+   des produits-groupe. Comme le logo est CONTENU (pas plein cadre), il ne
+   chevauche pas l'overlay du bas. */
+.pc-logo-wrap {
+  position: absolute; inset: 0; z-index: 1;
+  display: flex; align-items: center; justify-content: center;
+  padding-bottom: 30px; pointer-events: none;
+}
+.pc-logo {
+  width: 44%; max-width: 150px; max-height: 52%;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 18px rgba(0,0,0,.35));
+}
+.pc-logo--emoji {
+  font-size: 82px; line-height: 1;
+  filter: drop-shadow(0 6px 18px rgba(0,0,0,.35));
+}
+
 /* ── Thumbnail ── */
 .pc-thumb {
   position: absolute; inset: 0; overflow: hidden;
