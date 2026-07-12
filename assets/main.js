@@ -62,12 +62,17 @@ window.NX_ICONS = function (name) {
     navbar.classList[window.scrollY > 20 ? 'add' : 'remove']('scrolled');
   }, { passive: true });
 
-  /* URL de la fiche produit. On garde le même style d'URL que la page courante
-     (avec ou sans .html) pour fonctionner aussi bien en local que via le rewrite
-     /product en production, sans perdre le ?id=. */
-  function productUrl(id) {
-    var ext = /\.html$/.test(window.location.pathname) ? '.html' : '';
-    return 'preview-product' + ext + '?id=' + encodeURIComponent(id);
+  /* Slug d'URL à partir du nom du produit : "Netflix Premium" → "netflix-premium". */
+  function slugify(s) {
+    return String(s || '').toLowerCase().trim()
+      .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  }
+
+  /* URL de la fiche produit : /products-<nom> (ex. /products-netflix).
+     Si le nom est vide, on retombe sur l'ancien style ?id= pour ne rien casser. */
+  function productUrl(id, name) {
+    var slug = slugify(name);
+    return slug ? '/products-' + slug : '/preview-product?id=' + encodeURIComponent(id);
   }
 
   /* ─── Product card click → product detail page ─── */
@@ -75,7 +80,7 @@ window.NX_ICONS = function (name) {
     var card = e.target.closest('.product-card');
     if (!card) return;
     var productId = card.dataset.productId;
-    if (productId) window.location.href = productUrl(productId);
+    if (productId) window.location.href = productUrl(productId, card.dataset.name);
   });
 
   /* ─── Escape ─── */

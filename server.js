@@ -113,6 +113,10 @@ var REWRITES = {
 Object.keys(REWRITES).forEach(function (route) {
   app.get(route, function (req, res) { res.sendFile(path.join(__dirname, REWRITES[route])); });
 });
+/* URL propre de la fiche produit : /products-<nom> (ex. /products-netflix). */
+app.get(/^\/products-[^\/]+$/, function (req, res) {
+  res.sendFile(path.join(__dirname, 'preview-product.html'));
+});
 
 /* ── Garde : ne jamais servir le code source / secrets en statique ── */
 var BLOCKED = /^\/(?:api|node_modules|\.git|\.claude|\.vercel)(?:\/|$)|^\/(?:server\.js|package(?:-lock)?\.json|vercel\.json|deploy\.ps1|\.env.*|\.gitignore)$/i;
