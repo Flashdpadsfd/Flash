@@ -71,10 +71,28 @@ async function ensure() {
     ' email VARCHAR(255) NOT NULL PRIMARY KEY,' +
     ' code VARCHAR(12),' +
     ' attempts INT DEFAULT 0,' +
-    ' expires_at DATETIME NULL,' +
-    ' cooldown_until DATETIME NULL' +
+    ' expires_at BIGINT NULL,' +          /* epoch ms (pas DATETIME : évite les bugs de fuseau) */
+    ' cooldown_until BIGINT NULL' +       /* epoch ms */
     ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4'
   );
+
+  /* Migration des anciennes bases : expires_at/cooldown_until étaient en
+     DATETIME. Le round-trip mysql2↔MySQL relisait la valeur comme « passée »,
+     donc les bons codes étaient rejetés « expirés ». On passe en BIGINT (epoch
+     ms). On ne migre qu'une fois (si la colonne est encore de type datetime),
+     puis on vide la table (codes éphémères, sans valeur après conversion). */
+  try {
+    var col = await p.query(
+      "SELECT DATA_TYPE FROM information_schema.COLUMNS" +
+      " WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'otp_codes' AND COLUMN_NAME = 'expires_at'"
+    );
+    var dt = col[0] && col[0][0] && col[0][0].DATA_TYPE;
+    if (dt && String(dt).toLowerCase() !== 'bigint') {
+      await p.query('ALTER TABLE otp_codes MODIFY COLUMN expires_at BIGINT NULL, MODIFY COLUMN cooldown_until BIGINT NULL');
+      await p.query('DELETE FROM otp_codes');
+    }
+  } catch (e) { console.error('[FlashShp] otp_codes migration skipped:', e && e.message); }
+
   ensured = true;
 }
 
@@ -121,7 +139,7 @@ async function getClient(id) {
 /* Enregistre un code (expire dans 600 s), en réinitialisant les essais. */
 async function saveOtp(email, code) {
   await ensure();
-  var exp = new Date(Date.now() + 600 * 1000);
+  var exp = Date.now() + 600 * 1000;   /* epoch ms */
   await getPool().query(
     'INSERT INTO otp_codes (email, code, attempts, expires_at) VALUES (?, ?, 0, ?)' +
     ' ON DUPLICATE KEY UPDATE code=VALUES(code), attempts=0, expires_at=VALUES(expires_at)',
@@ -135,7 +153,7 @@ async function getOtp(email) {
   var res = await getPool().query('SELECT code, attempts, expires_at FROM otp_codes WHERE email = ? LIMIT 1', [email]);
   var r = res[0] && res[0][0];
   if (!r || !r.code || !r.expires_at) return null;
-  if (new Date(r.expires_at).getTime() < Date.now()) { await deleteOtp(email); return null; }
+  if (Number(r.expires_at) < Date.now()) { await deleteOtp(email); return null; }
   return { code: r.code, attempts: r.attempts || 0 };
 }
 
@@ -157,8 +175,8 @@ async function checkCooldown(email, ttlSec) {
   var now = Date.now();
   var res = await p.query('SELECT cooldown_until FROM otp_codes WHERE email = ? LIMIT 1', [email]);
   var r = res[0] && res[0][0];
-  if (r && r.cooldown_until && new Date(r.cooldown_until).getTime() > now) return false;
-  var until = new Date(now + ttlSec * 1000);
+  if (r && r.cooldown_until && Number(r.cooldown_until) > now) return false;
+  var until = now + ttlSec * 1000;   /* epoch ms */
   await p.query(
     'INSERT INTO otp_codes (email, cooldown_until) VALUES (?, ?)' +
     ' ON DUPLICATE KEY UPDATE cooldown_until = VALUES(cooldown_until)',
