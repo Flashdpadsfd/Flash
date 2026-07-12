@@ -391,11 +391,18 @@
       '</div>';
     }
 
+    /* Un produit rattaché à un produit parent existant ne s'affiche PAS comme
+       carte autonome dans la grille : il n'apparaît que dans son produit parent
+       (et imbriqué sous lui dans la sidebar). */
+    function isChildProduct(p, all) {
+      return p.parentProduct && all.some(function(x) { return String(x.id) === String(p.parentProduct); });
+    }
     function renderGrid() {
       var grid = document.getElementById('productGrid');
       var countEl = document.getElementById('resultsCount');
       if (!grid) return;
-      var products = getProducts();
+      var all = getProducts();
+      var products = all.filter(function(p) { return !isChildProduct(p, all); });
       grid.innerHTML = products.map(function(p, i) { return buildCard(p, i); }).join('');
       if (countEl) countEl.textContent = products.length;
       if (window._nexusFilterAndSort) window._nexusFilterAndSort();
