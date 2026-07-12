@@ -35,7 +35,6 @@
       background:linear-gradient(135deg,#5b616e,#f6f7f9);color:#15161a;box-shadow:0 8px 22px rgba(0,0,0,.35);transition:transform .14s,box-shadow .2s,opacity .2s;}
     .cl-btn:hover{transform:translateY(-1px);box-shadow:0 12px 28px rgba(0,0,0,.45);}
     .cl-btn[disabled]{opacity:.55;cursor:not-allowed;transform:none;}
-    .cl-btn--discord{background:#5865F2;color:#fff;box-shadow:0 8px 22px rgba(88,101,242,.35);}
 
     .cl-divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:rgba(255,255,255,.3);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;}
     .cl-divider::before,.cl-divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.09);}
@@ -79,13 +78,6 @@
         <div class="cl-title">Sign in to your account</div>
         <div class="cl-sub">Access your orders and delivery history.</div>
 
-        <a class="cl-btn cl-btn--discord" href="/api/auth-discord">
-          <svg width="21" height="21" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.317 4.369a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.211.375-.445.865-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.1 13.1 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.009c.12.099.245.198.372.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.891.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.056c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.331c-1.183 0-2.157-1.086-2.157-2.42 0-1.332.955-2.418 2.157-2.418 1.21 0 2.176 1.096 2.157 2.42 0 1.332-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.086-2.157-2.42 0-1.332.955-2.418 2.157-2.418 1.21 0 2.176 1.096 2.157 2.42 0 1.332-.946 2.418-2.157 2.418z"/></svg>
-          Continue with Discord
-        </a>
-
-        <div class="cl-divider">or with email</div>
-
         <form id="clEmailForm" autocomplete="on">
           <input class="cl-input" type="email" id="clEmail" placeholder="you@email.com" required autocomplete="email" />
           <button class="cl-btn" type="submit" id="clSendBtn">Send me a code</button>
@@ -121,12 +113,6 @@
   (function () {
     var params = new URLSearchParams(location.search);
     var ERRORS = {
-      missing_code: "Sign-in was cancelled. Please try again.",
-      bad_state: "Your sign-in session expired. Please try again.",
-      token_exchange: "Could not validate the Discord sign-in.",
-      userinfo: "Could not read your Discord profile.",
-      no_email: "Your Discord account has no verified email. Verify it on Discord, then try again.",
-      access_denied: "You declined the Discord authorization.",
       server: "Something went wrong. Please try again later."
     };
     var errBox = document.getElementById('clErr');
@@ -187,7 +173,7 @@
         .then(function(res){
           if (res.ok && res.body && res.body.ok) { showOk('Code sent to ' + email + '. Check your inbox (and spam).'); return true; }
           if (res.status === 429) showErr((res.body && res.body.error) || 'Too many requests. Try again in a minute.');
-          else if (res.status === 501) showErr('Email sign-in is not enabled yet. Use Discord.');
+          else if (res.status === 501) showErr('Email sign-in is temporarily unavailable. Please try again later.');
           else showErr((res.body && res.body.error) || 'Could not send the code. Try again.');
           return false;
         })
