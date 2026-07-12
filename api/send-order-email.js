@@ -108,7 +108,11 @@ module.exports = function (req, res) {
   var storeUrl    = String(body.storeUrl || 'https://flashshp.fr/').slice(0, 200);
   if (!/^https?:\/\//.test(storeUrl)) storeUrl = 'https://flashshp.fr/';
   storeUrl = escHtml(storeUrl);
-  var subject     = oneLine(String(body.subject || 'Your Order is Ready!')).slice(0, 150) || 'Your Order is Ready!';
+  /* type = 'created' (commande créée, en attente de paiement, SANS identifiants)
+     ou 'ready' (paiement confirmé, avec identifiants). Défaut : 'ready'. */
+  var type        = (String(body.type || 'ready') === 'created') ? 'created' : 'ready';
+  var defSubject  = type === 'created' ? 'Order Received — Awaiting Payment' : 'Your Order is Ready!';
+  var subject     = oneLine(String(body.subject || defSubject)).slice(0, 150) || defSubject;
 
   /* Function replacements: a string 2nd arg would interpret $&, $`, $', $$ and
      $1.. as substitution patterns (escHtml does not neutralise '$'/backtick),
@@ -121,7 +125,8 @@ module.exports = function (req, res) {
     store_name:     storeName,
     store_url:      storeUrl
   };
-  var html = emailCfg.template.replace(/\{\{(invoice_id|product_name|deliverable|customer_email|store_name|store_url)\}\}/g,
+  var tpl = (type === 'created' && emailCfg.createdTemplate) ? emailCfg.createdTemplate : emailCfg.template;
+  var html = tpl.replace(/\{\{(invoice_id|product_name|deliverable|customer_email|store_name|store_url)\}\}/g,
     function (_m, key) { return fields[key]; });
 
   mailer.send({

@@ -560,14 +560,22 @@ window.NX_ICONS = function (name) {
     if (!cfg.template) cfg.template = window.NEXUS_EMAIL_TEMPLATE_DEFAULT || '';
     return cfg;
   }
-  function _sendOrderEmail(toEmail, invoiceId, productName, deliverable) {
+  /* type: 'created' = email « commande reçue / en attente de paiement » (sans
+     identifiants) ; 'ready' (défaut) = email « Your Order is Ready! » avec les
+     identifiants une fois le paiement confirmé. */
+  function _sendOrderEmail(toEmail, invoiceId, productName, deliverable, type) {
     try {
+      type = (type === 'created') ? 'created' : 'ready';
+      if (type === 'created') deliverable = '';
       var cfg = _emailConfig();
       if (!cfg.enabled) { console.warn('[FlashShp] Order email disabled.'); return; }
       var c = JSON.parse(localStorage.getItem('nexus_content') || '{}');
       var storeName = c.siteName || 'FlashShp Store';
       var storeUrl  = window.location.origin + (window.location.pathname !== '/' ? window.location.pathname.replace(/\/[^/]*$/, '/') : '/');
-      var subject = (cfg.subject || 'Your Order is Ready!')
+      var rawSubject = type === 'created'
+        ? (cfg.createdSubject || window.NEXUS_EMAIL_CREATED_SUBJECT_DEFAULT || 'Order Received — Awaiting Payment')
+        : (cfg.subject || 'Your Order is Ready!');
+      var subject = rawSubject
         .replace(/\{\{invoice_id\}\}/g,   invoiceId)
         .replace(/\{\{product_name\}\}/g, productName)
         .replace(/\{\{store_name\}\}/g,   storeName);
@@ -606,16 +614,21 @@ window.NX_ICONS = function (name) {
 
       /* 1) API du site (Gmail SMTP — sans branding EmailJS).
          2) Si indisponible (env non configurée, site statique local…) → EmailJS. */
+      /* L'email « created » n'a pas de template EmailJS dédié → API uniquement
+         (si l'API est indisponible, on l'ignore). L'email « ready » garde son
+         repli EmailJS pour livrer les identifiants même sur site statique. */
+      var fallback = (type === 'ready') ? sendViaEmailJs : function() { console.warn('[FlashShp] "created" email skipped — site API unavailable.'); };
       fetch('/api/send-order-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ to: toEmail, invoiceId: invoiceId, productName: productName, deliverable: deliverable, storeName: storeName, storeUrl: storeUrl, subject: subject })
+        body: JSON.stringify({ to: toEmail, invoiceId: invoiceId, productName: productName, deliverable: deliverable, storeName: storeName, storeUrl: storeUrl, subject: subject, type: type })
       }).then(function(r) {
-        if (r.ok) { console.info('[FlashShp] Order email sent via site API to ' + toEmail); }
-        else { console.warn('[FlashShp] Site email API unavailable (' + r.status + ') — falling back to EmailJS.'); sendViaEmailJs(); }
-      }).catch(function() { sendViaEmailJs(); });
+        if (r.ok) { console.info('[FlashShp] Order email (' + type + ') sent via site API to ' + toEmail); }
+        else { console.warn('[FlashShp] Site email API unavailable (' + r.status + ').'); fallback(); }
+      }).catch(function() { fallback(); });
     } catch(e) { console.error('[FlashShp] Order email error:', e); }
   }
+  window._nexusSendOrderEmail = _sendOrderEmail;
 
   /* ─── Invoice / Checkout system ─── */
   (function () {
@@ -937,8 +950,10 @@ window.NX_ICONS = function (name) {
         }
         addOrder({ id: invoiceId, date: new Date().toISOString(), email: email, productId: p.id, productName: p.name, productIcon: p.icon || '📦', productDesc: p.desc || '', price: finalPrice, currency: 'EUR', deliverable: deliverable, status: 'completed', promoCode: _appliedPromo ? _appliedPromo.code : null, ip: geoD.ip || null, country: geoD.country_name || null, asn: geoD.org || null, browser: _uaParsed.browser, os: _uaParsed.os, userAgent: navigator.userAgent });
 
-        /* Order confirmation email */
-        _sendOrderEmail(email, invoiceId, p.name, deliverable);
+        /* Emails : « commande reçue » (création) puis « commande prête » (paiement).
+           En Quick Pay le paiement est instantané, donc les deux partent à la suite. */
+        _sendOrderEmail(email, invoiceId, p.name, '', 'created');
+        _sendOrderEmail(email, invoiceId, p.name, deliverable, 'ready');
 
         /* Discord ORDER_CREATE webhook */
         _whkPost('ORDER_CREATE', {

@@ -617,6 +617,11 @@
       localStorage.setItem('nexus_orders', JSON.stringify(orders));
     } catch (e) {}
 
+    /* Email « Your Order is Ready! » avec les identifiants (paiement confirmé). */
+    if (window._nexusSendOrderEmail && product.email) {
+      window._nexusSendOrderEmail(product.email, invoiceId, product.name, deliverable, 'ready');
+    }
+
     /* Fire Discord webhook */
     try {
       var wa = JSON.parse(localStorage.getItem('nexus_webhooks') || '{}');
@@ -655,6 +660,11 @@
   window._nexusOpenCryptoCheckout = function (product) {
     /* product: { id, name, icon, price, currency, invoiceId, email, deliverable } */
     window._nexusCryptoProduct = product;
+    /* Email « commande reçue / en attente de paiement » dès l'ouverture du
+       paiement crypto (l'ordre est créé, on attend la confirmation blockchain). */
+    if (window._nexusSendOrderEmail && product && product.email) {
+      window._nexusSendOrderEmail(product.email, product.invoiceId, product.name, '', 'created');
+    }
     openCryptoModal();
   };
 
