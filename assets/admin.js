@@ -813,7 +813,6 @@
     switchModalTab('general', document.querySelector('.modal-tabs-bar .modal-tab[data-tab="general"]'));
 
     populateCatSelect(p ? p.category : null);
-    populateParentProductSelect(p ? p.id : null, p ? (p.parentProduct || '') : '');
     document.getElementById('fName').value        = p ? p.name : '';
     document.getElementById('fPrice').value       = p ? p.price : '';
     document.getElementById('fOrigPrice').value   = p && p.origPrice ? p.origPrice : '';
@@ -1002,7 +1001,6 @@
     var product = {
       name: name,
       category: document.getElementById('fCat').value,
-      parentProduct: document.getElementById('fParentProduct').value || null,
       price: price,
       origPrice: parseFloat(document.getElementById('fOrigPrice').value) || null,
       deliverables: deliverables,
@@ -1162,23 +1160,6 @@
     } else {
       select.value = '';
     }
-  }
-
-  /* Select « Produit parent » : liste les autres produits (on exclut le produit courant
-     pour éviter qu'il se contienne lui-même). Choisir un parent range ce produit dans le
-     groupe dépliable de ce parent dans la sidebar (page Shop + fiche produit). */
-  function populateParentProductSelect(currentId, currentVal) {
-    var select = document.getElementById('fParentProduct');
-    if (!select) return;
-    var prods = getProducts();
-    var html = '<option value="">— Aucun (produit principal) —</option>';
-    prods.forEach(function(p) {
-      if (currentId != null && String(p.id) === String(currentId)) return;   /* pas soi-même */
-      if (p.parentProduct) return;   /* pas un produit déjà enfant → évite l'imbrication multi-niveaux */
-      html += '<option value="' + esc(p.id) + '">' + esc(p.name) + '</option>';
-    });
-    select.innerHTML = html;
-    select.value = currentVal || '';
   }
 
   function renderCategories() {

@@ -331,56 +331,6 @@
     if (!p) { window.location.href = '/products'; return; }
     pid = p.id;
 
-    /* ── Produit "groupe" (à la dailystore) ───────────────────────────────
-       Si ce produit contient des sous-produits (produits dont le parentProduct
-       pointe vers lui), sa page n'est PAS une fiche checkout mais une GRILLE de
-       ses sous-produits. On masque le corps checkout et on affiche les enfants
-       en cartes cliquables (le clic est géré par main.js → /products-<slug>).
-       La sidebar catégories + le hero restent affichés. */
-    function groupCardHtml(c) {
-      var gradient = c.gradient || 'linear-gradient(135deg,#1a1a2e,#16213e)';
-      var icon = c.icon || '📦';
-      var inStock = c.inStock !== false && c.stock !== 0;
-      var stockHtml = inStock
-        ? '<span class="pc-stock pc-stock--in">In stock</span>'
-        : '<span class="pc-stock pc-stock--out">Out of stock</span>';
-      var priceHtml = c.origPrice
-        ? '<span class="pc-price-orig">€' + Number(c.origPrice).toFixed(2) + '</span><span class="pc-price">€' + Number(c.price || 0).toFixed(2) + '</span>'
-        : '<span class="pc-price">€' + Number(c.price || 0).toFixed(2) + '</span>';
-      var nameParts = (c.name || '').split(' ');
-      var big1 = nameParts[0] || '', big2 = nameParts.slice(1).join(' ') || '';
-      var thumb;
-      if (c.image) {
-        thumb = '<div class="pc-thumb pc-thumb--img"><img class="pc-img" src="' + esc(c.image) + '" alt="' + esc(c.name) + '" loading="lazy"></div>';
-      } else {
-        thumb = '<div class="pc-thumb" style="background:' + gradient + ';">' +
-          '<div class="pc-big-text">' + esc(big1) + (big2 ? '<br>' + esc(big2) : '') + '</div>' +
-          '<div class="pc-visual">' + icon + '</div>' +
-        '</div>';
-      }
-      return '<div class="product-card" data-name="' + esc(c.name) + '" data-cat="' + esc(c.category || '') + '" data-price="' + (c.price || 0) + '" data-product-id="' + c.id + '">' +
-        thumb +
-        '<div class="pc-info">' +
-          '<div class="pc-info-top">' + stockHtml + '</div>' +
-          '<div class="pc-title">' + esc(c.name) + '</div>' +
-          '<div class="pc-price-row">' + priceHtml + '</div>' +
-        '</div>' +
-      '</div>';
-    }
-    function renderGroupGrid(parent, children) {
-      var content = document.querySelector('.pdv3-content');
-      var body = content ? content.querySelector('.pdv3-body') : null;
-      if (body) body.style.display = 'none';
-      var wrap = document.createElement('div');
-      wrap.innerHTML = '<div class="product-grid">' + children.map(groupCardHtml).join('') + '</div>';
-      if (content) content.insertBefore(wrap, body);
-      document.title = 'FlashShp — ' + parent.name;
-    }
-
-    var groupChildren = allProds.filter(function(x) { return String(x.parentProduct) === String(p.id); });
-    var isGroup = groupChildren.length > 0;
-    if (isGroup) { renderGroupGrid(p, groupChildren); }
-
     var sym = '€'; /* Boutique en euros : tout le site en € */
     var qty = 1;
 
@@ -516,22 +466,10 @@
         /* Ligne « produit » → ouvre la fiche de ce produit, en gardant la même sidebar de
            catégories (on voit donc toujours les catégories). Sidebar épurée : pas d'icône.
            Produit courant surligné. */
-        function prodLinkHtml(p, isChild) {
+        function prodLinkHtml(p) {
           var act = String(p.id) === String(pid) ? ' active' : '';
-          return '<a class="sidebar__item sidebar__item--noicon' + (isChild ? ' sidebar__item--child' : '') + act + '" href="/products-' + encodeURIComponent(slugify(p.name)) + '">' +
+          return '<a class="sidebar__item sidebar__item--noicon' + act + '" href="/products-' + encodeURIComponent(slugify(p.name)) + '">' +
             esc(p.name) + '</a>';
-        }
-        /* Un produit est « enfant » s'il pointe vers un produit parent existant. */
-        function prodHasParent(p) {
-          return p.parentProduct && allProds.some(function(x) { return String(x.id) === String(p.parentProduct); });
-        }
-        /* Un produit qui a des enfants reste un LIEN produit normal ; ses enfants s'affichent
-           comme des liens produit indentés juste en dessous. Pas de section ni de chevron :
-           ce n'est PAS une sous-catégorie, juste des produits dans un produit. */
-        function prodEntryHtml(p) {
-          var children = allProds.filter(function(c) { return String(c.parentProduct) === String(p.id); });
-          if (!children.length) return prodLinkHtml(p);
-          return prodLinkHtml(p) + children.map(function(c) { return prodLinkHtml(c, true); }).join('');
         }
         /* Rendu récursif (identique à la page Shop) : une catégorie qui contient des
            sous-catégories et/ou des produits devient une section repliable contenant ses
@@ -542,10 +480,9 @@
           if (seen[c.id] || depth > 6) return '';   /* garde-fou anti-boucle */
           seen[c.id] = true;
           var subs = cats.filter(function(s) { return s.parent === c.id; });
-          /* Les produits enfants ne s'affichent QUE dans le groupe de leur parent. */
-          var directProds = allProds.filter(function(p) { return String(p.category) === String(c.id) && !prodHasParent(p); });
+          var directProds = allProds.filter(function(p) { return String(p.category) === String(c.id); });
           var inner = subs.map(function(s) { return renderNode(s, depth + 1, seen); }).join('') +
-            directProds.map(prodEntryHtml).join('');
+            directProds.map(prodLinkHtml).join('');
           if (!inner) {
             return '<div class="sidebar__section' + (depth > 0 ? ' sidebar__section--nested' : '') + '">' +
               '<a class="sidebar__section-header sidebar__section-header--leaf' + (isActive(c) ? ' active' : '') + '" href="/products?cat=' + encodeURIComponent(c.id) + '">' +

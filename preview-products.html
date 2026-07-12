@@ -187,21 +187,9 @@
     }
     /* Produit rattaché à la catégorie → item qui FILTRE la grille sur ce produit
        (reste sur la page, comme l'écran). Sidebar épurée : pas d'icône sur les lignes produit. */
-    function prodItemHtml(p, isChild) {
-      return '<div class="sidebar__item sidebar__item--noicon' + (isChild ? ' sidebar__item--child' : '') + '" data-product-id="' + esc(p.id) + '" data-label="' + esc(p.name) + '">' +
+    function prodItemHtml(p) {
+      return '<div class="sidebar__item sidebar__item--noicon" data-product-id="' + esc(p.id) + '" data-label="' + esc(p.name) + '">' +
         esc(p.name) + '</div>';
-    }
-    /* Un produit est « enfant » s'il pointe vers un produit parent existant. */
-    function prodHasParent(p, prods) {
-      return p.parentProduct && prods.some(function(x) { return String(x.id) === String(p.parentProduct); });
-    }
-    /* Un produit qui a des enfants reste une LIGNE produit normale ; ses enfants
-       s'affichent comme des lignes produit indentées juste en dessous. Pas de section
-       ni de chevron : ce n'est PAS une sous-catégorie, juste des produits dans un produit. */
-    function renderProdEntry(p, prods) {
-      var children = prods.filter(function(c) { return String(c.parentProduct) === String(p.id); });
-      if (!children.length) return prodItemHtml(p);
-      return prodItemHtml(p) + children.map(function(c) { return prodItemHtml(c, true); }).join('');
     }
     /* Rendu récursif : une catégorie (racine OU sous-catégorie) qui contient des
        sous-catégories et/ou des produits devient une section repliable contenant
@@ -212,10 +200,9 @@
       if (seen[cat.id] || depth > 6) return '';   /* garde-fou anti-boucle */
       seen[cat.id] = true;
       var subs = cats.filter(function(s) { return s.parent === cat.id; });
-      /* Les produits enfants ne s'affichent QUE dans le groupe de leur parent. */
-      var directProds = prods.filter(function(p) { return String(p.category) === String(cat.id) && !prodHasParent(p, prods); });
+      var directProds = prods.filter(function(p) { return String(p.category) === String(cat.id); });
       var inner = subs.map(function(s) { return renderNode(s, cats, prods, depth + 1, seen); }).join('') +
-        directProds.map(function(p) { return renderProdEntry(p, prods); }).join('');
+        directProds.map(function(p) { return prodItemHtml(p); }).join('');
       if (!inner) {
         return '<div class="sidebar__section' + (depth > 0 ? ' sidebar__section--nested' : '') + '">' +
           '<div class="sidebar__section-header sidebar__section-header--leaf" data-cat="' + cat.id + '" data-label="' + esc(cat.name) + '">' +
@@ -391,18 +378,11 @@
       '</div>';
     }
 
-    /* Un produit rattaché à un produit parent existant ne s'affiche PAS comme
-       carte autonome dans la grille : il n'apparaît que dans son produit parent
-       (et imbriqué sous lui dans la sidebar). */
-    function isChildProduct(p, all) {
-      return p.parentProduct && all.some(function(x) { return String(x.id) === String(p.parentProduct); });
-    }
     function renderGrid() {
       var grid = document.getElementById('productGrid');
       var countEl = document.getElementById('resultsCount');
       if (!grid) return;
-      var all = getProducts();
-      var products = all.filter(function(p) { return !isChildProduct(p, all); });
+      var products = getProducts();
       grid.innerHTML = products.map(function(p, i) { return buildCard(p, i); }).join('');
       if (countEl) countEl.textContent = products.length;
       if (window._nexusFilterAndSort) window._nexusFilterAndSort();
