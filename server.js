@@ -103,6 +103,7 @@ var REWRITES = {
   '/admin': 'admin.html',
   '/products': 'preview-products.html',
   '/product': 'preview-product.html',
+  '/review': 'preview-feedback.html',
   '/reviews': 'preview-feedback.html',
   '/invoice': 'invoice.html',
   '/checkout': 'checkout.html',
