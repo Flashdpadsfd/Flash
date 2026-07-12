@@ -216,6 +216,15 @@
     .rv-dd.open .rv-dd__menu { display:block; }
     .rv-dd__opt { padding:8px 10px; border-radius:8px; font-size:13px; color:rgba(255,255,255,.78); cursor:pointer; white-space:nowrap; }
     .rv-dd__opt:hover, .rv-dd__opt.active { background:rgba(255,255,255,.1); color:#fff; }
+    /* Barres de défilement discrètes (plus de « barre blanche » sur fond sombre) */
+    html{ scrollbar-width:thin; scrollbar-color:rgba(255,255,255,.16) transparent; }
+    body::-webkit-scrollbar, html::-webkit-scrollbar{ width:12px; }
+    body::-webkit-scrollbar-thumb, html::-webkit-scrollbar-thumb{ background:rgba(255,255,255,.14); border-radius:10px; border:3px solid #09090b; }
+    body::-webkit-scrollbar-track, html::-webkit-scrollbar-track{ background:#09090b; }
+    .rv-dd__menu{ scrollbar-width:thin; scrollbar-color:rgba(255,255,255,.2) transparent; }
+    .rv-dd__menu::-webkit-scrollbar{ width:8px; }
+    .rv-dd__menu::-webkit-scrollbar-thumb{ background:rgba(255,255,255,.2); border-radius:8px; }
+    .rv-dd__menu::-webkit-scrollbar-track{ background:transparent; }
     .rv-pill { display:inline-flex; align-items:center; gap:5px; padding:9px 13px; border-radius:11px;
       background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1); color:rgba(255,255,255,.8);
       font-size:13px; font-weight:600; font-family:Inter,sans-serif; cursor:pointer; }
@@ -357,10 +366,6 @@
           <div class="rv-dd__menu" id="rvProductMenu"></div>
         </div>
         <div class="rv-pills" id="rvStarPills"></div>
-        <div class="rv-sort">
-          <button class="rv-sort__btn active" data-sort="recent" type="button">Recent</button>
-          <button class="rv-sort__btn" data-sort="oldest" type="button">Oldest</button>
-        </div>
       </div>
     </div>
 
