@@ -53,8 +53,9 @@
     .cl-link{margin-top:16px;display:block;width:100%;text-align:center;background:none;border:none;color:var(--mut);
       font-size:13px;cursor:pointer;font-family:inherit;}
     .cl-link:hover{color:#fff;}
-    .cl-back{margin-top:22px;display:block;text-align:center;font-size:12.5px;color:rgba(255,255,255,.38);}
-    .cl-back:hover{color:#fff;}
+    .cl-close{position:absolute;top:15px;right:15px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;
+      border-radius:10px;color:rgba(255,255,255,.45);text-decoration:none;transition:color .15s,background .15s;z-index:3;}
+    .cl-close:hover{color:#fff;background:rgba(255,255,255,.08);}
     .cl-note{margin-top:16px;font-size:11.5px;color:rgba(255,255,255,.32);text-align:center;line-height:1.6;}
 
     .cl-msg{margin-bottom:18px;font-size:13px;padding:11px 14px;border-radius:11px;display:none;text-align:center;}
@@ -68,6 +69,9 @@
   <div class="cl-bg-tint"></div>
   <div class="cl-wrap">
     <div class="cl-card">
+      <a class="cl-close" href="/" aria-label="Close">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </a>
       <div class="cl-logo">Flash<span>Shp</span></div>
 
       <div class="cl-msg cl-msg--err" id="clErr"></div>
@@ -104,8 +108,6 @@
           <button class="cl-link" type="button" id="clReset" style="margin-top:4px;">← Use a different email</button>
         </form>
       </div>
-
-      <a class="cl-back" href="/">← Back to store</a>
     </div>
   </div>
 
