@@ -331,6 +331,56 @@
     if (!p) { window.location.href = '/products'; return; }
     pid = p.id;
 
+    /* ── Produit "groupe" (à la dailystore) ───────────────────────────────
+       Si ce produit contient des sous-produits (produits dont le parentProduct
+       pointe vers lui), sa page n'est PAS une fiche checkout mais une GRILLE de
+       ses sous-produits. On masque le corps checkout et on affiche les enfants
+       en cartes cliquables (le clic est géré par main.js → /products-<slug>).
+       La sidebar catégories + le hero restent affichés. */
+    function groupCardHtml(c) {
+      var gradient = c.gradient || 'linear-gradient(135deg,#1a1a2e,#16213e)';
+      var icon = c.icon || '📦';
+      var inStock = c.inStock !== false && c.stock !== 0;
+      var stockHtml = inStock
+        ? '<span class="pc-stock pc-stock--in">In stock</span>'
+        : '<span class="pc-stock pc-stock--out">Out of stock</span>';
+      var priceHtml = c.origPrice
+        ? '<span class="pc-price-orig">€' + Number(c.origPrice).toFixed(2) + '</span><span class="pc-price">€' + Number(c.price || 0).toFixed(2) + '</span>'
+        : '<span class="pc-price">€' + Number(c.price || 0).toFixed(2) + '</span>';
+      var nameParts = (c.name || '').split(' ');
+      var big1 = nameParts[0] || '', big2 = nameParts.slice(1).join(' ') || '';
+      var thumb;
+      if (c.image) {
+        thumb = '<div class="pc-thumb pc-thumb--img"><img class="pc-img" src="' + esc(c.image) + '" alt="' + esc(c.name) + '" loading="lazy"></div>';
+      } else {
+        thumb = '<div class="pc-thumb" style="background:' + gradient + ';">' +
+          '<div class="pc-big-text">' + esc(big1) + (big2 ? '<br>' + esc(big2) : '') + '</div>' +
+          '<div class="pc-visual">' + icon + '</div>' +
+        '</div>';
+      }
+      return '<div class="product-card" data-name="' + esc(c.name) + '" data-cat="' + esc(c.category || '') + '" data-price="' + (c.price || 0) + '" data-product-id="' + c.id + '">' +
+        thumb +
+        '<div class="pc-info">' +
+          '<div class="pc-info-top">' + stockHtml + '</div>' +
+          '<div class="pc-title">' + esc(c.name) + '</div>' +
+          '<div class="pc-price-row">' + priceHtml + '</div>' +
+        '</div>' +
+      '</div>';
+    }
+    function renderGroupGrid(parent, children) {
+      var content = document.querySelector('.pdv3-content');
+      var body = content ? content.querySelector('.pdv3-body') : null;
+      if (body) body.style.display = 'none';
+      var wrap = document.createElement('div');
+      wrap.innerHTML = '<div class="product-grid">' + children.map(groupCardHtml).join('') + '</div>';
+      if (content) content.insertBefore(wrap, body);
+      document.title = 'FlashShp — ' + parent.name;
+    }
+
+    var groupChildren = allProds.filter(function(x) { return String(x.parentProduct) === String(p.id); });
+    var isGroup = groupChildren.length > 0;
+    if (isGroup) { renderGroupGrid(p, groupChildren); }
+
     var sym = '€'; /* Boutique en euros : tout le site en € */
     var qty = 1;
 
