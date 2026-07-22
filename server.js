@@ -118,8 +118,12 @@ app.get(/^\/products-[^\/]+$/, function (req, res) {
   res.sendFile(path.join(__dirname, 'preview-product.html'));
 });
 
-/* ── Garde : ne jamais servir le code source / secrets en statique ── */
-var BLOCKED = /^\/(?:api|node_modules|\.git|\.claude|\.vercel)(?:\/|$)|^\/(?:server\.js|package(?:-lock)?\.json|vercel\.json|deploy\.ps1|\.env.*|\.gitignore)$/i;
+/* ── Garde : ne jamais servir le code source / secrets en statique ──
+   Les dossiers d'outillage (scripts/, logs/) étaient servis : /logs/<fichier>.log
+   renvoyait 200, et les journaux de déploiement exposent l'arborescence du
+   serveur. On bloque le dossier entier plutôt que fichier par fichier, et on
+   couvre deploy.* quelle que soit l'extension (.ps1, .bat…). */
+var BLOCKED = /^\/(?:api|node_modules|scripts|logs|\.git|\.claude|\.vercel)(?:\/|$)|^\/(?:server\.js|package(?:-lock)?\.json|vercel\.json|deploy[^\/]*\.(?:ps1|bat|sh|cmd)|\.env.*|\.gitignore)$/i;
 app.use(function (req, res, next) {
   if (BLOCKED.test(req.path)) { res.status(404).send('Not found'); return; }
   next();

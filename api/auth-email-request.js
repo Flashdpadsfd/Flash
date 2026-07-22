@@ -16,7 +16,11 @@ var crypto = require('crypto');
 var mailer = require('./_mailer.js');
 var store = require('./_store.js');
 
-var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+/* Liste blanche de caractères (et non « tout sauf espace et @ ») : l'adresse
+   devient l'identifiant du client, stocké puis réaffiché dans le panneau admin.
+   L'ancienne règle laissait passer apostrophes, parenthèses et points-virgules,
+   de quoi injecter du code dans l'admin via une adresse fabriquée. */
+var EMAIL_RE = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
 
 function hostFrom(value) { try { return new URL(value).hostname.toLowerCase(); } catch (e) { return ''; } }
 function isAllowedOrigin(req) {
@@ -46,6 +50,40 @@ function readBody(req) {
     req.on('end', function () { try { resolve(JSON.parse(data || '{}')); } catch (e) { resolve({}); } });
     req.on('error', function () { resolve({}); });
   });
+}
+
+/* ── Limite par IP (en plus du cooldown par adresse) ──
+   Le cooldown de _store.js est indexé sur l'e-mail : viser 10 000 adresses
+   différentes ne coûtait rien, et cet endpoint envoie un vrai e-mail à chaque
+   appel. De quoi épuiser le quota SMTP et faire classer le domaine en
+   expéditeur de spam. Le garde d'origine ne protège pas de ça : un en-tête
+   Origin se falsifie hors navigateur.
+   Compteur en mémoire — le process Hostinger est persistant (même raisonnement
+   que le cache de api/feedbacks.js). */
+var IP_MAX = 5;                          // envois max par fenêtre
+var IP_WINDOW_MS = 15 * 60 * 1000;       // fenêtre glissante : 15 minutes
+var _ipHits = new Map();
+
+function clientIp(req) {
+  var fwd = String((req.headers && req.headers['x-forwarded-for']) || '').split(',')[0].trim();
+  return fwd || (req.socket && req.socket.remoteAddress) || 'unknown';
+}
+
+function ipAllowed(req) {
+  var now = Date.now();
+  var ip = clientIp(req);
+  var hits = (_ipHits.get(ip) || []).filter(function (t) { return now - t < IP_WINDOW_MS; });
+  if (hits.length >= IP_MAX) { _ipHits.set(ip, hits); return false; }
+  hits.push(now);
+  _ipHits.set(ip, hits);
+  /* Purge des IP inactives : sans ça la Map grossit indéfiniment (fuite mémoire
+     sur un process qui tourne des semaines). */
+  if (_ipHits.size > 5000) {
+    _ipHits.forEach(function (times, key) {
+      if (!times.length || now - times[times.length - 1] >= IP_WINDOW_MS) _ipHits.delete(key);
+    });
+  }
+  return true;
 }
 
 function codeEmailHtml(code) {
@@ -86,6 +124,11 @@ module.exports = async function (req, res) {
 
   if (!mailer.available()) { res.status(501).json({ error: 'Email login not configured' }); return; }
   if (!store.available()) { res.status(501).json({ error: 'Store not configured' }); return; }
+
+  if (!ipAllowed(req)) {
+    res.status(429).json({ error: 'Trop de demandes. Réessayez dans quelques minutes.' });
+    return;
+  }
 
   var body = await readBody(req);
   var email = String((body && body.email) || '').trim().toLowerCase().slice(0, 254);

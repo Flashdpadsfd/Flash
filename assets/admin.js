@@ -2413,7 +2413,13 @@
             '<td style="color:rgba(255,255,255,.5);font-size:13px;">' + esc(c.email || '—') + '</td>' +
             '<td style="font-weight:600;">' + (c.loginCount || 1) + '</td>' +
             '<td style="color:rgba(255,255,255,.5);font-size:13px;">' + fmtDateTime(c.lastSeen) + '</td>' +
-            '<td style="text-align:right;"><button class="db-btn db-btn--icon" onclick="viewClientOrders(\'' + esc(c.id) + '\')">Commandes →</button></td>' +
+            /* data-* + délégation, JAMAIS onclick="fn('...')" : l'id contient
+               l'e-mail du client (donc du texte choisi par un inconnu), et une
+               apostrophe y refermait la chaîne JS → exécution arbitraire dans
+               l'admin, qui garde le secret admin en localStorage. Échapper ne
+               suffirait pas : le parseur HTML décode les entités AVANT que le
+               JS de l'attribut ne soit lu. */
+            '<td style="text-align:right;"><button class="db-btn db-btn--icon" data-client-id="' + esc(c.id) + '">Commandes →</button></td>' +
           '</tr>';
         }).join('');
       })
@@ -2422,6 +2428,13 @@
         tbody.innerHTML = emptyRow(5, 'users', 'Erreur réseau', 'Impossible de charger les connexions.');
       });
   };
+
+  /* Délégation pour les boutons « Commandes → » de la liste des connexions.
+     Posée une seule fois sur document : survit à chaque re-rendu du tableau. */
+  document.addEventListener('click', function(e) {
+    var btn = e.target.closest && e.target.closest('[data-client-id]');
+    if (btn) window.viewClientOrders(btn.getAttribute('data-client-id'));
+  });
 
   /* Modale légère autonome pour le détail d'un client. */
   function openClientModal(inner) {
@@ -2956,7 +2969,14 @@
   };
 
   /* ── Helpers ── */
-  function esc(s) { return String(s).replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  /* Échappe TOUT ce qui compte en HTML, y compris les guillemets : esc() est
+     très souvent inséré dans des attributs (style="…", src="…", data-…="…"),
+     où ne traiter que < et > laissait une apostrophe ou un guillemet refermer
+     l'attribut. Même règle que le esc() de client-dashboard.html. */
+  function esc(s) {
+    var MAP = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function(c) { return MAP[c]; });
+  }
   function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
 
   /* ── Badge helpers ── */

@@ -38,9 +38,18 @@ module.exports = async function (req, res) {
     return;
   }
 
+  /* Sans e-mail dans la session, la requête partirait avec « ?email= » vide —
+     et un filtre vide côté SellAuth renverrait les factures de TOUT LE MONDE.
+     On refuse plutôt que de risquer d'exposer les commandes d'autrui. */
+  var myEmail = String(sess.email || '').trim().toLowerCase();
+  if (!myEmail) {
+    res.status(200).json({ ok: true, user: user, orders: [], ordersAvailable: false });
+    return;
+  }
+
   try {
     var url = SELLAUTH_BASE + '/shops/' + encodeURIComponent(shopId) +
-      '/invoices?email=' + encodeURIComponent(sess.email) +
+      '/invoices?email=' + encodeURIComponent(myEmail) +
       '&perPage=100&orderColumn=created_at&orderDirection=desc';
     var r = await fetch(url, {
       headers: {
@@ -51,6 +60,13 @@ module.exports = async function (req, res) {
     if (!r.ok) { res.status(200).json({ ok: true, user: user, orders: [], ordersAvailable: false }); return; }
     var json = await r.json();
     var list = Array.isArray(json) ? json : (json && Array.isArray(json.data) ? json.data : []);
+
+    /* Deuxième barrière : on ne se repose pas sur le filtre « ?email= » de
+       SellAuth (recherche partielle ou filtre ignoré = commandes d'autrui
+       exposées). On revérifie l'égalité stricte, comme le fait /api/order. */
+    list = list.filter(function (inv) {
+      return String((inv && inv.email) || '').trim().toLowerCase() === myEmail;
+    });
 
     /* On n'expose QUE des champs sûrs (pas d'IP, user-agent, etc.). */
     var orders = list.map(function (inv) {

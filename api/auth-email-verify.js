@@ -12,7 +12,9 @@ var crypto = require('crypto');
 var session = require('./_session.js');
 var store = require('./_store.js');
 
-var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+/* Même liste blanche stricte que auth-email-request.js (voir le commentaire
+   là-bas) : l'adresse sert d'identifiant client et finit affichée dans l'admin. */
+var EMAIL_RE = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
 
 function hostFrom(value) { try { return new URL(value).hostname.toLowerCase(); } catch (e) { return ''; } }
 function isAllowedOrigin(req) {
