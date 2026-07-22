@@ -124,16 +124,22 @@
   function syncFeedbacks(cb) {
     if (_apiSyncing) return;
     _apiSyncing = true;
-    fetch('/api/feedbacks', { headers: { 'Accept': 'application/json' } })
-      .then(function(r) { return r.ok ? r.json() : null; })
-      .then(function(data) {
-        if (data && data.ok && Array.isArray(data.reviews)) {
-          _apiReviews = data.reviews.map(function(r) {
-            return Object.assign({}, r, { _synced: true, published: true });
-          });
-        }
-      })
-      .catch(function() { /* non configuré / hors-ligne : on garde les avis locaux */ })
+    function getJSON(url) {
+      return fetch(url, { headers: { 'Accept': 'application/json' } })
+        .then(function(r) { return r.ok ? r.json() : null; })
+        .catch(function() { return null; });
+    }
+    function take(data) {
+      if (!data || !data.ok || !Array.isArray(data.reviews) || !data.reviews.length) return false;
+      _apiReviews = data.reviews.map(function(r) {
+        return Object.assign({}, r, { _synced: true, published: true });
+      });
+      return true;
+    }
+    /* En direct depuis SellAuth ; à défaut l'instantané importé
+       (assets/reviews.json, cf. « npm run import:feedbacks »). */
+    getJSON('/api/feedbacks')
+      .then(function(live) { return take(live) ? true : getJSON('/assets/reviews.json').then(take); })
       .then(function() {
         if (_apiReviews === null) _apiReviews = []; // marque « essayé » → pas de re-fetch en boucle
         _apiSyncing = false;

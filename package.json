@@ -4,7 +4,8 @@
   "version": "1.0.0",
   "description": "FlashShp storefront + client area (standalone Node/Express server).",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "import:feedbacks": "node scripts/import-feedbacks.js"
   },
   "engines": {
     "node": ">=18"

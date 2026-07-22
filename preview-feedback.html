@@ -671,16 +671,26 @@
     });
 
     (function loadSellAuthFeedbacks() {
-      fetch('/api/feedbacks', { headers: { 'Accept': 'application/json' } })
-        .then(function(r) { return r.ok ? r.json() : null; })
-        .then(function(data) {
-          if (!data || !data.ok || !Array.isArray(data.reviews) || !data.reviews.length) return;
-          ALL = data.reviews;
-          fProduct = 'all'; fStars = 'all';
-          document.querySelectorAll('.rv-pill').forEach(function(p, i) { p.classList.toggle('active', i === 0); });
-          renderAll();
-        })
-        .catch(function() { /* hors-ligne ou non configuré : on garde les avis locaux */ });
+      function show(data) {
+        if (!data || !data.ok || !Array.isArray(data.reviews) || !data.reviews.length) return false;
+        ALL = data.reviews;
+        fProduct = 'all'; fStars = 'all';
+        document.querySelectorAll('.rv-pill').forEach(function(p, i) { p.classList.toggle('active', i === 0); });
+        renderAll();
+        return true;
+      }
+      function getJSON(url) {
+        return fetch(url, { headers: { 'Accept': 'application/json' } })
+          .then(function(r) { return r.ok ? r.json() : null; })
+          .catch(function() { return null; });
+      }
+      /* 1) avis SellAuth en direct ; 2) à défaut (API non configurée, SellAuth
+         en rade, rate-limit) l'instantané importé par « npm run import:feedbacks ».
+         Les avis de démo ne servent plus que si aucun des deux n'existe. */
+      getJSON('/api/feedbacks').then(function(live) {
+        if (show(live)) return;
+        return getJSON('/assets/reviews.json').then(show);
+      });
     })();
   })();
   </script>
