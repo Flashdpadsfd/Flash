@@ -152,6 +152,28 @@
       50%      { transform: translateY(-11px); }
     }
     .pdx-visual__pills { position: absolute; left: 18px; bottom: 18px; display: flex; gap: 8px; flex-wrap: wrap; }
+    /* L'image de la galerie est un <img> plein cadre et non un background :
+       on peut ainsi la faire disparaitre en fondu au changement de vignette. */
+    .pdx-visual__img {
+      position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+      transition: opacity .26s var(--pdx-ease);
+    }
+    .pdx-visual__img.pdx-fade { opacity: 0; }
+
+    /* ── Galerie : visuel principal + bande de vignettes ── */
+    .pdx-gal { display: flex; flex-direction: column; gap: 10px; }
+    .pdx-thumbs { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+    .pdx-thumb {
+      position: relative; overflow: hidden; cursor: pointer; padding: 0;
+      aspect-ratio: 16 / 10; border-radius: 11px; opacity: .5;
+      background: var(--pdx-panel); border: 1px solid var(--pdx-line);
+      display: flex; align-items: center; justify-content: center; font-size: 26px;
+      transition: opacity .22s var(--pdx-ease), border-color .22s var(--pdx-ease), transform .22s var(--pdx-ease);
+    }
+    .pdx-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .pdx-thumb:hover { opacity: .85; transform: translateY(-2px); border-color: rgba(255,255,255,.15); }
+    .pdx-thumb--active { opacity: 1; border-color: var(--pdx-accent); box-shadow: 0 0 0 1px var(--pdx-accent-line); }
+    .pdx-thumb:focus-visible { outline: 2px solid var(--pdx-accent); outline-offset: 2px; }
 
     .pdx-buy {
       position: sticky; top: 88px;
@@ -168,6 +190,43 @@
     .pdx-buy__price { padding: 20px 20px 16px; border-bottom: 1px solid rgba(255,255,255,.06); }
     .pdx-buy__lbl { font-size: 10.5px; font-weight: 700; letter-spacing: .10em; text-transform: uppercase; color: rgba(255,255,255,.35); margin-bottom: 6px; }
     .pdx-buy__amount { font-size: 32px; font-weight: 800; color: #fff; letter-spacing: -1px; line-height: 1; }
+
+    /* ── Promotion : bandeau, prix barre, economie ──
+       Tout ce bloc reste masque tant que le produit n'a pas d'ancien prix. */
+    .pdx-sale {
+      display: flex; align-items: center; gap: 9px;
+      padding: 10px 20px; border-bottom: 1px solid rgba(255,255,255,.06);
+      background: linear-gradient(90deg, rgba(239,68,68,.16), transparent);
+      font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: rgba(255,255,255,.72);
+    }
+    .pdx-sale__pct {
+      padding: 3px 8px; border-radius: 6px; letter-spacing: .04em;
+      background: #ef4444; color: #fff; font-size: 11px; font-weight: 800;
+    }
+    .pdx-buy__row { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+    .pdx-buy__was { font-size: 15px; font-weight: 600; color: rgba(255,255,255,.3); text-decoration: line-through; }
+    .pdx-buy__save { margin-top: 8px; font-size: 11.5px; font-weight: 600; color: var(--pdx-ok); }
+
+    /* ── Formules : les variantes en cartes cote a cote ── */
+    .pdx-plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); gap: 9px; }
+    .pdx-plan {
+      position: relative; text-align: left; cursor: pointer; font-family: inherit;
+      padding: 12px 13px; border-radius: 12px;
+      background: rgba(255,255,255,.03); border: 1px solid var(--pdx-line); color: inherit;
+      transition: border-color .22s var(--pdx-ease), background .22s var(--pdx-ease), transform .22s var(--pdx-ease);
+    }
+    .pdx-plan:hover { transform: translateY(-2px); border-color: rgba(255,255,255,.16); }
+    .pdx-plan--active { border-color: var(--pdx-accent); background: var(--pdx-accent-soft); }
+    .pdx-plan:focus-visible { outline: 2px solid var(--pdx-accent); outline-offset: 2px; }
+    .pdx-plan__name { font-size: 12.5px; font-weight: 700; color: #fff; }
+    .pdx-plan__price { margin-top: 5px; font-size: 17px; font-weight: 800; color: #fff; letter-spacing: -.4px; }
+    .pdx-plan__was { margin-left: 6px; font-size: 11.5px; font-weight: 600; color: rgba(255,255,255,.28); text-decoration: line-through; }
+    .pdx-plan__flag {
+      position: absolute; top: -8px; right: 9px; padding: 2px 7px; border-radius: 6px;
+      background: var(--pdx-accent); color: #fff; font-size: 9.5px; font-weight: 800;
+      letter-spacing: .06em; text-transform: uppercase;
+    }
+    .pdx-plans-note { margin-bottom: 9px; font-size: 11.5px; font-weight: 600; color: var(--pdx-ok); }
     /* Le prix clignote brievement quand la quantite change : le changement de
        chiffre passait sinon totalement inapercu. */
     .pdx-bump { animation: pdx-bump .38s var(--pdx-ease); }
@@ -365,6 +424,8 @@
     }
     @media (max-width: 560px) {
       .pdx-feats, .pdx-rel, .pdx-trust { grid-template-columns: 1fr; }
+      /* Cinq vignettes deviennent illisibles sous 560px : on passe a trois. */
+      .pdx-thumbs { grid-template-columns: repeat(3, 1fr); }
     }
 
     /* Accessibilite : quand le systeme demande moins de mouvement, on coupe
@@ -458,15 +519,19 @@
     <!-- Visuel + achat -->
     <div class="pdx-top">
 
-      <div class="pdx-visual pdx-rise" id="pdVisual">
-        <div class="pdx-visual__bg" id="pdHeroBgText"></div>
-        <div class="pdx-visual__icon" id="pdHeroIcon">📦</div>
-        <div class="pdx-visual__pills">
-          <span class="pdv3-pill">
-            <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-            Instant Digital Delivery
-          </span>
+      <div class="pdx-gal pdx-rise">
+        <div class="pdx-visual" id="pdVisual">
+          <div class="pdx-visual__bg" id="pdHeroBgText"></div>
+          <div class="pdx-visual__icon" id="pdHeroIcon">📦</div>
+          <div class="pdx-visual__pills">
+            <span class="pdv3-pill">
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              Instant Digital Delivery
+            </span>
+          </div>
         </div>
+        <!-- Vignettes : remplies par le script, masquees s'il n'y a qu'une image. -->
+        <div class="pdx-thumbs" id="pdThumbs" style="display:none;"></div>
       </div>
 
       <aside class="pdx-buy pdx-rise" style="--d:90ms;">
@@ -475,9 +540,19 @@
           Fast checkout
         </div>
 
+        <!-- Bandeau promo : affiche seulement si le produit a un ancien prix. -->
+        <div class="pdx-sale" id="pdSaleBanner" style="display:none;">
+          <span class="pdx-sale__pct" id="pdSalePct">-0%</span>
+          <span>Limited time sale</span>
+        </div>
+
         <div class="pdx-buy__price">
           <div class="pdx-buy__lbl">Per each</div>
-          <div class="pdx-buy__amount" id="pdPrice">—</div>
+          <div class="pdx-buy__row">
+            <div class="pdx-buy__amount" id="pdPrice">—</div>
+            <div class="pdx-buy__was" id="pdPriceWas" style="display:none;">—</div>
+          </div>
+          <div class="pdx-buy__save" id="pdSaveLine" style="display:none;"></div>
         </div>
 
         <div class="pdx-trust">
@@ -502,9 +577,10 @@
             <div class="pdx-mini__price" id="pdSidePrice">—</div>
           </div>
 
-          <div class="pdv3-variants pdx-buy__sect" id="pdVariantsSection" style="display:none;">
-            <div class="pdv3-qty-lbl">Variant</div>
-            <div class="pdv3-variants-grid" id="pdVariants"></div>
+          <div class="pdx-buy__sect" id="pdVariantsSection" style="display:none;">
+            <div class="pdv3-qty-lbl" style="display:block;margin-bottom:10px;">Choose your plan</div>
+            <div class="pdx-plans-note" id="pdPlansNote" style="display:none;"></div>
+            <div class="pdx-plans" id="pdVariants" role="radiogroup" aria-label="Choose your plan"></div>
           </div>
 
           <div class="pdv3-qty-section pdx-buy__sect">
@@ -579,6 +655,10 @@
           <div class="pd-rev-score" id="pdRevScore">5.0</div>
           <div class="pd-rev-count" id="pdRevCount">(0 reviews)</div>
         </div>
+        <a href="/review" class="pdx-rel__go" style="margin-left:auto;">
+          View all reviews
+          <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
       </div>
       <div id="pdReviewsList">
         <div style="color:rgba(255,255,255,.32);font-size:13px;padding:4px 0;">No reviews yet for this product.</div>
@@ -760,11 +840,30 @@
     var selVariant = 0;
     /* Prix unitaire de base = prix de la variante choisie, sinon prix du produit */
     function unitBasePrice() { return hasVariants ? Number(variants[selVariant].price) : Number(p.price); }
+    /* Ancien prix, pour la promotion. Facultatif : un produit sans oldPrice
+       (le cas de tous les produits existants) renvoie 0, et toute la
+       signaletique promo reste masquee. */
+    function oldPriceOf(o) {
+      if (!o) return 0;
+      var v = Number(o.oldPrice != null ? o.oldPrice : (o.compareAt != null ? o.compareAt : 0));
+      return isFinite(v) && v > 0 ? v : 0;
+    }
+    function unitOldPrice() { return oldPriceOf(hasVariants ? variants[selVariant] : p); }
 
     document.title = 'FlashShp — ' + p.name;
 
     /* ── Breadcrumb ── */
     document.getElementById('pdBreadcrumbName').textContent = p.name;
+
+    /* ── Galerie ──
+       Le produit peut porter plusieurs images (p.images) ; s'il n'en a qu'une
+       (p.image) on garde le visuel unique et la bande de vignettes reste
+       masquee. Sans image du tout, on retombe sur l'icone et le nom en filigrane. */
+    var gallery = (Array.isArray(p.images) ? p.images : [])
+      .map(function(src) { return String(src || '').trim(); })
+      .filter(Boolean);
+    if (!gallery.length && p.image) gallery = [p.image];
+    var galIdx = 0;
 
     /* ── Hero ── */
     if (p.image) {
@@ -776,7 +875,15 @@
          On vise donc l'element reel, et on verifie sa presence. */
       var heroEl = document.getElementById('pdVisual');
       if (heroEl) {
-        heroEl.style.background = 'url(' + p.image + ') center/cover no-repeat';
+        /* Un <img> plutot qu'un background : le changement de vignette peut
+           alors se faire en fondu, et l'image reste dans l'arbre accessible.
+           Insere en premier enfant pour rester sous les pastilles. */
+        var heroImg = document.createElement('img');
+        heroImg.className = 'pdx-visual__img';
+        heroImg.id = 'pdHeroImg';
+        heroImg.alt = p.name;
+        heroImg.src = gallery[0] || p.image;
+        heroEl.insertBefore(heroImg, heroEl.firstChild);
         document.getElementById('pdHeroBgText').style.display = 'none';
         document.getElementById('pdHeroIcon').style.display = 'none';
       }
@@ -784,6 +891,37 @@
       document.getElementById('pdHeroBgText').textContent = p.name;
       document.getElementById('pdHeroIcon').textContent = p.icon || '📦';
     }
+
+    /* Vignettes : uniquement quand il y a vraiment plusieurs images. */
+    (function renderThumbs() {
+      var strip = document.getElementById('pdThumbs');
+      var main  = document.getElementById('pdHeroImg');
+      if (!strip || !main || gallery.length < 2) return;
+      strip.style.display = '';
+      strip.innerHTML = gallery.map(function(src, i) {
+        return '<button type="button" class="pdx-thumb' + (i === 0 ? ' pdx-thumb--active' : '') + '"' +
+          ' data-gi="' + i + '" aria-label="View image ' + (i + 1) + '">' +
+          '<img src="' + esc2(src) + '" alt="" loading="lazy">' +
+        '</button>';
+      }).join('');
+      strip.querySelectorAll('.pdx-thumb').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var i = parseInt(btn.getAttribute('data-gi'), 10) || 0;
+          if (i === galIdx) return;
+          galIdx = i;
+          /* Fondu : on n'echange la source qu'une fois l'image effacee, sinon
+             la nouvelle apparait d'un coup au milieu de la transition. */
+          main.classList.add('pdx-fade');
+          setTimeout(function() {
+            main.src = gallery[galIdx];
+            main.classList.remove('pdx-fade');
+          }, 180);
+          strip.querySelectorAll('.pdx-thumb').forEach(function(b) {
+            b.classList.toggle('pdx-thumb--active', b === btn);
+          });
+        });
+      });
+    })();
     var catKey = p.category || 'other';
     document.getElementById('pdHeroCatPill').textContent = (CAT_ICONS[catKey] || '📦') + ' ' + (CAT_LABELS[catKey] || cap(catKey));
 
@@ -1013,6 +1151,21 @@
       document.getElementById('pdQtyVal').textContent = qty;
       document.getElementById('pdQtyDisplay').textContent = qty;
       document.getElementById('pdPrice').textContent = sym + base.toFixed(2);
+
+      /* ── Promotion ── */
+      var was = unitOldPrice();
+      var onSale = was > base;
+      var banner = document.getElementById('pdSaleBanner');
+      var wasEl  = document.getElementById('pdPriceWas');
+      var saveEl = document.getElementById('pdSaveLine');
+      if (onSale) {
+        document.getElementById('pdSalePct').textContent = '-' + Math.round((1 - base / was) * 100) + '%';
+        wasEl.textContent = sym + was.toFixed(2);
+        saveEl.textContent = 'You save ' + sym + ((was - base) * qty).toFixed(2);
+        banner.style.display = ''; wasEl.style.display = ''; saveEl.style.display = '';
+      } else {
+        banner.style.display = 'none'; wasEl.style.display = 'none'; saveEl.style.display = 'none';
+      }
       document.getElementById('pdSidePrice').textContent = sym + unitPrice.toFixed(2);
       document.getElementById('pdSubtotal').textContent = sym + sub.toFixed(2);
       document.getElementById('pdTotal').textContent = sym + sub.toFixed(2);
@@ -1064,17 +1217,40 @@
       var grid = document.getElementById('pdVariants');
       if (!sec || !grid) return;
       sec.style.display = '';
+
+      /* La formule la plus interessante est celle qui fait economiser le plus
+         par rapport a son ancien prix ; sans promotion, aucune n'est mise en
+         avant et le bandeau d'economie reste masque. */
+      var bestIdx = -1, bestSave = 0;
+      variants.forEach(function(v, i) {
+        var save = oldPriceOf(v) - Number(v.price);
+        if (save > bestSave) { bestSave = save; bestIdx = i; }
+      });
+      var note = document.getElementById('pdPlansNote');
+      if (note && bestSave > 0) {
+        note.textContent = 'Save up to ' + sym + bestSave.toFixed(2) + '!';
+        note.style.display = '';
+      }
+
       grid.innerHTML = variants.map(function(v, i) {
-        return '<button type="button" class="pdv3-variant' + (i === selVariant ? ' pdv3-variant--active' : '') + '" data-vi="' + i + '">' +
-          '<span class="pdv3-variant__name">' + esc2(v.name) + '</span>' +
-          '<span class="pdv3-variant__price">' + sym + Number(v.price).toFixed(2) + '</span>' +
+        var was = oldPriceOf(v);
+        var active = i === selVariant;
+        return '<button type="button" role="radio" aria-checked="' + (active ? 'true' : 'false') + '"' +
+          ' class="pdx-plan' + (active ? ' pdx-plan--active' : '') + '" data-vi="' + i + '">' +
+          (i === bestIdx ? '<span class="pdx-plan__flag">Best value</span>' : '') +
+          '<span class="pdx-plan__name">' + esc2(v.name) + '</span>' +
+          '<div class="pdx-plan__price">' + sym + Number(v.price).toFixed(2) +
+            (was > Number(v.price) ? '<span class="pdx-plan__was">' + sym + was.toFixed(2) + '</span>' : '') +
+          '</div>' +
         '</button>';
       }).join('');
-      grid.querySelectorAll('.pdv3-variant').forEach(function(btn) {
+      grid.querySelectorAll('.pdx-plan').forEach(function(btn) {
         btn.addEventListener('click', function() {
           selVariant = parseInt(btn.getAttribute('data-vi'), 10) || 0;
-          grid.querySelectorAll('.pdv3-variant').forEach(function(b) {
-            b.classList.toggle('pdv3-variant--active', b === btn);
+          grid.querySelectorAll('.pdx-plan').forEach(function(b) {
+            var on = b === btn;
+            b.classList.toggle('pdx-plan--active', on);
+            b.setAttribute('aria-checked', on ? 'true' : 'false');
           });
           /* Le nom affiché côté récap inclut la variante */
           document.getElementById('pdSideName').textContent = p.name + ' — ' + variants[selVariant].name;
