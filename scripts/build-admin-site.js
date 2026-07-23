@@ -64,6 +64,29 @@ function build() {
   /* Empêche l'indexation même si le fichier est servi tel quel. */
   fs.writeFileSync(path.join(OUT, 'robots.txt'), 'User-agent: *\nDisallow: /\n', 'utf8');
 
+  /* Verrou Apache — indispensable.
+     Le dossier publié atterrit dans public_html/, qu'Apache sert AUSSI pour le
+     domaine principal, avant même d'atteindre Node. Sans ce fichier, le panneau
+     redevenait accessible sur flashshp.fr/admin/ : la garde de server.js n'est
+     jamais consultée pour ces requêtes, et toute la séparation tombait.
+     On n'autorise donc que l'hôte du sous-domaine, tout le reste reçoit 404. */
+  var host = new URL(SHOP_URL.indexOf('://') > 0 ? SHOP_URL : 'https://' + SHOP_URL).hostname;
+  var adminHost = process.env.ADMIN_HOST || ('admin.' + host.replace(/^www\./, ''));
+  fs.writeFileSync(path.join(OUT, '.htaccess'),
+    '# Genere par scripts/build-admin-site.js — ne pas editer a la main.\n' +
+    '# Le panneau ne doit repondre que sur ' + adminHost + ' :\n' +
+    '# ce dossier vit dans public_html/, donc le domaine principal y accede aussi.\n' +
+    '<IfModule mod_rewrite.c>\n' +
+    '  RewriteEngine On\n' +
+    '  RewriteCond %{HTTP_HOST} !^' + adminHost.replace(/\./g, '\\.') + '$ [NC]\n' +
+    '  RewriteRule ^ - [R=404,L]\n' +
+    '</IfModule>\n' +
+    /* Encadré : une directive inconnue dans un .htaccess renvoie 500 sur toute
+       la page. Sans mod_headers, on préfère perdre l'en-tête que le site. */
+    '<IfModule mod_headers.c>\n' +
+    '  Header always set X-Robots-Tag "noindex, nofollow"\n' +
+    '</IfModule>\n', 'utf8');
+
   console.log('\n✓ Site admin généré dans admin/');
   console.log('  API de la boutique : ' + SHOP_URL);
   console.log('  Fichiers : index.html, robots.txt, assets/' + copied.join(', assets/'));

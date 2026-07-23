@@ -1,0 +1,11 @@
+# Genere par scripts/build-admin-site.js — ne pas editer a la main.
+# Le panneau ne doit repondre que sur admin.flashshp.fr :
+# ce dossier vit dans public_html/, donc le domaine principal y accede aussi.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTP_HOST} !^admin\.flashshp\.fr$ [NC]
+  RewriteRule ^ - [R=404,L]
+</IfModule>
+<IfModule mod_headers.c>
+  Header always set X-Robots-Tag "noindex, nofollow"
+</IfModule>
