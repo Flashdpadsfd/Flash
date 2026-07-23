@@ -441,14 +441,15 @@
       loginError.classList.remove('show');
       loginScreen.style.display = 'none';
       app.style.display = 'flex';
-      nxPullContent(nxBindSync);   /* même raison que dans checkSession() */
       discordLog('ADMIN_LOGIN', {});
       var loginLog = JSON.parse(localStorage.getItem('nexus_login_log') || '[]');
       loginLog.unshift({ time: new Date().toISOString(), success: true, attempts: 0 });
       if (loginLog.length > 50) loginLog = loginLog.slice(0, 50);
       localStorage.setItem('nexus_login_log', JSON.stringify(loginLog));
       localStorage.setItem('nexus_login_fails', '0');
-      init();
+      /* init() DOIT attendre la récupération : sinon il lit le localStorage
+         avant l'arrivée du contenu serveur et affiche l'état d'avant. */
+      nxPullContent(function () { nxBindSync(); init(); });
     } else {
       loginError.classList.add('show');
       document.getElementById('loginPass').value = '';

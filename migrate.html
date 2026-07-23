@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>FlashShp — Publier le contenu local</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #09090b; color: #fafafa;
+      font-family: Inter, -apple-system, 'Segoe UI', Arial, sans-serif;
+      font-size: 14px; line-height: 1.6;
+      display: flex; align-items: flex-start; justify-content: center;
+      min-height: 100vh; padding: 48px 20px;
+    }
+    .wrap { width: 100%; max-width: 620px; }
+    h1 { font-size: 24px; font-weight: 700; letter-spacing: -.5px; margin-bottom: 10px; }
+    .lede { color: rgba(255,255,255,.52); margin-bottom: 26px; }
+    .card {
+      background: rgba(255,255,255,.025); border: 1px solid rgba(255,255,255,.07);
+      border-radius: 14px; padding: 22px 24px; margin-bottom: 16px;
+    }
+    .card h2 { font-size: 15px; font-weight: 700; margin-bottom: 12px; }
+    .row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,.05); font-size: 13.5px;
+    }
+    .row:last-child { border-bottom: none; }
+    .row__key { color: rgba(255,255,255,.72); font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12.5px; }
+    .row__val { color: rgba(255,255,255,.45); }
+    .empty { color: rgba(255,255,255,.35); font-size: 13.5px; }
+    label { display: block; font-size: 12px; font-weight: 600; letter-spacing: .04em;
+            text-transform: uppercase; color: rgba(255,255,255,.42); margin-bottom: 8px; }
+    input {
+      width: 100%; height: 44px; border-radius: 9px; padding: 0 14px;
+      background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.10);
+      color: #fff; font-family: inherit; font-size: 14px; outline: none;
+    }
+    input:focus { border-color: rgba(255,255,255,.26); }
+    .hint { font-size: 12.5px; color: rgba(255,255,255,.35); margin-top: 8px; }
+    button {
+      width: 100%; height: 46px; border-radius: 9px; margin-top: 16px;
+      background: #fff; color: #000; border: none; cursor: pointer;
+      font-family: inherit; font-size: 14px; font-weight: 600;
+      transition: background 160ms ease;
+    }
+    button:hover:not(:disabled) { background: #f0f0f0; }
+    button:disabled { opacity: .45; cursor: default; }
+    .result { margin-top: 16px; padding: 14px 16px; border-radius: 10px; font-size: 13.5px; display: none; }
+    .result.ok   { display: block; background: rgba(60,200,100,.10); border: 1px solid rgba(60,200,100,.28); color: #86efac; }
+    .result.err  { display: block; background: rgba(255,85,85,.10);  border: 1px solid rgba(255,85,85,.28);  color: #fca5a5; }
+    a { color: #fff; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <h1>Publier le contenu local</h1>
+    <p class="lede">
+      Ce navigateur contient du contenu de boutique enregistré localement, à l'époque
+      où le panneau d'administration était servi depuis ce domaine. Tant qu'il n'est
+      pas publié, vos visiteurs ne le voient pas et le panneau, désormais hébergé
+      ailleurs, ne peut pas le lire.
+    </p>
+
+    <div class="card">
+      <h2>Trouvé dans ce navigateur</h2>
+      <div id="found"><div class="empty">Lecture…</div></div>
+    </div>
+
+    <div class="card">
+      <h2>Publier vers la boutique</h2>
+      <label for="secret">Secret admin</label>
+      <input id="secret" type="password" autocomplete="off" placeholder="ADMIN_SECRET" />
+      <p class="hint">
+        La même valeur que la variable <code>ADMIN_SECRET</code> de votre hébergement.
+        Elle n'est ni enregistrée ni transmise ailleurs qu'à votre propre serveur.
+      </p>
+      <button id="go" disabled>Publier</button>
+      <div class="result" id="result"></div>
+    </div>
+
+    <p class="hint">
+      Une fois la publication réussie, cette page n'a plus d'utilité :
+      le panneau <a href="https://admin.flashshp.fr">admin.flashshp.fr</a> devient
+      la source unique.
+    </p>
+
+  </div>
+
+  <script>
+  (function () {
+    /* Doit refléter WRITABLE de api/content.js : une clé absente d'ici ne
+       serait pas acceptée par le serveur. */
+    var KEYS = [
+      'nexus_products', 'nexus_categories', 'nexus_content', 'nexus_links',
+      'nexus_reviews', 'nexus_text_overrides', 'nexus_payments', 'nexus_promos',
+      'nexus_webhooks', 'nexus_blacklist_emails', 'nexus_blacklist_ips',
+      'nexus_security', 'nexus_email_config', 'nexus_stats', 'nexus_orders'
+    ];
+
+    var payload = {};
+    var lignes = [];
+
+    KEYS.forEach(function (k) {
+      var raw = null;
+      try { raw = localStorage.getItem(k); } catch (e) { return; }
+      if (raw === null) return;
+      var val;
+      try { val = JSON.parse(raw); } catch (e) { return; }   /* illisible : ignorée */
+      payload[k] = val;
+      var desc = Array.isArray(val) ? val.length + ' élément(s)'
+               : (val && typeof val === 'object') ? Object.keys(val).length + ' champ(s)'
+               : String(val).slice(0, 30);
+      lignes.push('<div class="row"><span class="row__key">' + k + '</span><span class="row__val">' + desc + '</span></div>');
+    });
+
+    var found = document.getElementById('found');
+    var go = document.getElementById('go');
+
+    if (!lignes.length) {
+      found.innerHTML = '<div class="empty">Rien à publier depuis ce navigateur. ' +
+        'Si vos produits sont ailleurs, ouvrez cette page dans le navigateur qui les contient.</div>';
+    } else {
+      found.innerHTML = lignes.join('');
+      go.disabled = false;
+    }
+
+    function show(cls, msg) {
+      var r = document.getElementById('result');
+      r.className = 'result ' + cls;
+      r.textContent = msg;
+    }
+
+    go.addEventListener('click', function () {
+      var secret = document.getElementById('secret').value.trim();
+      if (!secret) { show('err', 'Saisissez le secret admin.'); return; }
+
+      go.disabled = true;
+      show('', '');
+
+      fetch('/api/content', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'x-admin-secret': secret },
+        body: JSON.stringify({ content: payload })
+      }).then(function (r) {
+        if (r.ok) {
+          show('ok', Object.keys(payload).length + ' élément(s) publié(s). ' +
+                     'Vos visiteurs et le panneau admin voient maintenant ce contenu.');
+          return;
+        }
+        go.disabled = false;
+        if (r.status === 401) { show('err', 'Secret refusé par le serveur.'); return; }
+        if (r.status === 501) { show('err', 'La base de données n\'est pas configurée côté serveur.'); return; }
+        return r.text().then(function (t) { show('err', 'Échec (' + r.status + ') : ' + t.slice(0, 160)); });
+      }).catch(function () {
+        go.disabled = false;
+        show('err', 'Serveur injoignable.');
+      });
+    });
+  })();
+  </script>
+</body>
+</html>
