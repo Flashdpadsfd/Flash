@@ -147,9 +147,9 @@
     <aside class="tut-side" id="tutSide"><!-- rempli par le script --></aside>
     <main class="tut-main">
       <div class="tut-crumb">Tutorials</div>
-      <span class="tut-chip" id="tutChip">General</span>
-      <h1 class="tut-title" id="tutTitle">Tutorials</h1>
-      <p class="tut-sub" id="tutSub">Guides and fixes for everything we sell.</p>
+      <span class="tut-chip" id="tutChip">Général</span>
+      <h1 class="tut-title" id="tutTitle">Aperçu</h1>
+      <p class="tut-sub" id="tutSub">Guides et dépannage pour tout ce que nous vendons.</p>
       <div id="tutBody"></div>
       <div class="tut-count" id="tutCount"></div>
     </main>
@@ -253,70 +253,66 @@
        partir du champ « group ». */
     var TUTORIALS = [
       {
-        id: 'overview', group: 'General', chip: 'General', icon: 'book',
-        title: 'Overview', sub: 'Guides and fixes for everything we sell.',
+        id: 'overview', group: 'Général', chip: 'Général', icon: 'book',
+        title: 'Aperçu', sub: 'Guides et dépannage pour tout ce que nous vendons.',
         blocks: [
-          { h: 'What you will find here', p: ['Pick a topic on the left. Each one covers a single task, step by step, using the exact wording you will see on screen.'] },
-          { h: 'Still stuck after reading?', p: ['Open a ticket on our Discord and include your order number. Having it ready saves a round trip.'] }
+          { h: 'Ce que vous trouverez ici', p: ['Choisissez un sujet dans la colonne de gauche. Chacun traite une seule tâche, étape par étape, avec les mêmes intitulés que ceux affichés à l\'écran.'] },
+          { h: 'Toujours bloqué après lecture ?', p: ['Ouvrez un ticket sur notre Discord en indiquant votre numéro de commande. L\'avoir sous la main évite un aller-retour.'] }
         ]
       },
       {
-        id: 'ordering', group: 'General', chip: 'General', icon: 'cart',
-        title: 'Placing an order', sub: 'From the catalogue to your inbox.',
+        id: 'ordering', group: 'Général', chip: 'Général', icon: 'cart',
+        title: 'Passer une commande', sub: 'Du catalogue à votre boîte mail.',
         blocks: [
-          { h: 'How it works', steps: [
-            'Open the Shop and pick the product and duration you want.',
-            'Add it to your cart, then open the cart and go to checkout.',
-            'Enter the email address where the delivery should be sent. Check it twice, everything goes there.',
-            'Pay with the method you prefer. Delivery is automatic once the payment clears.'
+          { h: 'Comment ça se passe', steps: [
+            'Ouvrez la boutique et choisissez le produit et la durée souhaités.',
+            'Ajoutez-le au panier, puis ouvrez le panier et lancez la commande.',
+            'Saisissez l\'adresse e-mail de livraison. Vérifiez-la deux fois : tout y sera envoyé.',
+            'Payez avec le moyen de votre choix. La livraison est automatique dès le paiement validé.'
           ] },
-          { h: 'How long does delivery take?', p: ['Usually seconds. If the payment is still confirming on the network it can take a few minutes, and the page keeps you posted.'] }
+          { h: 'Combien de temps pour la livraison ?', p: ['Quelques secondes en général. Si le paiement est encore en cours de confirmation sur le réseau, comptez quelques minutes — la page vous tient informé.'] }
         ]
       },
       {
-        id: 'account', group: 'Your account', chip: 'Your account', icon: 'user',
-        title: 'Signing in', sub: 'Reach your orders without a password.',
+        id: 'login', group: 'Votre compte', chip: 'Votre compte', icon: 'user',
+        title: 'Comment se connecter à votre espace client', sub: 'Sans mot de passe, en trois étapes.',
         blocks: [
-          { h: 'There is no password', p: ['We never ask you to create one. Go to Sign In, type the email you used at checkout, and a six digit code arrives in your inbox.'] },
-          { h: 'The code is not arriving', steps: [
-            'Look in spam. That is the usual culprit.',
-            'Make sure you typed the same address you ordered with.',
-            'Codes last ten minutes. Past that, ask for a new one.',
-            'After five wrong tries the code is cancelled. Request another.'
+          { h: 'Il n\'y a pas de mot de passe', p: ['Nous ne vous en faisons jamais créer. La connexion se fait avec un code à usage unique envoyé sur votre adresse e-mail : personne ne peut entrer sans accès à votre boîte mail.'] },
+          { h: 'Les étapes', steps: [
+            'Cliquez sur « Sign In » en haut à droite du site.',
+            'Saisissez l\'adresse e-mail utilisée lors de votre commande — ce doit être exactement la même.',
+            'Un code à 6 chiffres arrive dans votre boîte mail, en quelques secondes.',
+            'Saisissez ce code. Vous arrivez directement sur votre espace client.'
+          ] },
+          { h: 'Le code n\'arrive pas', steps: [
+            'Regardez dans les spams : c\'est la cause la plus fréquente.',
+            'Vérifiez que vous avez saisi la même adresse que lors de la commande.',
+            'Le code est valable 10 minutes. Passé ce délai, demandez-en un nouveau.',
+            'Après 5 tentatives incorrectes, le code est annulé. Demandez-en un autre.',
+            'Un seul code peut être demandé par minute : patientez si le bouton ne réagit pas.'
           ] }
         ]
       },
       {
-        id: 'orders', group: 'Your account', chip: 'Your account', icon: 'receipt',
-        title: 'Finding your orders', sub: 'Everything you bought, in one place.',
+        id: 'orders', group: 'Votre compte', chip: 'Votre compte', icon: 'receipt',
+        title: 'Comment retrouver vos anciennes commandes', sub: 'Tout votre historique au même endroit.',
         blocks: [
-          { h: 'Where to look', p: ['Once signed in, your account page lists every order tied to your email, most recent first, with the amount paid and the current status.'] },
-          { h: 'Seeing what was delivered', p: ['Open an order to see the details we sent you. They stay available, so you can come back to them whenever you need.'] }
+          { h: 'Où regarder', p: ['Une fois connecté, votre espace client affiche toutes les commandes rattachées à votre adresse e-mail, de la plus récente à la plus ancienne, avec le montant payé et le statut de chacune.'] },
+          { h: 'Revoir ce qui vous a été livré', p: ['Ouvrez une commande pour réafficher les informations qui vous ont été envoyées. Elles restent consultables : vous pouvez y revenir autant de fois que nécessaire, même des mois plus tard.'] },
+          { h: 'Une commande manque à l\'appel', p: ['Vos commandes sont rattachées à l\'adresse e-mail saisie au moment du paiement. Si l\'une d\'elles n\'apparaît pas, vous avez probablement commandé avec une autre adresse : reconnectez-vous avec celle-ci.'] }
         ]
       },
       {
-        id: 'using', group: 'After purchase', chip: 'After purchase', icon: 'key',
-        title: 'Using what you received', sub: 'Getting set up on your devices.',
+        id: 'replacements', group: 'Après achat', chip: 'Après achat', icon: 'refresh',
+        title: 'Remplacements', sub: 'Quand un accès cesse de fonctionner.',
         blocks: [
-          { h: 'Before you start', steps: [
-            'Sign out of any existing session on that service first.',
-            'Copy the details exactly as delivered, with no extra space at either end.',
-            'If a device offers to remember the login, accept. It saves doing this twice.'
+          { h: 'Ce qui est couvert', p: ['Si votre accès cesse de fonctionner pendant la période que vous avez payée, et que rien n\'a été modifié sur le compte, nous le remplaçons.'] },
+          { h: 'Comment le demander', steps: [
+            'Ouvrez un ticket sur notre Discord.',
+            'Indiquez votre numéro de commande et l\'adresse e-mail utilisée.',
+            'Décrivez ce que vous voyez : le message d\'erreur exact aide bien plus qu\'un résumé.'
           ] },
-          { h: 'Do not change the password', p: ['Changing it breaks the account and puts your own access at risk. Leave it exactly as delivered.'] }
-        ]
-      },
-      {
-        id: 'replacements', group: 'After purchase', chip: 'After purchase', icon: 'refresh',
-        title: 'Replacements', sub: 'When something stops working.',
-        blocks: [
-          { h: 'What is covered', p: ['If your access stops working inside the period you paid for, and nothing was changed on the account, we replace it.'] },
-          { h: 'How to ask', steps: [
-            'Open a ticket on our Discord.',
-            'Give your order number and the email you ordered with.',
-            'Describe what you see. The exact error message helps far more than a summary.'
-          ] },
-          { h: 'What is not covered', p: ['Access broken by a password change, a region switch, or sharing the details outside your household. Those we cannot replace.'] }
+          { h: 'Ce qui n\'est pas couvert', p: ['Un accès cassé par un changement de mot de passe, un changement de région, ou le partage des identifiants en dehors de votre foyer. Ne modifiez jamais le mot de passe reçu : cela casse le compte et met votre propre accès en péril.'] }
         ]
       }
     ];
@@ -368,7 +364,7 @@
         return '<div class="tut-card">' + inner + '</div>';
       }).join('');
       var idx = TUTORIALS.map(function(x) { return x.id; }).indexOf(t.id) + 1;
-      document.getElementById('tutCount').textContent = idx + ' of ' + TUTORIALS.length + ' tutorials';
+      document.getElementById('tutCount').textContent = idx + ' sur ' + TUTORIALS.length + ' tutoriels';
     }
 
     /* Delegation : la barre laterale est reconstruite a chaque changement. */
