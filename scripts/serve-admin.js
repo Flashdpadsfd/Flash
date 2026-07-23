@@ -2,19 +2,19 @@
    =========================================================================
    Usage :  npm run serve:admin      (puis http://localhost:3001)
 
-   Sert le dossier admin-site/ sur le port 3001, l'origine que api/_origin.js
+   Sert le dossier admin/ sur le port 3001, l'origine que api/_origin.js
    autorise pour le développement. Cela permet de tester le panneau dans les
    conditions réelles — deux origines distinctes, donc du vrai CORS — sans rien
    déployer. En production, ce rôle est tenu par Hostinger.
 
    Variables : PORT (défaut 3001), SHOP_URL n'est PAS utilisée ici (elle est
-   figée dans admin-site/index.html au moment du build). */
+   figée dans admin/index.html au moment du build). */
 
 var http = require('http');
 var fs = require('fs');
 var path = require('path');
 
-var DIR = path.join(__dirname, '..', 'admin-site');
+var DIR = path.join(__dirname, '..', 'admin');
 var PORT = Number(process.env.PORT || 3001);
 
 var TYPES = {
@@ -26,7 +26,7 @@ var TYPES = {
 };
 
 if (!fs.existsSync(DIR)) {
-  console.error('\n✗ admin-site/ est absent. Lancez d\'abord : npm run build:admin\n');
+  console.error('\n✗ admin/ est absent. Lancez d\'abord : npm run build:admin\n');
   process.exit(1);
 }
 

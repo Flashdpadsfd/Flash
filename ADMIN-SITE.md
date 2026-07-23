@@ -19,11 +19,18 @@ Le contenu passe donc par `/api/content`, adossé à la table `site_content`.
 npm run build:admin
 ```
 
-Génère `admin-site/` (non versionné : c'est un artefact de build, régénéré depuis
-`admin.html` + `assets/admin.*` pour qu'il n'existe qu'une seule source).
+Génère le dossier `admin/`, puis commitez et poussez : **c'est tout**.
 
-Téléversez ensuite le **contenu** de `admin-site/` à la racine de
-`admin.flashshp.fr` (hPanel → Gestionnaire de fichiers, ou FTP).
+La racine du sous-domaine `admin.flashshp.fr` est `public_html/admin`, et
+l'auto-deploy git dépose le dépôt dans `public_html`. Le dossier `admin/` du
+dépôt atterrit donc exactement au bon endroit — aucun téléversement manuel.
+
+Le dossier est versionné mais **généré** : ne l'éditez jamais à la main, vos
+modifications seraient écrasées au prochain build. La source reste `admin.html`
+et `assets/admin.*`.
+
+À refaire après chaque modification du panneau, sinon le site publié garde
+l'ancienne version.
 
 Pour viser une autre boutique que la production :
 
@@ -58,6 +65,9 @@ SHOP_URL=http://localhost:3000 npm run build:admin && npm run serve:admin
 
 Boutique sur `http://localhost:3000`, panneau sur `http://localhost:3001` —
 deux origines distinctes, donc les mêmes conditions de CORS qu'en production.
+
+⚠ Pensez à relancer `npm run build:admin` **sans** `SHOP_URL` avant de
+commiter, sinon vous publieriez un panneau qui pointe vers localhost.
 
 ## Ce qui est publié, et ce qui ne l'est pas
 

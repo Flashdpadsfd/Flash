@@ -1,7 +1,8 @@
 /* FlashShp — Génère le site du panneau admin (à déployer sur admin.flashshp.fr).
    =========================================================================
    Usage :  npm run build:admin
-   Sortie :  admin-site/   (index.html + assets/) — dossier à téléverser tel quel.
+   Sortie :  admin/   — versionné, publié automatiquement par l'auto-deploy git
+             (la racine du sous-domaine est public_html/admin).
 
    Pourquoi un script plutôt qu'un dossier écrit à la main : le panneau reste
    une SEULE source (admin.html + assets/admin.*). Dupliquer ces fichiers
@@ -21,7 +22,7 @@ var fs = require('fs');
 var path = require('path');
 
 var ROOT = path.join(__dirname, '..');
-var OUT = path.join(ROOT, 'admin-site');
+var OUT = path.join(ROOT, 'admin');
 var SHOP_URL = String(process.env.SHOP_URL || 'https://flashshp.fr').replace(/\/+$/, '');
 
 var ASSETS = ['admin.css', 'admin.js', 'email-config.js'];
@@ -63,10 +64,10 @@ function build() {
   /* Empêche l'indexation même si le fichier est servi tel quel. */
   fs.writeFileSync(path.join(OUT, 'robots.txt'), 'User-agent: *\nDisallow: /\n', 'utf8');
 
-  console.log('\n✓ Site admin généré dans admin-site/');
+  console.log('\n✓ Site admin généré dans admin/');
   console.log('  API de la boutique : ' + SHOP_URL);
   console.log('  Fichiers : index.html, robots.txt, assets/' + copied.join(', assets/'));
-  console.log('\n  Téléversez le CONTENU de admin-site/ à la racine de admin.flashshp.fr.');
+  console.log('\n  Commitez et poussez : le deploiement automatique publie admin/ sur admin.flashshp.fr.');
   console.log('  Côté boutique, ADMIN_ORIGIN doit valoir https://admin.flashshp.fr\n');
 }
 

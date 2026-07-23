@@ -1,0 +1,2266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="robots" content="noindex, nofollow" />
+  <!-- Généré par scripts/build-admin-site.js — ne pas modifier ici, éditer admin.html -->
+  <script>window.NEXUS_API_BASE = "https://flashshp.fr";</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FlashShp — Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/admin.css?v=5" />
+</head>
+<body>
+
+  <!-- ─── LOGIN ─── -->
+  <div class="login-screen" id="loginScreen">
+    <div class="login-box">
+      <div class="login-logo">FlashShp <span>Admin</span></div>
+      <p class="login-sub">Panneau d'administration</p>
+      <form id="loginForm">
+        <div class="field">
+          <label>Mot de passe</label>
+          <input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password" />
+        </div>
+        <div class="login-error" id="loginError">Mot de passe incorrect.</div>
+        <button type="submit" class="a-btn a-btn--primary" style="width:100%;margin-top:8px;">Se connecter</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ─── APP ─── -->
+  <div class="app" id="app" style="display:none;">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar__brand">
+        <div class="sidebar__brand-icon" id="sidebarBrandIcon">N</div>
+        <div>
+          <div class="sidebar__brand-name" id="sidebarBrandName">FlashShp</div>
+          <div class="sidebar__brand-sub">Admin Panel</div>
+        </div>
+      </div>
+      <div class="sidebar__scroll">
+
+        <!-- Dashboard -->
+        <div class="sidebar__group">
+          <a class="sidebar__link active" data-page="dashboard" onclick="showPage('dashboard')">
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            Dashboard
+          </a>
+        </div>
+
+        <!-- Catalog -->
+        <div class="sidebar__group">
+          <div class="sidebar__group-label">Catalog</div>
+          <a class="sidebar__link" data-page="products" onclick="showPage('products')">
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+            Products
+          </a>
+          <a class="sidebar__link" data-page="categories" onclick="showPage('categories')">
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 17.5h7M17.5 14v7"/></svg>
+            Categories
+          </a>
+          <a class="sidebar__link" data-page="promos" onclick="showPage('promos')">
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+            Coupons
+          </a>
+        </div>
+
+        <!-- Orders -->
+        <div class="sidebar__group">
+          <div class="sidebar__group-label">Orders</div>
+          <a class="sidebar__link" data-page="orders" onclick="showPage('orders')">
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            Invoices
+          </a>
+          <a class="sidebar__link" data-page="customers" onclick="showPage('customers')">
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+            Customers
+          </a>
+          <a class="sidebar__link" data-page="reviews" onclick="showPage('reviews')">
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            Feedbacks
+          </a>
+        </div>
+
+        <!-- Storefront -->
+        <div class="sidebar__group">
+          <div class="sidebar__group-label">Storefront</div>
+          <a class="sidebar__link" data-page="payments" onclick="showPage('payments')">
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            Payment Methods
+          </a>
+          <a class="sidebar__link" data-page="settings" onclick="showPage('settings')">
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+            Configure
+          </a>
+          <a class="sidebar__link" data-page="content" onclick="showPage('content')">
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Visual Editor
+          </a>
+          <a class="sidebar__link" data-page="stats" onclick="showPage('stats')">
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+            Statistics
+          </a>
+          <a class="sidebar__link" data-page="links" onclick="showPage('links')">
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+            Links
+          </a>
+        </div>
+
+        <!-- Tools -->
+        <div class="sidebar__group">
+          <div class="sidebar__group-label">Tools</div>
+          <a class="sidebar__link" data-page="webhooks" onclick="showPage('webhooks')">
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+            Discord Webhooks
+          </a>
+          <a class="sidebar__link" data-page="security" onclick="showPage('security')">
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Security
+          </a>
+          <a class="sidebar__link" data-page="email" onclick="showPage('email')">
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
+            Email
+          </a>
+        </div>
+
+      </div>
+      <div class="sidebar__bottom">
+        <button class="sidebar__logout" onclick="logout()">
+          <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+          Déconnexion
+        </button>
+      </div>
+    </aside>
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="topbar__left">
+        <span class="topbar__page-title" id="topbarTitle">Vue d'ensemble</span>
+      </div>
+      <div class="topbar__right">
+        <a href="https://flashshp.fr/" target="_blank" class="topbar__store-link">
+          <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Voir la boutique
+        </a>
+        <div class="topbar__avatar" id="topbarAvatar">A</div>
+      </div>
+    </header>
+
+    <!-- Main -->
+    <main class="main">
+    <div class="main-inner">
+
+      <!-- ─── DASHBOARD ─── -->
+      <div class="page active" id="page-dashboard">
+
+        <!-- Header -->
+        <div class="db-hdr">
+          <div>
+            <h1 class="db-hdr__title">Dashboard</h1>
+            <p class="db-hdr__sub">Discover the latest updates and insights regarding your store today.</p>
+          </div>
+          <div class="db-hdr__actions">
+            <button class="db-btn db-btn--accent" onclick="showPage('settings')">
+              <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              Quick setup
+            </button>
+            <div class="db-period-wrap" id="dbPeriodWrap">
+              <button class="db-btn db-btn--outline" id="dbPeriodBtn">
+                <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <span id="dbPeriodLabel">Today</span>
+                <svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+              </button>
+              <div class="db-period-drop" id="dbPeriodDrop">
+                <div class="db-preset active" data-period="today">Today</div>
+                <div class="db-preset" data-period="yesterday">Yesterday</div>
+                <div class="db-preset" data-period="week">This Week</div>
+                <div class="db-preset" data-period="lastweek">Last Week</div>
+                <div class="db-preset" data-period="month">This Month</div>
+                <div class="db-preset" data-period="lastmonth">Last Month</div>
+                <div class="db-preset" data-period="year">This Year</div>
+                <div class="db-preset" data-period="lastyear">Last Year</div>
+                <div class="db-preset" data-period="all">All Time</div>
+              </div>
+            </div>
+            <button class="db-btn db-btn--icon" onclick="showPage('settings')" aria-label="Settings">
+              <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="db-tabs">
+          <button class="db-tab active" onclick="switchDashTab('revenue',this)">Revenue &amp; Orders</button>
+          <button class="db-tab" onclick="switchDashTab('traffic',this)">Traffic &amp; Visitors</button>
+        </div>
+
+        <!-- ── Revenue & Orders ── -->
+        <div id="dbRevSection">
+          <div class="db-kpi-row" id="dbKpis"></div>
+          <div class="db-main-row">
+            <div class="db-charts-col">
+              <div class="db-chart-card">
+                <div class="db-chart-card__title">Revenue</div>
+                <canvas id="revenueChart" style="width:100%;"></canvas>
+              </div>
+              <div class="db-chart-card">
+                <div class="db-chart-card__title">Orders</div>
+                <canvas id="ordersChart" style="width:100%;"></canvas>
+              </div>
+            </div>
+            <div class="db-latest-col">
+              <div class="db-latest-hdr">Latest Completed Orders</div>
+              <div id="dbLatestOrders" class="db-latest-list"></div>
+            </div>
+          </div>
+          <div class="db-bottom-3">
+            <div class="db-mini-card">
+              <div class="db-mini-card__hdr">
+                <span>Best Selling Products</span>
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="opacity:.3;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              </div>
+              <div class="db-mini-card__body" id="dbBestProducts"></div>
+              <div class="db-mini-card__foot"><a onclick="showPage('products')" style="cursor:pointer;">View all →</a></div>
+            </div>
+            <div class="db-mini-card">
+              <div class="db-mini-card__hdr">
+                <span>Top Spenders</span>
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="opacity:.3;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              </div>
+              <div class="db-mini-card__body" id="dbTopSpenders"></div>
+              <div class="db-mini-card__foot"><a onclick="showPage('customers')" style="cursor:pointer;">View all →</a></div>
+            </div>
+            <div class="db-mini-card">
+              <div class="db-mini-card__hdr">
+                <span>Most Used Methods</span>
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="opacity:.3;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              </div>
+              <div class="db-mini-card__body" id="dbMostMethods"></div>
+              <div class="db-mini-card__foot"><a style="cursor:pointer;">View all →</a></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Traffic & Visitors ── -->
+        <div id="dbTrafficSection" style="display:none;">
+          <div class="db-live-banner">
+            <span class="db-live-dot"></span>
+            <span id="dbLiveText" style="font-size:13px;font-weight:500;">0 visitors browsing your store right now</span>
+            <span class="db-live-hint">updates every 5s</span>
+          </div>
+          <div class="db-kpi-row db-kpi-row--6" id="dbTrafficKpis"></div>
+          <div class="db-2col-charts">
+            <div class="db-chart-card">
+              <div class="db-chart-card__title">Pageviews</div>
+              <canvas id="pageviewsChart" style="width:100%;"></canvas>
+            </div>
+            <div class="db-chart-card">
+              <div class="db-chart-card__title">Sessions</div>
+              <canvas id="sessionsChart" style="width:100%;"></canvas>
+            </div>
+          </div>
+          <div class="db-analytics-grid">
+            <div class="db-analytics-card">
+              <div class="db-analytics-card__hdr">
+                <span>Pages</span>
+                <div class="db-pill-tabs"><button class="db-pill active">Path</button></div>
+              </div>
+              <div id="dbPages"></div>
+            </div>
+            <div class="db-analytics-card">
+              <div class="db-analytics-card__hdr">
+                <span>Sources</span>
+                <div class="db-pill-tabs"><button class="db-pill active">Referrer</button></div>
+              </div>
+              <div id="dbSources"></div>
+            </div>
+            <div class="db-analytics-card">
+              <div class="db-analytics-card__hdr">
+                <span>Environment</span>
+                <div class="db-pill-tabs">
+                  <button class="db-pill active" onclick="switchEnvTab('browser',this)">Browser</button>
+                  <button class="db-pill" onclick="switchEnvTab('os',this)">OS</button>
+                </div>
+              </div>
+              <div id="dbEnvironment"></div>
+            </div>
+            <div class="db-analytics-card">
+              <div class="db-analytics-card__hdr">
+                <span>Location</span>
+                <div class="db-pill-tabs"><button class="db-pill active">Country</button></div>
+              </div>
+              <div id="dbLocation"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ─── PRODUCTS ─── -->
+      <div class="page" id="page-products">
+        <div class="page-header">
+          <h1>Produits</h1>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <div class="search-bar" style="width:220px;">
+              <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" placeholder="Rechercher produit…" id="productsSearch" oninput="filterProducts(this.value)" />
+            </div>
+            <button class="a-btn a-btn--primary" onclick="openModal()">
+              <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Nouveau produit
+            </button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="a-table">
+            <thead><tr><th>Produit</th><th>Catégorie</th><th>Prix</th><th>Ancien prix</th><th>Stock</th><th>Badge</th><th>Actions</th></tr></thead>
+            <tbody id="productsTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ─── CATEGORIES ─── -->
+      <div class="page" id="page-categories">
+        <div class="page-header">
+          <h1>Categories</h1>
+          <button class="a-btn a-btn--primary" onclick="openCatModal()">
+            <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Create Category
+          </button>
+        </div>
+        <div class="table-wrap">
+          <table class="a-table">
+            <thead><tr><th>Icon</th><th>Name</th><th>Slug</th><th>Color</th><th>Actions</th></tr></thead>
+            <tbody id="categoriesTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ─── PAYMENT METHODS ─── -->
+      <div class="page" id="page-payments">
+        <div class="page-header">
+          <div>
+            <h1>Payment Methods</h1>
+            <p style="font-size:13px;color:var(--text-muted);margin-top:4px;font-weight:400;">Configure the payment gateways accepted in your store.</p>
+          </div>
+        </div>
+        <div class="pm-grid" id="pmGrid"></div>
+      </div>
+
+      <!-- ─── FEEDBACKS ─── -->
+      <div class="page" id="page-reviews">
+        <div class="page-header">
+          <h1>Feedbacks</h1>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span id="fbSyncNote" style="display:none;font-size:12px;color:rgba(255,255,255,.5);align-items:center;gap:6px;"></span>
+            <button id="fbAddBtn" class="a-btn a-btn--primary" onclick="openReviewModal(null)">
+              <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add Feedback
+            </button>
+          </div>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="fb-kpi-grid">
+          <div class="fb-kpi-card">
+            <div class="fb-kpi-label">Total Feedbacks</div>
+            <div class="fb-kpi-value" id="fbKpiTotal">0</div>
+          </div>
+          <div class="fb-kpi-card">
+            <div class="fb-kpi-label">Average Rating</div>
+            <div class="fb-kpi-value" id="fbKpiRating">—</div>
+          </div>
+          <div class="fb-kpi-card">
+            <div class="fb-kpi-label">Published</div>
+            <div class="fb-kpi-value" id="fbKpiPublished">0</div>
+          </div>
+          <div class="fb-kpi-card">
+            <div class="fb-kpi-label">Pending Reply</div>
+            <div class="fb-kpi-value" id="fbKpiPending">0</div>
+          </div>
+        </div>
+
+        <!-- Rating Breakdown -->
+        <div class="fb-breakdown">
+          <div class="fb-breakdown__score">
+            <div class="fb-breakdown__big" id="fbBigRating">—</div>
+            <div class="fb-breakdown__stars" id="fbBigStars"></div>
+            <div class="fb-breakdown__sub" id="fbBigCount">0 reviews</div>
+          </div>
+          <div class="fb-breakdown__bars" id="fbBarsContainer"></div>
+        </div>
+
+        <!-- Feedbacks Table -->
+        <div class="table-wrap">
+          <table class="a-table">
+            <thead>
+              <tr>
+                <th>Author</th>
+                <th>Rating</th>
+                <th>Feedback</th>
+                <th>Product</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="reviewsTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ─── COMMANDES ─── -->
+      <div class="page" id="page-orders">
+        <div class="page-header">
+          <h1>Commandes</h1>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <input type="text" id="ordersSearch" placeholder="Rechercher ID, email, produit…" class="a-input" style="width:260px;font-size:13px;" oninput="filterOrders(this.value)" />
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="a-table" id="ordersTable">
+            <thead>
+              <tr>
+                <th>Invoice ID</th>
+                <th>Produit</th>
+                <th>Email</th>
+                <th>Montant</th>
+                <th>Date</th>
+                <th>Statut</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="ordersTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ─── ORDER DETAIL ─── -->
+      <div class="page" id="page-order-detail">
+
+        <!-- Header -->
+        <div class="od-page-header">
+          <div>
+            <button class="od-back-btn" onclick="goBackToOrders()">
+              <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+              Invoices
+            </button>
+            <div class="od-page-title">Invoice Details</div>
+            <div class="od-page-sub">View the details of the invoice.</div>
+          </div>
+          <div class="od-page-header__actions">
+            <button class="a-btn a-btn--ghost" onclick="downloadOrderPDF()">
+              <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>
+              Download PDF
+            </button>
+            <button class="a-btn a-btn--ghost" id="odRefundBtn" onclick="refundOrderFromDetail()">
+              <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.86"/></svg>
+              Mark as Refunded
+            </button>
+            <button class="a-btn a-btn--primary" onclick="viewOrderInvoice()">
+              <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              View Invoice
+            </button>
+          </div>
+        </div>
+
+        <!-- Order Info + Customer Info -->
+        <div class="od-grid-2">
+          <div class="od-card">
+            <div class="od-card__head">
+              <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              Order Information
+            </div>
+            <div class="od-card__body" id="odOrderInfo"></div>
+          </div>
+          <div class="od-card">
+            <div class="od-card__head">
+              <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              Customer Information
+            </div>
+            <div class="od-card__body" id="odCustomerInfo"></div>
+            <div class="od-actions-row" id="odCustActions"></div>
+          </div>
+        </div>
+
+        <!-- Items -->
+        <div class="od-card" style="margin-bottom:16px;">
+          <div class="od-card__head">
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.72a2 2 0 001.99-1.61L23 6H6"/></svg>
+            Items
+          </div>
+          <div class="table-wrap" style="border-radius:0;border:none;">
+            <table class="a-table od-items-thead">
+              <thead>
+                <tr>
+                  <th>Status</th>
+                  <th>Product &amp; Variant</th>
+                  <th>Quantity</th>
+                  <th>Total Price</th>
+                  <th>Custom Fields</th>
+                  <th>Delivered</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="odItemsTbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Payment History + Customer Feedback -->
+        <div class="od-grid-2">
+          <div class="od-card">
+            <div class="od-card__head">
+              <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+              Payment History
+            </div>
+            <div class="table-wrap" style="border-radius:0;border:none;">
+              <table class="a-table od-items-thead">
+                <thead><tr><th>Status</th><th>Amount</th><th>Paid At</th><th>External ID</th></tr></thead>
+                <tbody id="odPayTbody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="od-card">
+            <div class="od-card__head">
+              <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              Customer Feedback
+            </div>
+            <div class="od-card__body" id="odFeedback"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ─── CLIENTS ─── -->
+      <div class="page" id="page-customers">
+        <div class="page-header">
+          <div>
+            <h1>Clients</h1>
+            <div class="page-header__meta" id="customersCount">—</div>
+          </div>
+          <div class="search-bar" style="width:260px;">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" placeholder="Rechercher email, produit…" id="customersSearch" oninput="filterCustomers(this.value)" />
+          </div>
+        </div>
+        <!-- Comptes connectés via Discord (notre stockage, indépendant de SellAuth) -->
+        <div class="section-title" style="margin:4px 0 8px;display:flex;align-items:center;gap:8px;">
+          🟢 Comptes connectés <span id="loginsCount" style="font-weight:400;color:rgba(255,255,255,.45);font-size:13px;">—</span>
+          <button class="db-btn db-btn--icon" onclick="renderLogins(true)" title="Rafraîchir" style="margin-left:auto;">↻</button>
+        </div>
+        <div class="table-wrap" style="margin-bottom:26px;">
+          <table class="a-table">
+            <thead><tr><th>Client</th><th>Email</th><th>Connexions</th><th>Dernière connexion</th><th></th></tr></thead>
+            <tbody id="loginsTbody"></tbody>
+          </table>
+        </div>
+
+        <div class="section-title" style="margin:4px 0 8px;">🛒 Clients (via commandes)</div>
+        <div class="table-wrap">
+          <table class="a-table">
+            <thead><tr><th>Client</th><th>Email</th><th>Commandes</th><th>Total dépensé</th><th>Dernier achat</th><th>Produits</th></tr></thead>
+            <tbody id="customersTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ─── CONTENU ─── -->
+      <div class="page" id="page-content">
+        <div class="page-header">
+          <h1>Éditeur de contenu</h1>
+          <div style="display:flex;gap:8px;">
+            <a href="https://flashshp.fr/" target="_blank" class="a-btn a-btn--ghost" style="font-size:12px;gap:5px;">
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              Accueil
+            </a>
+            <a href="https://flashshp.fr/products" target="_blank" class="a-btn a-btn--ghost" style="font-size:12px;gap:5px;">
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              Produits
+            </a>
+            <a href="https://flashshp.fr/review" target="_blank" class="a-btn a-btn--ghost" style="font-size:12px;gap:5px;">
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              Avis
+            </a>
+          </div>
+        </div>
+
+        <!-- Site global -->
+        <div class="stats-editor" style="margin-bottom:20px;">
+          <div class="section-title" style="margin-bottom:16px;">🌐 Site global</div>
+          <div class="field">
+            <label>Nom du site <span class="f-optional">(logo nav, drawer, footer)</span></label>
+            <input type="text" id="cSiteName" placeholder="FlashShp" />
+          </div>
+          <div class="field">
+            <label>Description footer <span class="f-optional">(HTML accepté : &lt;br&gt; pour saut de ligne)</span></label>
+            <textarea id="cFooterDesc" rows="2" placeholder="Premium streaming accounts,&#10;delivered instantly." style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:#fff;font-family:inherit;font-size:14px;padding:10px 14px;resize:vertical;outline:none;box-sizing:border-box;"></textarea>
+          </div>
+          <div class="field" style="margin-bottom:0;">
+            <label>Copyright</label>
+            <input type="text" id="cFooterCopy" placeholder="© 2026 FlashShp. All rights reserved." />
+          </div>
+        </div>
+
+        <!-- Page Accueil -->
+        <div class="stats-editor" style="margin-bottom:20px;">
+          <div class="section-title" style="margin-bottom:16px;">🏠 Page Accueil</div>
+          <div class="field">
+            <label>Texte accroche <span class="f-optional">(petite étiquette au-dessus du titre)</span></label>
+            <input type="text" id="cHomeEyebrow" placeholder="Digital Products Store" />
+          </div>
+          <div class="field">
+            <label>Titre <span class="f-optional">(HTML accepté : &lt;br&gt; pour saut de ligne)</span></label>
+            <input type="text" id="cHomeTitle" placeholder="Premium. Curated.&lt;br&gt;Digital." />
+          </div>
+          <div class="field">
+            <label>Sous-titre</label>
+            <textarea id="cHomeSub" rows="3" placeholder="Paying full price for a streaming service..." style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:#fff;font-family:inherit;font-size:14px;padding:10px 14px;resize:vertical;outline:none;box-sizing:border-box;"></textarea>
+          </div>
+          <div class="form-row">
+            <div class="field" style="margin-bottom:0;">
+              <label>Bouton principal</label>
+              <input type="text" id="cHomeCta1" placeholder="Explore Products" />
+            </div>
+            <div class="field" style="margin-bottom:0;">
+              <label>Bouton secondaire</label>
+              <input type="text" id="cHomeCta2" placeholder="Join Discord →" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Page Produits -->
+        <div class="stats-editor" style="margin-bottom:20px;">
+          <div class="section-title" style="margin-bottom:16px;">🛍 Page Produits</div>
+          <div class="form-row">
+            <div class="field">
+              <label>Mot après le compteur <span class="f-optional">(ex: « 6 products »)</span></label>
+              <input type="text" id="cProductsTitle" placeholder="products" />
+            </div>
+            <div class="field">
+              <label>Placeholder de recherche</label>
+              <input type="text" id="cSearchPlaceholder" placeholder="Search products…" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="field">
+              <label>Bouton d'achat (survol carte)</label>
+              <input type="text" id="cBuyNow" placeholder="Buy Now" />
+            </div>
+            <div class="field">
+              <label>Étiquette « En stock »</label>
+              <input type="text" id="cInStock" placeholder="In stock" />
+            </div>
+          </div>
+          <div class="form-row" style="margin-bottom:0;">
+            <div class="field" style="margin-bottom:0;">
+              <label>Étiquette « Rupture de stock »</label>
+              <input type="text" id="cOutOfStock" placeholder="Out of stock" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Textes du site (navigation, stats, footer) -->
+        <div id="overrideEditor"></div>
+
+        <!-- Page Avis -->
+        <div class="stats-editor" style="margin-bottom:20px;">
+          <div class="section-title" style="margin-bottom:16px;">⭐ Page Avis</div>
+          <div class="field">
+            <label>Texte accroche</label>
+            <input type="text" id="cReviewsEyebrow" placeholder="Verified Customers" />
+          </div>
+          <div class="field">
+            <label>Titre</label>
+            <input type="text" id="cReviewsTitle" placeholder="What Our Customers Say" />
+          </div>
+          <div class="field">
+            <label>Sous-titre</label>
+            <textarea id="cReviewsSub" rows="2" placeholder="Real reviews from real customers..." style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:#fff;font-family:inherit;font-size:14px;padding:10px 14px;resize:vertical;outline:none;box-sizing:border-box;"></textarea>
+          </div>
+          <div class="field" style="margin-bottom:0;">
+            <label>Note affichée <span class="f-optional">(ex: 4.96 — visible dans le résumé)</span></label>
+            <input type="text" id="cReviewsRating" placeholder="4.96" />
+          </div>
+        </div>
+
+        <button class="a-btn a-btn--primary" onclick="saveContent()">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Enregistrer tout
+        </button>
+        <div class="save-msg" id="contentSaveMsg" style="margin-top:12px;"></div>
+      </div>
+
+      <!-- ─── STATS ─── -->
+      <div class="page" id="page-stats">
+        <div class="page-header"><h1>Statistiques</h1></div>
+        <div class="stats-editor">
+          <div class="field">
+            <label>Note moyenne (Avg. Rating)</label>
+            <input type="text" id="statRating" placeholder="4.96" />
+          </div>
+          <div class="field">
+            <label>Produits vendus (Products Sold)</label>
+            <input type="text" id="statSold" placeholder="4,350" />
+          </div>
+          <div class="field">
+            <label>Clients totaux (Total Customers)</label>
+            <input type="text" id="statCustomers" placeholder="439" />
+          </div>
+          <button class="a-btn a-btn--primary" onclick="saveStats()">Enregistrer les stats</button>
+          <div class="save-msg" id="statsSaveMsg"></div>
+        </div>
+      </div>
+
+      <!-- ─── LIENS ─── -->
+      <div class="page" id="page-links">
+        <div class="page-header"><h1>Liens</h1></div>
+        <div class="stats-editor">
+          <div class="field">
+            <label>Discord</label>
+            <input type="url" id="linkDiscord" placeholder="https://discord.gg/…" />
+          </div>
+          <div class="field">
+            <label>Telegram</label>
+            <input type="url" id="linkTelegram" placeholder="https://t.me/…" />
+          </div>
+          <div class="field">
+            <label>Conditions d'utilisation (Terms of Service)</label>
+            <input type="url" id="linkTos" placeholder="https://…" />
+          </div>
+          <div class="field">
+            <label>Politique de confidentialité (Privacy)</label>
+            <input type="url" id="linkPrivacy" placeholder="https://…" />
+          </div>
+          <div class="field">
+            <label>Page Avis / Feedback</label>
+            <input type="url" id="linkFeedback" placeholder="https://…" />
+          </div>
+          <button class="a-btn a-btn--primary" onclick="saveLinks()">Enregistrer les liens</button>
+          <div class="save-msg" id="linksSaveMsg"></div>
+        </div>
+      </div>
+
+      <!-- ─── CODES PROMO ─── -->
+      <div class="page" id="page-promos">
+        <!-- ── LIST VIEW ── -->
+        <div id="promos-list-view">
+          <div class="page-header">
+            <h1>Coupons</h1>
+            <button class="a-btn a-btn--primary" onclick="openPromoForm()">
+              <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Create Coupon
+            </button>
+          </div>
+          <div class="table-wrap">
+            <div id="promosList"></div>
+          </div>
+        </div>
+
+        <!-- ── FORM VIEW ── -->
+        <div id="promos-form-view" style="display:none;">
+          <div class="coupon-form-header">
+            <div>
+              <h1 id="promoFormTitle">Create Coupon</h1>
+              <p class="coupon-form-sub">Fill in the details below to create a new coupon.</p>
+            </div>
+            <div class="coupon-form-actions">
+              <button class="a-btn a-btn--ghost" onclick="closePromoForm()">
+                <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                Cancel
+              </button>
+              <button class="a-btn a-btn--ghost" onclick="savePromo(true)">
+                <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                Create &amp; Exit
+              </button>
+              <button class="a-btn a-btn--primary" onclick="savePromo(false)">
+                <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                Create
+              </button>
+            </div>
+          </div>
+
+          <div class="coupon-form-body">
+            <input type="hidden" id="promoEditIndex" value="" />
+
+            <!-- LEFT COLUMN -->
+            <div class="coupon-form-main">
+
+              <!-- General -->
+              <div class="coupon-section">
+                <div class="coupon-section__title">
+                  <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                  General
+                </div>
+
+                <div class="field">
+                  <label>Coupon Code</label>
+                  <div style="display:flex;gap:8px;">
+                    <input type="text" id="promoCode" placeholder="SUMMER20" style="text-transform:uppercase;flex:1;" oninput="this.value=this.value.toUpperCase()" />
+                    <button type="button" class="a-btn a-btn--ghost" onclick="generatePromoCode()" style="flex-shrink:0;padding:0 12px;" title="Generate random code">
+                      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label>Type</label>
+                  <div class="coupon-type-picker" id="couponTypePicker">
+                    <button type="button" class="coupon-type-opt active" data-val="percentage" onclick="selectCouponType('percentage',this)">
+                      <span class="coupon-type-dot"></span> Percentage
+                    </button>
+                    <button type="button" class="coupon-type-opt" data-val="fixed" onclick="selectCouponType('fixed',this)">
+                      <span class="coupon-type-dot"></span> Fixed Amount
+                    </button>
+                  </div>
+                  <input type="hidden" id="promoType" value="percentage" />
+                </div>
+
+                <div class="field" style="margin-bottom:0;">
+                  <label>Discount</label>
+                  <p class="field-hint" id="promoDiscountHint">Enter a percentage discount.</p>
+                  <div class="coupon-discount-row">
+                    <button type="button" class="coupon-step-btn" onclick="stepDiscount(-1)">
+                      <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    </button>
+                    <input type="number" id="promoDiscount" value="0" min="0" style="text-align:center;width:80px;" />
+                    <span id="promoDiscountUnit" style="font-size:14px;color:var(--text-muted);">%</span>
+                    <button type="button" class="coupon-step-btn" onclick="stepDiscount(1)">
+                      <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    </button>
+                    <div class="coupon-presets" id="couponPresets">
+                      <button type="button" onclick="setPromoDiscount(5)">5%</button>
+                      <button type="button" onclick="setPromoDiscount(10)">10%</button>
+                      <button type="button" onclick="setPromoDiscount(15)">15%</button>
+                      <button type="button" onclick="setPromoDiscount(20)">20%</button>
+                      <button type="button" onclick="setPromoDiscount(25)">25%</button>
+                      <button type="button" onclick="setPromoDiscount(50)">50%</button>
+                      <button type="button" onclick="setPromoDiscount(100)">100%</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Restrictions -->
+              <div class="coupon-section">
+                <div class="coupon-section__title">
+                  <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+                  Restrictions
+                </div>
+
+                <div class="form-row">
+                  <div class="field">
+                    <label>Start Date <span class="f-optional">(optional)</span></label>
+                    <p class="field-hint">Leave empty to allow immediate use.</p>
+                    <input type="datetime-local" id="promoStartDate" />
+                  </div>
+                  <div class="field">
+                    <label>Expiration Date <span class="f-optional">(optional)</span></label>
+                    <p class="field-hint">Leave empty for no expiration.</p>
+                    <input type="datetime-local" id="promoExpDate" />
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="field">
+                    <label>Max Total Uses <span class="f-optional">(optional)</span></label>
+                    <p class="field-hint">Leave empty for unlimited uses.</p>
+                    <input type="number" id="promoMaxUses" placeholder="" min="0" />
+                  </div>
+                  <div class="field">
+                    <label>Max Uses Per Customer <span class="f-optional">(optional)</span></label>
+                    <p class="field-hint">Leave empty for unlimited uses per customer.</p>
+                    <input type="number" id="promoMaxUsesPerCustomer" placeholder="" min="0" />
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label>Min Cart Price <span class="f-optional">(optional)</span></label>
+                  <p class="field-hint">Leave empty for no minimum cart price.</p>
+                  <input type="number" id="promoMinCart" placeholder="" min="0" step="0.01" />
+                </div>
+
+                <div class="field">
+                  <label>Allowed Emails <span class="f-optional">(optional)</span></label>
+                  <p class="field-hint">Leave empty to allow all emails.</p>
+                  <input type="text" id="promoAllowedEmails" placeholder="Comma separated list of emails" />
+                </div>
+
+                <!-- Coupon & Volume Discounts -->
+                <div class="field">
+                  <label>Coupon &amp; Volume Discounts <span class="f-optional">(optional)</span></label>
+                  <p class="field-hint">If checked, the coupon won't be applied when there's a volume discount.</p>
+                  <label class="ls-toggle" style="width:100%;justify-content:flex-start;">
+                    <input type="checkbox" id="promoDisableVolume" />
+                    <span class="ls-toggle__track"></span>
+                    <span class="ls-toggle__label">Disable when Volume Discount applied</span>
+                  </label>
+                </div>
+
+                <!-- Coupon & Bundle Offers -->
+                <div class="field">
+                  <label>Coupon &amp; Bundle Offers <span class="f-optional">(optional)</span></label>
+                  <p class="field-hint">If checked, the coupon won't apply to items already discounted by a bundle offer.</p>
+                  <label class="ls-toggle" style="width:100%;justify-content:flex-start;">
+                    <input type="checkbox" id="promoDisableBundle" />
+                    <span class="ls-toggle__track"></span>
+                    <span class="ls-toggle__label">Disable when Bundle Offer applied</span>
+                  </label>
+                </div>
+
+                <!-- Coupon & Quantity Deals -->
+                <div class="field" style="margin-bottom:0;">
+                  <label>Coupon &amp; Quantity Deals <span class="f-optional">(optional)</span></label>
+                  <p class="field-hint">If checked, the coupon won't apply to items already discounted by a quantity deal.</p>
+                  <label class="ls-toggle" style="width:100%;justify-content:flex-start;">
+                    <input type="checkbox" id="promoDisableQty" />
+                    <span class="ls-toggle__track"></span>
+                    <span class="ls-toggle__label">Disable when Quantity Deal applied</span>
+                  </label>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN -->
+            <div class="coupon-form-side">
+              <div class="coupon-section">
+                <div class="coupon-section__title">
+                  <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+                  Products
+                </div>
+                <label class="ls-toggle" style="width:100%;justify-content:flex-start;">
+                  <input type="checkbox" id="promoApplyAll" checked />
+                  <span class="ls-toggle__track"></span>
+                  <span class="ls-toggle__label">Apply to All Products</span>
+                </label>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── WEBHOOKS ─── -->
+      <div class="page" id="page-webhooks">
+        <div class="page-header"><h1>Discord Webhooks</h1></div>
+
+        <div style="margin-bottom:28px;">
+          <div class="section-title" style="margin-bottom:6px;">🔔 Notifications Discord</div>
+          <p style="font-size:13px;color:rgba(255,255,255,.4);margin:0 0 18px;line-height:1.65;">
+            Configurez un webhook Discord par événement — chaque notification peut aller dans un salon différent.<br>
+            Créez un webhook : <strong style="color:rgba(255,255,255,.6);">Paramètres serveur → Intégrations → Webhooks → Créer un webhook</strong>.
+          </p>
+
+          <!-- Grille de cartes par événement -->
+          <div class="whk-grid">
+
+            <!-- Commande créée -->
+            <div class="whk-card">
+              <div class="whk-card__head">
+                <div class="whk-card__icon" style="background:rgba(59,130,246,.15);">🛍️</div>
+                <div><div class="whk-card__title">Commande créée</div><div class="whk-card__desc">Notification quand une nouvelle commande est passée.</div></div>
+              </div>
+              <div class="whk-channel">
+                <div class="whk-disc-badge"><svg viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.014.01.028.021.037a19.953 19.953 0 0 0 5.993 3.03.077.077 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.201 13.201 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg></div>
+                <span class="whk-channel__label">Discord</span>
+                <label class="whk-toggle"><input type="checkbox" id="en-ORDER_CREATE" onchange="toggleWebhookCard('ORDER_CREATE')"><span class="whk-toggle-track"></span></label>
+              </div>
+              <div class="whk-expand" id="expand-ORDER_CREATE">
+                <div class="field"><label>Webhook URL <span style="color:#ff5555;">*</span></label><input type="url" id="url-ORDER_CREATE" placeholder="https://discord.com/api/webhooks/…"/></div>
+                <div class="field"><label>Message additionnel <span style="color:rgba(255,255,255,.3);font-weight:400;">(ex: @everyone)</span></label><input type="text" id="msg-ORDER_CREATE" placeholder="@everyone (optionnel)"/></div>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:12px;">
+                  <button class="a-btn a-btn--ghost" style="font-size:12px;padding:5px 12px;" onclick="testWebhookCard('ORDER_CREATE')">Tester</button>
+                  <span id="test-ORDER_CREATE" style="font-size:12px;"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Remboursement -->
+            <div class="whk-card">
+              <div class="whk-card__head">
+                <div class="whk-card__icon" style="background:rgba(249,115,22,.15);">↩️</div>
+                <div><div class="whk-card__title">Remboursement</div><div class="whk-card__desc">Notification quand une commande est remboursée.</div></div>
+              </div>
+              <div class="whk-channel">
+                <div class="whk-disc-badge"><svg viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.014.01.028.021.037a19.953 19.953 0 0 0 5.993 3.03.077.077 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.201 13.201 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg></div>
+                <span class="whk-channel__label">Discord</span>
+                <label class="whk-toggle"><input type="checkbox" id="en-REFUND" onchange="toggleWebhookCard('REFUND')"><span class="whk-toggle-track"></span></label>
+              </div>
+              <div class="whk-expand" id="expand-REFUND">
+                <div class="field"><label>Webhook URL <span style="color:#ff5555;">*</span></label><input type="url" id="url-REFUND" placeholder="https://discord.com/api/webhooks/…"/></div>
+                <div class="field"><label>Message additionnel <span style="color:rgba(255,255,255,.3);font-weight:400;">(ex: @here)</span></label><input type="text" id="msg-REFUND" placeholder="@here (optionnel)"/></div>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:12px;">
+                  <button class="a-btn a-btn--ghost" style="font-size:12px;padding:5px 12px;" onclick="testWebhookCard('REFUND')">Tester</button>
+                  <span id="test-REFUND" style="font-size:12px;"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Produit ajouté -->
+            <div class="whk-card">
+              <div class="whk-card__head">
+                <div class="whk-card__icon" style="background:rgba(34,197,94,.15);"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div>
+                <div><div class="whk-card__title">Produit ajouté</div><div class="whk-card__desc">Notification quand un nouveau produit est créé.</div></div>
+              </div>
+              <div class="whk-channel">
+                <div class="whk-disc-badge"><svg viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.014.01.028.021.037a19.953 19.953 0 0 0 5.993 3.03.077.077 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.201 13.201 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg></div>
+                <span class="whk-channel__label">Discord</span>
+                <label class="whk-toggle"><input type="checkbox" id="en-PRODUCT_ADD" onchange="toggleWebhookCard('PRODUCT_ADD')"><span class="whk-toggle-track"></span></label>
+              </div>
+              <div class="whk-expand" id="expand-PRODUCT_ADD">
+                <div class="field"><label>Webhook URL <span style="color:#ff5555;">*</span></label><input type="url" id="url-PRODUCT_ADD" placeholder="https://discord.com/api/webhooks/…"/></div>
+                <div class="field"><label>Message additionnel <span style="color:rgba(255,255,255,.3);font-weight:400;">(optionnel)</span></label><input type="text" id="msg-PRODUCT_ADD" placeholder="(optionnel)"/></div>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:12px;">
+                  <button class="a-btn a-btn--ghost" style="font-size:12px;padding:5px 12px;" onclick="testWebhookCard('PRODUCT_ADD')">Tester</button>
+                  <span id="test-PRODUCT_ADD" style="font-size:12px;"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Produit modifié -->
+            <div class="whk-card">
+              <div class="whk-card__head">
+                <div class="whk-card__icon" style="background:rgba(59,130,246,.15);"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+                <div><div class="whk-card__title">Produit modifié</div><div class="whk-card__desc">Notification quand un produit est mis à jour.</div></div>
+              </div>
+              <div class="whk-channel">
+                <div class="whk-disc-badge"><svg viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.014.01.028.021.037a19.953 19.953 0 0 0 5.993 3.03.077.077 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.201 13.201 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg></div>
+                <span class="whk-channel__label">Discord</span>
+                <label class="whk-toggle"><input type="checkbox" id="en-PRODUCT_UPDATE" onchange="toggleWebhookCard('PRODUCT_UPDATE')"><span class="whk-toggle-track"></span></label>
+              </div>
+              <div class="whk-expand" id="expand-PRODUCT_UPDATE">
+                <div class="field"><label>Webhook URL <span style="color:#ff5555;">*</span></label><input type="url" id="url-PRODUCT_UPDATE" placeholder="https://discord.com/api/webhooks/…"/></div>
+                <div class="field"><label>Message additionnel <span style="color:rgba(255,255,255,.3);font-weight:400;">(optionnel)</span></label><input type="text" id="msg-PRODUCT_UPDATE" placeholder="(optionnel)"/></div>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:12px;">
+                  <button class="a-btn a-btn--ghost" style="font-size:12px;padding:5px 12px;" onclick="testWebhookCard('PRODUCT_UPDATE')">Tester</button>
+                  <span id="test-PRODUCT_UPDATE" style="font-size:12px;"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Produit supprimé -->
+            <div class="whk-card">
+              <div class="whk-card__head">
+                <div class="whk-card__icon" style="background:rgba(239,68,68,.15);"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg></div>
+                <div><div class="whk-card__title">Produit supprimé</div><div class="whk-card__desc">Notification quand un produit est supprimé.</div></div>
+              </div>
+              <div class="whk-channel">
+                <div class="whk-disc-badge"><svg viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.014.01.028.021.037a19.953 19.953 0 0 0 5.993 3.03.077.077 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.201 13.201 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg></div>
+                <span class="whk-channel__label">Discord</span>
+                <label class="whk-toggle"><input type="checkbox" id="en-PRODUCT_DELETE" onchange="toggleWebhookCard('PRODUCT_DELETE')"><span class="whk-toggle-track"></span></label>
+              </div>
+              <div class="whk-expand" id="expand-PRODUCT_DELETE">
+                <div class="field"><label>Webhook URL <span style="color:#ff5555;">*</span></label><input type="url" id="url-PRODUCT_DELETE" placeholder="https://discord.com/api/webhooks/…"/></div>
+                <div class="field"><label>Message additionnel <span style="color:rgba(255,255,255,.3);font-weight:400;">(optionnel)</span></label><input type="text" id="msg-PRODUCT_DELETE" placeholder="(optionnel)"/></div>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:12px;">
+                  <button class="a-btn a-btn--ghost" style="font-size:12px;padding:5px 12px;" onclick="testWebhookCard('PRODUCT_DELETE')">Tester</button>
+                  <span id="test-PRODUCT_DELETE" style="font-size:12px;"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stock mis à jour -->
+            <div class="whk-card">
+              <div class="whk-card__head">
+                <div class="whk-card__icon" style="background:rgba(14,165,233,.15);"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+                <div><div class="whk-card__title">Stock mis à jour</div><div class="whk-card__desc">Notification quand le stock d'un produit est modifié.</div></div>
+              </div>
+              <div class="whk-channel">
+                <div class="whk-disc-badge"><svg viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.014.01.028.021.037a19.953 19.953 0 0 0 5.993 3.03.077.077 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.201 13.201 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg></div>
+                <span class="whk-channel__label">Discord</span>
+                <label class="whk-toggle"><input type="checkbox" id="en-STOCK_UPDATE" onchange="toggleWebhookCard('STOCK_UPDATE')"><span class="whk-toggle-track"></span></label>
+              </div>
+              <div class="whk-expand" id="expand-STOCK_UPDATE">
+                <div class="field"><label>Webhook URL <span style="color:#ff5555;">*</span></label><input type="url" id="url-STOCK_UPDATE" placeholder="https://discord.com/api/webhooks/…"/></div>
+                <div class="field"><label>Message additionnel <span style="color:rgba(255,255,255,.3);font-weight:400;">(optionnel)</span></label><input type="text" id="msg-STOCK_UPDATE" placeholder="(optionnel)"/></div>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:12px;">
+                  <button class="a-btn a-btn--ghost" style="font-size:12px;padding:5px 12px;" onclick="testWebhookCard('STOCK_UPDATE')">Tester</button>
+                  <span id="test-STOCK_UPDATE" style="font-size:12px;"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stock faible -->
+            <div class="whk-card">
+              <div class="whk-card__head">
+                <div class="whk-card__icon" style="background:rgba(234,179,8,.15);">⚠️</div>
+                <div><div class="whk-card__title">Stock faible</div><div class="whk-card__desc">Alerte quand le stock passe sous 5 unités.</div></div>
+              </div>
+              <div class="whk-channel">
+                <div class="whk-disc-badge"><svg viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.014.01.028.021.037a19.953 19.953 0 0 0 5.993 3.03.077.077 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.201 13.201 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg></div>
+                <span class="whk-channel__label">Discord</span>
+                <label class="whk-toggle"><input type="checkbox" id="en-LOW_STOCK" onchange="toggleWebhookCard('LOW_STOCK')"><span class="whk-toggle-track"></span></label>
+              </div>
+              <div class="whk-expand" id="expand-LOW_STOCK">
+                <div class="field"><label>Webhook URL <span style="color:#ff5555;">*</span></label><input type="url" id="url-LOW_STOCK" placeholder="https://discord.com/api/webhooks/…"/></div>
+                <div class="field"><label>Message additionnel <span style="color:rgba(255,255,255,.3);font-weight:400;">(ex: @here)</span></label><input type="text" id="msg-LOW_STOCK" placeholder="@here (optionnel)"/></div>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:12px;">
+                  <button class="a-btn a-btn--ghost" style="font-size:12px;padding:5px 12px;" onclick="testWebhookCard('LOW_STOCK')">Tester</button>
+                  <span id="test-LOW_STOCK" style="font-size:12px;"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Connexion admin -->
+            <div class="whk-card">
+              <div class="whk-card__head">
+                <div class="whk-card__icon" style="background:rgba(99,102,241,.15);">🔐</div>
+                <div><div class="whk-card__title">Connexion admin</div><div class="whk-card__desc">Notification quand l'admin ouvre une session.</div></div>
+              </div>
+              <div class="whk-channel">
+                <div class="whk-disc-badge"><svg viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.014.01.028.021.037a19.953 19.953 0 0 0 5.993 3.03.077.077 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.201 13.201 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg></div>
+                <span class="whk-channel__label">Discord</span>
+                <label class="whk-toggle"><input type="checkbox" id="en-ADMIN_LOGIN" onchange="toggleWebhookCard('ADMIN_LOGIN')"><span class="whk-toggle-track"></span></label>
+              </div>
+              <div class="whk-expand" id="expand-ADMIN_LOGIN">
+                <div class="field"><label>Webhook URL <span style="color:#ff5555;">*</span></label><input type="url" id="url-ADMIN_LOGIN" placeholder="https://discord.com/api/webhooks/…"/></div>
+                <div class="field"><label>Message additionnel <span style="color:rgba(255,255,255,.3);font-weight:400;">(optionnel)</span></label><input type="text" id="msg-ADMIN_LOGIN" placeholder="(optionnel)"/></div>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:12px;">
+                  <button class="a-btn a-btn--ghost" style="font-size:12px;padding:5px 12px;" onclick="testWebhookCard('ADMIN_LOGIN')">Tester</button>
+                  <span id="test-ADMIN_LOGIN" style="font-size:12px;"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Erreur JavaScript -->
+            <div class="whk-card">
+              <div class="whk-card__head">
+                <div class="whk-card__icon" style="background:rgba(239,68,68,.12);">🐛</div>
+                <div><div class="whk-card__title">Erreur JavaScript</div><div class="whk-card__desc">Notification en cas d'erreur JS côté client (max 1/30s).</div></div>
+              </div>
+              <div class="whk-channel">
+                <div class="whk-disc-badge"><svg viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.014.01.028.021.037a19.953 19.953 0 0 0 5.993 3.03.077.077 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.201 13.201 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg></div>
+                <span class="whk-channel__label">Discord</span>
+                <label class="whk-toggle"><input type="checkbox" id="en-BUG" onchange="toggleWebhookCard('BUG')"><span class="whk-toggle-track"></span></label>
+              </div>
+              <div class="whk-expand" id="expand-BUG">
+                <div class="field"><label>Webhook URL <span style="color:#ff5555;">*</span></label><input type="url" id="url-BUG" placeholder="https://discord.com/api/webhooks/…"/></div>
+                <div class="field"><label>Message additionnel <span style="color:rgba(255,255,255,.3);font-weight:400;">(optionnel)</span></label><input type="text" id="msg-BUG" placeholder="(optionnel)"/></div>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:12px;">
+                  <button class="a-btn a-btn--ghost" style="font-size:12px;padding:5px 12px;" onclick="testWebhookCard('BUG')">Tester</button>
+                  <span id="test-BUG" style="font-size:12px;"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Changelog -->
+            <div class="whk-card">
+              <div class="whk-card__head">
+                <div class="whk-card__icon" style="background:rgba(167,139,250,.15);">📋</div>
+                <div><div class="whk-card__title">Changelog</div><div class="whk-card__desc">Salon où envoyer les notes de mise à jour manuelles.</div></div>
+              </div>
+              <div class="whk-channel">
+                <div class="whk-disc-badge"><svg viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.014.01.028.021.037a19.953 19.953 0 0 0 5.993 3.03.077.077 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.201 13.201 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg></div>
+                <span class="whk-channel__label">Discord</span>
+                <label class="whk-toggle"><input type="checkbox" id="en-CHANGELOG" onchange="toggleWebhookCard('CHANGELOG')"><span class="whk-toggle-track"></span></label>
+              </div>
+              <div class="whk-expand" id="expand-CHANGELOG">
+                <div class="field"><label>Webhook URL <span style="color:#ff5555;">*</span></label><input type="url" id="url-CHANGELOG" placeholder="https://discord.com/api/webhooks/…"/></div>
+                <div class="field"><label>Message additionnel <span style="color:rgba(255,255,255,.3);font-weight:400;">(optionnel)</span></label><input type="text" id="msg-CHANGELOG" placeholder="@everyone (optionnel)"/></div>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:12px;">
+                  <button class="a-btn a-btn--ghost" style="font-size:12px;padding:5px 12px;" onclick="testWebhookCard('CHANGELOG')">Tester</button>
+                  <span id="test-CHANGELOG" style="font-size:12px;"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Panier abandonné -->
+            <div class="whk-card">
+              <div class="whk-card__head">
+                <div class="whk-card__icon" style="background:rgba(251,191,36,.15);">🛒</div>
+                <div><div class="whk-card__title">Panier abandonné</div><div class="whk-card__desc">Alerte quand un client ferme le checkout sans acheter.</div></div>
+              </div>
+              <div class="whk-channel">
+                <div class="whk-disc-badge"><svg viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.014.01.028.021.037a19.953 19.953 0 0 0 5.993 3.03.077.077 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.201 13.201 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg></div>
+                <span class="whk-channel__label">Discord</span>
+                <label class="whk-toggle"><input type="checkbox" id="en-CART_ABANDON" onchange="toggleWebhookCard('CART_ABANDON')"><span class="whk-toggle-track"></span></label>
+              </div>
+              <div class="whk-expand" id="expand-CART_ABANDON">
+                <div class="field"><label>Webhook URL <span style="color:#ff5555;">*</span></label><input type="url" id="url-CART_ABANDON" placeholder="https://discord.com/api/webhooks/…"/></div>
+                <div class="field"><label>Message additionnel <span style="color:rgba(255,255,255,.3);font-weight:400;">(ex: @here)</span></label><input type="text" id="msg-CART_ABANDON" placeholder="@here (optionnel)"/></div>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:12px;">
+                  <button class="a-btn a-btn--ghost" style="font-size:12px;padding:5px 12px;" onclick="testWebhookCard('CART_ABANDON')">Tester</button>
+                  <span id="test-CART_ABANDON" style="font-size:12px;"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Échec de paiement -->
+            <div class="whk-card">
+              <div class="whk-card__head">
+                <div class="whk-card__icon" style="background:rgba(239,68,68,.15);">❌</div>
+                <div><div class="whk-card__title">Échec de paiement</div><div class="whk-card__desc">Notification quand une tentative de commande échoue.</div></div>
+              </div>
+              <div class="whk-channel">
+                <div class="whk-disc-badge"><svg viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.014.01.028.021.037a19.953 19.953 0 0 0 5.993 3.03.077.077 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.201 13.201 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg></div>
+                <span class="whk-channel__label">Discord</span>
+                <label class="whk-toggle"><input type="checkbox" id="en-PAYMENT_FAIL" onchange="toggleWebhookCard('PAYMENT_FAIL')"><span class="whk-toggle-track"></span></label>
+              </div>
+              <div class="whk-expand" id="expand-PAYMENT_FAIL">
+                <div class="field"><label>Webhook URL <span style="color:#ff5555;">*</span></label><input type="url" id="url-PAYMENT_FAIL" placeholder="https://discord.com/api/webhooks/…"/></div>
+                <div class="field"><label>Message additionnel <span style="color:rgba(255,255,255,.3);font-weight:400;">(optionnel)</span></label><input type="text" id="msg-PAYMENT_FAIL" placeholder="(optionnel)"/></div>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:12px;">
+                  <button class="a-btn a-btn--ghost" style="font-size:12px;padding:5px 12px;" onclick="testWebhookCard('PAYMENT_FAIL')">Tester</button>
+                  <span id="test-PAYMENT_FAIL" style="font-size:12px;"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Brute Force login -->
+            <div class="whk-card">
+              <div class="whk-card__head">
+                <div class="whk-card__icon" style="background:rgba(220,38,38,.15);"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
+                <div><div class="whk-card__title">Tentative Brute Force</div><div class="whk-card__desc">Alerte après 3 mots de passe admin incorrects consécutifs.</div></div>
+              </div>
+              <div class="whk-channel">
+                <div class="whk-disc-badge"><svg viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.014.01.028.021.037a19.953 19.953 0 0 0 5.993 3.03.077.077 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.201 13.201 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg></div>
+                <span class="whk-channel__label">Discord</span>
+                <label class="whk-toggle"><input type="checkbox" id="en-LOGIN_FAIL" onchange="toggleWebhookCard('LOGIN_FAIL')"><span class="whk-toggle-track"></span></label>
+              </div>
+              <div class="whk-expand" id="expand-LOGIN_FAIL">
+                <div class="field"><label>Webhook URL <span style="color:#ff5555;">*</span></label><input type="url" id="url-LOGIN_FAIL" placeholder="https://discord.com/api/webhooks/…"/></div>
+                <div class="field"><label>Message additionnel <span style="color:rgba(255,255,255,.3);font-weight:400;">(ex: @everyone)</span></label><input type="text" id="msg-LOGIN_FAIL" placeholder="@everyone (optionnel)"/></div>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:12px;">
+                  <button class="a-btn a-btn--ghost" style="font-size:12px;padding:5px 12px;" onclick="testWebhookCard('LOGIN_FAIL')">Tester</button>
+                  <span id="test-LOGIN_FAIL" style="font-size:12px;"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Code promo utilisé -->
+            <div class="whk-card">
+              <div class="whk-card__head">
+                <div class="whk-card__icon" style="background:rgba(99,102,241,.15);">🏷️</div>
+                <div><div class="whk-card__title">Code promo utilisé</div><div class="whk-card__desc">Notification quand un client applique un code de réduction.</div></div>
+              </div>
+              <div class="whk-channel">
+                <div class="whk-disc-badge"><svg viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.014.01.028.021.037a19.953 19.953 0 0 0 5.993 3.03.077.077 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.201 13.201 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg></div>
+                <span class="whk-channel__label">Discord</span>
+                <label class="whk-toggle"><input type="checkbox" id="en-PROMO_USE" onchange="toggleWebhookCard('PROMO_USE')"><span class="whk-toggle-track"></span></label>
+              </div>
+              <div class="whk-expand" id="expand-PROMO_USE">
+                <div class="field"><label>Webhook URL <span style="color:#ff5555;">*</span></label><input type="url" id="url-PROMO_USE" placeholder="https://discord.com/api/webhooks/…"/></div>
+                <div class="field"><label>Message additionnel <span style="color:rgba(255,255,255,.3);font-weight:400;">(optionnel)</span></label><input type="text" id="msg-PROMO_USE" placeholder="(optionnel)"/></div>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:12px;">
+                  <button class="a-btn a-btn--ghost" style="font-size:12px;padding:5px 12px;" onclick="testWebhookCard('PROMO_USE')">Tester</button>
+                  <span id="test-PROMO_USE" style="font-size:12px;"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Nouvel avis -->
+            <div class="whk-card">
+              <div class="whk-card__head">
+                <div class="whk-card__icon" style="background:rgba(34,197,94,.15);">⭐</div>
+                <div><div class="whk-card__title">Nouvel avis client</div><div class="whk-card__desc">Notification quand un client soumet un avis sur la boutique.</div></div>
+              </div>
+              <div class="whk-channel">
+                <div class="whk-disc-badge"><svg viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.014.01.028.021.037a19.953 19.953 0 0 0 5.993 3.03.077.077 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.201 13.201 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg></div>
+                <span class="whk-channel__label">Discord</span>
+                <label class="whk-toggle"><input type="checkbox" id="en-NEW_REVIEW" onchange="toggleWebhookCard('NEW_REVIEW')"><span class="whk-toggle-track"></span></label>
+              </div>
+              <div class="whk-expand" id="expand-NEW_REVIEW">
+                <div class="field"><label>Webhook URL <span style="color:#ff5555;">*</span></label><input type="url" id="url-NEW_REVIEW" placeholder="https://discord.com/api/webhooks/…"/></div>
+                <div class="field"><label>Message additionnel <span style="color:rgba(255,255,255,.3);font-weight:400;">(optionnel)</span></label><input type="text" id="msg-NEW_REVIEW" placeholder="(optionnel)"/></div>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:12px;">
+                  <button class="a-btn a-btn--ghost" style="font-size:12px;padding:5px 12px;" onclick="testWebhookCard('NEW_REVIEW')">Tester</button>
+                  <span id="test-NEW_REVIEW" style="font-size:12px;"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Ticket support -->
+            <div class="whk-card">
+              <div class="whk-card__head">
+                <div class="whk-card__icon" style="background:rgba(139,92,246,.15);">🎫</div>
+                <div><div class="whk-card__title">Ticket support</div><div class="whk-card__desc">Notification quand un client ouvre un ticket de support.</div></div>
+              </div>
+              <div class="whk-channel">
+                <div class="whk-disc-badge"><svg viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.014.01.028.021.037a19.953 19.953 0 0 0 5.993 3.03.077.077 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.201 13.201 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg></div>
+                <span class="whk-channel__label">Discord</span>
+                <label class="whk-toggle"><input type="checkbox" id="en-SUPPORT_TICKET" onchange="toggleWebhookCard('SUPPORT_TICKET')"><span class="whk-toggle-track"></span></label>
+              </div>
+              <div class="whk-expand" id="expand-SUPPORT_TICKET">
+                <div class="field"><label>Webhook URL <span style="color:#ff5555;">*</span></label><input type="url" id="url-SUPPORT_TICKET" placeholder="https://discord.com/api/webhooks/…"/></div>
+                <div class="field"><label>Message additionnel <span style="color:rgba(255,255,255,.3);font-weight:400;">(ex: @staff)</span></label><input type="text" id="msg-SUPPORT_TICKET" placeholder="@staff (optionnel)"/></div>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:12px;">
+                  <button class="a-btn a-btn--ghost" style="font-size:12px;padding:5px 12px;" onclick="testWebhookCard('SUPPORT_TICKET')">Tester</button>
+                  <span id="test-SUPPORT_TICKET" style="font-size:12px;"></span>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /whk-grid -->
+
+          <!-- Bouton save global -->
+          <div style="margin-top:16px;display:flex;align-items:center;gap:12px;max-width:860px;">
+            <button class="a-btn a-btn--primary" onclick="saveWebhooks()">Enregistrer tout</button>
+            <span class="save-msg" id="whkSaveMsg"></span>
+          </div>
+
+          <!-- Changelog manuel -->
+          <div style="margin-top:24px;border-top:1px solid rgba(255,255,255,.07);padding-top:20px;max-width:860px;">
+            <div style="font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:10px;">📤 Publier un changelog</div>
+            <p style="font-size:13px;color:rgba(255,255,255,.35);margin:0 0 12px;">Envoyez une note de mise à jour dans le salon configuré pour le Changelog ci-dessus.</p>
+            <textarea id="whkChangelog" rows="3" placeholder="v1.2 — Nouvelle fonctionnalité : système de logs Discord avec webhooks par événement…" style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:#fff;font-family:inherit;font-size:13px;padding:10px 14px;resize:vertical;outline:none;box-sizing:border-box;"></textarea>
+            <div style="margin-top:10px;display:flex;align-items:center;gap:10px;">
+              <button class="a-btn a-btn--ghost" onclick="sendChangelog()">📤 Publier le changelog</button>
+              <span id="changelogMsg" style="font-size:13px;color:rgba(255,255,255,.4);"></span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ─── SECURITY ─── -->
+      <div class="page" id="page-security">
+        <div class="page-header">
+          <div>
+            <h1>Security</h1>
+            <p style="font-size:13px;color:var(--text-muted);margin-top:4px;font-weight:400;">Protect your store against fraud, VPNs, and unauthorized access.</p>
+          </div>
+        </div>
+
+        <!-- KPI row -->
+        <div class="kpi-grid" id="secKpis" style="margin-bottom:20px;"></div>
+
+        <!-- Two column layout -->
+        <div class="sec-2col">
+
+          <!-- ── LEFT COLUMN ── -->
+          <div>
+
+            <!-- Anti-Fraud -->
+            <div class="sec-section" style="margin-bottom:20px;">
+              <div class="sec-section__hdr">
+                <div class="sec-section__title">
+                  <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  Anti-Fraud Protection
+                </div>
+              </div>
+              <!-- VPN / Proxy -->
+              <div class="sec-rule-row">
+                <div class="sec-rule-info">
+                  <div class="sec-rule-name">Block VPN &amp; Proxy</div>
+                  <div class="sec-rule-desc">Prevent users connecting via VPN, proxy, or anonymizer services. Uses real-time IP intelligence (ip-api.com).</div>
+                </div>
+                <div class="sec-rule-right">
+                  <span class="sec-badge sec-badge--inactive" id="antiVpnBadge">Inactive</span>
+                  <label class="pm-toggle">
+                    <input type="checkbox" id="secAntiVpn" onchange="saveSecuritySettings()" />
+                    <span class="pm-toggle__track"></span><span class="pm-toggle__thumb"></span>
+                  </label>
+                </div>
+              </div>
+              <!-- Tor -->
+              <div class="sec-rule-row">
+                <div class="sec-rule-info">
+                  <div class="sec-rule-name">Block Tor Exit Nodes</div>
+                  <div class="sec-rule-desc">Automatically block connections originating from Tor anonymization network exit nodes.</div>
+                </div>
+                <div class="sec-rule-right">
+                  <span class="sec-badge sec-badge--inactive" id="antiTorBadge">Inactive</span>
+                  <label class="pm-toggle">
+                    <input type="checkbox" id="secBlockTor" onchange="saveSecuritySettings()" />
+                    <span class="pm-toggle__track"></span><span class="pm-toggle__thumb"></span>
+                  </label>
+                </div>
+              </div>
+              <!-- Datacenter -->
+              <div class="sec-rule-row sec-rule-row--last">
+                <div class="sec-rule-info">
+                  <div class="sec-rule-name">Block Datacenter IPs</div>
+                  <div class="sec-rule-desc">Block connections from cloud hosting providers (AWS, Azure, DigitalOcean…) commonly used by bots and fraud tools.</div>
+                </div>
+                <div class="sec-rule-right">
+                  <span class="sec-badge sec-badge--inactive" id="antiDcBadge">Inactive</span>
+                  <label class="pm-toggle">
+                    <input type="checkbox" id="secBlockDc" onchange="saveSecuritySettings()" />
+                    <span class="pm-toggle__track"></span><span class="pm-toggle__thumb"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- IP Blacklist -->
+            <div class="sec-section" style="margin-bottom:20px;">
+              <div class="sec-section__hdr">
+                <div class="sec-section__title">
+                  <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+                  IP Blacklist
+                </div>
+                <button class="a-btn a-btn--ghost" style="font-size:12px;padding:4px 10px;color:var(--red);" onclick="clearBlacklist('ip')">Clear all</button>
+              </div>
+              <div class="sec-add-row">
+                <input type="text" id="newBlacklistIP" placeholder="e.g. 192.168.1.1 or 10.0.0.0/8" style="flex:1;" />
+                <button class="a-btn a-btn--primary" onclick="addBlacklistItem('ip')" style="font-size:13px;white-space:nowrap;">
+                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  Add IP
+                </button>
+              </div>
+              <div id="blacklistIPsList" style="margin-top:14px;"></div>
+            </div>
+
+            <!-- Email Blacklist -->
+            <div class="sec-section">
+              <div class="sec-section__hdr">
+                <div class="sec-section__title">
+                  <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                  Email Blacklist
+                </div>
+                <button class="a-btn a-btn--ghost" style="font-size:12px;padding:4px 10px;color:var(--red);" onclick="clearBlacklist('email')">Clear all</button>
+              </div>
+              <div class="sec-add-row">
+                <input type="text" id="newBlacklistEmail" placeholder="e.g. fraud@example.com or *@spam.com" style="flex:1;" />
+                <button class="a-btn a-btn--primary" onclick="addBlacklistItem('email')" style="font-size:13px;white-space:nowrap;">
+                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  Add Email
+                </button>
+              </div>
+              <div id="blacklistEmailsList" style="margin-top:14px;"></div>
+            </div>
+
+          </div>
+
+          <!-- ── RIGHT COLUMN ── -->
+          <div>
+
+            <!-- IP Checker -->
+            <div class="sec-section" style="margin-bottom:20px;">
+              <div class="sec-section__hdr">
+                <div class="sec-section__title">
+                  <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  IP Checker
+                </div>
+              </div>
+              <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">Check any IP address for VPN, proxy, or datacenter flags. Leave blank to check your current IP.</p>
+              <div class="sec-add-row" style="margin-bottom:10px;">
+                <input type="text" id="checkIpInput" placeholder="IP address (optional)" style="flex:1;font-size:13px;" />
+                <button class="a-btn a-btn--ghost" onclick="checkIpVpn()" style="font-size:13px;white-space:nowrap;">
+                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  Check
+                </button>
+              </div>
+              <div id="checkIpResult"></div>
+            </div>
+
+            <!-- Admin Password -->
+            <div class="sec-section" style="margin-bottom:20px;">
+              <div class="sec-section__hdr">
+                <div class="sec-section__title">
+                  <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                  Admin Password
+                </div>
+              </div>
+              <div class="field" style="margin-bottom:12px;">
+                <label>New Password</label>
+                <input type="password" id="newPass" placeholder="••••••••" />
+              </div>
+              <div class="field" style="margin-bottom:14px;">
+                <label>Confirm Password</label>
+                <input type="password" id="confirmPass" placeholder="••••••••" />
+              </div>
+              <button class="a-btn a-btn--primary" onclick="changePassword()" style="width:100%;justify-content:center;">
+                <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
+                Save Password
+              </button>
+              <div class="save-msg" id="settingsSaveMsg" style="margin-top:8px;text-align:center;font-size:13px;"></div>
+            </div>
+
+            <!-- Brute Force Status -->
+            <div class="sec-section">
+              <div class="sec-section__hdr">
+                <div class="sec-section__title">
+                  <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  Brute Force
+                </div>
+                <button class="a-btn a-btn--ghost" style="font-size:11px;padding:3px 10px;" onclick="resetBruteForce()">Reset</button>
+              </div>
+              <div id="bruteForceStatus" style="font-size:13px;line-height:1.7;"></div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Login Log (full width) -->
+        <div class="sec-section" style="margin-top:20px;">
+          <div class="sec-section__hdr">
+            <div class="sec-section__title">
+              <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              Login Attempts
+            </div>
+            <button class="a-btn a-btn--ghost" style="font-size:12px;padding:4px 10px;" onclick="clearLoginLog()">Clear log</button>
+          </div>
+          <div class="table-wrap">
+            <table class="a-table">
+              <thead><tr><th>Date &amp; Time</th><th>Result</th><th>Consecutive Attempts</th></tr></thead>
+              <tbody id="loginLogTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── SETTINGS ─── -->
+      <div class="page" id="page-settings">
+        <div class="page-header"><h1>Paramètres</h1></div>
+
+        <!-- Informations boutique -->
+        <div class="stats-editor" style="margin-bottom:20px;">
+          <div class="section-title" style="margin-bottom:16px;">Informations générales</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:700px;">
+            <div class="field" style="margin-bottom:0;">
+              <label>Nom de la boutique</label>
+              <input type="text" id="settingsStoreName" placeholder="FlashShp Shop" />
+            </div>
+            <div class="field" style="margin-bottom:0;">
+              <label>Email de contact</label>
+              <input type="email" id="settingsEmail" placeholder="contact@monshop.fr" />
+            </div>
+          </div>
+          <div style="margin-top:14px;display:flex;align-items:center;gap:12px;">
+            <button class="a-btn a-btn--primary" onclick="saveSettingsInfo()">Enregistrer</button>
+            <span class="save-msg" id="settingsInfoMsg"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── EMAIL NOTIFICATIONS ─── -->
+      <div class="page" id="page-email">
+        <div class="page-header">
+          <h1>Email Notifications</h1>
+        </div>
+
+        <!-- Enable toggle -->
+        <div class="stats-editor" style="margin-bottom:20px;">
+          <div class="sec-row">
+            <div>
+              <div class="section-title">Automatic Order Emails</div>
+              <p style="font-size:12px;color:rgba(255,255,255,.4);margin:5px 0 0;">Send a confirmation email to the customer automatically after each purchase.</p>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span class="sec-badge" id="emailEnabledBadge">Inactive</span>
+              <label class="ios-toggle">
+                <input type="checkbox" id="emailEnabled" onchange="toggleEmailEnabled(this)">
+                <span class="ios-toggle__track"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- EmailJS config -->
+        <div class="stats-editor" style="margin-bottom:20px;">
+          <div class="section-title" style="margin-bottom:6px;">EmailJS Configuration</div>
+          <p style="font-size:12px;color:rgba(255,255,255,.4);margin-bottom:18px;line-height:1.6;">
+            Create a free account at <a href="https://www.emailjs.com" target="_blank" style="color:var(--accent);">emailjs.com</a>, add an email service, then create a template.<br>
+            In the EmailJS template, set <strong>To&nbsp;Email</strong> → <code style="background:rgba(255,255,255,.06);padding:1px 5px;border-radius:4px;">{{to_email}}</code>, <strong>Subject</strong> → <code style="background:rgba(255,255,255,.06);padding:1px 5px;border-radius:4px;">{{subject}}</code>, and the HTML body to <code style="background:rgba(255,255,255,.06);padding:1px 5px;border-radius:4px;">{{message_html}}</code>.
+          </p>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;max-width:820px;margin-bottom:16px;">
+            <div class="field" style="margin:0;">
+              <label>Public Key</label>
+              <input type="text" id="emailPublicKey" placeholder="abcXYZ123..." />
+            </div>
+            <div class="field" style="margin:0;">
+              <label>Service ID</label>
+              <input type="text" id="emailServiceId" placeholder="service_abc123" />
+            </div>
+            <div class="field" style="margin:0;">
+              <label>Template ID</label>
+              <input type="text" id="emailTemplateId" placeholder="template_abc123" />
+            </div>
+          </div>
+          <div class="field" style="max-width:520px;margin-bottom:16px;">
+            <label>Email Subject</label>
+            <input type="text" id="emailSubject" placeholder="Your Order is Ready! 📦" />
+            <p class="field-hint" style="margin-top:5px;">Variables: <code>{{invoice_id}}</code> <code>{{product_name}}</code> <code>{{store_name}}</code></p>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center;">
+            <button class="a-btn a-btn--primary" onclick="saveEmailConfig()">Save Configuration</button>
+            <button class="a-btn a-btn--ghost" id="emailTestBtn" onclick="testEmailSend()">Send Test Email</button>
+            <span class="save-msg" id="emailConfigMsg"></span>
+          </div>
+        </div>
+
+        <!-- Template editor -->
+        <div class="stats-editor">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;gap:12px;">
+            <div>
+              <div class="section-title">Email Template</div>
+              <p style="font-size:12px;color:rgba(255,255,255,.4);margin-top:5px;line-height:1.7;">
+                Available variables:
+                <code style="background:rgba(255,255,255,.06);padding:1px 5px;border-radius:4px;">{{invoice_id}}</code>
+                <code style="background:rgba(255,255,255,.06);padding:1px 5px;border-radius:4px;">{{product_name}}</code>
+                <code style="background:rgba(255,255,255,.06);padding:1px 5px;border-radius:4px;">{{deliverable}}</code>
+                <code style="background:rgba(255,255,255,.06);padding:1px 5px;border-radius:4px;">{{customer_email}}</code>
+                <code style="background:rgba(255,255,255,.06);padding:1px 5px;border-radius:4px;">{{store_name}}</code>
+                <code style="background:rgba(255,255,255,.06);padding:1px 5px;border-radius:4px;">{{store_url}}</code>
+              </p>
+            </div>
+            <div style="display:flex;gap:8px;flex-shrink:0;">
+              <button class="a-btn a-btn--ghost" onclick="previewEmailTemplate()" style="font-size:12px;">
+                <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="margin-right:5px;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Preview
+              </button>
+              <button class="a-btn a-btn--ghost" onclick="resetEmailTemplate()" style="font-size:12px;color:rgba(255,255,255,.35);">Reset</button>
+            </div>
+          </div>
+          <textarea id="emailTemplateEditor" style="width:100%;min-height:420px;font-family:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace;font-size:11.5px;background:#0d0d0f;border:1px solid rgba(255,255,255,.08);border-radius:8px;color:rgba(255,255,255,.75);padding:14px 16px;resize:vertical;line-height:1.65;outline:none;" spellcheck="false" placeholder="Paste or write your HTML email template here…"></textarea>
+          <div style="margin-top:12px;display:flex;gap:10px;align-items:center;">
+            <button class="a-btn a-btn--primary" onclick="saveEmailTemplate()">Save Template</button>
+            <span class="save-msg" id="emailTemplateMsg"></span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /main-inner -->
+    </main>
+  </div>
+
+  <!-- ─── MODAL CATEGORY ─── -->
+  <div class="modal-overlay" id="catModalOverlay" onclick="closeCatModal()"></div>
+  <div class="modal" id="catModal" style="max-width:520px;">
+    <div class="modal__header">
+      <h2 id="catModalTitle">Create Category</h2>
+      <button class="btn-close" onclick="closeCatModal()">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal__body">
+      <input type="hidden" id="catEditId" value="" />
+
+      <!-- Name + URL Path -->
+      <div class="form-row">
+        <div class="field">
+          <label>Name <span class="f-required">*</span></label>
+          <input type="text" id="catName" placeholder="Ex: Streaming" oninput="autoCatSlug()" />
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label>URL Path <span class="f-optional">(optional)</span></label>
+          <input type="text" id="catSlug" placeholder="category-url-path" />
+        </div>
+      </div>
+
+      <!-- Color only -->
+      <div class="field">
+        <label>Color</label>
+        <input type="color" id="catColor" value="#6495ed" style="width:100%;height:40px;border-radius:8px;border:1px solid var(--border);cursor:pointer;padding:2px 4px;background:transparent;" />
+      </div>
+
+      <!-- Parent Category -->
+      <div class="field">
+        <label>Parent Category</label>
+        <select id="catParent">
+          <option value="">Select...</option>
+        </select>
+      </div>
+
+      <!-- Description -->
+      <div class="field">
+        <label>Description</label>
+        <textarea id="catDesc" rows="3" placeholder="Describe this category..."></textarea>
+      </div>
+
+      <!-- Image -->
+      <div class="field">
+        <label>Image</label>
+        <div class="image-upload-zone" id="catImageZone" onclick="document.getElementById('catImageInput').click()">
+          <div id="catImageEmpty" class="image-upload-empty">
+            <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <span>Tap to select an image from your content gallery.</span>
+          </div>
+          <img id="catImagePreview" class="image-upload-preview" alt="" />
+          <button type="button" class="image-upload-remove" id="catImageRemoveBtn" onclick="removeCatImage(event)" title="Remove">×</button>
+        </div>
+        <input type="file" id="catImageInput" accept="image/png,image/jpeg,image/webp" style="display:none;" onchange="handleCatImageUpload(this)" />
+        <input type="hidden" id="catImage" />
+      </div>
+
+      <!-- Meta Title -->
+      <div class="field">
+        <label>Meta Title</label>
+        <p class="field-hint">This is the title that will appear in search engines and when you share the product link on social media. If left empty, the product title will be used.</p>
+        <input type="text" id="catMetaTitle" placeholder="..." />
+      </div>
+
+      <!-- Meta Description -->
+      <div class="field" style="margin-bottom:0;">
+        <label>Meta Description</label>
+        <p class="field-hint">This is the description that will appear in search engines and when you share the product link on social media. If left empty, the product description will be used.</p>
+        <textarea id="catMetaDesc" rows="3" placeholder="..."></textarea>
+      </div>
+
+    </div>
+    <div class="modal__footer">
+      <button class="a-btn a-btn--ghost" onclick="closeCatModal()">
+        <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        Cancel
+      </button>
+      <button class="a-btn a-btn--primary" onclick="saveCategory()">
+        <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        <span id="catSubmitLabel">Create</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ─── MODAL PRODUIT ─── -->
+  <div class="modal-overlay" id="modalOverlay" onclick="closeModal()"></div>
+  <div class="modal modal--product" id="modal">
+
+    <div class="modal__header" style="border-bottom:none;padding-bottom:0;">
+      <h2 id="modalTitle">New Product</h2>
+      <button class="btn-close" onclick="closeModal()">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <!-- Tab bar -->
+    <div class="modal-tabs-bar">
+      <button class="modal-tab active" data-tab="general" onclick="switchModalTab('general',this)">
+        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 12h8M8 8h5"/></svg>
+        General
+      </button>
+      <button class="modal-tab" data-tab="pricing" onclick="switchModalTab('pricing',this)">
+        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        Pricing
+      </button>
+      <button class="modal-tab" data-tab="delivery" onclick="switchModalTab('delivery',this)">
+        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+        Delivery
+      </button>
+      <button class="modal-tab" data-tab="fields" onclick="switchModalTab('fields',this)">
+        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        Custom Fields
+      </button>
+      <button class="modal-tab" data-tab="stats" onclick="switchModalTab('stats',this)">
+        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Live Stats
+      </button>
+      <button class="modal-tab" data-tab="page" onclick="switchModalTab('page',this)">
+        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+        Product Page
+      </button>
+    </div>
+
+    <div class="modal__body">
+      <input type="hidden" id="editId" />
+
+      <!-- ══ TAB: General ══ -->
+      <div class="mtab active" id="mtab-general">
+
+        <div class="form-section">
+          <div class="form-section__header">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 12h8M8 8h5"/></svg>
+            Product Info
+          </div>
+          <div class="field">
+            <label>Product Name <span class="f-required">*</span></label>
+            <input type="text" id="fName" placeholder="Ex: Netflix Premium" oninput="autoSlug()" />
+          </div>
+          <div class="field">
+            <label>Description <span class="f-optional">(optional)</span></label>
+            <textarea id="fDesc" rows="2" placeholder="1 Month · 4K UHD · Shared"></textarea>
+          </div>
+          <div class="field">
+            <label>Category</label>
+            <select id="fCat"></select>
+          </div>
+
+          <!-- Visibility -->
+          <div class="field">
+            <label>Visibility</label>
+            <div class="vis-picker" id="visibilityPicker">
+              <button type="button" class="vis-opt active" data-val="public">
+                <span class="vis-opt__icon"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></span>
+                <span class="vis-opt__label">Public</span>
+                <span class="vis-opt__sub">Listed in catalog</span>
+              </button>
+              <button type="button" class="vis-opt" data-val="unlisted">
+                <span class="vis-opt__icon"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></span>
+                <span class="vis-opt__label">Unlisted</span>
+                <span class="vis-opt__sub">Direct link only</span>
+              </button>
+              <button type="button" class="vis-opt" data-val="private">
+                <span class="vis-opt__icon"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span>
+                <span class="vis-opt__label">Private</span>
+                <span class="vis-opt__sub">Admin only</span>
+              </button>
+            </div>
+            <input type="hidden" id="fVisibility" value="public" />
+          </div>
+
+          <!-- Slug -->
+          <div class="field" style="margin-bottom:0;">
+            <label>URL Slug <span class="f-optional">(auto-generated from name)</span></label>
+            <div class="input-prefix-wrap">
+              <span class="input-prefix" style="font-size:11px;left:10px;color:rgba(255,255,255,.3);letter-spacing:0;">store/</span>
+              <input type="text" id="fSlug" placeholder="netflix-premium" style="padding-left:50px;" />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section" style="margin-bottom:0;">
+          <div class="form-section__header">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            Media &amp; Display
+          </div>
+          <div class="field">
+            <label>Badge</label>
+            <div class="badge-picker" id="badgePicker">
+              <button type="button" class="badge-opt badge-opt--none" data-val="" data-emoji="" data-color="">None</button>
+              <button type="button" class="badge-opt badge-opt--hot" data-val="HOT" data-emoji="🔥" data-color="#ff6b6b">🔥 HOT</button>
+              <button type="button" class="badge-opt badge-opt--new" data-val="NEW" data-emoji="✨" data-color="#60b4ff">✨ NEW</button>
+              <button type="button" class="badge-opt badge-opt--sale" data-val="SALE" data-emoji="💰" data-color="#ffb83c">💰 SALE</button>
+            </div>
+            <div class="badge-custom">
+              <div class="badge-custom__row">
+                <input type="text" id="fBadgeText" maxlength="24" placeholder="Texte personnalisé (ex: PROMO -50%)" />
+                <input type="text" id="fBadgeEmoji" maxlength="4" placeholder="😀" class="badge-emoji-input" title="Emoji du badge" />
+                <label class="badge-color-wrap" title="Couleur du badge">
+                  <input type="color" id="fBadgeColor" value="#ff6b6b" />
+                </label>
+              </div>
+              <div class="badge-emoji-quick" id="badgeEmojiQuick">
+                <button type="button" data-emoji="🔥">🔥</button>
+                <button type="button" data-emoji="✨">✨</button>
+                <button type="button" data-emoji="💰">💰</button>
+                <button type="button" data-emoji="⭐">⭐</button>
+                <button type="button" data-emoji="🎁">🎁</button>
+                <button type="button" data-emoji="⚡">⚡</button>
+                <button type="button" data-emoji="💎">💎</button>
+                <button type="button" data-emoji="🚀">🚀</button>
+                <button type="button" data-emoji="👑">👑</button>
+                <button type="button" data-emoji="🏆">🏆</button>
+                <button type="button" data-emoji="" title="Sans emoji">∅</button>
+              </div>
+              <div class="badge-preview-row">Aperçu&nbsp;: <span class="tbadge" id="badgeLivePreview">—</span></div>
+            </div>
+          </div>
+          <div class="field">
+            <label>Product Image <span class="f-optional">(optional — overrides background color)</span></label>
+            <div class="image-upload-zone" id="imageUploadZone" onclick="document.getElementById('fImageInput').click()">
+              <div id="imageUploadEmpty" class="image-upload-empty">
+                <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                <span>Click to add an image</span>
+                <span class="image-upload-hint">PNG, JPG, WEBP</span>
+              </div>
+              <img id="imagePreview" class="image-upload-preview" alt="" />
+              <button type="button" class="image-upload-remove" id="imageRemoveBtn" onclick="removeProductImage(event)" title="Remove image">×</button>
+            </div>
+            <input type="file" id="fImageInput" accept="image/png,image/jpeg,image/webp" style="display:none;" onchange="handleImageUpload(this)" />
+            <input type="hidden" id="fImage" />
+          </div>
+          <div class="field" style="margin-bottom:0;">
+            <label>Background Color <span class="f-optional">(when no image)</span></label>
+            <select id="fGradient">
+              <option value="linear-gradient(135deg,#1a1a2e,#16213e)">🌑 Midnight Blue</option>
+              <option value="linear-gradient(135deg,#1e3a5f,#0a1628)">🔵 Deep Blue</option>
+              <option value="linear-gradient(135deg,#2d1b69,#11053b)">🟣 Purple</option>
+              <option value="linear-gradient(135deg,#1a3a1a,#0d1f0d)">🟢 Green</option>
+              <option value="linear-gradient(135deg,#3a1a1a,#1f0d0d)">🔴 Red</option>
+              <option value="linear-gradient(135deg,#1a2a3a,#0d1520)">🩶 Slate</option>
+              <option value="linear-gradient(135deg,#2a1a0a,#150d05)">🟤 Brown</option>
+            </select>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ══ TAB: Pricing ══ -->
+      <div class="mtab" id="mtab-pricing">
+
+        <div class="form-section">
+          <div class="form-section__header">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+            Pricing
+          </div>
+          <div class="form-row">
+            <div class="field">
+              <label>Price <span class="f-required">*</span></label>
+              <div class="input-prefix-wrap">
+                <span class="input-prefix" id="pricePrefix">€</span>
+                <input type="number" id="fPrice" placeholder="9.99" step="0.01" min="0" class="input--prefixed" />
+              </div>
+            </div>
+            <div class="field">
+              <label>Compare at Price <span class="f-optional">(crossed out)</span></label>
+              <div class="input-prefix-wrap">
+                <span class="input-prefix" id="origPricePrefix">€</span>
+                <input type="number" id="fOrigPrice" placeholder="19.99" step="0.01" min="0" class="input--prefixed" />
+              </div>
+            </div>
+          </div>
+          <div class="field" style="margin-bottom:0;">
+            <label>Currency</label>
+            <select id="fCurrency" onchange="updateCurrencyPrefixes()">
+              <option value="EUR">EUR (€)</option>
+              <option value="USD">USD ($)</option>
+              <option value="GBP">GBP (£)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- ══ Variantes : options du produit (nom + prix), ex. 1 mois / 3 mois ══ -->
+        <div class="form-section">
+          <div class="form-section__header">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+            Variantes <span class="f-optional" style="text-transform:none;letter-spacing:0;">(optionnel)</span>
+          </div>
+          <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;line-height:1.6;">
+            Ajoutez des variantes (ex. « 1 mois », « 3 mois »), chacune avec son prix. Le client choisit la variante sur la fiche produit et le prix s'adapte. Laissez vide pour un produit sans variante.
+          </p>
+          <div id="variantsList"></div>
+          <button type="button" class="a-btn a-btn--ghost" onclick="addVariant()" style="margin-top:12px;font-size:12px;gap:5px;">
+            <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Ajouter une variante
+          </button>
+        </div>
+
+        <div class="form-section" style="margin-bottom:0;">
+          <div class="form-section__header">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+            Quantity Limits
+          </div>
+          <div class="form-row">
+            <div class="field">
+              <label>Min. Quantity <span class="f-optional">(default: 1)</span></label>
+              <input type="number" id="fMinQty" placeholder="1" min="1" />
+            </div>
+            <div class="field" style="margin-bottom:0;">
+              <label>Max. Quantity <span class="f-optional">(0 = unlimited)</span></label>
+              <input type="number" id="fMaxQty" placeholder="0" min="0" />
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ══ TAB: Delivery ══ -->
+      <div class="mtab" id="mtab-delivery">
+
+        <div class="form-section">
+          <div class="form-section__header">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></svg>
+            Delivery Type
+          </div>
+          <div class="deltype-picker" id="deliveryTypePicker">
+            <button type="button" class="deltype-opt active" data-val="keys">
+              <span style="font-size:18px;flex-shrink:0;">🔑</span>
+              <div>
+                <div style="font-weight:600;font-size:13px;">Serial Keys / Credentials</div>
+                <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:2px;">Stock-based, one entry delivered per order</div>
+              </div>
+            </button>
+            <button type="button" class="deltype-opt" data-val="service">
+              <span style="font-size:18px;flex-shrink:0;">⚙️</span>
+              <div>
+                <div style="font-weight:600;font-size:13px;color:rgba(255,255,255,.7);">Manual Service</div>
+                <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:2px;">You deliver manually after purchase</div>
+              </div>
+            </button>
+          </div>
+          <input type="hidden" id="fDeliveryType" value="keys" />
+        </div>
+
+        <div class="form-section" id="deliveryKeysSection">
+          <div class="form-section__header">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+            Stock &amp; Deliverables
+          </div>
+          <div class="stock-indicator" id="modalStockIndicator">
+            <span class="stock-indicator__icon"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span>
+            <div style="flex:1;">
+              <div class="stock-indicator__title" id="modalStockTitle">No deliverables</div>
+              <div class="stock-indicator__sub" id="modalStockSub">Current stock: 0</div>
+            </div>
+            <span class="stock-pill stock-pill--out" id="modalStockPill">0</span>
+          </div>
+          <div class="deliverable-tabs" id="deliverableTabs">
+            <button type="button" class="deliverable-tab active" data-mode="add">Add</button>
+            <button type="button" class="deliverable-tab" data-mode="update">Replace</button>
+          </div>
+          <div class="field">
+            <label id="fDeliverableLabel">New Deliverables</label>
+            <textarea id="fDeliverables" rows="5" placeholder="One per line&#10;email:password&#10;abc@gmail.com:pass123"></textarea>
+            <div class="deliverable-hint">One deliverable per line. Last entry is delivered first.</div>
+          </div>
+          <input type="hidden" id="fDeliverableMode" value="add" />
+          <input type="hidden" id="fExistingDeliverables" value="[]" />
+        </div>
+
+        <div class="form-section" style="margin-bottom:0;">
+          <div class="form-section__header">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+            Options
+          </div>
+          <div class="field">
+            <label>Out of Stock Behavior</label>
+            <select id="fOutOfStock">
+              <option value="show">Show as out of stock</option>
+              <option value="hide">Hide product automatically</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Delivery Note <span class="f-optional">(shown to buyer after purchase)</span></label>
+            <textarea id="fDeliveryNote" rows="3" placeholder="Thank you for your order! If you have any issues, contact our support."></textarea>
+          </div>
+          <div class="field">
+            <label>Status Color</label>
+            <div class="status-color-row" id="statusColorPicker">
+              <button type="button" class="status-dot" style="background:#ef4444;" data-color="red" title="Red"></button>
+              <button type="button" class="status-dot" style="background:#f97316;" data-color="orange" title="Orange"></button>
+              <button type="button" class="status-dot" style="background:#eab308;" data-color="yellow" title="Yellow"></button>
+              <button type="button" class="status-dot" style="background:#22c55e;" data-color="green" title="Green"></button>
+              <button type="button" class="status-dot" style="background:#3b82f6;" data-color="blue" title="Blue"></button>
+              <button type="button" class="status-dot status-dot--none" data-color="" title="None">×</button>
+            </div>
+            <input type="hidden" id="fStatusColor" value="green" />
+          </div>
+          <div class="field" style="margin-bottom:0;">
+            <label>Status Label <span class="f-optional">(optional)</span></label>
+            <input type="text" id="fStatusLabel" placeholder="In Stock" />
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ══ TAB: Custom Fields ══ -->
+      <div class="mtab" id="mtab-fields">
+
+        <div class="form-section" style="margin-bottom:0;">
+          <div class="form-section__header">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+            Custom Checkout Fields
+          </div>
+          <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;line-height:1.6;">
+            These fields will be shown to the buyer at checkout. Use them to collect required info (Discord username, recipient email, etc.).
+          </p>
+          <div id="customFieldsList"></div>
+          <button type="button" class="a-btn a-btn--ghost" onclick="addCustomField()" style="margin-top:12px;font-size:12px;gap:5px;">
+            <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Field
+          </button>
+        </div>
+
+      </div>
+
+      <!-- ══ TAB: Live Stats ══ -->
+      <div class="mtab" id="mtab-stats">
+
+        <div class="form-section" style="margin-bottom:0;">
+          <div class="form-section__header">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            Live Stats
+          </div>
+
+          <!-- Views -->
+          <div class="ls-row">
+            <div class="ls-row__info">
+              <div class="ls-row__title">Live Product Views Count</div>
+              <div class="ls-row__sub">If enabled, the live views count will be displayed on the product page.</div>
+            </div>
+            <label class="ls-toggle">
+              <input type="checkbox" id="fShowViews" />
+              <span class="ls-toggle__track"></span>
+              <span class="ls-toggle__label">Show Views Count</span>
+            </label>
+          </div>
+
+          <!-- Sales count -->
+          <div class="ls-row">
+            <div class="ls-row__info">
+              <div class="ls-row__title">Live Product Sales Count</div>
+              <div class="ls-row__sub">If enabled, the live sales count will be displayed on the product page.</div>
+            </div>
+            <label class="ls-toggle">
+              <input type="checkbox" id="fShowSales" />
+              <span class="ls-toggle__track"></span>
+              <span class="ls-toggle__label">Show Sales Count</span>
+            </label>
+          </div>
+
+          <!-- Timespan -->
+          <div class="ls-row">
+            <div class="ls-row__info">
+              <div class="ls-row__title">Live Sales Count Timespan</div>
+              <div class="ls-row__sub">The timespan for which the live sales count will be displayed.</div>
+            </div>
+            <select id="fSalesTimespan" style="min-width:160px;font-size:13px;">
+              <option value="all">All Time</option>
+              <option value="24h">Last 24 Hours</option>
+              <option value="7d">Last 7 Days</option>
+              <option value="30d">Last 30 Days</option>
+            </select>
+          </div>
+
+          <!-- Notifications -->
+          <div class="ls-row" style="border-bottom:none;margin-bottom:0;">
+            <div class="ls-row__info">
+              <div class="ls-row__title">Live Sales Notifications</div>
+              <div class="ls-row__sub">If enabled, the latest orders will be displayed as live notifications on the bottom left of the product page.</div>
+            </div>
+            <label class="ls-toggle">
+              <input type="checkbox" id="fShowNotifs" />
+              <span class="ls-toggle__track"></span>
+              <span class="ls-toggle__label">Show Sales Notifications</span>
+            </label>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- ══ TAB: Product Page ══ -->
+      <div class="mtab" id="mtab-page">
+
+        <div class="form-section">
+          <div class="form-section__header">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 10h16M4 14h16M4 18h7"/></svg>
+            System Specs
+          </div>
+          <p class="ps-hint">Rows shown in the <b>System Specs</b> block on the product page. The <b>Stock</b> row is added automatically from the real stock.</p>
+          <div id="pageSpecsList"></div>
+          <div style="display:flex;gap:8px;margin-top:8px;">
+            <button type="button" class="a-btn a-btn--ghost" onclick="addPageSpec()">+ Add Row</button>
+            <button type="button" class="a-btn a-btn--ghost" onclick="resetPageSpecs()" title="Restore default rows">Reset Defaults</button>
+          </div>
+        </div>
+
+        <div class="form-section" style="margin-bottom:0;">
+          <div class="form-section__header">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Service Guarantee
+          </div>
+          <p class="ps-hint">Cards shown in the <b>Service Guarantee</b> block (icon, title, subtitle).</p>
+          <div id="pageGuaranteesList"></div>
+          <div style="display:flex;gap:8px;margin-top:8px;">
+            <button type="button" class="a-btn a-btn--ghost" onclick="addPageGuarantee()">+ Add Card</button>
+            <button type="button" class="a-btn a-btn--ghost" onclick="resetPageGuarantees()" title="Restore default cards">Reset Defaults</button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="modal__footer">
+      <button class="a-btn a-btn--ghost" onclick="closeModal()">Cancel</button>
+      <button class="a-btn a-btn--primary" onclick="saveProduct()">
+        <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Save Product
+      </button>
+    </div>
+  </div>
+
+  <!-- ─── MODAL STOCK ─── -->
+  <div class="modal-overlay" id="stockOverlay" onclick="closeStockModal()"></div>
+  <div class="modal" id="stockModal" style="max-width:460px;">
+    <div class="modal__header">
+      <h2>Définir le stock</h2>
+      <button class="btn-close" onclick="closeStockModal()">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal__body">
+      <input type="hidden" id="stockEditId" />
+      <p id="stockProductName" style="color:rgba(255,255,255,.45);margin-bottom:14px;font-size:13px;font-weight:500;"></p>
+      <div class="stock-indicator" id="stockModalIndicator" style="margin-bottom:14px;">
+        <span class="stock-indicator__icon">📦</span>
+        <div style="flex:1;">
+          <div class="stock-indicator__title" id="stockModalTitle">Aucun livrable</div>
+          <div class="stock-indicator__sub" id="stockModalSub">Stock actuel</div>
+        </div>
+        <span class="stock-pill stock-pill--out" id="stockModalPill">0</span>
+      </div>
+      <div class="deliverable-tabs" id="stockDeliverableTabs">
+        <button type="button" class="deliverable-tab active" data-mode="add">Ajouter</button>
+        <button type="button" class="deliverable-tab" data-mode="update">Mettre à jour</button>
+      </div>
+      <div class="field">
+        <label id="stockDeliverableLabel">Nouveaux livrables</label>
+        <textarea id="stockDeliverables" rows="7" placeholder="Un livrable par ligne&#10;email:motdepasse&#10;abc@gmail.com:pass123"></textarea>
+        <div class="deliverable-hint">Entrez un livrable par ligne. Lors d'un achat, la dernière ligne est livrée au client.</div>
+      </div>
+      <input type="hidden" id="fStockDeliverableMode" value="add" />
+      <input type="hidden" id="stockExistingDeliverables" value="[]" />
+    </div>
+    <div class="modal__footer">
+      <button class="a-btn a-btn--ghost" onclick="closeStockModal()">Annuler</button>
+      <button class="a-btn a-btn--primary" onclick="saveStock()">
+        <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Enregistrer
+      </button>
+    </div>
+  </div>
+
+  <!-- ─── MODAL FEEDBACK ─── -->
+  <div class="modal-overlay" id="reviewModalOverlay" onclick="closeReviewModal()"></div>
+  <div class="modal" id="reviewModal" style="max-width:520px;">
+    <div class="modal__header">
+      <h2 id="reviewModalTitle">Add Feedback</h2>
+      <button class="btn-close" onclick="closeReviewModal()">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal__body" style="max-height:68vh;overflow-y:auto;">
+      <input type="hidden" id="rvEditId" />
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="field" style="margin-bottom:0;">
+          <label>Name <span class="f-required">*</span></label>
+          <input type="text" id="rvName" placeholder="Alex L." oninput="autoInitials()" />
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label>Initials</label>
+          <input type="text" id="rvInitials" placeholder="AL" maxlength="3" />
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label>Avatar Color</label>
+          <input type="color" id="rvColor" value="#7c3aed" style="width:100%;height:40px;border-radius:8px;border:1px solid rgba(255,255,255,.12);cursor:pointer;padding:2px 4px;" />
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label>Date</label>
+          <input type="text" id="rvDate" placeholder="May 2025" />
+        </div>
+        <div class="field" style="margin-bottom:0;grid-column:span 2;">
+          <label>Product</label>
+          <input type="text" id="rvProduct" placeholder="Netflix" />
+        </div>
+      </div>
+      <div class="field" style="margin-top:14px;margin-bottom:0;">
+        <label>Rating</label>
+        <div class="fb-star-picker" id="rvStarPicker"></div>
+      </div>
+      <div class="field" style="margin-top:14px;margin-bottom:0;">
+        <label>Feedback Text <span class="f-required">*</span></label>
+        <textarea id="rvText" rows="3" placeholder="Write the feedback here..." style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:#fff;font-family:inherit;font-size:14px;padding:10px 14px;resize:vertical;outline:none;box-sizing:border-box;"></textarea>
+      </div>
+      <div class="field" style="margin-top:14px;margin-bottom:0;">
+        <label>Reply <span style="color:var(--text-muted);font-weight:400;">(optional)</span></label>
+        <textarea id="rvReply" rows="2" placeholder="Your reply to this feedback..." style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:#fff;font-family:inherit;font-size:14px;padding:10px 14px;resize:vertical;outline:none;box-sizing:border-box;"></textarea>
+      </div>
+      <div class="field" style="margin-top:14px;margin-bottom:0;">
+        <label class="ls-toggle" style="width:100%;justify-content:flex-start;">
+          <input type="checkbox" id="rvPublished" checked />
+          <span class="ls-toggle__track"></span>
+          <span class="ls-toggle__label">Published (visible on storefront)</span>
+        </label>
+      </div>
+    </div>
+    <div class="modal__footer">
+      <button class="a-btn a-btn--ghost" onclick="closeReviewModal()">Cancel</button>
+      <button class="a-btn a-btn--primary" onclick="saveReview()">
+        <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
+        Save
+      </button>
+    </div>
+  </div>
+
+  <!-- ─── TOAST ─── -->
+  <div id="adminToast" class="admin-toast"></div>
+
+  <script src="assets/email-config.js?v=1"></script>
+  <script src="assets/admin.js"></script>
+</body>
+</html>
