@@ -6,81 +6,201 @@
   <title>FlashShp — Product</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Lancelot&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Lancelot&family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/style.css?v=15" />
   <style>
-    /* ── Page produit ──
-       Bandeau d'en-tete, puis visuel et panneau d'achat cote a cote, puis les
-       sections d'information empilees en pleine largeur. Monochrome comme le
-       reste du site : aucune couleur d'accent. */
-    .pdx-page { max-width: 1180px; margin: 0 auto; padding: 96px 28px 80px; }
+    /* ══ Page produit ══════════════════════════════════════════════════════
+       Deux colonnes : le contenu defile, le panneau d'achat reste colle. Sous
+       ce bloc, les sections d'information s'empilent en pleine largeur.
 
+       Contrairement au reste du site (volontairement monochrome), cette page a
+       UNE couleur d'accent, tenue dans --pdx-accent et confinee a .pdx-page :
+       elle ne peut donc pas deteindre sur les autres pages. Pour l'etendre au
+       site entier, il suffit de deplacer ces variables dans :root.
+
+       Les animations passent toutes par .pdx-rise (revelation au defilement) et
+       des transitions courtes au survol. Elles sont entierement neutralisees
+       par prefers-reduced-motion, en bas de ce bloc. */
+    .pdx-page {
+      --pdx-accent:      #7257ff;
+      --pdx-accent-line: rgba(114,87,255,.38);
+      --pdx-accent-soft: rgba(114,87,255,.13);
+      --pdx-accent-glow: rgba(114,87,255,.28);
+      --pdx-panel:       rgba(255,255,255,.025);
+      --pdx-panel-hi:    rgba(255,255,255,.045);
+      --pdx-line:        rgba(255,255,255,.07);
+      --pdx-ok:          #34d399;
+      --pdx-star:        #ffd27a;
+      --pdx-r:           16px;
+      --pdx-ease:        cubic-bezier(.22,.61,.36,1);
+      position: relative;
+      max-width: 1180px; margin: 0 auto; padding: 96px 28px 80px;
+    }
+    .pdx-display { font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; }
+
+    /* Halo d'ambiance derriere l'en-tete. Purement decoratif, donc hors du flux
+       et non cliquable : il ne doit jamais intercepter un clic. */
+    .pdx-page::before {
+      content: ''; position: absolute; z-index: -1; pointer-events: none;
+      top: 40px; left: 50%; transform: translateX(-50%);
+      width: min(760px, 92%); height: 420px;
+      background: radial-gradient(50% 50% at 50% 50%, var(--pdx-accent-glow), transparent 70%);
+      filter: blur(50px); opacity: .5;
+      animation: pdx-breathe 9s var(--pdx-ease) infinite;
+    }
+    @keyframes pdx-breathe {
+      0%, 100% { opacity: .38; transform: translateX(-50%) scale(1); }
+      50%      { opacity: .62; transform: translateX(-50%) scale(1.09); }
+    }
+
+    /* ── Revelation au defilement ──
+       L'element part legerement plus bas et transparent ; l'observateur ajoute
+       .is-in quand il entre dans l'ecran. --d echelonne les enfants d'une meme
+       rangee. Sans JavaScript (ou si l'observateur echoue), rien ne s'affiche —
+       d'où le filet de securite .pdx-rise sans .is-in visible par defaut, que le
+       script retire seulement une fois qu'il a pris la main. */
+    .pdx-js .pdx-rise {
+      opacity: 0; transform: translateY(18px);
+      transition: opacity .62s var(--pdx-ease), transform .62s var(--pdx-ease);
+      transition-delay: var(--d, 0ms);
+    }
+    .pdx-js .pdx-rise.is-in { opacity: 1; transform: none; }
+
+    /* ── Fil d'Ariane ── */
     .pdx-crumb { display: flex; align-items: center; gap: 8px; font-size: 12.5px; margin-bottom: 18px; }
-    .pdx-crumb a { color: rgba(255,255,255,.42); }
+    .pdx-crumb a { color: rgba(255,255,255,.42); transition: color .2s var(--pdx-ease); }
     .pdx-crumb a:hover { color: #fff; }
     .pdx-crumb span { color: rgba(255,255,255,.22); }
     .pdx-crumb .pdx-crumb__cur { color: rgba(255,255,255,.75); }
 
-    /* En-tete : nom + note a gauche, disponibilite a droite. */
+    /* ── En-tete : nom + note a gauche, disponibilite a droite ── */
     .pdx-head {
       display: flex; align-items: flex-start; justify-content: space-between; gap: 24px;
-      background: rgba(255,255,255,.025); border: 1px solid rgba(255,255,255,.07);
-      border-radius: 16px; padding: 24px 26px; margin-bottom: 16px;
+      background: var(--pdx-panel); border: 1px solid var(--pdx-line);
+      border-radius: var(--pdx-r); padding: 24px 26px; margin-bottom: 16px;
+      position: relative; overflow: hidden;
     }
-    .pdx-head__name { font-size: 30px; font-weight: 700; color: #fff; letter-spacing: -.7px; margin: 0 0 10px; }
+    /* Liseré d'accent qui se déploie a l'ouverture de la page. */
+    .pdx-head::after {
+      content: ''; position: absolute; left: 0; top: 0; height: 2px; width: 100%;
+      background: linear-gradient(90deg, var(--pdx-accent), transparent);
+      transform: scaleX(0); transform-origin: left;
+      animation: pdx-sweep 1.1s var(--pdx-ease) .15s forwards;
+    }
+    @keyframes pdx-sweep { to { transform: scaleX(1); } }
+
+    .pdx-head__name { font-size: 30px; font-weight: 800; color: #fff; letter-spacing: -.8px; margin: 0 0 10px; }
     .pdx-head__meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .pdx-tag {
       display: inline-flex; align-items: center; gap: 6px;
-      padding: 4px 10px; border-radius: 6px;
+      padding: 4px 10px; border-radius: 7px;
       background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08);
       font-size: 11.5px; color: rgba(255,255,255,.55);
+      transition: border-color .22s var(--pdx-ease), color .22s var(--pdx-ease), transform .22s var(--pdx-ease);
     }
+    .pdx-tag:hover { border-color: var(--pdx-accent-line); color: rgba(255,255,255,.85); transform: translateY(-1px); }
+    .pdx-tag--rating { color: var(--pdx-star); border-color: rgba(255,210,122,.22); background: rgba(255,210,122,.07); }
+
     .pdx-status {
       display: inline-flex; align-items: center; gap: 7px; flex-shrink: 0;
-      padding: 7px 13px; border-radius: 8px;
-      background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.10);
+      padding: 7px 13px; border-radius: 9px;
+      background: rgba(52,211,153,.08); border: 1px solid rgba(52,211,153,.24);
       font-size: 11.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #fff;
     }
-    .pdx-status::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #34d399; }
+    .pdx-status::before {
+      content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--pdx-ok);
+      box-shadow: 0 0 0 0 rgba(52,211,153,.6); animation: pdx-pulse 2.2s infinite;
+    }
+    .pdx-status.out { background: rgba(239,68,68,.08); border-color: rgba(239,68,68,.24); }
+    .pdx-status.out::before { background: #ef4444; box-shadow: 0 0 0 0 rgba(239,68,68,.6); }
+    @keyframes pdx-pulse {
+      0%   { box-shadow: 0 0 0 0 rgba(52,211,153,.55); }
+      70%  { box-shadow: 0 0 0 8px rgba(52,211,153,0); }
+      100% { box-shadow: 0 0 0 0 rgba(52,211,153,0); }
+    }
 
-    /* Visuel + achat. Le panneau d'achat reste visible au defilement. */
+    /* ── Visuel + panneau d'achat ── */
     .pdx-top { display: grid; grid-template-columns: 1fr 380px; gap: 16px; align-items: start; margin-bottom: 16px; }
 
     .pdx-visual {
       position: relative; overflow: hidden;
-      background: rgba(255,255,255,.025); border: 1px solid rgba(255,255,255,.07);
-      border-radius: 16px; min-height: 340px;
+      background: var(--pdx-panel); border: 1px solid var(--pdx-line);
+      border-radius: var(--pdx-r); min-height: 340px;
       display: flex; align-items: center; justify-content: center;
+      transition: border-color .3s var(--pdx-ease);
     }
+    .pdx-visual:hover { border-color: var(--pdx-accent-line); }
+    /* Lueur qui suit le curseur : --mx/--my sont poses par le script. */
+    .pdx-visual::before {
+      content: ''; position: absolute; inset: 0; pointer-events: none;
+      background: radial-gradient(220px circle at var(--mx, 50%) var(--my, 50%), var(--pdx-accent-soft), transparent 65%);
+      opacity: 0; transition: opacity .35s var(--pdx-ease);
+    }
+    .pdx-visual:hover::before { opacity: 1; }
     .pdx-visual__bg {
       position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
       font-size: 132px; font-weight: 800; letter-spacing: -6px;
       color: rgba(255,255,255,.028); white-space: nowrap; pointer-events: none; user-select: none;
     }
-    .pdx-visual__icon { position: relative; font-size: 92px; line-height: 1; }
+    .pdx-visual__icon {
+      position: relative; font-size: 92px; line-height: 1;
+      animation: pdx-float 6s var(--pdx-ease) infinite;
+    }
     .pdx-visual__icon img { width: 128px; height: 128px; object-fit: contain; }
+    @keyframes pdx-float {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-11px); }
+    }
     .pdx-visual__pills { position: absolute; left: 18px; bottom: 18px; display: flex; gap: 8px; flex-wrap: wrap; }
 
     .pdx-buy {
       position: sticky; top: 88px;
-      background: rgba(255,255,255,.025); border: 1px solid rgba(255,255,255,.07);
-      border-radius: 16px; overflow: hidden;
+      background: var(--pdx-panel); border: 1px solid var(--pdx-line);
+      border-radius: var(--pdx-r); overflow: hidden;
     }
+    .pdx-buy__hdr {
+      display: flex; align-items: center; gap: 8px;
+      padding: 13px 20px; border-bottom: 1px solid var(--pdx-line);
+      background: linear-gradient(180deg, var(--pdx-accent-soft), transparent);
+      font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: #fff;
+    }
+    .pdx-buy__hdr svg { color: var(--pdx-accent); }
     .pdx-buy__price { padding: 20px 20px 16px; border-bottom: 1px solid rgba(255,255,255,.06); }
     .pdx-buy__lbl { font-size: 10.5px; font-weight: 700; letter-spacing: .10em; text-transform: uppercase; color: rgba(255,255,255,.35); margin-bottom: 6px; }
-    .pdx-buy__amount { font-size: 32px; font-weight: 700; color: #fff; letter-spacing: -1px; line-height: 1; }
+    .pdx-buy__amount { font-size: 32px; font-weight: 800; color: #fff; letter-spacing: -1px; line-height: 1; }
+    /* Le prix clignote brievement quand la quantite change : le changement de
+       chiffre passait sinon totalement inapercu. */
+    .pdx-bump { animation: pdx-bump .38s var(--pdx-ease); }
+    @keyframes pdx-bump {
+      0%   { transform: scale(1);    color: #fff; }
+      45%  { transform: scale(1.07); color: var(--pdx-accent); }
+      100% { transform: scale(1);    color: #fff; }
+    }
+
+    /* Reassurance sous le prix. */
+    .pdx-trust { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 14px 20px 0; }
+    .pdx-trust__item {
+      display: flex; align-items: center; gap: 7px;
+      padding: 8px 10px; border-radius: 9px;
+      background: rgba(255,255,255,.03); border: 1px solid var(--pdx-line);
+      font-size: 11px; color: rgba(255,255,255,.6);
+      transition: border-color .22s var(--pdx-ease), transform .22s var(--pdx-ease);
+    }
+    .pdx-trust__item:hover { border-color: var(--pdx-accent-line); transform: translateY(-1px); }
+    .pdx-trust__item svg { color: var(--pdx-accent); flex-shrink: 0; }
+
     .pdx-buy__body { padding: 16px 20px 20px; }
     .pdx-buy__sect { margin-bottom: 16px; }
     .pdx-buy__sect:last-child { margin-bottom: 0; }
 
     .pdx-line { display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: rgba(255,255,255,.50); padding: 5px 0; }
-    .pdx-line--total { color: #fff; font-size: 15px; font-weight: 700; padding-top: 11px; margin-top: 5px; border-top: 1px solid rgba(255,255,255,.07); }
+    .pdx-line--total { color: #fff; font-size: 15px; font-weight: 700; padding-top: 11px; margin-top: 5px; border-top: 1px solid var(--pdx-line); }
 
     /* Recapitulatif compact du produit choisi. */
     .pdx-mini { display: flex; align-items: center; gap: 11px; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.06); margin-bottom: 12px; }
     .pdx-mini__thumb {
-      width: 42px; height: 42px; border-radius: 9px; flex-shrink: 0;
-      background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.07);
+      width: 42px; height: 42px; border-radius: 10px; flex-shrink: 0;
+      background: rgba(255,255,255,.05); border: 1px solid var(--pdx-line);
       display: flex; align-items: center; justify-content: center; font-size: 20px;
     }
     .pdx-mini__thumb img { width: 100%; height: 100%; object-fit: contain; padding: 5px; }
@@ -89,14 +209,50 @@
     .pdx-mini__qty { font-size: 12px; color: rgba(255,255,255,.38); margin-top: 2px; }
     .pdx-mini__price { font-size: 14px; font-weight: 700; color: #fff; }
 
-    /* Sections d'information, en pleine largeur sous le bloc d'achat. */
+    /* Variantes et quantite : on repasse par-dessus les styles pdv3 de
+       style.css pour les aligner sur l'accent, sans toucher au fichier commun
+       (ces classes servent aussi ailleurs). */
+    .pdx-page .pdv3-variant { transition: border-color .22s var(--pdx-ease), background .22s var(--pdx-ease), transform .22s var(--pdx-ease); }
+    .pdx-page .pdv3-variant:hover { transform: translateY(-1px); border-color: var(--pdx-accent-line); }
+    .pdx-page .pdv3-variant--active { border-color: var(--pdx-accent-line); background: var(--pdx-accent-soft); }
+    .pdx-page .pdv3-qty-btn { transition: background .2s var(--pdx-ease), border-color .2s var(--pdx-ease), transform .12s var(--pdx-ease); }
+    .pdx-page .pdv3-qty-btn:hover { border-color: var(--pdx-accent-line); background: var(--pdx-accent-soft); }
+    .pdx-page .pdv3-qty-btn:active { transform: scale(.9); }
+
+    /* Bouton principal : bord d'accent + balayage lumineux au survol. */
+    .pdx-page .pdv3-btn-checkout {
+      position: relative; overflow: hidden;
+      border: 1px solid var(--pdx-accent-line);
+      background: linear-gradient(180deg, rgba(114,87,255,.22), rgba(114,87,255,.10));
+      transition: box-shadow .3s var(--pdx-ease), transform .18s var(--pdx-ease), border-color .3s var(--pdx-ease);
+    }
+    .pdx-page .pdv3-btn-checkout:hover:not(:disabled) {
+      transform: translateY(-2px);
+      border-color: var(--pdx-accent);
+      box-shadow: 0 10px 28px -8px var(--pdx-accent-glow);
+    }
+    .pdx-page .pdv3-btn-checkout:active:not(:disabled) { transform: translateY(0); }
+    .pdx-page .pdv3-btn-checkout::after {
+      content: ''; position: absolute; top: 0; bottom: 0; width: 40%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.16), transparent);
+      transform: translateX(-180%);
+    }
+    .pdx-page .pdv3-btn-checkout:hover:not(:disabled)::after { animation: pdx-shine .9s var(--pdx-ease); }
+    @keyframes pdx-shine { to { transform: translateX(320%); } }
+    .pdx-page .pdv3-btn-cart { transition: border-color .22s var(--pdx-ease), background .22s var(--pdx-ease), transform .18s var(--pdx-ease); }
+    .pdx-page .pdv3-btn-cart:hover:not(:disabled) { transform: translateY(-2px); border-color: var(--pdx-accent-line); }
+
+    /* ── Sections d'information ── */
     .pdx-sec { margin-bottom: 16px; }
     .pdx-sec__hdr { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
     .pdx-sec__title { font-size: 17px; font-weight: 700; color: #fff; }
+    .pdx-sec__sub { font-size: 12.5px; color: rgba(255,255,255,.35); }
     .pdx-card {
-      background: rgba(255,255,255,.025); border: 1px solid rgba(255,255,255,.07);
+      background: var(--pdx-panel); border: 1px solid var(--pdx-line);
       border-radius: 14px; padding: 22px 24px;
+      transition: border-color .28s var(--pdx-ease), background .28s var(--pdx-ease);
     }
+    .pdx-card--hover:hover { border-color: var(--pdx-accent-line); background: var(--pdx-panel-hi); }
     .pdx-card__text { font-size: 14px; line-height: 1.75; color: rgba(255,255,255,.58); }
 
     .pdx-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
@@ -105,23 +261,95 @@
       display: flex; align-items: flex-start; gap: 10px;
       padding: 10px 0; font-size: 13.5px; line-height: 1.6; color: rgba(255,255,255,.58);
       border-bottom: 1px solid rgba(255,255,255,.05);
+      transition: color .22s var(--pdx-ease), transform .22s var(--pdx-ease);
     }
+    .pdx-list li:hover { color: rgba(255,255,255,.85); transform: translateX(3px); }
     .pdx-list li:last-child { border-bottom: none; padding-bottom: 0; }
-    .pdx-list svg { flex-shrink: 0; margin-top: 2px; color: rgba(255,255,255,.40); }
+    .pdx-list svg { flex-shrink: 0; margin-top: 2px; color: var(--pdx-accent); }
 
-    /* Avis : trois colonnes, comme la grille de la page Avis. */
+    /* ── Points forts (pageGuarantees, editables dans l'admin) ── */
+    .pdx-feats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .pdx-feat {
+      background: var(--pdx-panel); border: 1px solid var(--pdx-line);
+      border-radius: 14px; padding: 18px 16px; text-align: center;
+      transition: border-color .28s var(--pdx-ease), transform .28s var(--pdx-ease), background .28s var(--pdx-ease);
+    }
+    .pdx-feat:hover { border-color: var(--pdx-accent-line); background: var(--pdx-panel-hi); transform: translateY(-4px); }
+    .pdx-feat__icon {
+      width: 38px; height: 38px; margin: 0 auto 11px; border-radius: 11px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--pdx-accent-soft); border: 1px solid var(--pdx-accent-line); color: var(--pdx-accent);
+      transition: transform .35s var(--pdx-ease);
+    }
+    .pdx-feat:hover .pdx-feat__icon { transform: scale(1.12) rotate(-6deg); }
+    .pdx-feat__title { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 3px; }
+    .pdx-feat__desc { font-size: 11.5px; color: rgba(255,255,255,.38); line-height: 1.5; }
+
+    /* ── Avis ── */
     #pdReviewsList { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
     #pdReviewsList .pd-review {
-      background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.06);
-      border-radius: 12px; padding: 16px; border-bottom: 1px solid rgba(255,255,255,.06);
+      background: var(--pdx-panel); border: 1px solid rgba(255,255,255,.06);
+      border-radius: 12px; padding: 16px;
+      transition: border-color .28s var(--pdx-ease), transform .28s var(--pdx-ease);
     }
+    #pdReviewsList .pd-review:hover { border-color: var(--pdx-accent-line); transform: translateY(-3px); }
+    .pdx-page .pd-rev-stars, .pdx-page .pd-review__stars { color: var(--pdx-star); }
 
-    .pdx-faq__q { font-size: 14.5px; font-weight: 600; color: #fff; margin-bottom: 6px; }
-    .pdx-faq__a { font-size: 13.5px; line-height: 1.7; color: rgba(255,255,255,.52); margin: 0 0 20px; }
-    .pdx-faq__a:last-child { margin-bottom: 0; }
+    /* ── Questions frequentes : accordeon ──
+       L'ouverture anime max-height. On aurait prefere grid-template-rows 0fr→1fr
+       (transition vers une hauteur inconnue, sans plafond a deviner), mais c'est
+       du Chrome 111+ / Safari 16+ : trop recent pour une boutique publique, et
+       sur un navigateur plus ancien le volet resterait clos. max-height est
+       supporte partout ; le plafond est large (les reponses tiennent en 2-3
+       lignes) et n'a d'effet que sur la duree, jamais sur la hauteur finale. */
+    .pdx-faq { display: flex; flex-direction: column; gap: 10px; }
+    .pdx-faq__item {
+      background: var(--pdx-panel); border: 1px solid var(--pdx-line);
+      border-radius: 13px; overflow: hidden;
+      transition: border-color .28s var(--pdx-ease), background .28s var(--pdx-ease);
+    }
+    .pdx-faq__item:hover { border-color: rgba(255,255,255,.14); }
+    .pdx-faq__item.open { border-color: var(--pdx-accent-line); background: var(--pdx-panel-hi); }
+    .pdx-faq__q {
+      display: flex; align-items: center; justify-content: space-between; gap: 14px; width: 100%;
+      padding: 16px 20px; background: none; border: none; cursor: pointer; text-align: left;
+      font-size: 14.5px; font-weight: 600; color: #fff; font-family: inherit;
+      transition: color .2s var(--pdx-ease);
+    }
+    .pdx-faq__chev { flex-shrink: 0; color: rgba(255,255,255,.4); transition: transform .3s var(--pdx-ease), color .3s var(--pdx-ease); }
+    .pdx-faq__item.open .pdx-faq__chev { transform: rotate(180deg); color: var(--pdx-accent); }
+    .pdx-faq__wrap { max-height: 0; overflow: hidden; transition: max-height .34s var(--pdx-ease); }
+    .pdx-faq__item.open .pdx-faq__wrap { max-height: 340px; }
+    .pdx-faq__a { font-size: 13.5px; line-height: 1.75; color: rgba(255,255,255,.52); margin: 0; padding: 0 20px 17px; }
 
-    .pdx-back { display: inline-flex; align-items: center; gap: 7px; margin-top: 26px; font-size: 13.5px; color: rgba(255,255,255,.45); }
-    .pdx-back:hover { color: #fff; }
+    /* ── Produits similaires ── */
+    .pdx-rel { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .pdx-rel__card {
+      display: flex; flex-direction: column; gap: 10px;
+      background: var(--pdx-panel); border: 1px solid var(--pdx-line);
+      border-radius: 14px; padding: 16px;
+      transition: border-color .28s var(--pdx-ease), transform .28s var(--pdx-ease), background .28s var(--pdx-ease);
+    }
+    .pdx-rel__card:hover { border-color: var(--pdx-accent-line); background: var(--pdx-panel-hi); transform: translateY(-4px); }
+    .pdx-rel__thumb {
+      width: 46px; height: 46px; border-radius: 11px; font-size: 23px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(255,255,255,.04); border: 1px solid var(--pdx-line);
+      transition: transform .35s var(--pdx-ease);
+    }
+    .pdx-rel__thumb img { width: 100%; height: 100%; object-fit: contain; padding: 5px; }
+    .pdx-rel__card:hover .pdx-rel__thumb { transform: scale(1.08); }
+    .pdx-rel__name { font-size: 13.5px; font-weight: 600; color: #fff; }
+    .pdx-rel__price { font-size: 13px; font-weight: 700; color: var(--pdx-accent); margin-top: auto; }
+    .pdx-rel__go { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; color: rgba(255,255,255,.35); transition: gap .22s var(--pdx-ease), color .22s var(--pdx-ease); }
+    .pdx-rel__card:hover .pdx-rel__go { gap: 9px; color: rgba(255,255,255,.7); }
+
+    .pdx-back {
+      display: inline-flex; align-items: center; gap: 7px; margin-top: 26px;
+      font-size: 13.5px; color: rgba(255,255,255,.45);
+      transition: color .2s var(--pdx-ease), gap .2s var(--pdx-ease);
+    }
+    .pdx-back:hover { color: #fff; gap: 11px; }
 
     @media (max-width: 1023px) {
       .pdx-page { padding: 92px 18px 64px; }
@@ -129,12 +357,32 @@
       .pdx-buy { position: static; }
       .pdx-cols { grid-template-columns: 1fr; }
       #pdReviewsList { grid-template-columns: 1fr; }
+      .pdx-feats, .pdx-rel { grid-template-columns: 1fr 1fr; }
       .pdx-head { flex-direction: column; }
       .pdx-head__name { font-size: 24px; }
       .pdx-visual { min-height: 240px; }
       .pdx-visual__bg { font-size: 82px; }
     }
+    @media (max-width: 560px) {
+      .pdx-feats, .pdx-rel, .pdx-trust { grid-template-columns: 1fr; }
+    }
+
+    /* Accessibilite : quand le systeme demande moins de mouvement, on coupe
+       tout. Les etats restent lisibles, seul le deplacement disparait. */
+    @media (prefers-reduced-motion: reduce) {
+      .pdx-page *, .pdx-page *::before, .pdx-page *::after {
+        animation: none !important;
+        transition-duration: .01ms !important;
+      }
+      .pdx-js .pdx-rise { opacity: 1 !important; transform: none !important; }
+    }
   </style>
+  <!-- Pose le drapeau AVANT le premier rendu. Ajoute en fin de page, il aurait
+       masque des elements deja peints : on aurait vu la page apparaitre, puis
+       disparaitre, puis revenir. Si IntersectionObserver manque, le drapeau
+       n'est jamais pose et .pdx-rise reste sans effet — le contenu s'affiche
+       normalement, sans animation. -->
+  <script>if ('IntersectionObserver' in window) document.documentElement.className += ' pdx-js';</script>
 </head>
 <body>
 
@@ -195,11 +443,11 @@
     </div>
 
     <!-- En-tete -->
-    <div class="pdx-head">
+    <div class="pdx-head pdx-rise">
       <div class="pdx-head__left">
-        <h1 class="pdx-head__name" id="pdName">Loading…</h1>
+        <h1 class="pdx-head__name pdx-display" id="pdName">Loading…</h1>
         <div class="pdx-head__meta">
-          <span class="pdx-tag" id="pdRating" style="display:none;"></span>
+          <span class="pdx-tag pdx-tag--rating" id="pdRating" style="display:none;"></span>
           <span class="pdx-tag" id="pdHeroCatPill">Digital</span>
           <span class="pdx-tag">Instant delivery</span>
         </div>
@@ -210,7 +458,7 @@
     <!-- Visuel + achat -->
     <div class="pdx-top">
 
-      <div class="pdx-visual">
+      <div class="pdx-visual pdx-rise" id="pdVisual">
         <div class="pdx-visual__bg" id="pdHeroBgText"></div>
         <div class="pdx-visual__icon" id="pdHeroIcon">📦</div>
         <div class="pdx-visual__pills">
@@ -221,10 +469,26 @@
         </div>
       </div>
 
-      <aside class="pdx-buy">
+      <aside class="pdx-buy pdx-rise" style="--d:90ms;">
+        <div class="pdx-buy__hdr">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          Fast checkout
+        </div>
+
         <div class="pdx-buy__price">
           <div class="pdx-buy__lbl">Per each</div>
           <div class="pdx-buy__amount" id="pdPrice">—</div>
+        </div>
+
+        <div class="pdx-trust">
+          <div class="pdx-trust__item">
+            <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            Instant delivery
+          </div>
+          <div class="pdx-trust__item">
+            <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            Secure payment
+          </div>
         </div>
 
         <div class="pdx-buy__body">
@@ -275,18 +539,27 @@
     </div>
 
     <!-- Description -->
-    <section class="pdx-sec">
+    <section class="pdx-sec pdx-rise">
       <div class="pdx-sec__hdr"><span class="pdx-sec__title">About this product</span></div>
-      <div class="pdx-card"><div class="pdx-card__text" id="pdDesc">—</div></div>
+      <div class="pdx-card pdx-card--hover"><div class="pdx-card__text" id="pdDesc">—</div></div>
+    </section>
+
+    <!-- Points forts : alimente par pageGuarantees (modifiable dans l'admin) -->
+    <section class="pdx-sec pdx-rise" id="pdFeatSec" style="display:none;">
+      <div class="pdx-sec__hdr">
+        <span class="pdx-sec__title">Key features</span>
+        <span class="pdx-sec__sub">What's included with every order</span>
+      </div>
+      <div class="pdx-feats" id="pdFeatGrid"></div>
     </section>
 
     <!-- Deux colonnes : details produit / engagements -->
-    <div class="pdx-cols">
-      <section class="pdx-card">
+    <div class="pdx-cols pdx-rise">
+      <section class="pdx-card pdx-card--hover">
         <div class="pdx-sec__hdr"><span class="pdx-sec__title">Product details</span></div>
         <div id="pdSpecsLeft"></div>
       </section>
-      <section class="pdx-card">
+      <section class="pdx-card pdx-card--hover">
         <div class="pdx-sec__hdr"><span class="pdx-sec__title">What you get</span></div>
         <ul class="pdx-list">
           <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>Delivered to your email the moment the payment clears.</span></li>
@@ -298,7 +571,7 @@
     </div>
 
     <!-- Avis -->
-    <section class="pdx-sec">
+    <section class="pdx-sec pdx-rise">
       <div class="pdx-sec__hdr">
         <span class="pdx-sec__title">Customer reviews</span>
         <div id="pdReviewsSummary" class="pd-rev-summary" style="display:none;">
@@ -312,19 +585,61 @@
       </div>
     </section>
 
-    <!-- Questions frequentes -->
-    <section class="pdx-sec">
+    <!-- Questions frequentes : accordeon, premiere reponse ouverte -->
+    <section class="pdx-sec pdx-rise">
       <div class="pdx-sec__hdr"><span class="pdx-sec__title">Common questions</span></div>
-      <div class="pdx-card">
-        <div class="pdx-faq__q">How fast is delivery?</div>
-        <p class="pdx-faq__a">Seconds, in most cases. If your payment is still confirming on the network it can take a few minutes — the checkout page keeps you posted.</p>
-        <div class="pdx-faq__q">Where do I find what I bought?</div>
-        <p class="pdx-faq__a">Sign in with the email you ordered with and open the order. Everything we sent stays there, so you can come back to it later.</p>
-        <div class="pdx-faq__q">What if it stops working?</div>
-        <p class="pdx-faq__a">Open a ticket on our Discord with your order number. If it failed inside the period you paid for and nothing was changed on the account, we replace it.</p>
-        <div class="pdx-faq__q">Can I change the password?</div>
-        <p class="pdx-faq__a">No. Changing it breaks the account and voids the replacement — leave it exactly as delivered.</p>
+      <div class="pdx-faq" id="pdFaq">
+
+        <div class="pdx-faq__item open">
+          <button type="button" class="pdx-faq__q" aria-expanded="true">
+            How fast is delivery?
+            <svg class="pdx-faq__chev" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="pdx-faq__wrap"><div class="pdx-faq__inner">
+            <p class="pdx-faq__a">Seconds, in most cases. If your payment is still confirming on the network it can take a few minutes — the checkout page keeps you posted.</p>
+          </div></div>
+        </div>
+
+        <div class="pdx-faq__item">
+          <button type="button" class="pdx-faq__q" aria-expanded="false">
+            Where do I find what I bought?
+            <svg class="pdx-faq__chev" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="pdx-faq__wrap"><div class="pdx-faq__inner">
+            <p class="pdx-faq__a">Sign in with the email you ordered with and open the order. Everything we sent stays there, so you can come back to it later.</p>
+          </div></div>
+        </div>
+
+        <div class="pdx-faq__item">
+          <button type="button" class="pdx-faq__q" aria-expanded="false">
+            What if it stops working?
+            <svg class="pdx-faq__chev" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="pdx-faq__wrap"><div class="pdx-faq__inner">
+            <p class="pdx-faq__a">Open a ticket on our Discord with your order number. If it failed inside the period you paid for and nothing was changed on the account, we replace it.</p>
+          </div></div>
+        </div>
+
+        <div class="pdx-faq__item">
+          <button type="button" class="pdx-faq__q" aria-expanded="false">
+            Can I change the password?
+            <svg class="pdx-faq__chev" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="pdx-faq__wrap"><div class="pdx-faq__inner">
+            <p class="pdx-faq__a">No. Changing it breaks the account and voids the replacement — leave it exactly as delivered.</p>
+          </div></div>
+        </div>
+
       </div>
+    </section>
+
+    <!-- Produits similaires : meme categorie, sinon les plus recents -->
+    <section class="pdx-sec pdx-rise" id="pdRelSec" style="display:none;">
+      <div class="pdx-sec__hdr">
+        <span class="pdx-sec__title">You may also like</span>
+        <span class="pdx-sec__sub">Other products from the shop</span>
+      </div>
+      <div class="pdx-rel" id="pdRelated"></div>
     </section>
 
     <a href="/products" class="pdx-back">
@@ -453,12 +768,18 @@
 
     /* ── Hero ── */
     if (p.image) {
-      /* Custom image → replace the default hero entirely */
-      var heroEl = document.querySelector('.pdv3-hero');
-      heroEl.style.background = 'url(' + p.image + ') center/cover no-repeat';
-      heroEl.classList.add('pdv3-hero--img');
-      document.getElementById('pdHeroBgText').style.display = 'none';
-      document.getElementById('pdHeroIcon').style.display = 'none';
+      /* Image personnalisee → elle remplace tout le visuel.
+         Le selecteur visait « .pdv3-hero », un element supprime lors de la
+         refonte de la mise en page : querySelector renvoyait null et la ligne
+         suivante levait une TypeError qui interrompait TOUT le script. Resultat,
+         un produit avec image n'affichait ni prix, ni stock, ni bouton d'achat.
+         On vise donc l'element reel, et on verifie sa presence. */
+      var heroEl = document.getElementById('pdVisual');
+      if (heroEl) {
+        heroEl.style.background = 'url(' + p.image + ') center/cover no-repeat';
+        document.getElementById('pdHeroBgText').style.display = 'none';
+        document.getElementById('pdHeroIcon').style.display = 'none';
+      }
     } else {
       document.getElementById('pdHeroBgText').textContent = p.name;
       document.getElementById('pdHeroIcon').textContent = p.icon || '📦';
@@ -639,18 +960,20 @@
       { icon: 'chat',    title: '24/7 Support',     desc: 'Via Discord' },
       { icon: 'refresh', title: 'Replacement',      desc: 'If invalid' }
     ];
-    var pdGuaranteeGrid = document.getElementById('pdGuaranteeGrid');
-    if (pdGuaranteeGrid && guarantees.length) {
-      pdGuaranteeGrid.innerHTML = guarantees.map(function(g) {
-        return '<div class="pdv3-gcard">' +
-          '<div class="pdv3-gcard__icon">' + (GUARANTEE_ICONS[g.icon] || GUARANTEE_ICONS.check) + '</div>' +
-          '<div class="pdv3-gcard__title">' + esc(g.title || '') + '</div>' +
-          '<div class="pdv3-gcard__desc">' + esc(g.desc || '') + '</div>' +
+    /* Ces engagements n'etaient plus affiches : leur conteneur avait disparu de
+       la page a la refonte precedente, alors qu'ils restaient modifiables dans
+       l'admin. Ils alimentent desormais la bande « Key features ». */
+    var pdFeatGrid = document.getElementById('pdFeatGrid');
+    var pdFeatSec  = document.getElementById('pdFeatSec');
+    if (pdFeatGrid && guarantees.length) {
+      pdFeatGrid.innerHTML = guarantees.map(function(g, i) {
+        return '<div class="pdx-feat" style="--d:' + (i * 70) + 'ms;">' +
+          '<div class="pdx-feat__icon">' + (GUARANTEE_ICONS[g.icon] || GUARANTEE_ICONS.check) + '</div>' +
+          '<div class="pdx-feat__title">' + esc(g.title || '') + '</div>' +
+          '<div class="pdx-feat__desc">' + esc(g.desc || '') + '</div>' +
         '</div>';
       }).join('');
-    } else {
-      var pdGuaranteeCol = document.getElementById('pdGuaranteeCol');
-      if (pdGuaranteeCol) pdGuaranteeCol.style.display = 'none';
+      if (pdFeatSec) pdFeatSec.style.display = '';
     }
 
     /* ── Sidebar product thumb ── */
@@ -716,6 +1039,21 @@
       if (pdVolFill) pdVolFill.style.width = fill + '%';
       var pdVolHint = document.getElementById('pdVolHint');
       if (pdVolHint) pdVolHint.textContent = hint;
+
+      /* Le total change sans que rien ne le signale : on le fait pulser une
+         fois. Jamais au premier rendu, sinon la page s'anime toute seule. */
+      if (updateSummary._ready) bump(document.getElementById('pdTotal'));
+      updateSummary._ready = true;
+    }
+
+    /* Relance l'animation : retirer la classe ne suffit pas, le navigateur ne
+       rejoue un keyframe que si la valeur change entre deux calculs de style —
+       d'où la lecture de offsetWidth qui force ce recalcul. */
+    function bump(el) {
+      if (!el) return;
+      el.classList.remove('pdx-bump');
+      void el.offsetWidth;
+      el.classList.add('pdx-bump');
     }
 
     /* ── Variant pills ── */
@@ -816,6 +1154,38 @@
       }).join('');
     }
 
+    /* ── Produits similaires ──
+       Meme categorie en priorite ; si elle ne contient rien d'autre, on comble
+       avec le reste de la boutique pour ne pas afficher une bande vide. */
+    (function renderRelated() {
+      var grid = document.getElementById('pdRelated');
+      var sec  = document.getElementById('pdRelSec');
+      if (!grid || !sec) return;
+
+      var others = allProds.filter(function(x) {
+        return x && x.id !== pid && String(x.visibility || 'public') !== 'hidden';
+      });
+      var sameCat = others.filter(function(x) { return (x.category || 'other') === catKey; });
+      var rest    = others.filter(function(x) { return sameCat.indexOf(x) < 0; });
+      var picks   = sameCat.concat(rest).slice(0, 4);
+      if (!picks.length) return;
+
+      grid.innerHTML = picks.map(function(x, i) {
+        var thumb = x.image
+          ? '<img src="' + esc(x.image) + '" alt="" loading="lazy">'
+          : (x.icon || '📦');
+        return '<a class="pdx-rel__card" style="--d:' + (i * 70) + 'ms;" href="/products-' + encodeURIComponent(slugify(x.name)) + '">' +
+          '<div class="pdx-rel__thumb">' + thumb + '</div>' +
+          '<div class="pdx-rel__name">' + esc(x.name || '') + '</div>' +
+          '<div class="pdx-rel__price">' + sym + Number(x.price || 0).toFixed(2) + '</div>' +
+          '<span class="pdx-rel__go">View product' +
+            '<svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>' +
+          '</span>' +
+        '</a>';
+      }).join('');
+      sec.style.display = '';
+    })();
+
     /* ── Apply site name ── */
     try {
       var c = JSON.parse(localStorage.getItem('nexus_content')) || {};
@@ -824,13 +1194,69 @@
 
   })();
 
-  /* ── FAQ toggle ── */
-  function toggleFaq(btn) {
-    var item = btn.parentElement;
-    var wasOpen = item.classList.contains('open');
-    document.querySelectorAll('.pdv3-faq-item.open').forEach(function(el) { el.classList.remove('open'); });
-    if (!wasOpen) item.classList.add('open');
-  }
+  /* ══ Animations de la page produit ═══════════════════════════════════════
+     Tout est ici plutot que dispersé : ce bloc ne fait que de la presentation,
+     il ne touche ni au prix, ni au panier, ni au stock. Chaque effet se coupe
+     de lui-meme si le navigateur ne sait pas le faire — la page reste lisible
+     sans aucune animation. */
+  (function () {
+    var page = document.querySelector('.pdx-page');
+    if (!page) return;
+
+    /* ── Accordeon ──
+       Un seul volet ouvert a la fois. On reclique sur l'ouvert pour le fermer. */
+    var faq = document.getElementById('pdFaq');
+    if (faq) {
+      faq.addEventListener('click', function (e) {
+        var btn = e.target.closest('.pdx-faq__q');
+        if (!btn) return;
+        var item = btn.parentElement;
+        var wasOpen = item.classList.contains('open');
+        faq.querySelectorAll('.pdx-faq__item').forEach(function (el) {
+          el.classList.remove('open');
+          var b = el.querySelector('.pdx-faq__q');
+          if (b) b.setAttribute('aria-expanded', 'false');
+        });
+        if (!wasOpen) { item.classList.add('open'); btn.setAttribute('aria-expanded', 'true'); }
+      });
+    }
+
+    /* ── Lueur suivant le curseur sur le visuel ──
+       On repasse les coordonnees en pourcentage a la CSS ; aucun style n'est
+       calcule ici, le degrade est entierement decrit dans la feuille de style. */
+    var visual = document.getElementById('pdVisual');
+    if (visual && window.matchMedia && window.matchMedia('(hover: hover)').matches) {
+      visual.addEventListener('pointermove', function (e) {
+        var r = visual.getBoundingClientRect();
+        visual.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100) + '%');
+        visual.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100) + '%');
+      });
+    }
+
+    /* ── Revelation au defilement ──
+       .pdx-js n'est ajoute QUE si l'observateur existe : sans lui, la regle qui
+       masque .pdx-rise ne s'applique jamais et le contenu reste visible. C'est
+       ce qui evite la page blanche sur un navigateur ancien. */
+    if (!('IntersectionObserver' in window)) return;   /* drapeau pose dans <head> */
+
+    var targets = page.querySelectorAll('.pdx-rise');
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        en.target.classList.add('is-in');
+        io.unobserve(en.target);        /* une seule fois : pas de va-et-vient */
+
+        /* Les enfants d'une grille arrivent en cascade. */
+        en.target.querySelectorAll('.pdx-feat, .pdx-rel__card').forEach(function (child, i) {
+          child.classList.add('pdx-rise');
+          child.style.setProperty('--d', (i * 70) + 'ms');
+          requestAnimationFrame(function () { child.classList.add('is-in'); });
+        });
+      });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: .08 });
+
+    targets.forEach(function (el) { io.observe(el); });
+  })();
   </script>
 
   <script src="assets/account-menu.js?v=1" defer></script>
