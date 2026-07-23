@@ -21,9 +21,20 @@ npm run build:admin
 
 Génère le dossier `admin/`, puis commitez et poussez : **c'est tout**.
 
-La racine du sous-domaine `admin.flashshp.fr` est `public_html/admin`, et
-l'auto-deploy git dépose le dépôt dans `public_html`. Le dossier `admin/` du
-dépôt atterrit donc exactement au bon endroit — aucun téléversement manuel.
+### Comment la publication se fait réellement
+
+Hostinger déploie le dépôt dans `<domaine>/nodejs/`, alors qu'un sous-domaine ne
+peut servir **que** depuis `<domaine>/public_html/…` — le champ du dossier est
+verrouillé sur ce préfixe dans le hPanel. Le dossier `admin/` du dépôt n'atterrit
+donc jamais là où `admin.flashshp.fr` le cherche.
+
+C'est l'application qui comble l'écart : au démarrage, `api/_publish-admin.js`
+recopie `admin/` vers `public_html/admin`. Comme l'application redémarre à chaque
+déploiement, le panneau publié suit automatiquement chaque push.
+
+La copie n'écrit que dans `public_html/admin`, ne supprime jamais rien d'autre,
+et toute erreur est journalisée sans empêcher le serveur de démarrer. Pour la
+désactiver : `PUBLISH_ADMIN=0`.
 
 Le dossier est versionné mais **généré** : ne l'éditez jamais à la main, vos
 modifications seraient écrasées au prochain build. La source reste `admin.html`

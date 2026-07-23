@@ -1,0 +1,61 @@
+/* FlashShp — Publication du panneau admin vers le sous-domaine, au démarrage.
+   =========================================================================
+   Appelé une fois par server.js au boot. Copie le dossier « admin/ » du dépôt
+   vers la racine du sous-domaine admin.flashshp.fr.
+
+   Pourquoi ce détour plutôt qu'un simple déploiement git :
+   Hostinger déploie le dépôt dans « <domaine>/nodejs/ », alors qu'un
+   sous-domaine ne peut servir QUE depuis « <domaine>/public_html/… » — le
+   panneau hPanel verrouille le champ du dossier à ce préfixe. Le dossier
+   admin/ du dépôt n'atterrit donc jamais là où le sous-domaine le cherche.
+   L'application, elle, redémarre à chaque déploiement : c'est le seul moment
+   automatique où l'on peut recopier les fichiers au bon endroit.
+
+   Sécurité : on n'écrit QUE dans public_html/admin, uniquement les fichiers
+   présents dans admin/, et on ne supprime jamais rien d'autre. Toute erreur est
+   journalisée sans interrompre le démarrage du serveur : mieux vaut une
+   boutique en ligne avec un panneau périmé qu'un site entièrement à terre.
+
+   Désactivation : PUBLISH_ADMIN=0 (utile en local, où le chemin n'existe pas). */
+
+var fs = require('fs');
+var path = require('path');
+
+/* Depuis <domaine>/nodejs/, la cible est ../public_html/admin. */
+function targetDir(appRoot) {
+  return path.join(appRoot, '..', 'public_html', 'admin');
+}
+
+function copyDir(src, dest) {
+  fs.mkdirSync(dest, { recursive: true });
+  var copied = 0;
+  fs.readdirSync(src, { withFileTypes: true }).forEach(function (entry) {
+    var from = path.join(src, entry.name);
+    var to = path.join(dest, entry.name);
+    if (entry.isDirectory()) copied += copyDir(from, to);
+    else if (entry.isFile()) { fs.copyFileSync(from, to); copied++; }
+  });
+  return copied;
+}
+
+function publish(appRoot) {
+  if (String(process.env.PUBLISH_ADMIN || '') === '0') return;
+
+  var src = path.join(appRoot, 'admin');
+  if (!fs.existsSync(src)) return;                 /* rien à publier */
+
+  var dest = targetDir(appRoot);
+  var parent = path.dirname(dest);
+  /* public_html absent = on n'est pas sur cet hébergement (dev local) : on sort
+     sans bruit plutôt que de créer une arborescence parasite. */
+  if (!fs.existsSync(parent)) return;
+
+  try {
+    var n = copyDir(src, dest);
+    console.log('[FlashShp] panneau admin publié : ' + n + ' fichier(s) → ' + dest);
+  } catch (e) {
+    console.error('[FlashShp] publication du panneau admin échouée :', e && e.message);
+  }
+}
+
+module.exports = { publish: publish };

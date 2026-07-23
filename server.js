@@ -140,6 +140,11 @@ app.use(function (req, res) {
   res.status(404).send('Not found');
 });
 
+/* Publie le panneau admin vers le sous-domaine (voir api/_publish-admin.js pour
+   la raison de ce détour). Best-effort : n'empêche jamais le démarrage. */
+try { require('./api/_publish-admin.js').publish(__dirname); }
+catch (e) { console.error('[FlashShp] publish admin skipped:', e && e.message); }
+
 var PORT = process.env.PORT || 3000;
 app.listen(PORT, function () {
   console.log('[FlashShp] serveur démarré sur le port ' + PORT);
