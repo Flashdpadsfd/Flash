@@ -930,14 +930,12 @@ body.nx-no-entrance .product-card { animation: none !important; }
 .cart-overlay.open { display: block; }
 
 /* ── Panneau panier ──
-   Teinte violette et fond bleu nuit : le panier se distingue du reste du site,
-   volontairement plus sombre et neutre. */
-:root { --cart-accent: #6d4aff; }
-
+   Monochrome, comme tout le reste du site : fond #09090b et accents blancs.
+   Aucune couleur d'accent propre au panier — elle jurerait avec la charte. */
 .cart-panel {
   position: fixed; top: 0; right: 0; bottom: 0; z-index: 301;
   width: 390px; max-width: 100vw;
-  background: #0d0d1c;
+  background: #09090b;
   border-left: 1px solid rgba(255,255,255,.07);
   box-shadow: -24px 0 60px rgba(0,0,0,.55);
   transform: translateX(100%); transition: transform 320ms cubic-bezier(.16,1,.3,1);
@@ -952,7 +950,7 @@ body.nx-no-entrance .product-card { animation: none !important; }
   flex-shrink: 0;
 }
 .cart-panel__heading { display: flex; align-items: center; gap: 9px; min-width: 0; }
-.cart-panel__heading-icon { display: flex; color: var(--cart-accent); flex-shrink: 0; }
+.cart-panel__heading-icon { display: flex; color: rgba(255,255,255,.85); flex-shrink: 0; }
 .cart-panel__title { font-size: 16px; font-weight: 700; }
 .cart-panel__count { font-size: 13px; color: rgba(255,255,255,.35); margin-left: 2px; }
 
@@ -975,16 +973,18 @@ body.nx-no-entrance .product-card { animation: none !important; }
   position: relative;
   width: 112px; height: 112px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  background: rgba(109,74,255,.13);
-  color: var(--cart-accent);
+  background: rgba(255,255,255,.045);
+  border: 1px solid rgba(255,255,255,.07);
+  color: rgba(255,255,255,.30);
   margin-bottom: 26px;
 }
 .cart-panel__empty-dot {
-  position: absolute; top: 12px; right: 10px;
+  position: absolute; top: 10px; right: 8px;
   width: 26px; height: 26px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  background: rgba(109,74,255,.30);
-  color: #cdbcff;
+  background: rgba(255,255,255,.09);
+  border: 1px solid rgba(255,255,255,.06);
+  color: rgba(255,255,255,.55);
 }
 .cart-panel__empty-title {
   font-size: 17px; font-weight: 700; color: #fff;
@@ -994,14 +994,16 @@ body.nx-no-entrance .product-card { animation: none !important; }
   font-size: 13.5px; color: rgba(255,255,255,.45);
   line-height: 1.55; margin-bottom: 26px;
 }
+/* Mêmes codes que .btn-primary du site : blanc sur noir. */
 .cart-panel__empty-cta {
-  display: flex; align-items: center; justify-content: center;
-  width: 100%; height: 48px; border-radius: 10px;
-  background: var(--cart-accent); color: #fff;
-  font-size: 14.5px; font-weight: 600; text-decoration: none;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  width: 100%; height: 46px; border-radius: 8px;
+  background: #fff; color: #000;
+  font-size: 14px; font-weight: 600; text-decoration: none;
+  box-shadow: 0 1px 3px rgba(0,0,0,.10), 0 1px 2px -1px rgba(0,0,0,.10);
   transition: background 180ms ease, transform 140ms ease;
 }
-.cart-panel__empty-cta:hover  { background: #7d5cff; }
+.cart-panel__empty-cta:hover  { background: #f0f0f0; }
 .cart-panel__empty-cta:active { transform: scale(.985); }
 
 .cart-item {
@@ -1050,16 +1052,15 @@ body.nx-no-entrance .product-card { animation: none !important; }
 .cart-panel__subtotal-label { font-size: 13px; color: rgba(255,255,255,.50); }
 .cart-panel__subtotal-value { font-size: 18px; font-weight: 700; }
 .cart-panel__checkout {
-  width: 100%; height: 46px; border-radius: 10px;
-  /* Même violet que « Browse Store » : les deux boutons ont le même rôle
-     (sortir du panier vers l'achat), ils doivent se ressembler. */
-  background: var(--cart-accent); color: #fff;
-  font-family: Inter, sans-serif; font-size: 14.5px; font-weight: 600;
+  width: 100%; height: 46px; border-radius: 8px;
+  /* Identique au bouton de l'état vide : même rôle, même apparence. */
+  background: #fff; color: #000;
+  font-family: Inter, sans-serif; font-size: 14px; font-weight: 600;
   display: flex; align-items: center; justify-content: center; gap: 8px;
   border: none; cursor: pointer;
   transition: background 200ms ease, transform 150ms ease;
 }
-.cart-panel__checkout:hover { background: #7d5cff; }
+.cart-panel__checkout:hover { background: #f0f0f0; }
 .cart-panel__checkout:active { transform: scale(.98); }
 .cart-panel__clear {
   margin-top: 8px; width: 100%; text-align: center;

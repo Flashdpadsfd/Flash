@@ -519,9 +519,9 @@ window.NX_ICONS = function (name) {
                 '<path d="M12 5v14M19 12l-7 7-7-7"/></svg>' +
             '</span>' +
           '</div>' +
-          '<div class="cart-panel__empty-title">Looks like it\'s empty here.</div>' +
-          '<div class="cart-panel__empty-sub">Explore our catalog and find what you need</div>' +
-          '<a class="cart-panel__empty-cta" href="/products">Browse Store</a>' +
+          '<div class="cart-panel__empty-title">Nothing in here yet.</div>' +
+          '<div class="cart-panel__empty-sub">Add something from the store and it\'ll show up right here.</div>' +
+          '<a class="cart-panel__empty-cta" href="/products">Explore Products</a>' +
         '</div>';
       if (foot) foot.innerHTML = '';
       return;
