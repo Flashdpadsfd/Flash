@@ -2,6 +2,78 @@
 (function () {
   'use strict';
 
+  /* ══ Liaison avec la boutique ══════════════════════════════════════════
+     Le panneau est hébergé sur son propre domaine (admin.flashshp.fr). Il doit
+     donc viser explicitement l'API de la boutique : une URL « /api/… » relative
+     taperait sur le domaine admin, où il n'y a pas de serveur.
+     NEXUS_API_BASE est défini dans admin.html ; vide = même origine (dev). */
+  var NX_API = (window.NEXUS_API_BASE || '').replace(/\/+$/, '');
+
+  /* Secret admin déjà saisi, sans jamais ouvrir de fenêtre : les sauvegardes
+     partent en arrière-plan, un prompt surgissant en plein travail serait
+     insupportable. Sans secret, on n'écrit qu'en local (voir nxSave). */
+  function nxSecret() {
+    try { return localStorage.getItem('nexus_sa_secret') || ''; } catch (e) { return ''; }
+  }
+
+  var _nxWarned = false;
+
+  /* Écrit une clé de contenu : en local (lecture immédiate par le panneau) ET
+     sur le serveur (source commune à la boutique et à tous les navigateurs).
+     Avant, tout restait dans le localStorage de CE navigateur : les visiteurs
+     ne voyaient jamais les modifications. */
+  function nxSave(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) { /* quota */ }
+
+    var secret = nxSecret();
+    if (!secret) {
+      if (!_nxWarned) {
+        _nxWarned = true;
+        try { toast('Secret admin absent : modification enregistrée localement seulement.'); } catch (e) {}
+      }
+      return;
+    }
+
+    fetch(NX_API + '/api/content', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'x-admin-secret': secret },
+      body: JSON.stringify({ key: key, value: value })
+    }).then(function (r) {
+      if (r.ok) return;
+      if (r.status === 401) {
+        try { localStorage.removeItem('nexus_sa_secret'); } catch (e) {}
+        try { toast('Secret admin refusé — modification non publiée.'); } catch (e) {}
+      } else {
+        try { toast('Publication échouée (' + r.status + ') — enregistré en local.'); } catch (e) {}
+      }
+    }).catch(function () {
+      try { toast('Serveur injoignable — modification enregistrée en local.'); } catch (e) {}
+    });
+  }
+
+  /* Au démarrage : on récupère le contenu publié pour repartir de l'état réel
+     du serveur, et non de ce que ce navigateur avait en mémoire. */
+  function nxPullContent(done) {
+    var secret = nxSecret();
+    var url = NX_API + '/api/content' + (secret ? '?scope=admin' : '');
+    var headers = { 'Accept': 'application/json' };
+    if (secret) headers['x-admin-secret'] = secret;
+
+    fetch(url, { headers: headers })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (data) {
+        if (data && data.ok && data.content) {
+          Object.keys(data.content).forEach(function (k) {
+            var v = data.content[k];
+            if (v === null || v === undefined) return;   /* jamais publiée */
+            try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {}
+          });
+        }
+      })
+      .catch(function () { /* hors-ligne : on travaille sur la copie locale */ })
+      .then(function () { if (typeof done === 'function') done(); });
+  }
+
   /* ─── Inline SVG icons (Lucide) for empty states ─── */
   function AICON(name) {
     var P = {
@@ -96,21 +168,21 @@
   function getProducts() {
     try { return JSON.parse(localStorage.getItem('nexus_products')) || DEFAULT_PRODUCTS; } catch(e) { return DEFAULT_PRODUCTS; }
   }
-  function setProducts(p) { localStorage.setItem('nexus_products', JSON.stringify(p)); }
+  function setProducts(p) { nxSave('nexus_products', p); }
   function getStats() {
     try { return JSON.parse(localStorage.getItem('nexus_stats')) || DEFAULT_STATS; } catch(e) { return DEFAULT_STATS; }
   }
-  function setStats(s) { localStorage.setItem('nexus_stats', JSON.stringify(s)); }
+  function setStats(s) { nxSave('nexus_stats', s); }
   function getPass() { return localStorage.getItem('nexus_admin_pass') || DEFAULT_PASS; }
   function setPass(p) { localStorage.setItem('nexus_admin_pass', p); }
   function getLinks() {
     try { return JSON.parse(localStorage.getItem('nexus_links')) || {}; } catch(e) { return {}; }
   }
-  function setLinks(l) { localStorage.setItem('nexus_links', JSON.stringify(l)); }
+  function setLinks(l) { nxSave('nexus_links', l); }
   function getReviews() {
     try { return JSON.parse(localStorage.getItem('nexus_reviews')) || DEFAULT_REVIEWS; } catch(e) { return DEFAULT_REVIEWS; }
   }
-  function setReviews(r) { localStorage.setItem('nexus_reviews', JSON.stringify(r)); }
+  function setReviews(r) { nxSave('nexus_reviews', r); }
 
   /* ── Sync des vrais avis SellAuth (via /api/feedbacks) ──
      Quand l'API est configurée, l'admin affiche les mêmes avis que la boutique
@@ -149,27 +221,27 @@
   function getPayments() {
     try { return JSON.parse(localStorage.getItem('nexus_payments')) || {}; } catch(e) { return {}; }
   }
-  function setPayments(p) { localStorage.setItem('nexus_payments', JSON.stringify(p)); }
+  function setPayments(p) { nxSave('nexus_payments', p); }
 
   function getCategories() {
     try { return JSON.parse(localStorage.getItem('nexus_categories')) || DEFAULT_CATEGORIES; } catch(e) { return DEFAULT_CATEGORIES; }
   }
-  function setCategories(c) { localStorage.setItem('nexus_categories', JSON.stringify(c)); }
+  function setCategories(c) { nxSave('nexus_categories', c); }
 
   function getOrders() {
     try { return JSON.parse(localStorage.getItem('nexus_orders')) || []; } catch(e) { return []; }
   }
-  function setOrders(o) { localStorage.setItem('nexus_orders', JSON.stringify(o)); }
+  function setOrders(o) { nxSave('nexus_orders', o); }
 
   function getContent() {
     try { return Object.assign({}, DEFAULT_CONTENT, JSON.parse(localStorage.getItem('nexus_content') || '{}')); } catch(e) { return DEFAULT_CONTENT; }
   }
-  function setContent(c) { localStorage.setItem('nexus_content', JSON.stringify(c)); }
+  function setContent(c) { nxSave('nexus_content', c); }
 
   function getWebhooks() {
     try { return JSON.parse(localStorage.getItem('nexus_webhooks')) || {}; } catch(e) { return {}; }
   }
-  function setWebhooks(w) { localStorage.setItem('nexus_webhooks', JSON.stringify(w)); }
+  function setWebhooks(w) { nxSave('nexus_webhooks', w); }
 
   function sendDiscordWebhook(url, embed, content) {
     if (!url) return;
@@ -229,7 +301,11 @@
     if (sessionStorage.getItem('nexus_admin_ok') === '1') {
       loginScreen.style.display = 'none';
       app.style.display = 'flex';
-      init();
+      /* On tire d'abord le contenu publié : sans ça le panneau afficherait
+         l'état de CE navigateur, qui peut être vide (autre machine) ou périmé
+         (modifié depuis ailleurs), et la première sauvegarde écraserait le
+         serveur avec des données obsolètes. */
+      nxPullContent(init);
     }
   }
 
@@ -241,6 +317,7 @@
       loginError.classList.remove('show');
       loginScreen.style.display = 'none';
       app.style.display = 'flex';
+      nxPullContent();   /* même raison que dans checkSession() */
       discordLog('ADMIN_LOGIN', {});
       var loginLog = JSON.parse(localStorage.getItem('nexus_login_log') || '[]');
       loginLog.unshift({ time: new Date().toISOString(), success: true, attempts: 0 });
@@ -1557,7 +1634,7 @@
     if (!confirm('Supprimer définitivement cet avis sur SellAuth ? Cette action est irréversible.')) return;
     var secret = getSaSecret(false);
     if (!secret) { toast('Suppression annulée (secret requis).'); return; }
-    fetch('/api/feedback-delete', {
+    fetch(NX_API + '/api/feedback-delete', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-admin-secret': secret },
       body: JSON.stringify({ id: id })
@@ -1809,7 +1886,7 @@
   function getTextOverrides() {
     try { return JSON.parse(localStorage.getItem('nexus_text_overrides')) || {}; } catch(e) { return {}; }
   }
-  function setTextOverrides(o) { localStorage.setItem('nexus_text_overrides', JSON.stringify(o)); }
+  function setTextOverrides(o) { nxSave('nexus_text_overrides', o); }
 
   function renderOverrideEditor() {
     var wrap = document.getElementById('overrideEditor');
@@ -2376,7 +2453,7 @@
 
     tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:rgba(255,255,255,.4);padding:22px;">Chargement…</td></tr>';
 
-    fetch('/api/admin-clients', { headers: { 'x-admin-secret': secret } })
+    fetch(NX_API + '/api/admin-clients', { headers: { 'x-admin-secret': secret } })
       .then(function(r) { return r.json().then(function(j) { return { status: r.status, body: j }; }); })
       .then(function(res) {
         if (res.status === 401) {
@@ -2459,7 +2536,7 @@
     var secret = loginsSecret(true);
     if (!secret) return;
     openClientModal('<div style="text-align:center;color:rgba(255,255,255,.5);padding:30px;">Chargement…</div>');
-    fetch('/api/admin-clients?id=' + encodeURIComponent(id), { headers: { 'x-admin-secret': secret } })
+    fetch(NX_API + '/api/admin-clients?id=' + encodeURIComponent(id), { headers: { 'x-admin-secret': secret } })
       .then(function(r) { return r.json().then(function(j) { return { status: r.status, body: j }; }); })
       .then(function(res) {
         if (res.status === 401) { localStorage.removeItem('nexus_sa_secret'); closeClientModal(); toast('Secret admin incorrect.'); return; }
@@ -2571,7 +2648,7 @@
     var email = document.getElementById('settingsEmail').value.trim();
     if (name) c.siteName = name;
     if (email) c.contactEmail = email;
-    localStorage.setItem('nexus_content', JSON.stringify(c));
+    nxSave('nexus_content', c);
     var msg = document.getElementById('settingsInfoMsg');
     if (msg) { msg.textContent = 'Enregistré ✓'; setTimeout(function() { msg.textContent = ''; }, 2000); }
     toast('Paramètres enregistrés ✓');
@@ -2591,13 +2668,13 @@
 
   function setBlacklist(type, list) {
     var key = type === 'ip' ? 'nexus_blacklist_ips' : 'nexus_blacklist_emails';
-    localStorage.setItem(key, JSON.stringify(list));
+    nxSave(key, list);
   }
 
   function getSecuritySettings() {
     try { return JSON.parse(localStorage.getItem('nexus_security') || '{}'); } catch(e) { return {}; }
   }
-  function setSecuritySettings(s) { localStorage.setItem('nexus_security', JSON.stringify(s)); }
+  function setSecuritySettings(s) { nxSave('nexus_security', s); }
 
   function updateSecBadge(id, active) {
     var el = document.getElementById(id);
@@ -2837,7 +2914,7 @@
     });
     return cfg;
   }
-  function setEmailConfig(cfg) { localStorage.setItem('nexus_email_config', JSON.stringify(cfg)); }
+  function setEmailConfig(cfg) { nxSave('nexus_email_config', cfg); }
 
   function loadEmailPage() {
     var cfg = getEmailConfig();
@@ -2958,7 +3035,7 @@
       }
     }
     /* 1) API du site (Gmail SMTP — sans branding). 2) Fallback EmailJS. */
-    fetch('/api/send-order-email', {
+    fetch(NX_API + '/api/send-order-email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ to: adminEmail, invoiceId: 'TEST-' + Date.now(), productName: 'Test Product', deliverable: 'test@example.com:password123', storeName: storeName, storeUrl: window.location.origin || '', subject: subject })
@@ -3152,7 +3229,7 @@
 
   /* ── Codes Promo ── */
   function getPromos() { try { return JSON.parse(localStorage.getItem('nexus_promos')) || []; } catch(e) { return []; } }
-  function setPromos(p) { localStorage.setItem('nexus_promos', JSON.stringify(p)); }
+  function setPromos(p) { nxSave('nexus_promos', p); }
 
   function renderPromos() {
     var el = document.getElementById('promosList');

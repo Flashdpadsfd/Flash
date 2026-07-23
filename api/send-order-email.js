@@ -20,6 +20,7 @@
 
 var mailer = require('./_mailer.js');
 var emailCfg = require('../assets/email-config.js');
+var origin = require('./_origin.js');
 
 var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -48,39 +49,18 @@ function oneLine(s) {
    foreign value means the call did not come from our pages (e.g. curl, bots).
    Allowed hosts: *.vercel.app preview/prod deploys, localhost (dev) and any
    host listed in the ALLOWED_ORIGINS env var. */
-function hostFrom(value) {
-  try { return new URL(value).hostname.toLowerCase(); } catch (e) { return ''; }
-}
-
-function isAllowedOrigin(req) {
-  var src = (req.headers && (req.headers.origin || req.headers.referer)) || '';
-  if (!src) return false;
-  var host = hostFrom(src);
-  if (!host) return false;
-  /* Same-origin (hôte de l'Origin == hôte servant la page) : marche sur
-     n'importe quel domaine (Hostinger, domaine perso…), sans config. */
-  var selfHost = String((req.headers && req.headers.host) || '').toLowerCase().split(':')[0];
-  if (selfHost && host === selfHost) return true;
-  if ((host === 'localhost' || host === '127.0.0.1') && process.env.NODE_ENV !== 'production') return true;
-  /* Project-scoped: only OUR deployments (prod + preview), not every tenant
-     of the multi-tenant vercel.app root. */
-  if (/^nexus-theme[a-z0-9-]*\.vercel\.app$/.test(host)) return true;
-  if (/^flashshp[a-z0-9-]*\.vercel\.app$/.test(host)) return true;
-  var extra = String(process.env.ALLOWED_ORIGINS || '')
-    .split(',').map(function (h) { return h.trim().toLowerCase(); }).filter(Boolean);
-  for (var i = 0; i < extra.length; i++) {
-    if (host === extra[i] || host.endsWith('.' + extra[i])) return true;
-  }
-  return false;
-}
+/* Règle d'origine partagée par toutes les routes : voir api/_origin.js. */
 
 module.exports = function (req, res) {
+  if (origin.handlePreflight(req, res)) return;
+  origin.applyCors(req, res);
+
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method not allowed' });
     return;
   }
 
-  if (!isAllowedOrigin(req)) {
+  if (!origin.isAllowedOrigin(req)) {
     res.status(403).json({ error: 'Forbidden' });
     return;
   }

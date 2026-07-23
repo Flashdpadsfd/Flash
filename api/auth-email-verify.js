@@ -11,31 +11,13 @@
 var crypto = require('crypto');
 var session = require('./_session.js');
 var store = require('./_store.js');
+var origin = require('./_origin.js');
 
 /* Même liste blanche stricte que auth-email-request.js (voir le commentaire
    là-bas) : l'adresse sert d'identifiant client et finit affichée dans l'admin. */
 var EMAIL_RE = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
 
-function hostFrom(value) { try { return new URL(value).hostname.toLowerCase(); } catch (e) { return ''; } }
-function isAllowedOrigin(req) {
-  var src = (req.headers && (req.headers.origin || req.headers.referer)) || '';
-  if (!src) return false;
-  var host = hostFrom(src);
-  if (!host) return false;
-  /* Same-origin (hôte de l'Origin == hôte servant la page) : marche sur
-     n'importe quel domaine (Hostinger, domaine perso…), sans config. */
-  var selfHost = String((req.headers && req.headers.host) || '').toLowerCase().split(':')[0];
-  if (selfHost && host === selfHost) return true;
-  if (host === 'localhost' || host === '127.0.0.1') return true;
-  if (/^nexus-theme[a-z0-9-]*\.vercel\.app$/.test(host)) return true;
-  if (/^flashshp[a-z0-9-]*\.vercel\.app$/.test(host)) return true;
-  var extra = String(process.env.ALLOWED_ORIGINS || '')
-    .split(',').map(function (h) { return h.trim().toLowerCase(); }).filter(Boolean);
-  for (var i = 0; i < extra.length; i++) {
-    if (host === extra[i] || host.endsWith('.' + extra[i])) return true;
-  }
-  return false;
-}
+/* Règle d'origine partagée : voir api/_origin.js. */
 function safeEqual(a, b) {
   var ba = Buffer.from(String(a)), bb = Buffer.from(String(b));
   if (ba.length !== bb.length) return false;
@@ -53,7 +35,7 @@ function readBody(req) {
 
 module.exports = async function (req, res) {
   if (req.method !== 'POST') { res.status(405).json({ error: 'Method not allowed' }); return; }
-  if (!isAllowedOrigin(req)) { res.status(403).json({ error: 'Forbidden' }); return; }
+  if (!origin.isAllowedOrigin(req)) { res.status(403).json({ error: 'Forbidden' }); return; }
   if (!process.env.SESSION_SECRET) { res.status(501).json({ error: 'Session not configured' }); return; }
   if (!store.available()) { res.status(501).json({ error: 'Store not configured' }); return; }
 

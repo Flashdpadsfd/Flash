@@ -7,3 +7,6 @@ logs/
 .env.local
 
 .env*
+
+# Panneau admin genere par « npm run build:admin » (voir ADMIN-SITE.md)
+admin-site/

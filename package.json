@@ -5,7 +5,9 @@
   "description": "FlashShp storefront + client area (standalone Node/Express server).",
   "scripts": {
     "start": "node server.js",
-    "import:feedbacks": "node scripts/import-feedbacks.js"
+    "import:feedbacks": "node scripts/import-feedbacks.js",
+    "build:admin": "node scripts/build-admin-site.js",
+    "serve:admin": "node scripts/serve-admin.js"
   },
   "engines": {
     "node": ">=18"

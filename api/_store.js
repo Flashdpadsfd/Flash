@@ -93,7 +93,64 @@ async function ensure() {
     }
   } catch (e) { console.error('[FlashShp] otp_codes migration skipped:', e && e.message); }
 
+  /* Contenu de la boutique (produits, catégories, textes…) — voir plus bas.
+     Un simple clé → JSON : c'est exactement la forme qu'avait localStorage,
+     donc l'admin et la boutique gardent leur code de lecture/écriture. */
+  await p.query(
+    'CREATE TABLE IF NOT EXISTS site_content (' +
+    ' k VARCHAR(64) NOT NULL PRIMARY KEY,' +
+    ' v LONGTEXT,' +                          /* JSON sérialisé */
+    ' updated_at DATETIME' +
+    ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4'
+  );
+
   ensured = true;
+}
+
+/* ── Contenu de la boutique ──
+   Jusqu'ici, produits/catégories/textes ne vivaient QUE dans le localStorage du
+   navigateur de l'admin : les visiteurs voyaient les valeurs codées en dur dans
+   assets/main.js, jamais les modifications. Ces trois fonctions déplacent ce
+   contenu côté serveur, pour qu'il soit enfin commun à tout le monde. */
+
+/* Lit plusieurs clés d'un coup → { clé: <valeur JSON décodée> }.
+   `keys` vide/absent = tout le contenu. */
+async function getContent(keys) {
+  if (!available()) return {};
+  await ensure();
+  var rows;
+  if (Array.isArray(keys) && keys.length) {
+    var marks = keys.map(function () { return '?'; }).join(',');
+    rows = await getPool().query('SELECT k, v FROM site_content WHERE k IN (' + marks + ')', keys);
+  } else {
+    rows = await getPool().query('SELECT k, v FROM site_content');
+  }
+  var out = {};
+  (rows[0] || []).forEach(function (r) {
+    /* Une ligne illisible ne doit pas faire échouer toute la page. */
+    try { out[r.k] = JSON.parse(r.v); } catch (e) { /* ignorée */ }
+  });
+  return out;
+}
+
+/* Écrit une clé (valeur sérialisée en JSON). */
+async function setContent(key, value) {
+  if (!available()) return false;
+  await ensure();
+  await getPool().query(
+    'INSERT INTO site_content (k, v, updated_at) VALUES (?, ?, ?)' +
+    ' ON DUPLICATE KEY UPDATE v = VALUES(v), updated_at = VALUES(updated_at)',
+    [String(key), JSON.stringify(value === undefined ? null : value), new Date()]
+  );
+  return true;
+}
+
+/* Date de dernière modification, tous contenus confondus (pour les caches). */
+async function contentUpdatedAt() {
+  if (!available()) return null;
+  await ensure();
+  var rows = await getPool().query('SELECT MAX(updated_at) AS m FROM site_content');
+  return (rows[0] && rows[0][0] && rows[0][0].m) || null;
 }
 
 /* ── Clients (connexions) ── */
@@ -194,5 +251,8 @@ module.exports = {
   getOtp: getOtp,
   bumpOtpAttempts: bumpOtpAttempts,
   deleteOtp: deleteOtp,
-  checkCooldown: checkCooldown
+  checkCooldown: checkCooldown,
+  getContent: getContent,
+  setContent: setContent,
+  contentUpdatedAt: contentUpdatedAt
 };

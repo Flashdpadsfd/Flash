@@ -100,7 +100,9 @@ app.all('/api/:name', function (req, res) {
 /* ── Réécritures d'URL propres (repris des rewrites vercel.json) ── */
 var REWRITES = {
   '/': 'preview.html',
-  '/admin': 'admin.html',
+  /* '/admin' retiré volontairement : le panneau vit désormais sur son propre
+     domaine (admin.flashshp.fr, cf. scripts/build-admin-site.js). Le servir ici
+     aussi annulerait la séparation demandée. */
   '/products': 'preview-products.html',
   '/product': 'preview-product.html',
   '/review': 'preview-feedback.html',
@@ -123,7 +125,7 @@ app.get(/^\/products-[^\/]+$/, function (req, res) {
    renvoyait 200, et les journaux de déploiement exposent l'arborescence du
    serveur. On bloque le dossier entier plutôt que fichier par fichier, et on
    couvre deploy.* quelle que soit l'extension (.ps1, .bat…). */
-var BLOCKED = /^\/(?:api|node_modules|scripts|logs|\.git|\.claude|\.vercel)(?:\/|$)|^\/(?:server\.js|package(?:-lock)?\.json|vercel\.json|deploy[^\/]*\.(?:ps1|bat|sh|cmd)|\.env.*|\.gitignore)$/i;
+var BLOCKED = /^\/(?:api|node_modules|scripts|logs|admin-site|\.git|\.claude|\.vercel)(?:\/|$)|^\/(?:server\.js|package(?:-lock)?\.json|vercel\.json|deploy[^\/]*\.(?:ps1|bat|sh|cmd)|\.env.*|\.gitignore|admin(?:\.html)?|assets\/admin\.(?:js|css))$/i;
 app.use(function (req, res, next) {
   if (BLOCKED.test(req.path)) { res.status(404).send('Not found'); return; }
   next();

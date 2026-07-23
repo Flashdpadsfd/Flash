@@ -4,8 +4,18 @@
     {
       "name": "nexus-server",
       "runtimeExecutable": "node",
-      "runtimeArgs": ["server.js"],
+      "runtimeArgs": [
+        "server.js"
+      ],
       "port": 3000
+    },
+    {
+      "name": "admin-site",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "scripts/serve-admin.js"
+      ],
+      "port": 3001
     }
   ]
 }

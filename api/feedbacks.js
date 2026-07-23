@@ -19,6 +19,7 @@
    fonction répond 501 et la page Avis garde ses avis de secours. */
 
 var sellauth = require('./_sellauth-feedbacks.js');
+var origin = require('./_origin.js');
 
 /* ── Cache mémoire (le serveur Hostinger est un process persistant) ──
    Sans cache, CHAQUE visite déclenchait ~13 appels SellAuth en parallèle →
@@ -30,33 +31,14 @@ var CACHE_FRESH_MS = 5 * 60 * 1000;    // sert le cache sans rappeler SellAuth
 var CACHE_STALE_MS = 60 * 60 * 1000;   // si SellAuth tombe : sert le cache jusqu'à 1h
 var _cache = { at: 0, payload: null, complete: false };
 
-/* ── Anti-abus : n'accepter que les appels venant de nos propres pages ── */
-function hostFrom(value) {
-  try { return new URL(value).hostname.toLowerCase(); } catch (e) { return ''; }
-}
-function isAllowedOrigin(req) {
-  var src = (req.headers && (req.headers.origin || req.headers.referer)) || '';
-  if (!src) return false;
-  var host = hostFrom(src);
-  if (!host) return false;
-  /* Same-origin (hôte de l'Origin/Referer == hôte servant la page) : marche sur
-     n'importe quel domaine (Hostinger, domaine perso…), sans config. */
-  var selfHost = String((req.headers && req.headers.host) || '').toLowerCase().split(':')[0];
-  if (selfHost && host === selfHost) return true;
-  if (host === 'localhost' || host === '127.0.0.1') return true;
-  if (/^nexus-theme[a-z0-9-]*\.vercel\.app$/.test(host)) return true;
-  if (/^flashshp[a-z0-9-]*\.vercel\.app$/.test(host)) return true;
-  var extra = String(process.env.ALLOWED_ORIGINS || '')
-    .split(',').map(function (h) { return h.trim().toLowerCase(); }).filter(Boolean);
-  for (var i = 0; i < extra.length; i++) {
-    if (host === extra[i] || host.endsWith('.' + extra[i])) return true;
-  }
-  return false;
-}
+/* Anti-abus : n'accepter que les appels venant de nos pages ou du panneau admin
+   (règle partagée par toutes les routes — voir api/_origin.js). */
 
 module.exports = async function (req, res) {
+  if (origin.handlePreflight(req, res)) return;
+  origin.applyCors(req, res);
   if (req.method !== 'GET') { res.status(405).json({ error: 'Method not allowed' }); return; }
-  if (!isAllowedOrigin(req)) { res.status(403).json({ error: 'Forbidden' }); return; }
+  if (!origin.isAllowedOrigin(req)) { res.status(403).json({ error: 'Forbidden' }); return; }
 
   var apiKey = String(process.env.SELLAUTH_API_KEY || '').trim();
   var shopId = String(process.env.SELLAUTH_SHOP_ID || '').trim();
