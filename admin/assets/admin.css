@@ -166,6 +166,33 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
   font-size: 12px; font-weight: 600; transition: all 140ms;
 }
 .topbar__store-link:hover { background: rgba(124,58,237,.22); color: #c4b5fd; }
+/* ── État de synchronisation ──
+   Le panneau écrit dans le localStorage ET sur le serveur. Sans secret admin
+   l'envoi échouait sans trace : ce voyant rend l'état visible en permanence. */
+.sync-pill {
+  display: flex; align-items: center; gap: 7px;
+  padding: 6px 11px; border-radius: 8px;
+  background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.09);
+  color: rgba(255,255,255,.72); font-size: 12px; font-weight: 600;
+  font-family: inherit; cursor: pointer; transition: all 140ms;
+}
+.sync-pill:hover { background: rgba(255,255,255,.09); color: #fff; }
+.sync-pill__dot { width: 7px; height: 7px; border-radius: 50%; background: #8a909c; flex-shrink: 0; }
+.sync-pill.is-ok      .sync-pill__dot { background: #3cc864; }
+.sync-pill.is-local   .sync-pill__dot { background: #ffa01e; }
+.sync-pill.is-error   .sync-pill__dot { background: #ff5555; }
+.sync-pill.is-working .sync-pill__dot { background: #60a5fa; }
+
+.sync-publish {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 11px; border-radius: 8px;
+  background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.09);
+  color: rgba(255,255,255,.72); font-size: 12px; font-weight: 600;
+  font-family: inherit; cursor: pointer; transition: all 140ms;
+}
+.sync-publish:hover { background: rgba(255,255,255,.09); color: #fff; }
+.sync-publish:disabled { opacity: .45; cursor: default; }
+
 .topbar__avatar {
   width: 32px; height: 32px; border-radius: 50%;
   background: var(--accent); display: flex; align-items: center; justify-content: center;

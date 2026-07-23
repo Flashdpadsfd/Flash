@@ -9,45 +9,136 @@
      NEXUS_API_BASE est défini dans admin.html ; vide = même origine (dev). */
   var NX_API = (window.NEXUS_API_BASE || '').replace(/\/+$/, '');
 
-  /* Secret admin déjà saisi, sans jamais ouvrir de fenêtre : les sauvegardes
-     partent en arrière-plan, un prompt surgissant en plein travail serait
-     insupportable. Sans secret, on n'écrit qu'en local (voir nxSave). */
+  /* Toutes les clés poussées vers la boutique. Doit refléter WRITABLE de
+     api/content.js : une clé absente ici ne serait jamais publiée. */
+  var NX_KEYS = [
+    'nexus_products', 'nexus_categories', 'nexus_content', 'nexus_links',
+    'nexus_reviews', 'nexus_text_overrides', 'nexus_payments', 'nexus_promos',
+    'nexus_webhooks', 'nexus_blacklist_emails', 'nexus_blacklist_ips',
+    'nexus_security', 'nexus_email_config', 'nexus_stats', 'nexus_orders'
+  ];
+
   function nxSecret() {
     try { return localStorage.getItem('nexus_sa_secret') || ''; } catch (e) { return ''; }
   }
+  function nxSetSecret(s) {
+    try { if (s) localStorage.setItem('nexus_sa_secret', s); else localStorage.removeItem('nexus_sa_secret'); } catch (e) {}
+  }
 
-  var _nxWarned = false;
+  /* ── Voyant de synchronisation ──
+     Avant, une sauvegarde sans secret admin ne partait nulle part et le panneau
+     affichait quand même « Produit ajouté ✓ ». On rend donc l'état visible en
+     permanence plutôt que de le signaler une fois dans un toast fugace. */
+  var NX_STATE = { cls: '', label: '' };
+  function nxStatus(cls, label) {
+    NX_STATE = { cls: cls, label: label };
+    var pill = document.getElementById('syncPill');
+    var lbl = document.getElementById('syncLabel');
+    if (!pill || !lbl) return;
+    pill.className = 'sync-pill ' + cls;
+    lbl.textContent = label;
+  }
 
-  /* Écrit une clé de contenu : en local (lecture immédiate par le panneau) ET
-     sur le serveur (source commune à la boutique et à tous les navigateurs).
-     Avant, tout restait dans le localStorage de CE navigateur : les visiteurs
-     ne voyaient jamais les modifications. */
+  /* Écrit une clé : en local (lecture immédiate par le panneau) ET sur le
+     serveur (source commune à la boutique et à tous les navigateurs). */
   function nxSave(key, value) {
     try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) { /* quota */ }
+    nxPush(key, value);
+  }
 
+  /* Envoi d'une clé vers la boutique. Renvoie une promesse résolue à true si
+     la valeur est bien publiée. */
+  function nxPush(key, value) {
     var secret = nxSecret();
     if (!secret) {
-      if (!_nxWarned) {
-        _nxWarned = true;
-        try { toast('Secret admin absent : modification enregistrée localement seulement.'); } catch (e) {}
-      }
-      return;
+      nxStatus('is-local', 'Non publié');
+      return Promise.resolve(false);
     }
-
-    fetch(NX_API + '/api/content', {
+    nxStatus('is-working', 'Publication…');
+    return fetch(NX_API + '/api/content', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', 'x-admin-secret': secret },
       body: JSON.stringify({ key: key, value: value })
     }).then(function (r) {
-      if (r.ok) return;
+      if (r.ok) { nxStatus('is-ok', 'Synchronisé'); return true; }
       if (r.status === 401) {
-        try { localStorage.removeItem('nexus_sa_secret'); } catch (e) {}
-        try { toast('Secret admin refusé — modification non publiée.'); } catch (e) {}
+        nxSetSecret('');
+        nxStatus('is-error', 'Secret refusé');
+        try { toast('Secret admin refusé — modification NON publiée.'); } catch (e) {}
       } else {
-        try { toast('Publication échouée (' + r.status + ') — enregistré en local.'); } catch (e) {}
+        nxStatus('is-error', 'Erreur ' + r.status);
+        try { toast('Publication échouée (' + r.status + ") — enregistré en local seulement."); } catch (e) {}
       }
+      return false;
     }).catch(function () {
-      try { toast('Serveur injoignable — modification enregistrée en local.'); } catch (e) {}
+      nxStatus('is-error', 'Hors ligne');
+      try { toast('Boutique injoignable — modification enregistrée en local seulement.'); } catch (e) {}
+      return false;
+    });
+  }
+
+  /* Vérifie le secret contre la boutique. Un secret invalide se voit tout de
+     suite, plutôt qu'à la première sauvegarde silencieusement perdue. */
+  function nxCheck() {
+    var secret = nxSecret();
+    if (!secret) { nxStatus('is-local', 'Non connecté'); return Promise.resolve(false); }
+    nxStatus('is-working', 'Vérification…');
+    return fetch(NX_API + '/api/content?scope=admin', {
+      headers: { 'Accept': 'application/json', 'x-admin-secret': secret }
+    }).then(function (r) {
+      if (r.ok)          { nxStatus('is-ok', 'Synchronisé'); return true; }
+      if (r.status === 401) { nxSetSecret(''); nxStatus('is-error', 'Secret refusé'); return false; }
+      if (r.status === 501) { nxStatus('is-error', 'Base non configurée'); return false; }
+      nxStatus('is-error', 'Erreur ' + r.status);
+      return false;
+    }).catch(function () { nxStatus('is-error', 'Hors ligne'); return false; });
+  }
+
+  /* Demande le secret puis le valide avant de l'enregistrer. */
+  function nxConnect() {
+    var s = (window.prompt('Secret admin (ADMIN_SECRET) — il autorise la publication vers la boutique :', '') || '').trim();
+    if (!s) return Promise.resolve(false);
+    nxSetSecret(s);
+    return nxCheck().then(function (ok) {
+      try { toast(ok ? 'Connecté à la boutique ✓' : 'Secret refusé par la boutique.'); } catch (e) {}
+      return ok;
+    });
+  }
+
+  /* Publie TOUT le contenu local d'un coup. Indispensable au premier
+     branchement : sans ça, seules les clés modifiées après coup partiraient,
+     et la boutique resterait vide de tout le reste. */
+  function nxPublishAll() {
+    if (!nxSecret()) { return nxConnect().then(function (ok) { return ok ? nxPublishAll() : false; }); }
+    var payload = {};
+    NX_KEYS.forEach(function (k) {
+      var raw = null;
+      try { raw = localStorage.getItem(k); } catch (e) {}
+      if (raw === null) return;                       /* jamais renseignée ici */
+      try { payload[k] = JSON.parse(raw); } catch (e) { /* valeur illisible : ignorée */ }
+    });
+    var count = Object.keys(payload).length;
+    if (!count) { try { toast('Rien à publier.'); } catch (e) {} return Promise.resolve(false); }
+
+    nxStatus('is-working', 'Publication…');
+    return fetch(NX_API + '/api/content', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'x-admin-secret': nxSecret() },
+      body: JSON.stringify({ content: payload })
+    }).then(function (r) {
+      if (r.ok) {
+        nxStatus('is-ok', 'Synchronisé');
+        try { toast(count + ' élément(s) publié(s) ✓'); } catch (e) {}
+        return true;
+      }
+      if (r.status === 401) { nxSetSecret(''); nxStatus('is-error', 'Secret refusé'); }
+      else nxStatus('is-error', 'Erreur ' + r.status);
+      try { toast('Publication échouée (' + r.status + ').'); } catch (e) {}
+      return false;
+    }).catch(function () {
+      nxStatus('is-error', 'Hors ligne');
+      try { toast('Boutique injoignable.'); } catch (e) {}
+      return false;
     });
   }
 
@@ -59,8 +150,16 @@
     var headers = { 'Accept': 'application/json' };
     if (secret) headers['x-admin-secret'] = secret;
 
+    nxStatus('is-working', 'Vérification…');
+
     fetch(url, { headers: headers })
-      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (r) {
+        if (r.status === 401) { nxSetSecret(''); nxStatus('is-error', 'Secret refusé'); return null; }
+        if (r.status === 501) { nxStatus('is-error', 'Base non configurée'); return null; }
+        if (!r.ok) { nxStatus('is-error', 'Erreur ' + r.status); return null; }
+        nxStatus(secret ? 'is-ok' : 'is-local', secret ? 'Synchronisé' : 'Non connecté');
+        return r.json();
+      })
       .then(function (data) {
         if (data && data.ok && data.content) {
           Object.keys(data.content).forEach(function (k) {
@@ -70,8 +169,33 @@
           });
         }
       })
-      .catch(function () { /* hors-ligne : on travaille sur la copie locale */ })
+      .catch(function () { nxStatus('is-error', 'Hors ligne'); })
       .then(function () { if (typeof done === 'function') done(); });
+  }
+
+  /* Branche le voyant et le bouton « Tout publier ». Appelé à l'ouverture du
+     panneau, une fois l'interface affichée. */
+  function nxBindSync() {
+    var pill = document.getElementById('syncPill');
+    var pub = document.getElementById('syncPublishBtn');
+    if (pill && !pill._bound) {
+      pill._bound = true;
+      pill.addEventListener('click', function () {
+        /* Déjà connecté : on revérifie. Sinon on demande le secret. */
+        if (nxSecret()) nxCheck(); else nxConnect();
+      });
+    }
+    if (pub && !pub._bound) {
+      pub._bound = true;
+      pub.addEventListener('click', function () {
+        if (!confirm('Publier tout le contenu de ce navigateur vers la boutique ?\n\nLes valeurs déjà en ligne seront remplacées.')) return;
+        pub.disabled = true;
+        nxPublishAll().then(function () { pub.disabled = false; });
+      });
+    }
+    /* Réapplique l'état courant : le voyant n'existait pas encore au moment
+       où le premier appel réseau a répondu. */
+    if (NX_STATE.cls) nxStatus(NX_STATE.cls, NX_STATE.label);
   }
 
   /* ─── Inline SVG icons (Lucide) for empty states ─── */
@@ -305,7 +429,7 @@
          l'état de CE navigateur, qui peut être vide (autre machine) ou périmé
          (modifié depuis ailleurs), et la première sauvegarde écraserait le
          serveur avec des données obsolètes. */
-      nxPullContent(init);
+      nxPullContent(function () { nxBindSync(); init(); });
     }
   }
 
@@ -317,7 +441,7 @@
       loginError.classList.remove('show');
       loginScreen.style.display = 'none';
       app.style.display = 'flex';
-      nxPullContent();   /* même raison que dans checkSession() */
+      nxPullContent(nxBindSync);   /* même raison que dans checkSession() */
       discordLog('ADMIN_LOGIN', {});
       var loginLog = JSON.parse(localStorage.getItem('nexus_login_log') || '[]');
       loginLog.unshift({ time: new Date().toISOString(), success: true, attempts: 0 });
