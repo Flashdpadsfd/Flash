@@ -481,7 +481,12 @@ window.NX_ICONS = function (name) {
   function updateCartCount() {
     var n = getCart().reduce(function(s,i){ return s+i.qty; }, 0);
     var el = document.getElementById('cartCount');
-    if (el) el.textContent = n;
+    if (!el) return;
+    el.textContent = n;
+    /* Le badge est masqué par défaut en CSS et rien ne le révélait : il ne
+       s'affichait jamais, quel que soit le contenu du panier. On l'affiche
+       maintenant dès qu'il y a au moins un article. */
+    el.classList.toggle('is-visible', n > 0);
   }
   window._nexusUpdateCartCount = updateCartCount;
 

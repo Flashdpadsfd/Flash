@@ -163,18 +163,45 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
 
 .nav__actions { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
 
-.nav__cart-wrap { position: relative; }
+/* ── Panier de la barre de navigation ──
+   Tuile icône + libellé « Cart », toujours visible (elle a remplacé le
+   sélecteur de langue). Volontairement plus large qu'une simple icône : c'est
+   le seul point d'entrée du panier, il doit se repérer immédiatement. */
+.nav__cart {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px;
+  width: 54px; height: 50px;
+  padding: 0; border-radius: 12px;
+  background: rgba(255,255,255,.045);
+  border: 1px solid rgba(255,255,255,.10);
+  color: #fff; cursor: pointer;
+  transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+.nav__cart:hover  { background: rgba(255,255,255,.09); border-color: rgba(255,255,255,.20); }
+.nav__cart:active { transform: scale(.96); }
+.nav__cart-label {
+  font-size: 10px; font-weight: 600; letter-spacing: .01em;
+  color: rgba(255,255,255,.62); line-height: 1;
+}
+.nav__cart:hover .nav__cart-label { color: rgba(255,255,255,.85); }
+
 .nav__cart-count {
-  position: absolute; top: 2px; right: 2px;
+  position: absolute; top: -6px; right: -6px;
   background: #fff; color: #000;
-  font-size: 9px; font-weight: 700;
-  min-width: 15px; height: 15px; border-radius: 9999px;
+  font-size: 10px; font-weight: 700;
+  min-width: 18px; height: 18px; border-radius: 9999px;
+  /* Affiché uniquement quand le panier n'est pas vide : c'est updateCartCount()
+     qui ajoute « is-visible ». Avant, la règle etait « display:none » sans que
+     rien ne la lève : le compteur ne s'affichait donc jamais. */
   display: none; align-items: center; justify-content: center;
-  padding: 0 3px;
+  padding: 0 5px;
+  border: 2px solid #09090b;
   transform: scale(1); transition: transform 300ms cubic-bezier(.34,1.56,.64,1);
   pointer-events: none;
 }
-.nav__cart-count.bump { transform: scale(1.5); }
+.nav__cart-count.is-visible { display: flex; }
+.nav__cart-count.bump { transform: scale(1.35); }
 
 .nav__hamburger { display: none; }
 .nav.scrolled { background: rgba(9,9,11,.95); box-shadow: 0 1px 0 rgba(255,255,255,.06); }
@@ -189,46 +216,7 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
 }
 .nav__login:hover { color: #fff; background: rgba(255,255,255,.07); }
 
-/*──────────────────────────────────────────────
-  LANGUAGE SELECTOR
-──────────────────────────────────────────────*/
-.nav__lang {
-  display: inline-flex; align-items: center; gap: 4px;
-  background: rgba(255,255,255,.07);
-  border: 1px solid rgba(255,255,255,.12); border-radius: 6px;
-  padding: 0 10px; height: 32px;
-  color: #fff; font-family: Inter, sans-serif;
-  font-size: 13px; font-weight: 600; letter-spacing: .4px;
-  cursor: pointer; position: relative;
-  transition: background 200ms ease, border-color 200ms ease;
-}
-.nav__lang:hover { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.22); }
-
-.lang-dropdown {
-  position: absolute; top: calc(100% + 8px); right: 0;
-  background: #0d0d0d;
-  border: 1px solid rgba(255,255,255,.12); border-radius: 6px;
-  overflow: hidden;
-  box-shadow: 0 20px 25px -5px rgba(0,0,0,.5);
-  min-width: 160px; z-index: 300;
-  opacity: 0; transform: translateY(-6px); pointer-events: none;
-  transition: opacity 200ms ease, transform 200ms ease;
-}
-.lang-dropdown.open { opacity: 1; transform: translateY(0); pointer-events: all; }
-
-.lang-option {
-  display: flex; align-items: center; gap: 8px;
-  padding: 9px 14px;
-  font-size: 13px; font-weight: 500; color: rgba(255,255,255,.55);
-  cursor: pointer;
-  transition: background 150ms ease, color 150ms ease;
-  border-bottom: 1px solid rgba(255,255,255,.05);
-  white-space: nowrap;
-}
-.lang-option:last-child { border-bottom: none; }
-.lang-option:hover { background: rgba(255,255,255,.06); color: #fff; }
-.lang-option.selected { color: #fff; }
-.lang-option.selected::after { content: '✓'; margin-left: auto; font-size: 11px; opacity: .5; }
+/* Sélecteur de langue retiré : remplacé par le panier dans la barre de nav. */
 
 /*──────────────────────────────────────────────
   MOBILE DRAWER
