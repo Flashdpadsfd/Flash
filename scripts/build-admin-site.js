@@ -13,13 +13,24 @@
       viser l'API de la boutique (une URL « /api/… » relative taperait dans le
       vide sur admin.flashshp.fr) ;
    2. rend absolus les liens vers la boutique (« / », « /products », « /review ») ;
-   3. ajoute une balise noindex, pour ne pas voir le panneau finir dans Google.
+   3. ajoute une balise noindex, pour ne pas voir le panneau finir dans Google ;
+   4. estampille chaque ressource d'une empreinte de son contenu (?v=…).
+
+   Le point 4 n'est pas cosmétique. Hostinger sert assets/ avec
+   « Cache-Control: public, max-age=604800 » : sept jours. « assets/admin.js »
+   sans numéro de version restait donc figé dans les caches (navigateur ET CDN)
+   longtemps après le déploiement — le panneau exécutait l'ancien script, celui
+   d'avant le voyant de synchronisation, et la pastille restait bloquée sur son
+   libellé HTML « Vérification… » sans jamais rien publier. Un numéro écrit à la
+   main (?v=5) marche tant qu'on pense à l'incrémenter ; l'empreinte du contenu,
+   elle, ne s'oublie pas.
 
    Personnalisation par variables d'environnement :
    - SHOP_URL  : URL de la boutique (défaut https://flashshp.fr) */
 
 var fs = require('fs');
 var path = require('path');
+var crypto = require('crypto');
 
 var ROOT = path.join(__dirname, '..');
 var OUT = path.join(ROOT, 'admin');
@@ -51,15 +62,25 @@ function build() {
     return 'href="' + SHOP_URL + '/' + (page || '') + '"';
   });
 
-  fs.writeFileSync(path.join(OUT, 'index.html'), html, 'utf8');
-
   var copied = [];
   ASSETS.forEach(function (name) {
     var src = path.join(ROOT, 'assets', name);
     if (!fs.existsSync(src)) { console.warn('  ⚠ ressource absente, ignorée : assets/' + name); return; }
-    fs.copyFileSync(src, path.join(OUT, 'assets', name));
-    copied.push(name);
+    var body = fs.readFileSync(src);
+    fs.writeFileSync(path.join(OUT, 'assets', name), body);
+
+    /* 4. Empreinte du contenu. On remplace la référence quelle que soit sa forme
+          (« assets/admin.js », « assets/admin.css?v=5 ») : le numéro écrit à la
+          main dans admin.html est ainsi toujours remplacé par le bon. */
+    var stamp = crypto.createHash('sha1').update(body).digest('hex').slice(0, 8);
+    var ref = new RegExp('assets/' + name.replace(/\./g, '\\.') + '(\\?[^"\']*)?', 'g');
+    var before = html;
+    html = html.replace(ref, 'assets/' + name + '?v=' + stamp);
+    if (html === before) console.warn('  ⚠ assets/' + name + ' n\'est référencé nulle part dans admin.html');
+    copied.push(name + '?v=' + stamp);
   });
+
+  fs.writeFileSync(path.join(OUT, 'index.html'), html, 'utf8');
 
   /* Empêche l'indexation même si le fichier est servi tel quel. */
   fs.writeFileSync(path.join(OUT, 'robots.txt'), 'User-agent: *\nDisallow: /\n', 'utf8');

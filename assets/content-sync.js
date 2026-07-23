@@ -32,12 +32,41 @@
   /* Vide = même origine. Le panneau admin, lui, pointe vers la boutique. */
   var API = window.NEXUS_API_BASE || '';
 
-  function apply(content) {
-    Object.keys(content).forEach(function (k) {
-      if (KEYS.indexOf(k) < 0) return;          /* clé inconnue : ignorée */
+  /* Prévient les pages déjà rendues. Les écouteurs « storage » natifs ne se
+     déclenchent que pour les AUTRES onglets : on émet donc l'événement
+     nous-mêmes pour celui-ci. */
+  function notify(key, newValue, oldValue) {
+    try {
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: key, newValue: newValue, oldValue: oldValue, storageArea: localStorage
+      }));
+    } catch (e) { /* navigateur ancien : le contenu sera bon au prochain chargement */ }
+  }
+
+  /* `published` : la boutique a-t-elle déjà reçu au moins une publication
+     (updatedAt renseigné) ? C'est ce qui décide du sort des clés absentes. */
+  function apply(content, published) {
+    KEYS.forEach(function (k) {
       var value = content[k];
-      /* null = jamais publiée. Ne pas écraser ce qu'a déjà le navigateur. */
-      if (value === null || value === undefined) return;
+
+      /* Clé que le serveur ne renvoie pas. */
+      if (value === null || value === undefined) {
+        /* Rien n'a jamais été publié : une base vide ne doit pas effacer le
+           contenu du navigateur (sinon une boutique fonctionnelle se viderait
+           au premier déploiement mal configuré). On ne touche à rien. */
+        if (!published) return;
+
+        /* Sinon le serveur fait autorité : une clé qu'il ne connaît plus
+           n'existe plus. La garder affichait du contenu fantôme — le bug où la
+           boutique montrait deux produits alors que l'admin n'en avait qu'un,
+           parce que le vieux localStorage survivait indéfiniment. */
+        var old = null;
+        try { old = localStorage.getItem(k); } catch (e) { return; }   /* mode privé */
+        if (old === null) return;
+        try { localStorage.removeItem(k); } catch (e) { return; }
+        notify(k, null, old);
+        return;
+      }
 
       var next = JSON.stringify(value);
       var prev = null;
@@ -45,15 +74,7 @@
       if (prev === next) return;                /* déjà à jour : rien à faire */
 
       try { localStorage.setItem(k, next); } catch (e) { return; }    /* quota plein */
-
-      /* Prévient les pages déjà rendues. Les écouteurs « storage » natifs ne se
-         déclenchent que pour les AUTRES onglets : on émet donc l'événement
-         nous-mêmes pour celui-ci. */
-      try {
-        window.dispatchEvent(new StorageEvent('storage', {
-          key: k, newValue: next, oldValue: prev, storageArea: localStorage
-        }));
-      } catch (e) { /* navigateur ancien : le contenu sera bon au prochain chargement */ }
+      notify(k, next, prev);
     });
   }
 
@@ -61,7 +82,7 @@
     .then(function (r) { return r.ok ? r.json() : null; })
     .then(function (data) {
       if (!data || !data.ok || !data.content) return;
-      apply(data.content);
+      apply(data.content, !!data.updatedAt);
     })
     .catch(function () { /* hors-ligne : on garde le contenu local */ });
 })();

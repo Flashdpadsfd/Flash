@@ -30,6 +30,10 @@
      affichait quand même « Produit ajouté ✓ ». On rend donc l'état visible en
      permanence plutôt que de le signaler une fois dans un toast fugace. */
   var NX_STATE = { cls: '', label: '' };
+
+  /* La boutique a-t-elle déjà reçu au moins une publication ? Renseigné par
+     nxPullContent depuis updatedAt. null = pas encore su. */
+  var NX_PUBLISHED = null;
   function nxStatus(cls, label) {
     NX_STATE = { cls: cls, label: label };
     var pill = document.getElementById('syncPill');
@@ -52,6 +56,15 @@
     var secret = nxSecret();
     if (!secret) {
       nxStatus('is-local', 'Non publié');
+      /* Le voyant seul passait inaperçu : on a vu une boutique rester vide en
+         ligne pendant que le panneau annonçait « Produit ajouté ✓ ». On le dit
+         donc explicitement, sans noyer l'écran lors d'un enregistrement en
+         rafale (plusieurs clés d'affilée). */
+      var now = Date.now();
+      if (now - (nxPush._warned || 0) > 5000) {
+        nxPush._warned = now;
+        try { toast('NON publié : connectez le panneau à la boutique (voyant en haut à droite).'); } catch (e) {}
+      }
       return Promise.resolve(false);
     }
     nxStatus('is-working', 'Publication…');
@@ -161,6 +174,7 @@
         return r.json();
       })
       .then(function (data) {
+        if (data && data.ok) NX_PUBLISHED = !!data.updatedAt;
         if (data && data.ok && data.content) {
           Object.keys(data.content).forEach(function (k) {
             var v = data.content[k];
@@ -196,6 +210,33 @@
     /* Réapplique l'état courant : le voyant n'existait pas encore au moment
        où le premier appel réseau a répondu. */
     if (NX_STATE.cls) nxStatus(NX_STATE.cls, NX_STATE.label);
+
+    nxEnsureConnected();
+  }
+
+  /* Sans secret, le panneau fonctionne « à vide » : tout s'enregistre dans ce
+     navigateur et la boutique en ligne ne reçoit rien. Le voyant le signalait,
+     mais rien n'obligeait à s'en occuper — d'où des sessions entières de travail
+     jamais publiées. On demande donc le secret dès l'ouverture.
+     Puis, si la boutique n'a encore RIEN reçu, on propose de tout publier :
+     c'est précisément l'étape qui manquait après le premier branchement. */
+  function nxEnsureConnected() {
+    if (nxEnsureConnected._done) return;
+    nxEnsureConnected._done = true;
+
+    if (nxSecret()) { nxOfferFirstPublish(); return; }
+    nxConnect().then(function (ok) { if (ok) nxOfferFirstPublish(); });
+  }
+
+  function nxOfferFirstPublish() {
+    /* NX_PUBLISHED reste null si la boutique est injoignable : dans le doute on
+       ne propose rien plutôt que d'écraser l'inconnu. */
+    if (NX_PUBLISHED !== false) return;
+    if (!confirm(
+      'La boutique en ligne ne contient encore AUCUN contenu publié.\n\n' +
+      'Publier maintenant le contenu de ce navigateur ?'
+    )) return;
+    nxPublishAll();
   }
 
   /* ─── Inline SVG icons (Lucide) for empty states ─── */
