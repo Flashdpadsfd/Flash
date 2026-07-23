@@ -243,7 +243,7 @@ window.NX_ICONS = function (name) {
   /* ─── i18n ─── */
   var TRANSLATIONS = {
     EN: {
-      'nav.shop':'Shop','nav.home':'Home','nav.reviews':'Reviews','nav.support':'Support',
+      'nav.shop':'Shop','nav.home':'Home','nav.reviews':'Reviews','nav.tutorials':'Tutorials',
       'nav.login':'Sign In','nav.register':'Create Account',
       'hero.eyebrow':'Digital Products Store',
       'hero.title':'Welcome to the<br>flashshp',
@@ -258,7 +258,7 @@ window.NX_ICONS = function (name) {
       'footer.terms':'Terms','footer.privacy':'Privacy'
     },
     FR: {
-      'nav.shop':'Boutique','nav.home':'Accueil','nav.reviews':'Avis','nav.support':'Support',
+      'nav.shop':'Boutique','nav.home':'Accueil','nav.reviews':'Avis','nav.tutorials':'Tutorials',
       'nav.login':'Connexion','nav.register':'Créer un compte',
       'hero.eyebrow':'Boutique de Produits Numériques',
       'hero.title':'Bienvenue sur<br>flashshp',
@@ -273,7 +273,7 @@ window.NX_ICONS = function (name) {
       'footer.terms':'CGU','footer.privacy':'Confidentialité'
     },
     ES: {
-      'nav.shop':'Tienda','nav.home':'Inicio','nav.reviews':'Reseñas','nav.support':'Soporte',
+      'nav.shop':'Tienda','nav.home':'Inicio','nav.reviews':'Reseñas','nav.tutorials':'Tutorials',
       'nav.login':'Iniciar sesión','nav.register':'Crear cuenta',
       'hero.eyebrow':'Tienda de Productos Digitales',
       'hero.title':'Bienvenido a<br>flashshp',
@@ -288,7 +288,7 @@ window.NX_ICONS = function (name) {
       'footer.terms':'Términos','footer.privacy':'Privacidad'
     },
     DE: {
-      'nav.shop':'Shop','nav.home':'Startseite','nav.reviews':'Bewertungen','nav.support':'Support',
+      'nav.shop':'Shop','nav.home':'Startseite','nav.reviews':'Bewertungen','nav.tutorials':'Tutorials',
       'nav.login':'Anmelden','nav.register':'Konto erstellen',
       'hero.eyebrow':'Digitale Produkte Shop',
       'hero.title':'Willkommen bei<br>flashshp',
@@ -303,7 +303,7 @@ window.NX_ICONS = function (name) {
       'footer.terms':'AGB','footer.privacy':'Datenschutz'
     },
     IT: {
-      'nav.shop':'Negozio','nav.home':'Home','nav.reviews':'Recensioni','nav.support':'Supporto',
+      'nav.shop':'Negozio','nav.home':'Home','nav.reviews':'Recensioni','nav.tutorials':'Tutorials',
       'nav.login':'Accedi','nav.register':'Crea account',
       'hero.eyebrow':'Negozio di Prodotti Digitali',
       'hero.title':'Benvenuto su<br>flashshp',
@@ -318,7 +318,7 @@ window.NX_ICONS = function (name) {
       'footer.terms':'Termini','footer.privacy':'Privacy'
     },
     PT: {
-      'nav.shop':'Loja','nav.home':'Início','nav.reviews':'Avaliações','nav.support':'Suporte',
+      'nav.shop':'Loja','nav.home':'Início','nav.reviews':'Avaliações','nav.tutorials':'Tutorials',
       'nav.login':'Entrar','nav.register':'Criar conta',
       'hero.eyebrow':'Loja de Produtos Digitais',
       'hero.title':'Bem-vindo à<br>flashshp',
@@ -333,7 +333,7 @@ window.NX_ICONS = function (name) {
       'footer.terms':'Termos','footer.privacy':'Privacidade'
     },
     AR: {
-      'nav.shop':'المتجر','nav.home':'الرئيسية','nav.reviews':'التقييمات','nav.support':'الدعم',
+      'nav.shop':'المتجر','nav.home':'الرئيسية','nav.reviews':'التقييمات','nav.tutorials':'Tutorials',
       'nav.login':'تسجيل الدخول','nav.register':'إنشاء حساب',
       'hero.eyebrow':'متجر المنتجات الرقمية',
       'hero.title':'مرحبًا بك في<br>flashshp',

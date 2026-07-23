@@ -106,6 +106,7 @@ var REWRITES = {
   '/products': 'preview-products.html',
   '/product': 'preview-product.html',
   '/review': 'preview-feedback.html',
+  '/tutorials': 'preview-tutorials.html',
   '/reviews': 'preview-feedback.html',
   '/invoice': 'invoice.html',
   '/checkout': 'checkout.html',
