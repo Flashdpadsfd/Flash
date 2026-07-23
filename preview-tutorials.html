@@ -303,6 +303,26 @@
         ]
       },
       {
+        id: 'keys', group: 'Streaming', chip: 'Streaming', icon: 'key',
+        title: 'Se connecter avec une clé', sub: 'Pour les produits livrés sous forme de code.',
+        blocks: [
+          { h: 'Clé ou identifiants ?', p: ['Selon le produit, vous recevez soit des identifiants à saisir directement, soit une clé d\'activation : une suite de caractères à échanger sur le site du service. Votre commande indique laquelle des deux vous avez reçue.'] },
+          { h: 'Activer votre clé', steps: [
+            'Connectez-vous à votre espace client et ouvrez la commande concernée.',
+            'Copiez la clé telle quelle, sans rien ajouter ni retirer.',
+            'Ouvrez la page d\'activation du service — le lien est fourni avec la clé.',
+            'Collez la clé, validez, puis connectez-vous au compte sur lequel l\'abonnement doit s\'appliquer.'
+          ] },
+          { h: 'La clé est refusée', steps: [
+            'Vérifiez qu\'aucun espace ne s\'est glissé au début ou à la fin lors du copier-coller.',
+            'Ne confondez pas la lettre O et le chiffre 0, ni la lettre I et le chiffre 1.',
+            'Une clé ne s\'utilise qu\'une fois : si elle a déjà été activée, elle sera refusée.',
+            'Certaines clés sont limitées à une région. Si la vôtre l\'est, la fiche produit le précise.'
+          ] },
+          { h: 'Toujours refusée ?', p: ['Ouvrez un ticket sur notre Discord avec votre numéro de commande et le message d\'erreur exact affiché par le service. Ne tentez pas de réactiver la clé en boucle : certains services bloquent temporairement après plusieurs échecs.'] }
+        ]
+      },
+      {
         id: 'replacements', group: 'Après achat', chip: 'Après achat', icon: 'refresh',
         title: 'Remplacements', sub: 'Quand un accès cesse de fonctionner.',
         blocks: [
