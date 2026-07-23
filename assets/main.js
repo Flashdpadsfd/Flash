@@ -507,7 +507,22 @@ window.NX_ICONS = function (name) {
     var sym      = '€'; /* tout le site en € */
     if (cntEl) cntEl.textContent = cart.length ? totalQty + (totalQty > 1 ? ' items' : ' item') : '';
     if (!cart.length) {
-      body.innerHTML = '<div class="cart-panel__empty"><div class="cart-panel__empty-icon">🛒</div><div class="cart-panel__empty-text">Your cart is empty</div></div>';
+      body.innerHTML =
+        '<div class="cart-panel__empty">' +
+          '<div class="cart-panel__empty-badge">' +
+            '<svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' +
+              '<circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>' +
+              '<path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/>' +
+            '</svg>' +
+            '<span class="cart-panel__empty-dot">' +
+              '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">' +
+                '<path d="M12 5v14M19 12l-7 7-7-7"/></svg>' +
+            '</span>' +
+          '</div>' +
+          '<div class="cart-panel__empty-title">Looks like it\'s empty here.</div>' +
+          '<div class="cart-panel__empty-sub">Explore our catalog and find what you need</div>' +
+          '<a class="cart-panel__empty-cta" href="/products">Browse Store</a>' +
+        '</div>';
       if (foot) foot.innerHTML = '';
       return;
     }
