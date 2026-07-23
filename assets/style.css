@@ -165,11 +165,13 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
 
 .nav__actions { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
 
-/* ── Panier de la barre de navigation ──
-   Tuile icône + libellé « Cart », toujours visible (elle a remplacé le
-   sélecteur de langue). Volontairement plus large qu'une simple icône : c'est
-   le seul point d'entrée du panier, il doit se repérer immédiatement. */
-.nav__cart {
+/* ── Tuiles de la barre de navigation ──
+   Panier, connexion et menu partagent la même forme : icône au-dessus, libellé
+   en dessous. Une seule règle pour les trois, sinon elles divergeraient au
+   premier ajustement. */
+.nav__cart,
+.nav__login,
+.nav__hamburger {
   position: relative;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 2px;
@@ -178,15 +180,23 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
   background: rgba(255,255,255,.045);
   border: 1px solid rgba(255,255,255,.10);
   color: #fff; cursor: pointer;
+  font-family: Inter, sans-serif;
   transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
 }
-.nav__cart:hover  { background: rgba(255,255,255,.09); border-color: rgba(255,255,255,.20); }
-.nav__cart:active { transform: scale(.96); }
-.nav__cart-label {
+.nav__cart:hover,
+.nav__login:hover,
+.nav__hamburger:hover  { background: rgba(255,255,255,.09); border-color: rgba(255,255,255,.20); }
+.nav__cart:active,
+.nav__login:active,
+.nav__hamburger:active { transform: scale(.96); }
+
+.nav__cart-label,
+.nav__login-label {
   font-size: 10px; font-weight: 600; letter-spacing: .01em;
   color: rgba(255,255,255,.62); line-height: 1;
 }
-.nav__cart:hover .nav__cart-label { color: rgba(255,255,255,.85); }
+.nav__cart:hover .nav__cart-label,
+.nav__login:hover .nav__login-label { color: rgba(255,255,255,.85); }
 
 .nav__cart-count {
   position: absolute; top: -6px; right: -6px;
@@ -208,15 +218,7 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
 .nav__hamburger { display: none; }
 .nav.scrolled { background: rgba(9,9,11,.95); box-shadow: 0 1px 0 rgba(255,255,255,.06); }
 
-.nav__login {
-  display: inline-flex; align-items: center; gap: 6px;
-  background: transparent; color: rgba(255,255,255,.70);
-  font-family: Inter, sans-serif; font-size: 13px; font-weight: 500;
-  padding: 0 10px; height: 32px; border-radius: 6px;
-  border: none; cursor: pointer;
-  transition: color 200ms ease, background 200ms ease;
-}
-.nav__login:hover { color: #fff; background: rgba(255,255,255,.07); }
+/* .nav__login est desormais une tuile, regroupee plus haut avec .nav__cart. */
 
 /* Sélecteur de langue retiré : remplacé par le panier dans la barre de nav. */
 
@@ -1114,6 +1116,9 @@ body.nx-no-entrance .product-card { animation: none !important; }
 @media (max-width: 1023px) {
   .nav__inner { padding: 0 24px; }
   .nav__links { display: none; }
+  /* Les liens masqués quittent la grille : sans redéfinir les colonnes, les
+     actions se retrouvaient dans celle du milieu, avec un vide à droite. */
+  .nav__inner { grid-template-columns: 1fr auto; }
   .nav__hamburger { display: flex; }
   .sidebar { display: none; }
   .shop-main { padding-left: 0; }
