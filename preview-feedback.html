@@ -654,42 +654,84 @@
     document.addEventListener('click', function(e) {
       var dd = document.getElementById('rvProductDd');
       var opt = e.target.closest && e.target.closest('.rv-dd__opt');
-      if (opt) { fProduct = opt.getAttribute('data-prod'); if (dd) dd.classList.remove('open'); renderPanel(); applyFilters(); return; }
+      if (opt) { touched = true; fProduct = opt.getAttribute('data-prod'); if (dd) dd.classList.remove('open'); renderPanel(); applyFilters(); return; }
       if (e.target.closest && e.target.closest('#rvProductBtn')) { if (dd) dd.classList.toggle('open'); return; }
       if (dd && e.target.closest && !e.target.closest('#rvProductDd')) dd.classList.remove('open');
       var pill = e.target.closest && e.target.closest('.rv-pill');
-      if (pill) { document.querySelectorAll('.rv-pill').forEach(function(p) { p.classList.remove('active'); }); pill.classList.add('active'); fStars = pill.getAttribute('data-stars'); applyFilters(); return; }
+      if (pill) { touched = true; document.querySelectorAll('.rv-pill').forEach(function(p) { p.classList.remove('active'); }); pill.classList.add('active'); fStars = pill.getAttribute('data-stars'); applyFilters(); return; }
       var sb = e.target.closest && e.target.closest('.rv-sort__btn');
-      if (sb) { document.querySelectorAll('.rv-sort__btn').forEach(function(b) { b.classList.remove('active'); }); sb.classList.add('active'); sortBy = sb.getAttribute('data-sort'); applyFilters(); return; }
+      if (sb) { touched = true; document.querySelectorAll('.rv-sort__btn').forEach(function(b) { b.classList.remove('active'); }); sb.classList.add('active'); sortBy = sb.getAttribute('data-sort'); applyFilters(); return; }
     });
 
-    /* Chargement : avis locaux/démo d'abord, puis vrais feedbacks SellAuth */
-    ALL = getReviews().filter(function(r) { return r.published !== false; });
-    renderAll();
+    /* Défilement = lecture en cours : on ne remplace plus la grille sous ses yeux
+       (le défilement infini a déjà chargé des lots ; re-rendre les ferait sauter). */
+    window.addEventListener('scroll', function() {
+      if (window.scrollY > 200) touched = true;
+    }, { passive: true });
+
+    /* ── Chargement des avis ──
+       On NE rend PLUS les avis locaux/démo au démarrage : ils s'affichaient
+       pendant les quelques secondes que mettait l'API, d'où un flash de 12 faux
+       avis à chaque rafraîchissement. Le placeholder « Loading reviews… » reste
+       en place jusqu'à l'arrivée de vraies données.
+
+       Le direct part tout de suite. L'instantané (/assets/reviews.json) ne part
+       QUE si le direct n'a pas répondu au bout de SNAPSHOT_AFTER_MS : il pèse
+       ~415 Ko non compressés, le télécharger systématiquement doublerait le
+       poids de la page alors que l'API répond le plus souvent en quelques
+       dizaines de ms (cache serveur de api/feedbacks.js). */
+    var SERVED = null;      /* null | 'snapshot' | 'live' — ce qui est affiché */
+    var touched = false;    /* l'utilisateur a filtré, trié ou fait défiler */
+
+    function showData(data, source) {
+      if (!data || !data.ok || !Array.isArray(data.reviews) || !data.reviews.length) return false;
+      if (SERVED === 'live') return false;                     /* le direct a déjà gagné */
+      /* L'instantané ne se fait remplacer que par le direct, et seulement si
+         l'utilisateur n'a encore rien touché : sinon on lui reprendrait son
+         filtre et sa position de défilement en pleine lecture. */
+      if (SERVED === 'snapshot' && (source !== 'live' || touched)) return false;
+      ALL = data.reviews;
+      SERVED = source;
+      fProduct = 'all'; fStars = 'all';
+      document.querySelectorAll('.rv-pill').forEach(function(p, i) { p.classList.toggle('active', i === 0); });
+      renderAll();
+      return true;
+    }
+
     window.addEventListener('storage', function(e) {
-      if (e.key === 'nexus_reviews') { ALL = getReviews().filter(function(r) { return r.published !== false; }); renderAll(); }
+      /* Les avis locaux ne reprennent la main que si aucune vraie source n'a répondu. */
+      if (e.key === 'nexus_reviews' && !SERVED) {
+        ALL = getReviews().filter(function(r) { return r.published !== false; });
+        renderAll();
+      }
     });
 
-    (function loadSellAuthFeedbacks() {
-      function show(data) {
-        if (!data || !data.ok || !Array.isArray(data.reviews) || !data.reviews.length) return false;
-        ALL = data.reviews;
-        fProduct = 'all'; fStars = 'all';
-        document.querySelectorAll('.rv-pill').forEach(function(p, i) { p.classList.toggle('active', i === 0); });
-        renderAll();
-        return true;
-      }
+    (function loadFeedbacks() {
+      var SNAPSHOT_AFTER_MS = 400;   /* au-delà, l'attente se verrait */
+
       function getJSON(url) {
         return fetch(url, { headers: { 'Accept': 'application/json' } })
           .then(function(r) { return r.ok ? r.json() : null; })
           .catch(function() { return null; });
       }
-      /* 1) avis SellAuth en direct ; 2) à défaut (API non configurée, SellAuth
-         en rade, rate-limit) l'instantané importé par « npm run import:feedbacks ».
-         Les avis de démo ne servent plus que si aucun des deux n'existe. */
-      getJSON('/api/feedbacks').then(function(live) {
-        if (show(live)) return;
-        return getJSON('/assets/reviews.json').then(show);
+
+      function delay(ms) { return new Promise(function(r) { setTimeout(r, ms); }); }
+
+      var live = getJSON('/api/feedbacks').then(function(d) { return showData(d, 'live'); });
+
+      /* Filet, déclenché au PREMIER des deux événements : le direct a échoué
+         (souvent en quelques ms — inutile d'attendre le délai complet), ou il
+         tarde au point que l'attente se verrait. */
+      var snap = Promise.race([live, delay(SNAPSHOT_AFTER_MS)]).then(function() {
+        if (SERVED) return;                       /* le direct est déjà à l'écran */
+        return getJSON('/assets/reviews.json').then(function(d) { showData(d, 'snapshot'); });
+      });
+
+      /* Dernier recours seulement : aucune des deux sources n'a rien donné. */
+      Promise.all([live, snap]).then(function() {
+        if (SERVED) return;
+        ALL = getReviews().filter(function(r) { return r.published !== false; });
+        renderAll();
       });
     })();
   })();
