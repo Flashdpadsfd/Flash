@@ -165,54 +165,43 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
 
 .nav__actions { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
 
-/* ── Tuiles de la barre de navigation ──
-   Panier, connexion et menu partagent la même forme : icône au-dessus, libellé
-   en dessous. Une seule règle pour les trois, sinon elles divergeraient au
-   premier ajustement. */
+/* ── Panier et connexion dans la barre ──
+   Pas d'encadré : même traitement que les liens Home / Shop / Support, à
+   savoir texte 14 px, gris atténué, blanc au survol. Une seule règle pour les
+   deux, sinon elles divergeraient au premier ajustement. */
 .nav__cart,
-.nav__login,
-.nav__hamburger {
+.nav__login {
   position: relative;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 2px;
-  width: 54px; height: 50px;
-  padding: 0; border-radius: 12px;
-  background: rgba(255,255,255,.045);
-  border: 1px solid rgba(255,255,255,.10);
-  color: #fff; cursor: pointer;
-  font-family: Inter, sans-serif;
-  transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
+  display: inline-flex; align-items: center; gap: 7px;
+  height: 72px; padding: 0 12px;
+  background: transparent; border: none; border-radius: 0;
+  color: rgba(255,255,255,.60); cursor: pointer;
+  font-family: Inter, sans-serif; font-size: 14px; font-weight: 500;
+  transition: color 200ms ease;
 }
 .nav__cart:hover,
-.nav__login:hover,
-.nav__hamburger:hover  { background: rgba(255,255,255,.09); border-color: rgba(255,255,255,.20); }
-.nav__cart:active,
-.nav__login:active,
-.nav__hamburger:active { transform: scale(.96); }
+.nav__login:hover { color: #fff; }
 
 .nav__cart-label,
 .nav__login-label {
-  font-size: 10px; font-weight: 600; letter-spacing: .01em;
-  color: rgba(255,255,255,.62); line-height: 1;
+  font-size: 14px; font-weight: 500; color: inherit; line-height: 1;
 }
-.nav__cart:hover .nav__cart-label,
-.nav__login:hover .nav__login-label { color: rgba(255,255,255,.85); }
 
+/* Le compteur suit le libellé, dans le flux : sans encadré autour du panier,
+   une pastille en position absolue n'aurait plus rien à quoi s'accrocher. */
 .nav__cart-count {
-  position: absolute; top: -6px; right: -6px;
   background: #fff; color: #000;
   font-size: 10px; font-weight: 700;
-  min-width: 18px; height: 18px; border-radius: 9999px;
+  min-width: 17px; height: 17px; border-radius: 9999px;
   /* Affiché uniquement quand le panier n'est pas vide : c'est updateCartCount()
      qui ajoute « is-visible ». Avant, la règle etait « display:none » sans que
      rien ne la lève : le compteur ne s'affichait donc jamais. */
   display: none; align-items: center; justify-content: center;
   padding: 0 5px;
-  border: 2px solid #09090b;
   transform: scale(1); transition: transform 300ms cubic-bezier(.34,1.56,.64,1);
   pointer-events: none;
 }
-.nav__cart-count.is-visible { display: flex; }
+.nav__cart-count.is-visible { display: inline-flex; }
 .nav__cart-count.bump { transform: scale(1.35); }
 
 .nav__hamburger { display: none; }
