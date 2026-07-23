@@ -8,6 +8,133 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Lancelot&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/style.css?v=15" />
+  <style>
+    /* ── Page produit ──
+       Bandeau d'en-tete, puis visuel et panneau d'achat cote a cote, puis les
+       sections d'information empilees en pleine largeur. Monochrome comme le
+       reste du site : aucune couleur d'accent. */
+    .pdx-page { max-width: 1180px; margin: 0 auto; padding: 96px 28px 80px; }
+
+    .pdx-crumb { display: flex; align-items: center; gap: 8px; font-size: 12.5px; margin-bottom: 18px; }
+    .pdx-crumb a { color: rgba(255,255,255,.42); }
+    .pdx-crumb a:hover { color: #fff; }
+    .pdx-crumb span { color: rgba(255,255,255,.22); }
+    .pdx-crumb .pdx-crumb__cur { color: rgba(255,255,255,.75); }
+
+    /* En-tete : nom + note a gauche, disponibilite a droite. */
+    .pdx-head {
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 24px;
+      background: rgba(255,255,255,.025); border: 1px solid rgba(255,255,255,.07);
+      border-radius: 16px; padding: 24px 26px; margin-bottom: 16px;
+    }
+    .pdx-head__name { font-size: 30px; font-weight: 700; color: #fff; letter-spacing: -.7px; margin: 0 0 10px; }
+    .pdx-head__meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .pdx-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 10px; border-radius: 6px;
+      background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08);
+      font-size: 11.5px; color: rgba(255,255,255,.55);
+    }
+    .pdx-status {
+      display: inline-flex; align-items: center; gap: 7px; flex-shrink: 0;
+      padding: 7px 13px; border-radius: 8px;
+      background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.10);
+      font-size: 11.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #fff;
+    }
+    .pdx-status::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #34d399; }
+
+    /* Visuel + achat. Le panneau d'achat reste visible au defilement. */
+    .pdx-top { display: grid; grid-template-columns: 1fr 380px; gap: 16px; align-items: start; margin-bottom: 16px; }
+
+    .pdx-visual {
+      position: relative; overflow: hidden;
+      background: rgba(255,255,255,.025); border: 1px solid rgba(255,255,255,.07);
+      border-radius: 16px; min-height: 340px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .pdx-visual__bg {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      font-size: 132px; font-weight: 800; letter-spacing: -6px;
+      color: rgba(255,255,255,.028); white-space: nowrap; pointer-events: none; user-select: none;
+    }
+    .pdx-visual__icon { position: relative; font-size: 92px; line-height: 1; }
+    .pdx-visual__icon img { width: 128px; height: 128px; object-fit: contain; }
+    .pdx-visual__pills { position: absolute; left: 18px; bottom: 18px; display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .pdx-buy {
+      position: sticky; top: 88px;
+      background: rgba(255,255,255,.025); border: 1px solid rgba(255,255,255,.07);
+      border-radius: 16px; overflow: hidden;
+    }
+    .pdx-buy__price { padding: 20px 20px 16px; border-bottom: 1px solid rgba(255,255,255,.06); }
+    .pdx-buy__lbl { font-size: 10.5px; font-weight: 700; letter-spacing: .10em; text-transform: uppercase; color: rgba(255,255,255,.35); margin-bottom: 6px; }
+    .pdx-buy__amount { font-size: 32px; font-weight: 700; color: #fff; letter-spacing: -1px; line-height: 1; }
+    .pdx-buy__body { padding: 16px 20px 20px; }
+    .pdx-buy__sect { margin-bottom: 16px; }
+    .pdx-buy__sect:last-child { margin-bottom: 0; }
+
+    .pdx-line { display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: rgba(255,255,255,.50); padding: 5px 0; }
+    .pdx-line--total { color: #fff; font-size: 15px; font-weight: 700; padding-top: 11px; margin-top: 5px; border-top: 1px solid rgba(255,255,255,.07); }
+
+    /* Recapitulatif compact du produit choisi. */
+    .pdx-mini { display: flex; align-items: center; gap: 11px; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.06); margin-bottom: 12px; }
+    .pdx-mini__thumb {
+      width: 42px; height: 42px; border-radius: 9px; flex-shrink: 0;
+      background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.07);
+      display: flex; align-items: center; justify-content: center; font-size: 20px;
+    }
+    .pdx-mini__thumb img { width: 100%; height: 100%; object-fit: contain; padding: 5px; }
+    .pdx-mini__info { flex: 1; min-width: 0; }
+    .pdx-mini__name { font-size: 13.5px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pdx-mini__qty { font-size: 12px; color: rgba(255,255,255,.38); margin-top: 2px; }
+    .pdx-mini__price { font-size: 14px; font-weight: 700; color: #fff; }
+
+    /* Sections d'information, en pleine largeur sous le bloc d'achat. */
+    .pdx-sec { margin-bottom: 16px; }
+    .pdx-sec__hdr { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .pdx-sec__title { font-size: 17px; font-weight: 700; color: #fff; }
+    .pdx-card {
+      background: rgba(255,255,255,.025); border: 1px solid rgba(255,255,255,.07);
+      border-radius: 14px; padding: 22px 24px;
+    }
+    .pdx-card__text { font-size: 14px; line-height: 1.75; color: rgba(255,255,255,.58); }
+
+    .pdx-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .pdx-list { list-style: none; margin: 0; padding: 0; }
+    .pdx-list li {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 10px 0; font-size: 13.5px; line-height: 1.6; color: rgba(255,255,255,.58);
+      border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+    .pdx-list li:last-child { border-bottom: none; padding-bottom: 0; }
+    .pdx-list svg { flex-shrink: 0; margin-top: 2px; color: rgba(255,255,255,.40); }
+
+    /* Avis : trois colonnes, comme la grille de la page Avis. */
+    #pdReviewsList { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    #pdReviewsList .pd-review {
+      background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.06);
+      border-radius: 12px; padding: 16px; border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+
+    .pdx-faq__q { font-size: 14.5px; font-weight: 600; color: #fff; margin-bottom: 6px; }
+    .pdx-faq__a { font-size: 13.5px; line-height: 1.7; color: rgba(255,255,255,.52); margin: 0 0 20px; }
+    .pdx-faq__a:last-child { margin-bottom: 0; }
+
+    .pdx-back { display: inline-flex; align-items: center; gap: 7px; margin-top: 26px; font-size: 13.5px; color: rgba(255,255,255,.45); }
+    .pdx-back:hover { color: #fff; }
+
+    @media (max-width: 1023px) {
+      .pdx-page { padding: 92px 18px 64px; }
+      .pdx-top { grid-template-columns: 1fr; }
+      .pdx-buy { position: static; }
+      .pdx-cols { grid-template-columns: 1fr; }
+      #pdReviewsList { grid-template-columns: 1fr; }
+      .pdx-head { flex-direction: column; }
+      .pdx-head__name { font-size: 24px; }
+      .pdx-visual { min-height: 240px; }
+      .pdx-visual__bg { font-size: 82px; }
+    }
+  </style>
 </head>
 <body>
 
@@ -59,161 +186,152 @@
     </div>
   </div>
 
-  <!-- ─── PAGE ─── -->
-  <!-- Layout identique à la page Shop : sidebar catégories à gauche (pleine hauteur),
-       et tout le reste (fil d'Ariane + hero + contenu + achat) dans la colonne de droite. -->
-  <div class="pdv3-page">
+  <!-- ─── PAGE PRODUIT ─── -->
+  <div class="pdx-page">
 
-    <!-- ── CATEGORIES (left) — même sidebar que la page Shop ── -->
-    <aside class="pdv3-cats" id="pdCatsAside">
-      <div class="sidebar__search">
-        <svg class="sidebar__search-icon" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
-        <input class="sidebar__search-input" id="pdSearchInput" type="text" placeholder="Search products…" autocomplete="off" />
-      </div>
-      <nav class="pdv3-cats__list" id="pdCatsList"></nav>
-    </aside>
-
-    <!-- ── COLONNE DROITE (hero + contenu) ── -->
-    <div class="pdv3-content">
-
-    <!-- ── BREADCRUMB ── -->
-    <div class="pdv3-breadcrumb">
-      <a href="/">Home</a>
-      <span class="pdv3-breadcrumb-sep">›</span>
-      <a href="/products">Products</a>
-      <span class="pdv3-breadcrumb-sep">›</span>
-      <span class="pdv3-breadcrumb-cur" id="pdBreadcrumbName">Loading…</span>
+    <div class="pdx-crumb">
+      <a href="/">Home</a><span>›</span><a href="/products">Products</a><span>›</span>
+      <span class="pdx-crumb__cur" id="pdBreadcrumbName">Loading…</span>
     </div>
 
-    <!-- ── HERO BANNER ── -->
-    <div class="pdv3-hero">
-      <div class="pdv3-hero__bg-text" id="pdHeroBgText"></div>
-      <div class="pdv3-hero__inner">
-        <div class="pdv3-hero__icon" id="pdHeroIcon">📦</div>
+    <!-- En-tete -->
+    <div class="pdx-head">
+      <div class="pdx-head__left">
+        <h1 class="pdx-head__name" id="pdName">Loading…</h1>
+        <div class="pdx-head__meta">
+          <span class="pdx-tag" id="pdRating" style="display:none;"></span>
+          <span class="pdx-tag" id="pdHeroCatPill">Digital</span>
+          <span class="pdx-tag">Instant delivery</span>
+        </div>
       </div>
-      <div class="pdv3-hero__pills">
-        <span class="pdv3-pill">
-          <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-          Instant Digital Delivery
-        </span>
-        <span class="pdv3-pill" id="pdHeroCatPill">📦 Digital</span>
-      </div>
+      <span class="pdx-status" id="pdStock">IN STOCK</span>
     </div>
 
-    <!-- ── BODY (main | purchase) ── -->
-    <div class="pdv3-body">
+    <!-- Visuel + achat -->
+    <div class="pdx-top">
 
-      <!-- ── MAIN CONTENT ── -->
-      <main class="pdv3-main">
+      <div class="pdx-visual">
+        <div class="pdx-visual__bg" id="pdHeroBgText"></div>
+        <div class="pdx-visual__icon" id="pdHeroIcon">📦</div>
+        <div class="pdx-visual__pills">
+          <span class="pdv3-pill">
+            <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            Instant Digital Delivery
+          </span>
+        </div>
+      </div>
 
-        <!-- Product name + price header -->
-        <div class="pdv3-product-hdr">
-          <div class="pdv3-product-hdr__left">
-            <div class="pdv3-badges">
-              <span class="pdv3-badge-stock" id="pdStock">IN STOCK</span>
-              <span class="pdv3-badge-rating" id="pdRating" style="display:none;"></span>
+      <aside class="pdx-buy">
+        <div class="pdx-buy__price">
+          <div class="pdx-buy__lbl">Per each</div>
+          <div class="pdx-buy__amount" id="pdPrice">—</div>
+        </div>
+
+        <div class="pdx-buy__body">
+
+          <div class="pdx-mini">
+            <div class="pdx-mini__thumb" id="pdSideThumb">📦</div>
+            <div class="pdx-mini__info">
+              <div class="pdx-mini__name" id="pdSideName">—</div>
+              <div class="pdx-mini__qty">Quantity: <span id="pdQtyDisplay">1</span></div>
             </div>
-            <h1 class="pdv3-name" id="pdName">Loading…</h1>
+            <div class="pdx-mini__price" id="pdSidePrice">—</div>
           </div>
-          <div class="pdv3-product-hdr__right">
-            <div class="pdv3-per-each">PER EACH</div>
-            <div class="pdv3-price" id="pdPrice">—</div>
+
+          <div class="pdv3-variants pdx-buy__sect" id="pdVariantsSection" style="display:none;">
+            <div class="pdv3-qty-lbl">Variant</div>
+            <div class="pdv3-variants-grid" id="pdVariants"></div>
           </div>
-        </div>
 
-        <div class="pdv3-sep"></div>
-
-        <!-- Description -->
-        <div>
-          <div class="pdv3-shdr">Description</div>
-          <div class="pdv3-desc-card" id="pdDesc">—</div>
-        </div>
-
-        <!-- Specs + Service Guarantee -->
-        <div class="pdv3-specs-wrap">
-          <div class="pdv3-specs-col">
-            <div class="pdv3-shdr">System Specs</div>
-            <div id="pdSpecsLeft"></div>
+          <div class="pdv3-qty-section pdx-buy__sect">
+            <div class="pdv3-qty-lbl">Quantity</div>
+            <div class="pdv3-qty-ctrl">
+              <button class="pdv3-qty-btn" id="pdQtyMinus">−</button>
+              <div class="pdv3-qty-val" id="pdQtyVal">1</div>
+              <button class="pdv3-qty-btn" id="pdQtyPlus">+</button>
+            </div>
           </div>
-        </div>
 
-        <!-- Customer Reviews -->
-        <div>
-          <div class="pdv3-shdr">Customer Reviews</div>
-          <div id="pdReviewsSummary" class="pd-rev-summary" style="display:none;">
-            <div class="pd-rev-stars" id="pdRevStars">★★★★★</div>
-            <div class="pd-rev-score" id="pdRevScore">5.0</div>
-            <div class="pd-rev-count" id="pdRevCount">(0 reviews)</div>
+          <div class="pdx-buy__sect">
+            <div class="pdx-line"><span>Subtotal</span><span id="pdSubtotal">—</span></div>
+            <div class="pdx-line"><span>Tax</span><span>€0.00</span></div>
+            <div class="pdx-line pdx-line--total"><span>Total</span><span id="pdTotal">—</span></div>
           </div>
-          <div id="pdReviewsList">
-            <div style="color:rgba(255,255,255,.32);font-size:13px;padding:4px 0;">No reviews yet for this product.</div>
+
+          <div class="pdv3-side-actions pdx-buy__sect">
+            <button class="pdv3-btn-cart" id="pdAddCart">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+              Add to Cart
+            </button>
+            <button class="pdv3-btn-checkout" id="pdBuyNow">
+              <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="display:inline;vertical-align:-2px;margin-right:6px;"><path d="M5 12l5 5L20 7"/></svg>
+              Checkout Now
+            </button>
           </div>
+
         </div>
-
-        <a href="/products" class="pd-back">
-          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-          Back to Products
-        </a>
-
-      </main>
-
-      <!-- ── RIGHT SIDEBAR ── -->
-      <aside class="pdv3-sidebar">
-
-        <div class="pdv3-sidebar__hdr">PRODUCT DETAILS</div>
-
-        <!-- Product card -->
-        <div class="pdv3-side-product">
-          <div class="pdv3-side-thumb" id="pdSideThumb">📦</div>
-          <div class="pdv3-side-info">
-            <div class="pdv3-side-name" id="pdSideName">—</div>
-            <div class="pdv3-side-qty-txt">Quantity: <span id="pdQtyDisplay">1</span></div>
-          </div>
-          <div class="pdv3-side-price" id="pdSidePrice">—</div>
-        </div>
-
-        <div class="pdv3-sep" style="margin:0 20px;"></div>
-
-        <!-- Subtotal / Tax / Total -->
-        <div class="pdv3-sum-rows">
-          <div class="pdv3-sum-row"><span>Subtotal</span><span id="pdSubtotal">—</span></div>
-          <div class="pdv3-sum-row"><span>Tax</span><span>€0.00</span></div>
-          <div class="pdv3-sum-row pdv3-sum-row--total"><span>Total</span><span id="pdTotal">—</span></div>
-        </div>
-
-
-        <!-- Variantes (affichées seulement si le produit en a) -->
-        <div class="pdv3-variants" id="pdVariantsSection" style="display:none;">
-          <div class="pdv3-qty-lbl">VARIANTE</div>
-          <div class="pdv3-variants-grid" id="pdVariants"></div>
-        </div>
-
-        <!-- Quantity -->
-        <div class="pdv3-qty-section">
-          <div class="pdv3-qty-lbl">QUANTITY</div>
-          <div class="pdv3-qty-ctrl">
-            <button class="pdv3-qty-btn" id="pdQtyMinus">−</button>
-            <div class="pdv3-qty-val" id="pdQtyVal">1</div>
-            <button class="pdv3-qty-btn" id="pdQtyPlus">+</button>
-          </div>
-        </div>
-
-        <!-- Action buttons -->
-        <div class="pdv3-side-actions">
-          <button class="pdv3-btn-cart" id="pdAddCart">
-            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-            Add to Cart
-          </button>
-          <button class="pdv3-btn-checkout" id="pdBuyNow">
-            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="display:inline;vertical-align:-2px;margin-right:6px;"><path d="M5 12l5 5L20 7"/></svg>
-            Checkout Now
-          </button>
-        </div>
-
       </aside>
 
     </div>
-    </div><!-- /.pdv3-content -->
+
+    <!-- Description -->
+    <section class="pdx-sec">
+      <div class="pdx-sec__hdr"><span class="pdx-sec__title">About this product</span></div>
+      <div class="pdx-card"><div class="pdx-card__text" id="pdDesc">—</div></div>
+    </section>
+
+    <!-- Deux colonnes : details produit / engagements -->
+    <div class="pdx-cols">
+      <section class="pdx-card">
+        <div class="pdx-sec__hdr"><span class="pdx-sec__title">Product details</span></div>
+        <div id="pdSpecsLeft"></div>
+      </section>
+      <section class="pdx-card">
+        <div class="pdx-sec__hdr"><span class="pdx-sec__title">What you get</span></div>
+        <ul class="pdx-list">
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>Delivered to your email the moment the payment clears.</span></li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>Kept in your account area, so you can look it up again any time.</span></li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>Replaced if it stops working inside the period you paid for.</span></li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>Support on Discord, with your order number to hand.</span></li>
+        </ul>
+      </section>
+    </div>
+
+    <!-- Avis -->
+    <section class="pdx-sec">
+      <div class="pdx-sec__hdr">
+        <span class="pdx-sec__title">Customer reviews</span>
+        <div id="pdReviewsSummary" class="pd-rev-summary" style="display:none;">
+          <div class="pd-rev-stars" id="pdRevStars">★★★★★</div>
+          <div class="pd-rev-score" id="pdRevScore">5.0</div>
+          <div class="pd-rev-count" id="pdRevCount">(0 reviews)</div>
+        </div>
+      </div>
+      <div id="pdReviewsList">
+        <div style="color:rgba(255,255,255,.32);font-size:13px;padding:4px 0;">No reviews yet for this product.</div>
+      </div>
+    </section>
+
+    <!-- Questions frequentes -->
+    <section class="pdx-sec">
+      <div class="pdx-sec__hdr"><span class="pdx-sec__title">Common questions</span></div>
+      <div class="pdx-card">
+        <div class="pdx-faq__q">How fast is delivery?</div>
+        <p class="pdx-faq__a">Seconds, in most cases. If your payment is still confirming on the network it can take a few minutes — the checkout page keeps you posted.</p>
+        <div class="pdx-faq__q">Where do I find what I bought?</div>
+        <p class="pdx-faq__a">Sign in with the email you ordered with and open the order. Everything we sent stays there, so you can come back to it later.</p>
+        <div class="pdx-faq__q">What if it stops working?</div>
+        <p class="pdx-faq__a">Open a ticket on our Discord with your order number. If it failed inside the period you paid for and nothing was changed on the account, we replace it.</p>
+        <div class="pdx-faq__q">Can I change the password?</div>
+        <p class="pdx-faq__a">No. Changing it breaks the account and voids the replacement — leave it exactly as delivered.</p>
+      </div>
+    </section>
+
+    <a href="/products" class="pdx-back">
+      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Back to Products
+    </a>
+
   </div>
 
   <!-- ─── CART PANEL ─── -->
