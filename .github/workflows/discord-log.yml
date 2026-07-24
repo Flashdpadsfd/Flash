@@ -39,7 +39,7 @@ jobs:
                 { "name": "Date",   "value": "${COMMIT_DATE}", "inline": true },
                 { "name": "Fichiers modifiés", "value": "${CHANGED_COUNT} fichier(s)", "inline": true }
               ],
-              "footer": { "text": "Nexus Store · Vercel · master" },
+              "footer": { "text": "Nexus Store · Hostinger · master" },
               "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
             }]
           }

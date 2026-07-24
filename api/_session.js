@@ -1,7 +1,7 @@
 /* FlashShp — Helpers de session pour le dashboard client (sans dépendance).
    =========================================================================
-   Fichier préfixé « _ » → Vercel ne le transforme PAS en route ; il est juste
-   require() par les autres fonctions (auth-callback, me, logout).
+   Fichier préfixé « _ » → server.js ne le monte PAS comme route ; il est juste
+   require() par les autres handlers (auth-callback, me, logout).
 
    La session est un jeton signé HMAC-SHA256 (façon JWT compact) stocké dans un
    cookie httpOnly. Aucune donnée sensible n'y est mise à part l'identité Discord

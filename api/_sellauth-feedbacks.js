@@ -5,8 +5,8 @@
    - scripts/import-feedbacks.js → l'import ponctuel qui fige TOUS les avis dans
                                    assets/reviews.json (secours hors-ligne).
 
-   Le préfixe « _ » exclut ce fichier du routage /api/<name> (server.js) et des
-   fonctions serverless Vercel : ce n'est pas un endpoint, juste une librairie.
+   Le préfixe « _ » exclut ce fichier du routage /api/<name> (server.js) :
+   ce n'est pas un endpoint, juste une librairie.
 
    Aucun secret n'est lu ici : la clé et l'id boutique sont passés en argument
    par l'appelant (qui les prend dans process.env). */

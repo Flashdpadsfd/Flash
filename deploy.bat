@@ -16,6 +16,6 @@ git commit -m "%msg%"
 git push origin master
 
 echo.
-echo  Termine ! Vercel va se mettre a jour dans 1-2 minutes.
+echo  Termine ! Code pousse sur GitHub. Mets a jour Hostinger (git pull) si necessaire.
 echo.
 pause

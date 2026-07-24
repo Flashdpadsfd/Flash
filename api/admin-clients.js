@@ -12,7 +12,7 @@
 
    Variables d'environnement :
    - ADMIN_SECRET                          : secret admin (obligatoire).
-   - KV_REST_API_URL / KV_REST_API_TOKEN   : stockage (via intégration Vercel).
+   - KV_REST_API_URL / KV_REST_API_TOKEN   : stockage (Upstash Redis).
    - SELLAUTH_API_KEY / SELLAUTH_SHOP_ID   : pour les commandes (optionnel). */
 
 var crypto = require('crypto');

@@ -1,7 +1,6 @@
 /* FlashShp — Contrôle d'origine partagé + CORS pour le panneau admin séparé.
    =========================================================================
-   Fichier préfixé « _ » → jamais exposé comme route (server.js) ni transformé
-   en fonction serverless.
+   Fichier préfixé « _ » → jamais exposé comme route (server.js).
 
    Remplace les 5 copies identiques de isAllowedOrigin() qui traînaient dans
    api/feedbacks.js, feedback-delete.js, admin-clients.js, auth-email-request.js
@@ -67,8 +66,6 @@ function isShopOrigin(req) {
   var selfHost = String((req.headers && req.headers.host) || '').toLowerCase().split(':')[0];
   if (selfHost && host === selfHost) return true;
   if (host === 'localhost' || host === '127.0.0.1') return true;
-  if (/^nexus-theme[a-z0-9-]*\.vercel\.app$/.test(host)) return true;
-  if (/^flashshp[a-z0-9-]*\.vercel\.app$/.test(host)) return true;
   var extra = listFromEnv('ALLOWED_ORIGINS');
   for (var i = 0; i < extra.length; i++) {
     if (host === extra[i] || host.endsWith('.' + extra[i])) return true;

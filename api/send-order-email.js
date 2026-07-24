@@ -1,9 +1,9 @@
-/* FlashShp - Envoi des emails de commande via Gmail SMTP (fonction Vercel)
+/* FlashShp - Envoi des emails de commande via Gmail SMTP (handler api)
    =====================================================================
    Remplace EmailJS : pas de bandeau "Email sent via EmailJS.com",
    nom d'expediteur controle (FROM_NAME), gratuit (~500 emails/jour Gmail).
 
-   Variables d'environnement a configurer sur Vercel :
+   Variables d'environnement a configurer :
    - GMAIL_USER          : adresse Gmail d'envoi (ex: astrashop250@gmail.com)
    - GMAIL_APP_PASSWORD  : mot de passe d'application Google (PAS le mot de
                            passe du compte) - cree sur myaccount.google.com
@@ -12,10 +12,10 @@
    - FROM_NAME           : nom d'expediteur affiche (defaut: FlashShp)
    - ALLOWED_ORIGINS     : (optionnel) liste de domaines autorises a appeler
                            cette fonction, separes par des virgules
-                           (ex: monshop.com,boutique.fr). *.vercel.app et
-                           localhost sont toujours autorises.
+                           (ex: monshop.com,boutique.fr). Le domaine qui sert
+                           le site et localhost sont toujours autorises.
 
-   Tant que GMAIL_USER/GMAIL_APP_PASSWORD ne sont pas definies, la fonction
+   Tant que GMAIL_USER/GMAIL_APP_PASSWORD ne sont pas definies, le handler
    repond 501 et le site retombe automatiquement sur EmailJS. */
 
 var mailer = require('./_mailer.js');
@@ -47,8 +47,8 @@ function oneLine(s) {
 /* Anti-abuse: only accept requests coming from our own front-end. Browsers
    always attach Origin (and usually Referer) on POST fetches, so a missing or
    foreign value means the call did not come from our pages (e.g. curl, bots).
-   Allowed hosts: *.vercel.app preview/prod deploys, localhost (dev) and any
-   host listed in the ALLOWED_ORIGINS env var. */
+   Allowed hosts: the host serving the site (same-origin), localhost (dev) and
+   any host listed in the ALLOWED_ORIGINS env var. */
 /* Règle d'origine partagée par toutes les routes : voir api/_origin.js. */
 
 module.exports = function (req, res) {

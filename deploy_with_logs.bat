@@ -96,7 +96,7 @@ call :log "========================================="
 call :log "Log complet: %LOG_FILE%"
 
 echo.
-echo  Termine ! Vercel va se mettre a jour dans 1-2 minutes.
+echo  Termine ! Code pousse sur GitHub. Mets a jour Hostinger (git pull) si necessaire.
 echo  Log sauvegarde dans: %LOG_FILE%
 echo.
 pause

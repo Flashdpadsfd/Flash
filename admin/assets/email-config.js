@@ -1,7 +1,7 @@
 /* FlashShp - Configuration email du site
    =====================================
    Charge sur toutes les pages (window.*) ET importable cote serveur
-   (module.exports) par la fonction Vercel api/send-order-email.js.
+   (module.exports) par le handler api/send-order-email.js.
    La Public Key EmailJS est concue pour etre exposee cote client. */
 var window = (typeof window !== 'undefined') ? window : {};
 window.NEXUS_EMAIL_DEFAULTS = {

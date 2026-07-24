@@ -2741,7 +2741,7 @@
         if (!res.body || res.body.storeAvailable === false) {
           if (countEl) countEl.textContent = '';
           tbody.innerHTML = emptyRow(5, 'users', 'Stockage non provisionné',
-            'Ajoutez Upstash Redis (KV) dans Vercel → Storage pour enregistrer les connexions.');
+            'Configurez Upstash Redis (variables KV_REST_API_URL / KV_REST_API_TOKEN) pour enregistrer les connexions.');
           return;
         }
         var clients = (res.body && res.body.clients) || [];

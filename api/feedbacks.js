@@ -12,8 +12,8 @@
    - SELLAUTH_API_KEY : clé API SellAuth (Dashboard SellAuth > Settings > API).
                         Envoyée en en-tête « Authorization: Bearer <clé> ».
    - SELLAUTH_SHOP_ID : identifiant numérique de la boutique SellAuth.
-   - ALLOWED_ORIGINS  : (optionnel) domaines autorisés en plus de *.vercel.app
-                        et localhost, séparés par des virgules.
+   - ALLOWED_ORIGINS  : (optionnel) domaines autorisés en plus du domaine qui
+                        sert le site et de localhost, séparés par des virgules.
 
    Tant que SELLAUTH_API_KEY / SELLAUTH_SHOP_ID ne sont pas définies, la
    fonction répond 501 et la page Avis garde ses avis de secours. */
