@@ -939,25 +939,119 @@
       stockEl.classList.add('out');
     }
 
-    /* ── Rating ── */
+    /* ── Avis ─────────────────────────────────────────────────────────────────
+       Trois sources fusionnées : les avis locaux (nexus_reviews, publiés par
+       l'admin), le snapshot SellAuth (assets/reviews.json, cf.
+       « npm run import:feedbacks ») et l'API live /api/feedbacks. Le rendu passe
+       par renderReviews(), rappelé quand les sources asynchrones arrivent. */
     var allReviews = [];
     try { allReviews = JSON.parse(localStorage.getItem('nexus_reviews')) || []; } catch(e) {}
-    /* Un avis appartient au produit s'il a le même productId, ou à défaut le même nom.
-       Seuls les avis publiés comptent. Note tolérée : champ stars ou rating. */
+
     var _pname = String(p.name || '').toLowerCase().trim();
     function _rVal(r) { var v = Number(r.stars != null ? r.stars : (r.rating != null ? r.rating : 5)); if (!isFinite(v)) v = 5; return Math.max(0, Math.min(5, Math.round(v))); }
-    var pr = allReviews.filter(function(r) {
+
+    /* Un avis appartient au produit si même productId, même nom, OU — corresp.
+       souple — si le nom produit de l'avis CONTIENT le nom de la fiche (ex.
+       fiche « Netflix » → avis « Netflix 4k LifeTime Key… »). Min. 3 caractères
+       pour éviter qu'un nom trop court n'attrape tout. Avis non publiés exclus. */
+    function matchesProduct(r) {
       if (r.published === false) return false;
       if (r.productId != null && String(r.productId) === String(pid)) return true;
-      if (_pname && r.product && String(r.product).toLowerCase().trim() === _pname) return true;
-      return false;
-    });
-    var ratingEl = document.getElementById('pdRating');
-    if (pr.length) {
-      var avg = pr.reduce(function(s,r){ return s + _rVal(r); }, 0) / pr.length;
-      ratingEl.textContent = '★ ' + avg.toFixed(1) + ' (' + pr.length + ')';
-      ratingEl.style.display = '';
+      if (!_pname) return false;
+      var rp = String(r.product || '').toLowerCase().trim();
+      if (!rp) return false;
+      if (rp === _pname) return true;
+      return _pname.length >= 3 && rp.indexOf(_pname) !== -1;
     }
+
+    /* Dédoublonnage : par id si présent, sinon par contenu (nom+texte+date). */
+    function reviewKey(r) {
+      return r.id != null ? ('id:' + r.id)
+        : ('t:' + String(r.name || '') + '|' + String(r.text || r.comment || '') + '|' + String(r.date || ''));
+    }
+    function mergeReviews(incoming) {
+      if (!Array.isArray(incoming) || !incoming.length) return;
+      var seen = {};
+      allReviews.forEach(function(r) { seen[reviewKey(r)] = true; });
+      var added = 0;
+      incoming.forEach(function(r) { var k = reviewKey(r); if (!seen[k]) { seen[k] = true; allReviews.push(r); added++; } });
+      if (added) renderReviews();
+    }
+
+    function relTime(dateStr) {
+      if (!dateStr) return '';
+      var d = new Date(dateStr); if (isNaN(d.getTime())) return '';
+      var s = Math.max(0, (Date.now() - d.getTime()) / 1000), day = 86400;
+      if (s < 3600)      { var mi = Math.floor(s / 60);  return mi <= 1 ? 'just now' : mi + ' minutes ago'; }
+      if (s < day)       { var h  = Math.floor(s / 3600); return h + ' hour' + (h > 1 ? 's' : '') + ' ago'; }
+      if (s < day * 30)  { var dd = Math.floor(s / day);  return dd + ' day' + (dd > 1 ? 's' : '') + ' ago'; }
+      if (s < day * 365) { var mo = Math.floor(s / (day * 30)); return mo + ' month' + (mo > 1 ? 's' : '') + ' ago'; }
+      var y = Math.floor(s / (day * 365)); return y + ' year' + (y > 1 ? 's' : '') + ' ago';
+    }
+    var REV_CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+
+    function renderReviews() {
+      var pr = allReviews.filter(matchesProduct);
+      /* Vrais témoignages (avec message) d'abord, puis par date décroissante. */
+      pr = pr.slice().sort(function(a, b) {
+        var ax = (a.automatic || !(a.text || a.comment) || a.text === 'Automatic after 7 days') ? 1 : 0;
+        var bx = (b.automatic || !(b.text || b.comment) || b.text === 'Automatic after 7 days') ? 1 : 0;
+        if (ax !== bx) return ax - bx;
+        return (new Date(b.createdAt || b.date || 0).getTime() || 0) - (new Date(a.createdAt || a.date || 0).getTime() || 0);
+      });
+
+      var ratingEl = document.getElementById('pdRating');
+      var summaryEl = document.getElementById('pdReviewsSummary');
+      var listEl = document.getElementById('pdReviewsList');
+      if (!pr.length) {
+        if (ratingEl) ratingEl.style.display = 'none';
+        if (summaryEl) summaryEl.style.display = 'none';
+        if (listEl) listEl.innerHTML = '<div class="pdx-rev__empty">No reviews yet for this product.</div>';
+        return;
+      }
+      var avg = pr.reduce(function(s, r) { return s + _rVal(r); }, 0) / pr.length;
+      if (ratingEl) { ratingEl.textContent = '★ ' + avg.toFixed(1) + ' (' + pr.length + ')'; ratingEl.style.display = ''; }
+      var fullStars = Math.round(avg);
+      document.getElementById('pdRevStars').textContent = '★'.repeat(fullStars) + '☆'.repeat(5 - fullStars);
+      document.getElementById('pdRevScore').textContent = avg.toFixed(1);
+      document.getElementById('pdRevCount').textContent = '(' + pr.length + ' review' + (pr.length !== 1 ? 's' : '') + ')';
+      if (summaryEl) summaryEl.style.display = '';
+      listEl.innerHTML = pr.slice(0, 6).map(function(r) {
+        var initial = (r.name || 'A').charAt(0).toUpperCase();
+        var _rv = _rVal(r);
+        var rStars = '★'.repeat(_rv) + '☆'.repeat(5 - _rv);
+        var when = relTime(r.createdAt || r.date);
+        return '<div class="pdx-rev-card">' +
+          '<div class="pdx-rev-card__top">' +
+            '<span class="pdx-rev-card__stars">' + rStars + '</span>' +
+            '<span class="pdx-rev-card__quote">”</span>' +
+          '</div>' +
+          '<p class="pdx-rev-card__body">' + esc(r.text || r.comment || '') + '</p>' +
+          '<div class="pdx-rev-card__foot">' +
+            '<div class="pdx-rev-card__avatar">' + esc(initial) + '</div>' +
+            '<div class="pdx-rev-card__who">' +
+              '<div class="pdx-rev-card__name">' + esc(r.name || 'Customer') + '</div>' +
+              (when ? '<div class="pdx-rev-card__time">' + esc(when) + '</div>' : '') +
+            '</div>' +
+            '<span class="pdx-rev-card__verified">' + REV_CHECK_SVG + 'Verified</span>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+    }
+
+    renderReviews();
+
+    /* Sources asynchrones : snapshot SellAuth + API live. On fusionne au retour. */
+    (function pullExternalReviews() {
+      function take(d) {
+        var arr = d && (Array.isArray(d) ? d : (d.reviews || (d.content && d.content.nexus_reviews) || []));
+        mergeReviews(arr || []);
+      }
+      fetch('/assets/reviews.json', { headers: { Accept: 'application/json' } })
+        .then(function(r) { return r.ok ? r.json() : null; }).then(take).catch(function() {});
+      fetch('/api/feedbacks', { headers: { Accept: 'application/json' } })
+        .then(function(r) { return r.ok ? r.json() : null; }).then(take).catch(function() {});
+    })();
 
     /* ── Name + price ── */
     document.getElementById('pdName').textContent = p.name;
@@ -1260,48 +1354,8 @@
       /* Comme dailystore : l'ajout n'ouvre pas le panier, seul le badge s'incrémente. */
     });
 
-    /* ── Reviews ── */
-    if (pr.length) {
-      var avg2 = pr.reduce(function(s,r){ return s + _rVal(r); }, 0) / pr.length;
-      var fullStars = Math.round(avg2);
-      document.getElementById('pdRevStars').textContent = '★'.repeat(fullStars) + '☆'.repeat(5 - fullStars);
-      document.getElementById('pdRevScore').textContent = avg2.toFixed(1);
-      document.getElementById('pdRevCount').textContent = '(' + pr.length + ' review' + (pr.length !== 1 ? 's' : '') + ')';
-      document.getElementById('pdReviewsSummary').style.display = '';
-      /* Temps relatif façon « 2 days ago » (comme la référence). */
-      function relTime(dateStr) {
-        if (!dateStr) return '';
-        var d = new Date(dateStr); if (isNaN(d.getTime())) return '';
-        var s = Math.max(0, (Date.now() - d.getTime()) / 1000), day = 86400;
-        if (s < 3600)        { var mi = Math.floor(s / 60);  return mi <= 1 ? 'just now' : mi + ' minutes ago'; }
-        if (s < day)         { var h  = Math.floor(s / 3600); return h + ' hour' + (h > 1 ? 's' : '') + ' ago'; }
-        if (s < day * 30)    { var dd = Math.floor(s / day);  return dd + ' day' + (dd > 1 ? 's' : '') + ' ago'; }
-        if (s < day * 365)   { var mo = Math.floor(s / (day * 30)); return mo + ' month' + (mo > 1 ? 's' : '') + ' ago'; }
-        var y = Math.floor(s / (day * 365)); return y + ' year' + (y > 1 ? 's' : '') + ' ago';
-      }
-      var checkSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
-      document.getElementById('pdReviewsList').innerHTML = pr.slice(0, 6).map(function(r) {
-        var initial = (r.name || 'A').charAt(0).toUpperCase();
-        var _rv = _rVal(r);
-        var rStars = '★'.repeat(_rv) + '☆'.repeat(5 - _rv);
-        var when = relTime(r.date);
-        return '<div class="pdx-rev-card">' +
-          '<div class="pdx-rev-card__top">' +
-            '<span class="pdx-rev-card__stars">' + rStars + '</span>' +
-            '<span class="pdx-rev-card__quote">”</span>' +
-          '</div>' +
-          '<p class="pdx-rev-card__body">' + esc(r.text || r.comment || '') + '</p>' +
-          '<div class="pdx-rev-card__foot">' +
-            '<div class="pdx-rev-card__avatar">' + esc(initial) + '</div>' +
-            '<div class="pdx-rev-card__who">' +
-              '<div class="pdx-rev-card__name">' + esc(r.name || 'Customer') + '</div>' +
-              (when ? '<div class="pdx-rev-card__time">' + esc(when) + '</div>' : '') +
-            '</div>' +
-            '<span class="pdx-rev-card__verified">' + checkSvg + 'Verified</span>' +
-          '</div>' +
-        '</div>';
-      }).join('');
-    }
+    /* Les avis sont rendus par renderReviews() (défini plus haut), rappelé quand
+       le snapshot SellAuth et l'API live arrivent. */
 
     /* ── Produits similaires ──
        Meme categorie en priorite ; si elle ne contient rien d'autre, on comble
