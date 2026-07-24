@@ -794,13 +794,17 @@
     /* ── Variantes (options du produit : nom + prix) ── */
     var variants = (Array.isArray(p.variants) ? p.variants : []).filter(function(v) { return v && String(v.name || '').trim() !== ''; });
     var hasVariants = variants.length > 0;
-    /* Sélection cumulative : on peut empiler plusieurs variantes (index ordonnés).
-       La 1re variante est sélectionnée d'office pour qu'il y ait toujours une ligne. */
-    var selVariants = hasVariants ? [0] : [];
-    /* Prix unitaire de base = somme des variantes sélectionnées, sinon prix du produit */
+    /* Sélection cumulative : on empile des « options » (clés ordonnées). Une clé
+       vaut -1 pour le PRODUIT DE BASE, ou l'index de la variante (0..n-1). Le
+       produit de base est sélectionné d'office → il y a toujours une ligne. */
+    var selVariants = hasVariants ? [-1] : [];
+    function priceOfKey(k) { return k === -1 ? Number(p.price) : Number(variants[k].price); }
+    function oldPriceOfKey(k) { return k === -1 ? oldPriceOf(p) : oldPriceOf(variants[k]); }
+    function nameOfKey(k) { return k === -1 ? p.name : (p.name + ' — ' + variants[k].name); }
+    /* Prix unitaire de base = somme des options sélectionnées, sinon prix du produit */
     function unitBasePrice() {
       return hasVariants
-        ? selVariants.reduce(function(s, i) { return s + Number(variants[i].price); }, 0)
+        ? selVariants.reduce(function(s, k) { return s + priceOfKey(k); }, 0)
         : Number(p.price);
     }
     /* Ancien prix, pour la promotion. Facultatif : un produit sans oldPrice
@@ -817,7 +821,7 @@
     }
     function unitOldPrice() {
       return hasVariants
-        ? selVariants.reduce(function(s, i) { return s + oldPriceOf(variants[i]); }, 0)
+        ? selVariants.reduce(function(s, k) { return s + oldPriceOfKey(k); }, 0)
         : oldPriceOf(p);
     }
 
@@ -1055,9 +1059,9 @@
       var list = document.getElementById('pdSideList');
       if (!list) return;
       var tier = getActiveTier(qty);
-      var rows = (hasVariants ? selVariants : [null]).map(function(i) {
-        var name = i == null ? p.name : (p.name + ' — ' + variants[i].name);
-        var unit = (i == null ? Number(p.price) : Number(variants[i].price)) * (1 - tier.disc);
+      var rows = (hasVariants ? selVariants : [null]).map(function(k) {
+        var name = k == null ? p.name : nameOfKey(k);
+        var unit = (k == null ? Number(p.price) : priceOfKey(k)) * (1 - tier.disc);
         var removable = hasVariants && selVariants.length > 1;
         return '<div class="pdx-mini">' +
           '<div class="pdx-mini__thumb">' + sideThumbHTML + '</div>' +
@@ -1066,7 +1070,7 @@
             '<div class="pdx-mini__qty">Quantity: ' + qty + '</div>' +
           '</div>' +
           '<div class="pdx-mini__price">' + sym + unit.toFixed(2) + '</div>' +
-          (removable ? '<button type="button" class="pdx-mini__rm" data-vi="' + i + '" aria-label="Remove">×</button>' : '') +
+          (removable ? '<button type="button" class="pdx-mini__rm" data-vi="' + k + '" aria-label="Remove">×</button>' : '') +
         '</div>';
       });
       list.innerHTML = rows.join('');
@@ -1191,15 +1195,18 @@
         note.style.display = '';
       }
 
-      grid.innerHTML = variants.map(function(v, i) {
-        var was = oldPriceOf(v);
-        var active = selVariants.indexOf(i) !== -1;
+      /* Options proposées : le PRODUIT DE BASE (clé -1) d'abord, puis les variantes. */
+      var options = [{ key: -1, name: p.name, price: Number(p.price), best: false }]
+        .concat(variants.map(function(v, i) { return { key: i, name: v.name, price: Number(v.price), best: i === bestIdx }; }));
+      grid.innerHTML = options.map(function(o) {
+        var was = oldPriceOfKey(o.key);
+        var active = selVariants.indexOf(o.key) !== -1;
         return '<button type="button" aria-pressed="' + (active ? 'true' : 'false') + '"' +
-          ' class="pdx-plan' + (active ? ' pdx-plan--active' : '') + '" data-vi="' + i + '">' +
-          (i === bestIdx ? '<span class="pdx-plan__flag">Best value</span>' : '') +
-          '<span class="pdx-plan__name">' + esc2(v.name) + '</span>' +
-          '<div class="pdx-plan__price">' + sym + Number(v.price).toFixed(2) +
-            (was > Number(v.price) ? '<span class="pdx-plan__was">' + sym + was.toFixed(2) + '</span>' : '') +
+          ' class="pdx-plan' + (active ? ' pdx-plan--active' : '') + '" data-vi="' + o.key + '">' +
+          (o.best ? '<span class="pdx-plan__flag">Best value</span>' : '') +
+          '<span class="pdx-plan__name">' + esc2(o.name) + '</span>' +
+          '<div class="pdx-plan__price">' + sym + o.price.toFixed(2) +
+            (was > o.price ? '<span class="pdx-plan__was">' + sym + was.toFixed(2) + '</span>' : '') +
           '</div>' +
         '</button>';
       }).join('');
@@ -1243,7 +1250,7 @@
       var cart = [];
       try { cart = JSON.parse(localStorage.getItem('nexus_cart')) || []; } catch(e) {}
       var picks = hasVariants
-        ? selVariants.map(function(i) { return { vi: i, name: p.name + ' — ' + variants[i].name, price: Number(variants[i].price), vName: variants[i].name }; })
+        ? selVariants.map(function(k) { return { vi: k === -1 ? null : k, name: nameOfKey(k), price: priceOfKey(k), vName: k === -1 ? null : variants[k].name }; })
         : [{ vi: null, name: p.name, price: Number(p.price), vName: null }];
       picks.forEach(function(it) {
         var ex = cart.find(function(c){ return c.id === pid && (c.variant == null ? null : String(c.variant)) === (it.vi == null ? null : String(it.vi)); });
@@ -1270,6 +1277,7 @@
         return;
       }
       var vi = hasVariants ? selVariants[0] : null;
+      if (vi === -1) vi = null;   /* produit de base seul → pas de paramètre variante */
       window.location.href = 'checkout?id=' + pid + (vi != null ? '&variant=' + vi : '');
     });
 
