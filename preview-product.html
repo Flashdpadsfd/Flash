@@ -375,15 +375,52 @@
     .pdx-feat__title { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 3px; }
     .pdx-feat__desc { font-size: 11.5px; color: rgba(255,255,255,.38); line-height: 1.5; }
 
-    /* ── Avis ── */
-    #pdReviewsList { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-    #pdReviewsList .pd-review {
-      background: var(--pdx-panel); border: 1px solid rgba(255,255,255,.06);
-      border-radius: 12px; padding: 16px;
-      transition: border-color .28s var(--pdx-ease), transform .28s var(--pdx-ease);
+    /* ── Avis : en-tête « badge étoile » + cartes témoignages ── */
+    .pdx-rev__hdr { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+    .pdx-rev__head-main { display: flex; align-items: center; gap: 14px; }
+    .pdx-rev__icon {
+      width: 46px; height: 46px; flex-shrink: 0; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(145deg, rgba(255,210,122,.26), rgba(255,210,122,.07));
+      border: 1.5px solid rgba(255,210,122,.32); color: var(--pdx-star);
     }
-    #pdReviewsList .pd-review:hover { border-color: var(--pdx-accent-line); transform: translateY(-3px); }
-    .pdx-page .pd-rev-stars, .pdx-page .pd-review__stars { color: var(--pdx-star); }
+    .pdx-rev__title { font-size: 22px; font-weight: 800; color: #fff; letter-spacing: -.4px; }
+    .pdx-rev__meta { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+    .pdx-rev__meta-stars { color: var(--pdx-star); font-size: 13px; letter-spacing: 1px; }
+    .pdx-rev__meta-score { font-size: 13px; font-weight: 800; color: #fff; }
+    .pdx-rev__meta-count { font-size: 12px; color: rgba(255,255,255,.4); }
+    .pdx-rev__empty { color: rgba(255,255,255,.32); font-size: 13px; padding: 4px 0; }
+
+    #pdReviewsList { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .pdx-rev-card {
+      position: relative; display: flex; flex-direction: column; gap: 12px;
+      background: var(--pdx-panel); border: 1px solid rgba(255,255,255,.07);
+      border-radius: 14px; padding: 18px;
+      transition: border-color .28s var(--pdx-ease), transform .28s var(--pdx-ease), background .28s var(--pdx-ease);
+    }
+    .pdx-rev-card:hover { border-color: var(--pdx-accent-line); background: var(--pdx-panel-hi); transform: translateY(-3px); }
+    .pdx-rev-card__top { display: flex; align-items: flex-start; justify-content: space-between; }
+    .pdx-rev-card__stars { color: var(--pdx-star); font-size: 14px; letter-spacing: 1.5px; }
+    .pdx-rev-card__quote { font-family: Georgia, 'Times New Roman', serif; font-size: 42px; line-height: .5; color: rgba(255,255,255,.1); }
+    .pdx-rev-card__body { font-size: 13px; line-height: 1.65; color: rgba(255,255,255,.62); margin: 0; flex: 1; }
+    .pdx-rev-card__foot { display: flex; align-items: center; gap: 10px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,.06); }
+    .pdx-rev-card__avatar {
+      width: 34px; height: 34px; flex-shrink: 0; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(145deg, rgba(255,210,122,.26), rgba(255,210,122,.07));
+      border: 1px solid rgba(255,210,122,.28); color: var(--pdx-star);
+      font-size: 13px; font-weight: 800;
+    }
+    .pdx-rev-card__who { flex: 1; min-width: 0; }
+    .pdx-rev-card__name { font-size: 12.5px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pdx-rev-card__time { font-size: 11px; color: rgba(255,255,255,.35); margin-top: 1px; }
+    .pdx-rev-card__verified {
+      display: inline-flex; align-items: center; gap: 4px; flex-shrink: 0;
+      padding: 4px 8px; border-radius: 7px;
+      background: rgba(52,211,153,.1); border: 1px solid rgba(52,211,153,.3); color: var(--pdx-ok);
+      font-size: 10px; font-weight: 700;
+    }
+    .pdx-rev-card__verified svg { width: 11px; height: 11px; }
 
     /* ── Questions frequentes : accordeon ──
        L'ouverture anime max-height. On aurait prefere grid-template-rows 0fr→1fr
@@ -645,20 +682,27 @@
 
     <!-- Avis -->
     <section class="pdx-sec pdx-rise">
-      <div class="pdx-sec__hdr">
-        <span class="pdx-sec__title">Customer reviews</span>
-        <div id="pdReviewsSummary" class="pd-rev-summary" style="display:none;">
-          <div class="pd-rev-stars" id="pdRevStars">★★★★★</div>
-          <div class="pd-rev-score" id="pdRevScore">5.0</div>
-          <div class="pd-rev-count" id="pdRevCount">(0 reviews)</div>
+      <div class="pdx-rev__hdr">
+        <div class="pdx-rev__head-main">
+          <div class="pdx-rev__icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <div>
+            <h3 class="pdx-rev__title">Customer reviews</h3>
+            <div id="pdReviewsSummary" class="pdx-rev__meta" style="display:none;">
+              <span class="pdx-rev__meta-stars" id="pdRevStars">★★★★★</span>
+              <span class="pdx-rev__meta-score" id="pdRevScore">5.0</span>
+              <span class="pdx-rev__meta-count" id="pdRevCount">(0 reviews)</span>
+            </div>
+          </div>
         </div>
-        <a href="/review" class="pdx-rel__go" style="margin-left:auto;">
+        <a href="/review" class="pdx-rel__go">
           View all reviews
           <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </a>
       </div>
       <div id="pdReviewsList">
-        <div style="color:rgba(255,255,255,.32);font-size:13px;padding:4px 0;">No reviews yet for this product.</div>
+        <div class="pdx-rev__empty">No reviews yet for this product.</div>
       </div>
     </section>
 
@@ -1224,23 +1268,36 @@
       document.getElementById('pdRevScore').textContent = avg2.toFixed(1);
       document.getElementById('pdRevCount').textContent = '(' + pr.length + ' review' + (pr.length !== 1 ? 's' : '') + ')';
       document.getElementById('pdReviewsSummary').style.display = '';
-      document.getElementById('pdReviewsList').innerHTML = pr.slice(0, 8).map(function(r) {
+      /* Temps relatif façon « 2 days ago » (comme la référence). */
+      function relTime(dateStr) {
+        if (!dateStr) return '';
+        var d = new Date(dateStr); if (isNaN(d.getTime())) return '';
+        var s = Math.max(0, (Date.now() - d.getTime()) / 1000), day = 86400;
+        if (s < 3600)        { var mi = Math.floor(s / 60);  return mi <= 1 ? 'just now' : mi + ' minutes ago'; }
+        if (s < day)         { var h  = Math.floor(s / 3600); return h + ' hour' + (h > 1 ? 's' : '') + ' ago'; }
+        if (s < day * 30)    { var dd = Math.floor(s / day);  return dd + ' day' + (dd > 1 ? 's' : '') + ' ago'; }
+        if (s < day * 365)   { var mo = Math.floor(s / (day * 30)); return mo + ' month' + (mo > 1 ? 's' : '') + ' ago'; }
+        var y = Math.floor(s / (day * 365)); return y + ' year' + (y > 1 ? 's' : '') + ' ago';
+      }
+      var checkSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+      document.getElementById('pdReviewsList').innerHTML = pr.slice(0, 6).map(function(r) {
         var initial = (r.name || 'A').charAt(0).toUpperCase();
         var _rv = _rVal(r);
         var rStars = '★'.repeat(_rv) + '☆'.repeat(5 - _rv);
-        var dateStr = '';
-        try { dateStr = r.date ? new Date(r.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ''; } catch(e) {}
-        return '<div class="pd-review">' +
-          '<div class="pd-review__avatar">' + initial + '</div>' +
-          '<div class="pd-review__info">' +
-            '<div class="pd-review__header">' +
-              '<div>' +
-                '<div class="pd-review__name">' + esc(r.name || 'Customer') + '</div>' +
-                (dateStr ? '<div class="pd-review__date">' + esc(dateStr) + '</div>' : '') +
-              '</div>' +
-              '<span class="pd-review__stars">' + rStars + '</span>' +
+        var when = relTime(r.date);
+        return '<div class="pdx-rev-card">' +
+          '<div class="pdx-rev-card__top">' +
+            '<span class="pdx-rev-card__stars">' + rStars + '</span>' +
+            '<span class="pdx-rev-card__quote">”</span>' +
+          '</div>' +
+          '<p class="pdx-rev-card__body">' + esc(r.text || r.comment || '') + '</p>' +
+          '<div class="pdx-rev-card__foot">' +
+            '<div class="pdx-rev-card__avatar">' + esc(initial) + '</div>' +
+            '<div class="pdx-rev-card__who">' +
+              '<div class="pdx-rev-card__name">' + esc(r.name || 'Customer') + '</div>' +
+              (when ? '<div class="pdx-rev-card__time">' + esc(when) + '</div>' : '') +
             '</div>' +
-            '<div class="pd-review__body">' + esc(r.text || r.comment || '') + '</div>' +
+            '<span class="pdx-rev-card__verified">' + checkSvg + 'Verified</span>' +
           '</div>' +
         '</div>';
       }).join('');
