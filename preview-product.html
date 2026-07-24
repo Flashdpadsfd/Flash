@@ -679,53 +679,6 @@
       </div>
     </section>
 
-    <!-- Questions frequentes : accordeon, premiere reponse ouverte -->
-    <section class="pdx-sec pdx-rise">
-      <div class="pdx-sec__hdr"><span class="pdx-sec__title">Common questions</span></div>
-      <div class="pdx-faq" id="pdFaq">
-
-        <div class="pdx-faq__item open">
-          <button type="button" class="pdx-faq__q" aria-expanded="true">
-            How fast is delivery?
-            <svg class="pdx-faq__chev" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-          </button>
-          <div class="pdx-faq__wrap"><div class="pdx-faq__inner">
-            <p class="pdx-faq__a">Seconds, in most cases. If your payment is still confirming on the network it can take a few minutes — the checkout page keeps you posted.</p>
-          </div></div>
-        </div>
-
-        <div class="pdx-faq__item">
-          <button type="button" class="pdx-faq__q" aria-expanded="false">
-            Where do I find what I bought?
-            <svg class="pdx-faq__chev" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-          </button>
-          <div class="pdx-faq__wrap"><div class="pdx-faq__inner">
-            <p class="pdx-faq__a">Sign in with the email you ordered with and open the order. Everything we sent stays there, so you can come back to it later.</p>
-          </div></div>
-        </div>
-
-        <div class="pdx-faq__item">
-          <button type="button" class="pdx-faq__q" aria-expanded="false">
-            What if it stops working?
-            <svg class="pdx-faq__chev" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-          </button>
-          <div class="pdx-faq__wrap"><div class="pdx-faq__inner">
-            <p class="pdx-faq__a">Open a ticket on our Discord with your order number. If it failed inside the period you paid for and nothing was changed on the account, we replace it.</p>
-          </div></div>
-        </div>
-
-        <div class="pdx-faq__item">
-          <button type="button" class="pdx-faq__q" aria-expanded="false">
-            Can I change the password?
-            <svg class="pdx-faq__chev" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-          </button>
-          <div class="pdx-faq__wrap"><div class="pdx-faq__inner">
-            <p class="pdx-faq__a">No. Changing it breaks the account and voids the replacement — leave it exactly as delivered.</p>
-          </div></div>
-        </div>
-
-      </div>
-    </section>
 
     <!-- Produits similaires : meme categorie, sinon les plus recents -->
     <section class="pdx-sec pdx-rise" id="pdRelSec" style="display:none;">
@@ -1003,13 +956,12 @@
       return SPEC_ICONS.generic;
     }
     var specsData = (Array.isArray(p.pageSpecs) ? p.pageSpecs : [
-      { k: 'Category',        v: cap(catKey) },
       { k: 'Delivery Method', v: 'Instant Digital Delivery' },
       { k: 'Activation',      v: 'Automatic' },
       { k: 'Warranty',        v: '30-Day Replacement' }
     ])
-    /* Region retiré partout, y compris pour les produits dont les pageSpecs enregistrés le contiennent encore */
-    .filter(function(s) { return String(s.k).toLowerCase() !== 'region'; })
+    /* Region et Category retirés partout, y compris pour les produits dont les pageSpecs enregistrés les contiennent encore */
+    .filter(function(s) { var k = String(s.k).toLowerCase(); return k !== 'region' && k !== 'category'; })
     .map(function(s) { return { k: s.k, v: s.v, green: false }; });
     /* Live stock row — always appended automatically */
     specsData.push({ k: 'Stock', v: avail > 0 ? 'In Stock (' + avail + ' available)' : 'Out of Stock', green: avail > 0 });
