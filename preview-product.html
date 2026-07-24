@@ -218,24 +218,37 @@
     .pdx-buy__was { font-size: 15px; font-weight: 600; color: rgba(255,255,255,.3); text-decoration: line-through; }
     .pdx-buy__save { margin-top: 8px; font-size: 11.5px; font-weight: 600; color: var(--pdx-ok); }
 
-    /* ── Formules : les variantes en cartes cote a cote ── */
-    .pdx-plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); gap: 9px; }
+    /* ── Formules : liste de plans en lignes-radio (pastille + coche) ── */
+    .pdx-plans { display: grid; gap: 8px; }
     .pdx-plan {
-      position: relative; text-align: left; cursor: pointer; font-family: inherit;
-      padding: 12px 13px; border-radius: 12px;
-      background: rgba(255,255,255,.03); border: 1px solid var(--pdx-line); color: inherit;
-      transition: border-color .22s var(--pdx-ease), background .22s var(--pdx-ease), transform .22s var(--pdx-ease);
+      position: relative; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      text-align: left; cursor: pointer; font-family: inherit;
+      padding: 12px 14px; border-radius: 12px;
+      background: rgba(255,255,255,.02); border: 1px solid var(--pdx-line); color: inherit;
+      transition: border-color .22s var(--pdx-ease), background .22s var(--pdx-ease);
     }
-    .pdx-plan:hover { transform: translateY(-2px); border-color: rgba(255,255,255,.16); }
-    .pdx-plan--active { border-color: var(--pdx-accent); background: var(--pdx-accent-soft); }
+    .pdx-plan:hover { border-color: rgba(255,255,255,.2); background: rgba(255,255,255,.04); }
+    .pdx-plan--active { border-color: var(--pdx-accent-line); background: var(--pdx-accent-soft); }
     .pdx-plan:focus-visible { outline: 2px solid var(--pdx-accent); outline-offset: 2px; }
-    .pdx-plan__name { font-size: 12.5px; font-weight: 700; color: #fff; }
-    .pdx-plan__price { margin-top: 5px; font-size: 17px; font-weight: 800; color: #fff; letter-spacing: -.4px; }
-    .pdx-plan__was { margin-left: 6px; font-size: 11.5px; font-weight: 600; color: rgba(255,255,255,.28); text-decoration: line-through; }
+    .pdx-plan__main { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .pdx-plan__radio {
+      flex-shrink: 0; width: 16px; height: 16px; border-radius: 50%;
+      border: 2px solid rgba(255,255,255,.28);
+      display: flex; align-items: center; justify-content: center;
+      transition: border-color .2s var(--pdx-ease), background .2s var(--pdx-ease);
+    }
+    .pdx-plan--active .pdx-plan__radio { border-color: var(--pdx-accent); background: var(--pdx-accent); }
+    .pdx-plan__radio svg { width: 9px; height: 9px; color: #17171c; opacity: 0; transition: opacity .2s var(--pdx-ease); }
+    .pdx-plan--active .pdx-plan__radio svg { opacity: 1; }
+    .pdx-plan__name { font-size: 13px; font-weight: 600; color: rgba(255,255,255,.7); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pdx-plan--active .pdx-plan__name { color: #fff; }
+    .pdx-plan__price { flex-shrink: 0; font-size: 13.5px; font-weight: 800; color: #fff; letter-spacing: -.2px; }
+    .pdx-plan--active .pdx-plan__price { color: var(--pdx-accent); }
+    .pdx-plan__was { margin-left: 6px; font-size: 11px; font-weight: 600; color: rgba(255,255,255,.28); text-decoration: line-through; }
     .pdx-plan__flag {
-      position: absolute; top: -8px; right: 9px; padding: 2px 7px; border-radius: 6px;
-      background: var(--pdx-accent-grad); color: #17171c; font-size: 9.5px; font-weight: 800;
-      letter-spacing: .06em; text-transform: uppercase;
+      padding: 2px 6px; border-radius: 5px; white-space: nowrap;
+      background: var(--pdx-accent-grad); color: #17171c; font-size: 8.5px; font-weight: 800;
+      letter-spacing: .05em; text-transform: uppercase;
     }
     .pdx-plans-note { margin-bottom: 9px; font-size: 11.5px; font-weight: 600; color: var(--pdx-ok); }
     /* Le prix clignote brievement quand la quantite change : le changement de
@@ -594,9 +607,9 @@
           <div id="pdSideList"></div>
 
           <div class="pdx-buy__sect" id="pdVariantsSection" style="display:none;">
-            <div class="pdv3-qty-lbl" style="display:block;margin-bottom:10px;">Add plans</div>
+            <div class="pdv3-qty-lbl" style="display:block;margin-bottom:10px;">Select plan</div>
             <div class="pdx-plans-note" id="pdPlansNote" style="display:none;"></div>
-            <div class="pdx-plans" id="pdVariants" role="group" aria-label="Add plans"></div>
+            <div class="pdx-plans" id="pdVariants" role="radiogroup" aria-label="Select plan"></div>
           </div>
 
           <div class="pdv3-qty-section pdx-buy__sect">
@@ -617,7 +630,7 @@
           <div class="pdv3-side-actions pdx-buy__sect">
             <button class="pdv3-btn-cart" id="pdAddCart">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
-              Add to Cart
+              <span id="pdAddCartLbl">Add to Cart</span>
             </button>
             <button class="pdv3-btn-checkout" id="pdBuyNow">
               <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="display:inline;vertical-align:-2px;margin-right:6px;"><path d="M5 12l5 5L20 7"/></svg>
@@ -794,19 +807,15 @@
     /* ── Variantes (options du produit : nom + prix) ── */
     var variants = (Array.isArray(p.variants) ? p.variants : []).filter(function(v) { return v && String(v.name || '').trim() !== ''; });
     var hasVariants = variants.length > 0;
-    /* Sélection cumulative : on empile des « options » (clés ordonnées). Une clé
-       vaut -1 pour le PRODUIT DE BASE, ou l'index de la variante (0..n-1). Le
-       produit de base est sélectionné d'office → il y a toujours une ligne. */
-    var selVariants = hasVariants ? [-1] : [];
+    /* Sélection UNIQUE (radio) : une seule option à la fois. Une clé vaut -1 pour
+       le PRODUIT DE BASE, ou l'index de la variante (0..n-1). Le produit de base
+       est sélectionné d'office. */
+    var selKey = hasVariants ? -1 : null;
     function priceOfKey(k) { return k === -1 ? Number(p.price) : Number(variants[k].price); }
     function oldPriceOfKey(k) { return k === -1 ? oldPriceOf(p) : oldPriceOf(variants[k]); }
     function nameOfKey(k) { return k === -1 ? p.name : (p.name + ' — ' + variants[k].name); }
-    /* Prix unitaire de base = somme des options sélectionnées, sinon prix du produit */
-    function unitBasePrice() {
-      return hasVariants
-        ? selVariants.reduce(function(s, k) { return s + priceOfKey(k); }, 0)
-        : Number(p.price);
-    }
+    /* Prix unitaire de base = prix de l'option choisie, sinon prix du produit */
+    function unitBasePrice() { return hasVariants ? priceOfKey(selKey) : Number(p.price); }
     /* Ancien prix, pour la promotion. Facultatif : un produit sans oldPrice
        (le cas de tous les produits existants) renvoie 0, et toute la
        signaletique promo reste masquee. */
@@ -819,11 +828,7 @@
                    : (o.compareAt != null ? o.compareAt : 0)));
       return isFinite(v) && v > 0 ? v : 0;
     }
-    function unitOldPrice() {
-      return hasVariants
-        ? selVariants.reduce(function(s, k) { return s + oldPriceOfKey(k); }, 0)
-        : oldPriceOf(p);
-    }
+    function unitOldPrice() { return hasVariants ? oldPriceOfKey(selKey) : oldPriceOf(p); }
 
     document.title = 'FlashShp — ' + p.name;
 
@@ -1054,37 +1059,22 @@
       ? '<img src="' + p.image + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">'
       : esc(p.icon || '📦');
 
-    /* ── Récap latéral : une ligne par variante sélectionnée (ou le produit seul). ── */
+    /* ── Récap latéral : la ligne de l'option choisie (produit de base ou variante). ── */
     function renderSideList() {
       var list = document.getElementById('pdSideList');
       if (!list) return;
       var tier = getActiveTier(qty);
-      var rows = (hasVariants ? selVariants : [null]).map(function(k) {
-        var name = k == null ? p.name : nameOfKey(k);
-        var unit = (k == null ? Number(p.price) : priceOfKey(k)) * (1 - tier.disc);
-        var removable = hasVariants && selVariants.length > 1;
-        return '<div class="pdx-mini">' +
+      var k = hasVariants ? selKey : -1;   /* -1 = produit de base (marche aussi sans variante) */
+      var unit = priceOfKey(k) * (1 - tier.disc);
+      list.innerHTML =
+        '<div class="pdx-mini">' +
           '<div class="pdx-mini__thumb">' + sideThumbHTML + '</div>' +
           '<div class="pdx-mini__info">' +
-            '<div class="pdx-mini__name">' + esc(name) + '</div>' +
+            '<div class="pdx-mini__name">' + esc(nameOfKey(k)) + '</div>' +
             '<div class="pdx-mini__qty">Quantity: ' + qty + '</div>' +
           '</div>' +
           '<div class="pdx-mini__price">' + sym + unit.toFixed(2) + '</div>' +
-          (removable ? '<button type="button" class="pdx-mini__rm" data-vi="' + k + '" aria-label="Remove">×</button>' : '') +
         '</div>';
-      });
-      list.innerHTML = rows.join('');
-      list.querySelectorAll('.pdx-mini__rm').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-          var vi = parseInt(btn.getAttribute('data-vi'), 10);
-          var pos = selVariants.indexOf(vi);
-          if (pos !== -1 && selVariants.length > 1) {
-            selVariants.splice(pos, 1);
-            if (window._refreshVariantActive) window._refreshVariantActive();
-            updateSummary();
-          }
-        });
-      });
     }
 
     /* ── Volume pricing pills ── */
@@ -1131,6 +1121,8 @@
       }
       document.getElementById('pdSubtotal').textContent = sym + sub.toFixed(2);
       document.getElementById('pdTotal').textContent = sym + sub.toFixed(2);
+      var addLbl = document.getElementById('pdAddCartLbl');
+      if (addLbl) addLbl.textContent = 'Add to Cart – ' + sym + sub.toFixed(2);
       renderSideList();
 
       /* Pills active state */
@@ -1198,37 +1190,36 @@
       /* Options proposées : le PRODUIT DE BASE (clé -1) d'abord, puis les variantes. */
       var options = [{ key: -1, name: p.name, price: Number(p.price), best: false }]
         .concat(variants.map(function(v, i) { return { key: i, name: v.name, price: Number(v.price), best: i === bestIdx }; }));
+      /* Pastille radio (vide → pleine + coche quand sélectionnée). */
+      var checkSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
       grid.innerHTML = options.map(function(o) {
         var was = oldPriceOfKey(o.key);
-        var active = selVariants.indexOf(o.key) !== -1;
-        return '<button type="button" aria-pressed="' + (active ? 'true' : 'false') + '"' +
+        var active = o.key === selKey;
+        return '<button type="button" role="radio" aria-checked="' + (active ? 'true' : 'false') + '"' +
           ' class="pdx-plan' + (active ? ' pdx-plan--active' : '') + '" data-vi="' + o.key + '">' +
-          (o.best ? '<span class="pdx-plan__flag">Best value</span>' : '') +
-          '<span class="pdx-plan__name">' + esc2(o.name) + '</span>' +
-          '<div class="pdx-plan__price">' + sym + o.price.toFixed(2) +
+          '<span class="pdx-plan__main">' +
+            '<span class="pdx-plan__radio">' + checkSvg + '</span>' +
+            '<span class="pdx-plan__name">' + esc2(o.name) + '</span>' +
+            (o.best ? '<span class="pdx-plan__flag">Best value</span>' : '') +
+          '</span>' +
+          '<span class="pdx-plan__price">' + sym + o.price.toFixed(2) +
             (was > o.price ? '<span class="pdx-plan__was">' + sym + was.toFixed(2) + '</span>' : '') +
-          '</div>' +
+          '</span>' +
         '</button>';
       }).join('');
-      /* Reflète l'état sélectionné (plusieurs peuvent être actives). */
+      /* Reflète l'option choisie (une seule active à la fois). */
       function refreshVariantActive() {
         grid.querySelectorAll('.pdx-plan').forEach(function(b) {
-          var i = parseInt(b.getAttribute('data-vi'), 10) || 0;
-          var on = selVariants.indexOf(i) !== -1;
+          var k = parseInt(b.getAttribute('data-vi'), 10);
+          var on = k === selKey;
           b.classList.toggle('pdx-plan--active', on);
-          b.setAttribute('aria-pressed', on ? 'true' : 'false');
+          b.setAttribute('aria-checked', on ? 'true' : 'false');
         });
       }
       window._refreshVariantActive = refreshVariantActive;
       grid.querySelectorAll('.pdx-plan').forEach(function(btn) {
         btn.addEventListener('click', function() {
-          var vi = parseInt(btn.getAttribute('data-vi'), 10) || 0;
-          var pos = selVariants.indexOf(vi);
-          if (pos === -1) {
-            selVariants.push(vi);                              /* ajoute la variante en dessous */
-          } else if (selVariants.length > 1) {
-            selVariants.splice(pos, 1);                        /* re-clic = retire (garde-en 1 min.) */
-          }
+          selKey = parseInt(btn.getAttribute('data-vi'), 10);   /* choix unique */
           refreshVariantActive();
           updateSummary();
         });
@@ -1244,20 +1235,17 @@
       if (qty < 9999) { qty++; updateSummary(); }
     });
 
-    /* Ajoute au panier chaque variante sélectionnée (ou le produit seul), une
-       ligne distincte par variante — même produit, variante différente. */
+    /* Ajoute au panier l'option choisie (produit de base ou variante). */
     function addSelectedToCart() {
       var cart = [];
       try { cart = JSON.parse(localStorage.getItem('nexus_cart')) || []; } catch(e) {}
-      var picks = hasVariants
-        ? selVariants.map(function(k) { return { vi: k === -1 ? null : k, name: nameOfKey(k), price: priceOfKey(k), vName: k === -1 ? null : variants[k].name }; })
-        : [{ vi: null, name: p.name, price: Number(p.price), vName: null }];
-      picks.forEach(function(it) {
-        var ex = cart.find(function(c){ return c.id === pid && (c.variant == null ? null : String(c.variant)) === (it.vi == null ? null : String(it.vi)); });
-        if (ex) { ex.qty += qty; } else {
-          cart.push({ id: pid, name: it.name, icon: p.icon || '📦', price: it.price, currency: p.currency || 'EUR', qty: qty, variant: it.vi, variantName: it.vName });
-        }
-      });
+      var k = hasVariants ? selKey : -1;
+      var vi = k === -1 ? null : k;
+      var vName = k === -1 ? null : variants[k].name;
+      var ex = cart.find(function(c){ return c.id === pid && (c.variant == null ? null : String(c.variant)) === (vi == null ? null : String(vi)); });
+      if (ex) { ex.qty += qty; } else {
+        cart.push({ id: pid, name: nameOfKey(k), icon: p.icon || '📦', price: priceOfKey(k), currency: p.currency || 'EUR', qty: qty, variant: vi, variantName: vName });
+      }
       localStorage.setItem('nexus_cart', JSON.stringify(cart));
       if (window._nexusUpdateCartCount) window._nexusUpdateCartCount();
     }
@@ -1269,15 +1257,8 @@
       buyBtn.textContent = 'Out of Stock';
     }
     buyBtn.addEventListener('click', function() {
-      /* Le checkout ne gère qu'un article : avec plusieurs variantes, on les met
-         au panier et on invite à passer par le panier. */
-      if (hasVariants && selVariants.length > 1) {
-        addSelectedToCart();
-        if (window._nexusToast) window._nexusToast('Plans added — open your cart to check out', '🛒');
-        return;
-      }
-      var vi = hasVariants ? selVariants[0] : null;
-      if (vi === -1) vi = null;   /* produit de base seul → pas de paramètre variante */
+      var vi = hasVariants ? selKey : null;
+      if (vi === -1) vi = null;   /* produit de base → pas de paramètre variante */
       window.location.href = 'checkout?id=' + pid + (vi != null ? '&variant=' + vi : '');
     });
 
