@@ -615,6 +615,47 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
 }
 .image-upload-remove:hover { background: rgba(200,0,0,.85); }
 
+/* ── Galerie : images supplementaires de la fiche produit ── */
+.gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 10px; }
+.gallery-item {
+  position: relative; aspect-ratio: 16 / 10; border-radius: 10px; overflow: hidden;
+  border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.02);
+}
+.gallery-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* Rang de l'image : c'est l'ordre d'affichage des vignettes sur la boutique. */
+.gallery-item__idx {
+  position: absolute; top: 6px; left: 6px; min-width: 18px; height: 18px; padding: 0 5px;
+  border-radius: 5px; background: rgba(0,0,0,.7); color: #fff;
+  font-size: 10.5px; font-weight: 700; line-height: 18px; text-align: center;
+}
+.gallery-item__del {
+  position: absolute; top: 6px; right: 6px; width: 20px; height: 20px; border-radius: 50%;
+  background: rgba(0,0,0,.75); color: #fff; border: none; cursor: pointer;
+  font-size: 13px; font-weight: 700; line-height: 1;
+  display: flex; align-items: center; justify-content: center; transition: background 140ms;
+}
+.gallery-item__del:hover { background: rgba(200,0,0,.85); }
+/* Fleches de reordonnancement : le glisser-deposer serait plus direct mais
+   inutilisable au doigt sur la tablette qui sert a gerer la boutique. */
+.gallery-item__move {
+  position: absolute; bottom: 0; left: 0; right: 0; display: flex;
+  background: linear-gradient(0deg, rgba(0,0,0,.72), transparent);
+}
+.gallery-item__move button {
+  flex: 1; padding: 4px 0; background: none; border: none; cursor: pointer;
+  color: rgba(255,255,255,.75); font-size: 13px; line-height: 1; transition: color 140ms;
+}
+.gallery-item__move button:hover:not(:disabled) { color: #fff; }
+.gallery-item__move button:disabled { opacity: .25; cursor: default; }
+.gallery-add {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+  aspect-ratio: 16 / 10; border-radius: 10px; cursor: pointer;
+  border: 2px dashed rgba(255,255,255,.12); background: rgba(255,255,255,.02);
+  color: var(--text-muted); font-size: 11.5px; text-align: center;
+  transition: border-color 200ms, background 200ms;
+}
+.gallery-add:hover { border-color: rgba(255,255,255,.28); background: rgba(255,255,255,.04); }
+
 /* ══════════════════════════════════
    DELIVERABLE TABS
 ══════════════════════════════════ */

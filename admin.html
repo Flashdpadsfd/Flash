@@ -6,7 +6,7 @@
   <title>FlashShp — Admin</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/admin.css?v=5" />
+  <link rel="stylesheet" href="assets/admin.css?v=6" />
 </head>
 <body>
 
@@ -1858,6 +1858,12 @@
             </div>
             <input type="file" id="fImageInput" accept="image/png,image/jpeg,image/webp" style="display:none;" onchange="handleImageUpload(this)" />
             <input type="hidden" id="fImage" />
+          </div>
+          <div class="field">
+            <label>Gallery <span class="f-optional">(optional — extra images shown as thumbnails)</span></label>
+            <div class="gallery-grid" id="galleryGrid"></div>
+            <p class="field-hint">The main image above always comes first. Add up to 4 more; they appear as thumbnails under the product image.</p>
+            <input type="file" id="fGalleryInput" accept="image/png,image/jpeg,image/webp" multiple style="display:none;" onchange="handleGalleryUpload(this)" />
           </div>
           <div class="field" style="margin-bottom:0;">
             <label>Background Color <span class="f-optional">(when no image)</span></label>

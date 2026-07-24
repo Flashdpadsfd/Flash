@@ -297,6 +297,12 @@
   var CURRENCY_SYMBOLS = { EUR: '€', USD: '$', GBP: '£' };
   var _customFields = [];
   var _variants = [];
+  /* Images supplementaires de la fiche produit. On n'y stocke QUE les images
+     en plus : l'image principale reste dans fImage et est remise en tete au
+     moment de l'enregistrement, pour qu'en changer ne laisse pas une vieille
+     copie en premiere position de la galerie. */
+  var _gallery = [];
+  var GALLERY_MAX = 4;   /* + l'image principale = 5 vignettes, comme la boutique */
 
   /* ── Product page : System Specs + Service Guarantee ── */
   var DEFAULT_PAGE_GUARANTEES = [
@@ -1114,8 +1120,15 @@
     document.getElementById('fShowNotifs').checked   = p ? (p.showNotifs !== false) : true;
     document.getElementById('fSalesTimespan').value  = p ? (p.salesTimespan || 'all') : 'all';
 
-    /* Image */
-    setImagePreview(p ? (p.image || '') : '');
+    /* Image + galerie.
+       images[] contient la galerie complete, image principale comprise : on
+       retire cette derniere pour ne garder que les images supplementaires,
+       que le formulaire gere seules. */
+    var mainImg = p ? (p.image || '') : '';
+    _gallery = (p && Array.isArray(p.images))
+      ? p.images.filter(function (src) { return src && src !== mainImg; })
+      : [];
+    setImagePreview(mainImg);   /* appelle renderGallery() */
 
     /* Deliverables */
     var deliverables = p ? (p.deliverables || []) : [];
@@ -1175,10 +1188,15 @@
       empty.style.display = 'flex';
       removeBtn.style.display = 'none';
     }
+    /* La galerie affiche l'image principale en 1re position : elle doit suivre
+       chaque changement de celle-ci. */
+    renderGallery();
   }
 
-  window.handleImageUpload = function (input) {
-    if (!input.files || !input.files[0]) return;
+  /* Redimensionne et compresse un fichier, puis rend la data-URL. Extrait de
+     handleImageUpload pour que la galerie applique exactement le meme
+     traitement que l'image principale. */
+  function readCompressedImage(file, cb) {
     var reader = new FileReader();
     reader.onload = function (e) {
       var img = new Image();
@@ -1192,17 +1210,93 @@
         ctx.imageSmoothingEnabled = true;
         ctx.imageSmoothingQuality = 'high';
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        setImagePreview(canvas.toDataURL('image/jpeg', 0.92));
+        cb(canvas.toDataURL('image/jpeg', 0.92));
       };
       img.src = e.target.result;
     };
-    reader.readAsDataURL(input.files[0]);
+    reader.readAsDataURL(file);
+  }
+
+  window.handleImageUpload = function (input) {
+    if (!input.files || !input.files[0]) return;
+    readCompressedImage(input.files[0], setImagePreview);
   };
 
   window.removeProductImage = function (e) {
     e.stopPropagation();
     document.getElementById('fImageInput').value = '';
     setImagePreview('');
+  };
+
+  /* ── Galerie ── */
+  function renderGallery() {
+    var grid = document.getElementById('galleryGrid');
+    if (!grid) return;
+    var main = document.getElementById('fImage').value;
+
+    var html = '';
+    /* L'image principale figure en tete, en lecture seule : elle se modifie
+       dans son propre encadre juste au-dessus. */
+    if (main) {
+      html += '<div class="gallery-item" title="Main image">' +
+        '<img src="' + main + '" alt="">' +
+        '<span class="gallery-item__idx">1</span>' +
+      '</div>';
+    }
+    html += _gallery.map(function (src, i) {
+      var pos = (main ? 2 : 1) + i;
+      return '<div class="gallery-item">' +
+        '<img src="' + src + '" alt="">' +
+        '<span class="gallery-item__idx">' + pos + '</span>' +
+        '<button type="button" class="gallery-item__del" title="Remove" onclick="removeGalleryImage(' + i + ')">×</button>' +
+        '<span class="gallery-item__move">' +
+          '<button type="button" title="Move left" onclick="moveGalleryImage(' + i + ',-1)"' + (i === 0 ? ' disabled' : '') + '>&#8592;</button>' +
+          '<button type="button" title="Move right" onclick="moveGalleryImage(' + i + ',1)"' + (i === _gallery.length - 1 ? ' disabled' : '') + '>&#8594;</button>' +
+        '</span>' +
+      '</div>';
+    }).join('');
+
+    if (_gallery.length < GALLERY_MAX) {
+      html += '<div class="gallery-add" onclick="document.getElementById(\'fGalleryInput\').click()">' +
+        '<svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6"><path d="M12 5v14M5 12h14"/></svg>' +
+        '<span>Add image</span>' +
+      '</div>';
+    }
+    grid.innerHTML = html;
+  }
+  window._renderGallery = renderGallery;
+
+  window.handleGalleryUpload = function (input) {
+    if (!input.files || !input.files.length) return;
+    var files = [].slice.call(input.files);
+    var room  = GALLERY_MAX - _gallery.length;
+    if (files.length > room) {
+      toast('Gallery limited to ' + GALLERY_MAX + ' extra images — ' + (files.length - room) + ' ignored.');
+      files = files.slice(0, room);
+    }
+    /* Le champ est vide avant la fin des lectures : on le remet a zero tout de
+       suite pour pouvoir re-selectionner le meme fichier ensuite. */
+    input.value = '';
+    var pending = files.length;
+    if (!pending) return;
+    files.forEach(function (f) {
+      readCompressedImage(f, function (src) {
+        _gallery.push(src);
+        if (--pending === 0) renderGallery();
+      });
+    });
+  };
+
+  window.removeGalleryImage = function (i) {
+    _gallery.splice(i, 1);
+    renderGallery();
+  };
+
+  window.moveGalleryImage = function (i, dir) {
+    var j = i + dir;
+    if (j < 0 || j >= _gallery.length) return;
+    var tmp = _gallery[i]; _gallery[i] = _gallery[j]; _gallery[j] = tmp;
+    renderGallery();
   };
 
   /* ── Currency prefix ── */
@@ -1260,6 +1354,14 @@
       badgeColor: document.getElementById('fBadgeColor').value,
       gradient: document.getElementById('fGradient').value,
       image: document.getElementById('fImage').value || null,
+      /* Galerie enregistree complete (principale en tete) : la boutique n'a
+         ainsi qu'un seul champ a lire. null si une seule image, pour que la
+         fiche produit retombe sur son affichage classique sans vignettes. */
+      images: (function () {
+        var all = [document.getElementById('fImage').value].concat(_gallery)
+          .filter(function (src) { return !!src; });
+        return all.length > 1 ? all : null;
+      })(),
       currency: document.getElementById('fCurrency').value || 'EUR',
       statusColor: document.getElementById('fStatusColor').value || 'green',
       statusLabel: document.getElementById('fStatusLabel').value.trim(),

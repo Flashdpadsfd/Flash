@@ -119,8 +119,18 @@
       100% { box-shadow: 0 0 0 0 rgba(52,211,153,0); }
     }
 
-    /* ── Visuel + panneau d'achat ── */
+    /* ── Visuel + panneau d'achat ──
+       La description occupe la 2e ligne de la colonne de gauche, sous la
+       galerie ; le panneau d'achat enjambe les deux lignes a droite. Sans ce
+       placement explicite, la description passait sous le panneau et laissait
+       une grande zone vide a cote de lui. */
     .pdx-top { display: grid; grid-template-columns: 1fr 380px; gap: 16px; align-items: start; margin-bottom: 16px; }
+    /* Galerie et description sont regroupees dans un conteneur plutot que
+       placees a la main sur deux lignes : un panneau d'achat qui enjambe deux
+       lignes etire celles-ci a sa propre hauteur, ce qui creusait un grand vide
+       entre l'image et la description. */
+    .pdx-main { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+    .pdx-main > .pdx-desc { margin-bottom: 0; }
 
     .pdx-visual {
       position: relative; overflow: hidden;
@@ -519,6 +529,8 @@
     <!-- Visuel + achat -->
     <div class="pdx-top">
 
+      <div class="pdx-main">
+
       <div class="pdx-gal pdx-rise">
         <div class="pdx-visual" id="pdVisual">
           <div class="pdx-visual__bg" id="pdHeroBgText"></div>
@@ -533,6 +545,14 @@
         <!-- Vignettes : remplies par le script, masquees s'il n'y a qu'une image. -->
         <div class="pdx-thumbs" id="pdThumbs" style="display:none;"></div>
       </div>
+
+      <!-- Description : sous la galerie, dans la colonne de gauche. -->
+      <section class="pdx-sec pdx-desc pdx-rise" style="--d:140ms;">
+        <div class="pdx-sec__hdr"><span class="pdx-sec__title">About this product</span></div>
+        <div class="pdx-card pdx-card--hover"><div class="pdx-card__text" id="pdDesc">—</div></div>
+      </section>
+
+      </div><!-- /.pdx-main -->
 
       <aside class="pdx-buy pdx-rise" style="--d:90ms;">
         <div class="pdx-buy__hdr">
@@ -613,12 +633,6 @@
       </aside>
 
     </div>
-
-    <!-- Description -->
-    <section class="pdx-sec pdx-rise">
-      <div class="pdx-sec__hdr"><span class="pdx-sec__title">About this product</span></div>
-      <div class="pdx-card pdx-card--hover"><div class="pdx-card__text" id="pdDesc">—</div></div>
-    </section>
 
     <!-- Points forts : alimente par pageGuarantees (modifiable dans l'admin) -->
     <section class="pdx-sec pdx-rise" id="pdFeatSec" style="display:none;">
@@ -845,7 +859,11 @@
        signaletique promo reste masquee. */
     function oldPriceOf(o) {
       if (!o) return 0;
-      var v = Number(o.oldPrice != null ? o.oldPrice : (o.compareAt != null ? o.compareAt : 0));
+      /* origPrice est le nom du champ cote admin ; oldPrice/compareAt sont
+         acceptes en plus pour les donnees importees. */
+      var v = Number(o.origPrice != null ? o.origPrice
+                   : (o.oldPrice != null ? o.oldPrice
+                   : (o.compareAt != null ? o.compareAt : 0)));
       return isFinite(v) && v > 0 ? v : 0;
     }
     function unitOldPrice() { return oldPriceOf(hasVariants ? variants[selVariant] : p); }
