@@ -32,6 +32,13 @@ body {
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
+/* Lueur d'ambiance violette (façon dashboard SaaS) — décor, non cliquable. */
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(1000px circle at 80% -8%, rgba(124,58,237,.13), transparent 52%),
+    radial-gradient(760px circle at 8% 105%, rgba(168,85,247,.08), transparent 48%);
+}
 a { color: inherit; text-decoration: none; cursor: pointer; }
 input, select, button, textarea { font-family: inherit; }
 
@@ -126,11 +133,10 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
 .sidebar__link:hover { background: rgba(255,255,255,.05); color: var(--text); }
 .sidebar__link:hover svg { opacity: 1; }
 .sidebar__link.active {
-  background: linear-gradient(90deg, rgba(124,58,237,.22), rgba(124,58,237,.05));
-  color: #fff; font-weight: 600;
-  box-shadow: inset 3px 0 0 var(--accent);
+  background: var(--grad-accent); color: #fff; font-weight: 600;
+  box-shadow: 0 6px 16px -6px rgba(124,58,237,.6);
 }
-.sidebar__link.active svg { opacity: 1; color: #c4b5fd; }
+.sidebar__link.active svg { opacity: 1; color: #fff; }
 .sidebar__link-badge {
   margin-left: auto; background: var(--accent);
   color: #fff; font-size: 10px; font-weight: 700;
