@@ -1271,15 +1271,23 @@
       if (idx2 !== -1) { prods2[idx2] = p2; saveProds(prods2); }
     }
 
-    /* Save order */
-    addOrder({
+    /* Save order — en local (immédiat) ET sur le serveur (pour l'admin, qui vit
+       sur un autre domaine et ne voit pas le localStorage du client). */
+    var orderRecord = {
       id: o.invoiceId, date: new Date().toISOString(),
       email: o.email, productId: product.id,
       productName: product.name, productIcon: product.icon || '📦',
       price: o.fiatAmount, currency: 'EUR',
       deliverable: deliverable, status: 'completed',
       paymentMethod: o.paymentMethod, txHash: o.txHash
-    });
+    };
+    addOrder(orderRecord);
+    try {
+      fetch('/api/record-order', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderRecord)
+      }).catch(function () {});
+    } catch (e) {}
 
     /* Email the customer their product */
     sendOrderEmail(o.email, o.invoiceId, product.name, deliverable);
