@@ -1915,6 +1915,25 @@
           </div>
         </div>
 
+        <!-- ══ SellAuth : relie ce produit à SellAuth pour le paiement ══ -->
+        <div class="form-section">
+          <div class="form-section__header">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            Paiement SellAuth <span class="f-optional" style="text-transform:none;letter-spacing:0;">(pour encaisser)</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="field" style="margin-bottom:0;">
+              <label>SellAuth Product ID</label>
+              <input type="number" id="fSaProductId" placeholder="Ex : 123456" min="0" />
+            </div>
+            <div class="field" style="margin-bottom:0;">
+              <label>SellAuth Variant ID <span class="f-optional" style="text-transform:none;letter-spacing:0;">(optionnel)</span></label>
+              <input type="number" id="fSaVariantId" placeholder="Ex : 7890" min="0" />
+            </div>
+          </div>
+          <p style="font-size:12px;color:rgba(255,255,255,.45);margin-top:8px;">Le bouton « Checkout » crée une facture dans ton compte SellAuth avec ces id et redirige le client vers le paiement SellAuth. Récupère-les dans ton dashboard SellAuth (Products → l'id du produit / de la variante).</p>
+        </div>
+
         <!-- ══ Variantes : options du produit (nom + prix), ex. 1 mois / 3 mois ══ -->
         <div class="form-section">
           <div class="form-section__header">

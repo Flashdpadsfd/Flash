@@ -1074,6 +1074,8 @@
     document.getElementById('fDesc').value        = p ? (p.desc || '') : '';
     document.getElementById('fGradient').value    = p ? (p.gradient || 'linear-gradient(135deg,#1a1a2e,#16213e)') : 'linear-gradient(135deg,#1a1a2e,#16213e)';
     document.getElementById('fCurrency').value    = p ? (p.currency || 'EUR') : 'EUR';
+    document.getElementById('fSaProductId').value = p && p.saProductId ? p.saProductId : '';
+    document.getElementById('fSaVariantId').value = p && p.saVariantId ? p.saVariantId : '';
     document.getElementById('fStatusLabel').value = p ? (p.statusLabel || '') : '';
 
     /* New fields */
@@ -1363,6 +1365,9 @@
         return all.length > 1 ? all : null;
       })(),
       currency: document.getElementById('fCurrency').value || 'EUR',
+      /* Mapping SellAuth : le bouton d'achat crée une facture SellAuth avec ces id. */
+      saProductId: parseInt(document.getElementById('fSaProductId').value) || null,
+      saVariantId: parseInt(document.getElementById('fSaVariantId').value) || null,
       statusColor: document.getElementById('fStatusColor').value || 'green',
       statusLabel: document.getElementById('fStatusLabel').value.trim(),
       /* new fields */
