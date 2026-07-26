@@ -1332,37 +1332,10 @@
       buyBtn.disabled = true;
       buyBtn.textContent = 'Out of Stock';
     }
-    /* IDs SellAuth de l'option choisie (mappés dans l'admin). Variante d'abord,
-       sinon fallback au niveau produit. */
-    function sellauthIds() {
-      var k = hasVariants ? selKey : -1;
-      var saVariant = (k !== -1 && hasVariants && variants[k]) ? (variants[k].saVariantId || null) : null;
-      if (!saVariant) saVariant = p.saVariantId || null;
-      return { productId: p.saProductId || null, variantId: saVariant };
-    }
-    /* Checkout via SellAuth : crée une vraie facture puis redirige vers le
-       checkout hébergé SellAuth (qui gère le paiement, crypto compris). */
     buyBtn.addEventListener('click', function() {
-      var ids = sellauthIds();
-      if (!ids.productId) {
-        if (window._nexusToast) window._nexusToast('Produit non relié à SellAuth (à mapper dans l\'admin).', '⚠️');
-        return;
-      }
-      var origHTML = buyBtn.innerHTML;
-      buyBtn.disabled = true; buyBtn.textContent = 'Redirection…';
-      fetch('/api/sellauth-checkout', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ productId: ids.productId, variantId: ids.variantId, quantity: qty })
-      })
-        .then(function(r) { return r.json().catch(function(){ return null; }).then(function(d){ return { ok: r.ok, d: d }; }); })
-        .then(function(res) {
-          if (res.ok && res.d && res.d.checkoutUrl) { window.location.href = res.d.checkoutUrl; return; }
-          throw new Error((res.d && res.d.error) || 'Échec du checkout');
-        })
-        .catch(function(e) {
-          buyBtn.disabled = false; buyBtn.innerHTML = origHTML;
-          if (window._nexusToast) window._nexusToast(String(e.message || e), '⚠️');
-        });
+      var vi = hasVariants ? selKey : null;
+      if (vi === -1) vi = null;   /* produit de base → pas de paramètre variante */
+      window.location.href = 'checkout?id=' + pid + (vi != null ? '&variant=' + vi : '');
     });
 
     /* ── Add to Cart ── */

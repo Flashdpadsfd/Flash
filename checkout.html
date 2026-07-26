@@ -743,10 +743,14 @@
   function addOrder(o) { var a = getOrders(); a.unshift(o); localStorage.setItem('nexus_orders', JSON.stringify(a)); }
   function getPromos() { try { return JSON.parse(localStorage.getItem('nexus_promos')) || []; } catch(e) { return []; } }
   function getContent() { try { return JSON.parse(localStorage.getItem('nexus_content') || '{}'); } catch(e) { return {}; } }
+  /* Invoice ID façon SellAuth : {salt hex 13}-{numéro sur 10 chiffres}
+     (ex. ba1181294bc7a-0000123456). Généré 100% en local, aucun tiers. */
   function generateId() {
-    var c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',id='NX-';
-    for(var i=0;i<8;i++) id+=c[Math.floor(Math.random()*c.length)];
-    return id;
+    var hex = '0123456789abcdef', salt = '';
+    for (var i = 0; i < 13; i++) salt += hex[Math.floor(Math.random() * 16)];
+    var num = Math.floor(Math.random() * 9000000) + 1000;
+    var padded = ('0000000000' + num).slice(-10);
+    return salt + '-' + padded;
   }
   function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
