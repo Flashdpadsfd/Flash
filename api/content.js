@@ -39,7 +39,8 @@ var PUBLIC_KEYS = [
                        (leur validation devra passer par le serveur pour marcher
                        côté client — voir les notes de livraison) ;
    - nexus_webhooks  : URLs de webhooks Discord, exploitables pour spammer ;
-   - blacklists / security / email_config / stats / orders : données internes. */
+   - blacklists / security / email_config / stats / orders / webhook_logs :
+     données internes. */
 var ADMIN_KEYS = [
   'nexus_payments',
   'nexus_promos',
@@ -49,7 +50,8 @@ var ADMIN_KEYS = [
   'nexus_security',
   'nexus_email_config',
   'nexus_stats',
-  'nexus_orders'
+  'nexus_orders',
+  'nexus_webhook_logs'
 ];
 
 var WRITABLE = PUBLIC_KEYS.concat(ADMIN_KEYS);

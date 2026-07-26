@@ -404,6 +404,14 @@
   }
   function setOrders(o) { nxSave('nexus_orders', o); }
 
+  /* Webhook Logs — écrit par api/log-webhook.js à chaque tentative d'envoi
+     Discord (commande créée, remboursement, produit ajouté…). Lecture seule
+     ici : le nettoyage se fait en vidant la clé (pas d'édition ligne à ligne). */
+  function getWebhookLogs() {
+    try { return JSON.parse(localStorage.getItem('nexus_webhook_logs')) || []; } catch(e) { return []; }
+  }
+  function setWebhookLogs(l) { nxSave('nexus_webhook_logs', l); }
+
   function getContent() {
     try { return Object.assign({}, DEFAULT_CONTENT, JSON.parse(localStorage.getItem('nexus_content') || '{}')); } catch(e) { return DEFAULT_CONTENT; }
   }
@@ -414,15 +422,39 @@
   }
   function setWebhooks(w) { nxSave('nexus_webhooks', w); }
 
-  function sendDiscordWebhook(url, embed, content) {
+  /* Journalise chaque tentative d'envoi (façon SellAuth « Webhook Logs ») :
+     avant, un webhook Discord échoué passait totalement inaperçu
+     (.catch(function(){})). Best-effort, ne bloque jamais l'envoi lui-même. */
+  function logWebhookAttempt(entry) {
+    try {
+      fetch(NX_API + '/api/log-webhook', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(entry)
+      }).catch(function() {});
+    } catch (e) {}
+  }
+
+  function sendDiscordWebhook(url, embed, content, eventName) {
     if (!url) return;
     var body = { embeds: [embed] };
     if (content) body.content = content;
+    var t0 = Date.now();
     fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
-    }).catch(function() {});
+    }).then(function(r) {
+      logWebhookAttempt({
+        source: 'discord', event: eventName || (embed && embed.title) || 'UNKNOWN', url: url,
+        success: r.ok, response_status: r.status, duration_ms: Date.now() - t0
+      });
+    }).catch(function(e) {
+      logWebhookAttempt({
+        source: 'discord', event: eventName || (embed && embed.title) || 'UNKNOWN', url: url,
+        success: false, error_type: 'network', error_message: String((e && e.message) || e),
+        duration_ms: Date.now() - t0
+      });
+    });
   }
 
   function getWebhookFor(type) {
@@ -453,7 +485,7 @@
     else return;
     embed.footer = { text:'FlashShp Store' };
     embed.timestamp = new Date().toISOString();
-    sendDiscordWebhook(cfg.url, embed, cfg.msg);
+    sendDiscordWebhook(cfg.url, embed, cfg.msg, type);
   }
 
   /* ── Toast ── */
@@ -524,7 +556,7 @@
     dashboard: 'Vue d\'ensemble', orders: 'Commandes', customers: 'Clients',
     products: 'Produits', categories: 'Catégories', promos: 'Codes promo',
     reviews: 'Feedbacks', payments: 'Payment Methods', content: 'Contenu', stats: 'Statistiques',
-    links: 'Liens', webhooks: 'Discord Webhooks', security: 'Sécurité', settings: 'Paramètres',
+    links: 'Liens', webhooks: 'Discord Webhooks', weblogs: 'Webhook Logs', security: 'Sécurité', settings: 'Paramètres',
     email: 'Email Notifications',
     'order-detail': 'Invoice Details'
   };
@@ -552,6 +584,7 @@
     if (name === 'stats') loadStatsForm();
     if (name === 'links') loadLinksForm();
     if (name === 'webhooks') loadWebhooksForm();
+    if (name === 'weblogs') renderWebhookLogs();
     if (name === 'security') renderSecurity();
     if (name === 'settings') loadSettingsInfo();
     if (name === 'email') loadEmailPage();
@@ -2320,6 +2353,59 @@
 
   window.filterOrders = function(q) { renderOrders(q); };
 
+  /* ── Webhook Logs (façon SellAuth : historique des envois, succès/échec) ── */
+  function renderWebhookLogs(query, filter) {
+    var logs = getWebhookLogs();
+    var q = (query || '').toLowerCase();
+    var f = filter || 'all';
+    if (f === 'success') logs = logs.filter(function(l) { return l.success; });
+    else if (f === 'failed') logs = logs.filter(function(l) { return !l.success; });
+    if (q) logs = logs.filter(function(l) {
+      return (l.event || '').toLowerCase().indexOf(q) !== -1 ||
+             (l.url || '').toLowerCase().indexOf(q) !== -1 ||
+             (l.invoice_id || '').toLowerCase().indexOf(q) !== -1;
+    });
+    var tbody = document.getElementById('weblogsTbody');
+    if (!tbody) return;
+    var countEl = document.getElementById('weblogsCount');
+    if (countEl) countEl.textContent = logs.length + ' entrée' + (logs.length > 1 ? 's' : '');
+    if (!logs.length) {
+      tbody.innerHTML = (q || f !== 'all')
+        ? emptyRow(6, 'search', 'Aucun log correspondant', 'Essayez un autre filtre.')
+        : emptyRow(6, 'activity', 'Aucun webhook envoyé', 'Les notifications Discord apparaîtront ici.');
+      return;
+    }
+    tbody.innerHTML = logs.map(function(l) {
+      var urlShort = (l.url || '').replace(/^https?:\/\//, '');
+      if (urlShort.length > 42) urlShort = urlShort.slice(0, 39) + '…';
+      var statusPill = l.success
+        ? '<span class="stock-pill stock-pill--ok">' + (l.response_status || 'OK') + '</span>'
+        : '<span class="stock-pill stock-pill--out">' + (l.response_status || l.error_type || 'Échec') + '</span>';
+      var detail = esc(l.error_message || l.response_body || '');
+      return '<tr>' +
+        '<td><span class="stock-pill" style="background:rgba(255,255,255,.06);color:rgba(255,255,255,.6);">' + esc(l.event || '—') + '</span></td>' +
+        '<td style="font-size:12px;color:rgba(255,255,255,.45);white-space:nowrap;" title="' + esc(l.url || '') + '">' + esc(urlShort || '—') + '</td>' +
+        '<td>' + statusPill + '</td>' +
+        '<td style="font-size:13px;color:rgba(255,255,255,.5);white-space:nowrap;">' + (Number(l.duration_ms) || 0) + ' ms</td>' +
+        '<td style="font-size:13px;color:rgba(255,255,255,.5);white-space:nowrap;">' + esc(timeAgo(l.created_at)) + '</td>' +
+        '<td style="font-size:12px;color:rgba(255,255,255,.4);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + detail + '">' + (detail || '—') + '</td>' +
+      '</tr>';
+    }).join('');
+  }
+
+  window.filterWebhookLogs = function() {
+    var q = document.getElementById('weblogsSearch');
+    var f = document.getElementById('weblogsFilter');
+    renderWebhookLogs(q ? q.value : '', f ? f.value : 'all');
+  };
+
+  window.clearWebhookLogs = function() {
+    if (!confirm('Vider tout le journal des webhooks ?')) return;
+    setWebhookLogs([]);
+    renderWebhookLogs('', 'all');
+    toast('Journal vidé.');
+  };
+
   window.refundOrder = function(id) {
     var orders = getOrders();
     var o = orders.find(function(x) { return x.id === id; });
@@ -2341,7 +2427,7 @@
         ],
         footer: { text: 'FlashShp Store' },
         timestamp: new Date().toISOString()
-      }, cfg.msg);
+      }, cfg.msg, 'REFUND');
     }
     toast('Commande marquée remboursée.');
   };
@@ -2504,7 +2590,7 @@
           { name: 'Montant', value: sym + Number(o.price || 0).toFixed(2), inline: true }
         ],
         footer: { text: 'FlashShp Store' }, timestamp: new Date().toISOString()
-      }, cfg.msg);
+      }, cfg.msg, 'REFUND');
     }
     toast('Commande remboursée ✓');
     viewOrderDetail(id);

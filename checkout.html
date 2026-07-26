@@ -1292,11 +1292,13 @@
     /* Email the customer their product */
     sendOrderEmail(o.email, o.invoiceId, product.name, deliverable);
 
-    /* Discord webhook */
+    /* Discord webhook — la tentative est journalisée (succès/échec, durée) via
+       /api/log-webhook pour rester visible dans l'admin même quand ça échoue. */
     try {
       var wa = JSON.parse(localStorage.getItem('nexus_webhooks') || '{}');
       var wc = wa['ORDER_CREATE'] || {};
       if (wc.url) {
+        var whT0 = Date.now();
         fetch(wc.url, {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ embeds: [{ title: '💎 Payment Confirmed', color: 0x57F287,
@@ -1306,7 +1308,19 @@
               { name: 'Method', value: o.paymentMethod, inline: true },
               { name: 'TX', value: o.txHash || '—', inline: false }
             ], footer: { text: 'FlashShp Store' }, timestamp: new Date().toISOString() }] })
-        }).catch(function() {});
+        }).then(function(r) {
+          fetch('/api/log-webhook', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ source: 'discord', event: 'ORDER_CREATE', url: wc.url, invoice_id: o.invoiceId,
+              success: r.ok, response_status: r.status, duration_ms: Date.now() - whT0 })
+          }).catch(function() {});
+        }).catch(function(e) {
+          fetch('/api/log-webhook', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ source: 'discord', event: 'ORDER_CREATE', url: wc.url, invoice_id: o.invoiceId,
+              success: false, error_type: 'network', error_message: String((e && e.message) || e), duration_ms: Date.now() - whT0 })
+          }).catch(function() {});
+        });
       }
     } catch(e) {}
 
