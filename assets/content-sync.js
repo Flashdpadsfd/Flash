@@ -26,7 +26,8 @@
     'nexus_content',
     'nexus_links',
     'nexus_reviews',
-    'nexus_text_overrides'
+    'nexus_text_overrides',
+    'nexus_payments'   /* version assainie (crypto uniquement) servie par /api/content */
   ];
 
   /* Vide = même origine. Le panneau admin, lui, pointe vers la boutique. */

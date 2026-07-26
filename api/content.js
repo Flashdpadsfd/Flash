@@ -54,6 +54,25 @@ var ADMIN_KEYS = [
 
 var WRITABLE = PUBLIC_KEYS.concat(ADMIN_KEYS);
 
+/* nexus_payments reste ADMIN (il POUVAIT contenir des secrets PayPal/Stripe),
+   MAIS le checkout crypto a besoin des adresses de wallet, qui sont publiques.
+   On expose donc une VERSION ASSAINIE : uniquement les cryptos, uniquement
+   { enabled, address }. Même si une vieille clé secrète traîne en base, elle
+   n'est jamais renvoyée au public. */
+var PUBLIC_CRYPTO = ['btc', 'eth', 'ltc', 'sol'];
+function publicPayments(raw) {
+  var out = {};
+  if (raw && typeof raw === 'object') {
+    PUBLIC_CRYPTO.forEach(function (k) {
+      var c = raw[k];
+      if (c && typeof c === 'object' && c.enabled && c.address) {
+        out[k] = { enabled: true, address: String(c.address) };
+      }
+    });
+  }
+  return out;
+}
+
 /* Garde-fou : une valeur démesurée saturerait la colonne LONGTEXT et la RAM. */
 var MAX_VALUE_BYTES = 2 * 1024 * 1024;   /* 2 Mo par clé */
 
@@ -94,8 +113,11 @@ module.exports = async function (req, res) {
     if (wantAdmin && !isAdmin(req)) { res.status(401).json({ error: 'Unauthorized' }); return; }
 
     try {
-      var keys = wantAdmin ? WRITABLE : PUBLIC_KEYS;
+      /* Public : on ajoute nexus_payments pour qu'il soit ASSAINI plus bas
+         (les adresses de wallet crypto, jamais les secrets). */
+      var keys = wantAdmin ? WRITABLE : PUBLIC_KEYS.concat(['nexus_payments']);
       var content = await store.getContent(keys);
+      if (!wantAdmin) content.nexus_payments = publicPayments(content.nexus_payments);
       var updatedAt = await store.contentUpdatedAt();
 
       if (wantAdmin) res.setHeader('Cache-Control', 'no-store');

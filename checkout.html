@@ -813,26 +813,37 @@
   }
   renderCart();
 
-  /* ── Render crypto payment methods ── */
-  var payments = getPayments();
+  /* ── Render crypto payment methods ──
+     Les wallets viennent de nexus_payments, publié (assaini) par /api/content et
+     déposé dans localStorage par content-sync — qui est ASYNCHRONE. On rend donc
+     au chargement PUIS à nouveau quand la synchro dépose la clé (event storage),
+     sinon une visite directe à /checkout afficherait « no wallets » à tort. */
   var cryptoGrid = document.getElementById('cryptoMethods');
   var cryptoCoins = ['btc', 'eth', 'ltc', 'sol'];
-  var hasCrypto = false;
-  cryptoCoins.forEach(function(coin) {
-    var cfg = payments[coin];
-    if (!cfg || !cfg.enabled || !cfg.address) return;
-    hasCrypto = true;
-    var info = CRYPTO_INFO[coin];
-    var btn = document.createElement('button');
-    btn.className = 'co-pm-opt';
-    btn.dataset.pm = coin;
-    btn.innerHTML =
-      '<div class="co-pm-opt__icon" style="background:' + info.bg + ';color:#fff;font-size:16px;font-weight:800;">' + info.icon + '</div>' +
-      '<span class="co-pm-opt__label">' + info.name + '</span>';
-    btn.addEventListener('click', function() { selectPM(coin); });
-    cryptoGrid.appendChild(btn);
+  function renderCryptoMethods() {
+    var payments = getPayments();
+    cryptoGrid.innerHTML = '';
+    var hasCrypto = false;
+    cryptoCoins.forEach(function(coin) {
+      var cfg = payments[coin];
+      if (!cfg || !cfg.enabled || !cfg.address) return;
+      hasCrypto = true;
+      var info = CRYPTO_INFO[coin];
+      var btn = document.createElement('button');
+      btn.className = 'co-pm-opt';
+      btn.dataset.pm = coin;
+      btn.innerHTML =
+        '<div class="co-pm-opt__icon" style="background:' + info.bg + ';color:#fff;font-size:16px;font-weight:800;">' + info.icon + '</div>' +
+        '<span class="co-pm-opt__label">' + info.name + '</span>';
+      btn.addEventListener('click', function() { selectPM(coin); });
+      cryptoGrid.appendChild(btn);
+    });
+    document.getElementById('noWalletsMsg').style.display = hasCrypto ? 'none' : '';
+  }
+  renderCryptoMethods();
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'nexus_payments') renderCryptoMethods();
   });
-  if (!hasCrypto) document.getElementById('noWalletsMsg').style.display = '';
 
   function selectPM(key) {
     selectedPM = key;
