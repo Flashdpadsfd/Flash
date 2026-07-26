@@ -1929,37 +1929,6 @@
   /* ── Payment Methods ── */
   var PM_METHODS = [
     {
-      key: 'paypal', name: 'PayPal',
-      desc: 'Accept PayPal, Pay Later & Debit/Credit card payments.',
-      bg: '#003087',
-      icon: '<svg viewBox="0 0 24 24" fill="#fff" width="22" height="22"><path d="M7.076 21.337H4.958a.641.641 0 01-.633-.74L6.29 3.617a.75.75 0 01.74-.633h6.264c2.089 0 3.572.493 4.383 1.466.78.932.997 2.304.644 4.075-.855 4.326-3.628 5.98-7.22 5.98H9.3a.75.75 0 00-.74.633l-.763 4.843a.641.641 0 01-.633.54H5.877zM19.79 9.24c-.847 4.297-3.95 6.655-8.34 6.655H9.4l-.846 5.374a.535.535 0 00.528.618h2.484c.347 0 .643-.252.698-.596l.715-4.532a.75.75 0 01.74-.633h1.056c3.592 0 6.365-1.654 7.22-5.98a5.38 5.38 0 00-.204-2.906z"/></svg>',
-      fields: [
-        { key: 'clientId',  label: 'Client ID',     type: 'text',     ph: 'AaBbCcDdEeFf...',  hint: 'From your PayPal Developer Dashboard.' },
-        { key: 'secret',    label: 'Client Secret', type: 'password', ph: 'EGTt...',           hint: '' },
-        { key: 'sandbox',   label: 'Sandbox Mode',  type: 'toggle',   hint: 'Enable for testing without real transactions.' }
-      ]
-    },
-    {
-      key: 'stripe', name: 'Stripe',
-      desc: 'Accept all major cards, Apple Pay & Google Pay.',
-      bg: '#635bff',
-      icon: '<svg viewBox="0 0 24 24" fill="#fff" width="21" height="21"><path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.591-7.305z"/></svg>',
-      fields: [
-        { key: 'publishableKey', label: 'Publishable Key', type: 'text',     ph: 'pk_live_...',  hint: '' },
-        { key: 'secretKey',      label: 'Secret Key',      type: 'password', ph: 'sk_live_...',  hint: 'Never share your secret key publicly.' },
-        { key: 'testMode',       label: 'Test Mode',       type: 'toggle',   hint: 'Use Stripe test keys for development.' }
-      ]
-    },
-    {
-      key: 'cashapp', name: 'Cash App',
-      desc: 'Accept payments via Cash App using your $Cashtag.',
-      bg: '#00d64f',
-      icon: '<svg viewBox="0 0 24 24" fill="#fff" width="20" height="20"><path d="M12.293 2.707a1 1 0 011.414 0l8 8a1 1 0 010 1.414 1 1 0 00.293.707V13a2 2 0 01-.586 1.414l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 014 13v-.172a1 1 0 00.293-.707 1 1 0 010-1.414l8-8zM13 8a1 1 0 10-2 0v1H9a1 1 0 000 2h1v2H9a1 1 0 000 2h1v1a1 1 0 102 0v-1h1a1 1 0 000-2h-1v-2h1a1 1 0 000-2h-1V8z"/></svg>',
-      fields: [
-        { key: 'cashtag', label: '$Cashtag', type: 'text', ph: '$YourName', hint: 'Your Cash App $Cashtag. Customers will send payments directly to it.' }
-      ]
-    },
-    {
       key: 'btc', name: 'Bitcoin (BTC)',
       desc: 'Accept Bitcoin payments directly to your wallet.',
       bg: '#f7931a',
@@ -1975,16 +1944,6 @@
       icon: '<svg viewBox="0 0 24 24" fill="#fff" width="18" height="18"><path d="M11.944 17.97L4.58 13.62 11.943 24l7.37-10.38-7.37 4.35h.001zM12.056 0L4.69 12.223l7.365 4.354 7.365-4.35L12.056 0z"/></svg>',
       fields: [
         { key: 'address', label: 'Ethereum Address', type: 'text', ph: '0x...', hint: 'Your public Ethereum wallet address.' }
-      ]
-    },
-    {
-      key: 'usdt', name: 'USDT',
-      desc: 'Accept Tether stablecoin on TRC-20 or ERC-20 network.',
-      bg: '#26a17b',
-      icon: '<svg viewBox="0 0 24 24" fill="#fff" width="20" height="20"><path d="M12 0C5.374 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm.75 17.1v1.388h-1.5V17.1c-1.618-.144-2.897-.77-3.75-1.507l.9-1.556c.803.68 1.912 1.186 3.103 1.186 1.255 0 2.044-.522 2.044-1.343 0-.782-.596-1.185-2.115-1.556-2.03-.497-3.703-1.185-3.703-3.028 0-1.45 1.003-2.556 2.771-2.876V6.013h1.5V5.47h.25v.543c1.34.168 2.438.684 3.188 1.33l-.87 1.527c-.748-.594-1.708-.978-2.7-.978-1.133 0-1.894.497-1.894 1.25 0 .738.625 1.07 2.187 1.458 2.052.521 3.646 1.28 3.646 3.138 0 1.52-1.055 2.667-3.057 2.962z"/></svg>',
-      fields: [
-        { key: 'address', label: 'Wallet Address', type: 'text', ph: 'T... or 0x...', hint: '' },
-        { key: 'network', label: 'Network',         type: 'select', options: ['TRC-20','ERC-20'], hint: 'Choose the network that matches your wallet address.' }
       ]
     },
     {

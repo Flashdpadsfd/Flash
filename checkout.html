@@ -483,31 +483,6 @@
         </div>
         <div class="co-card__body">
 
-          <!-- Cash -->
-          <div class="co-pm-section-lbl">CASH</div>
-          <div class="co-pm-grid" id="cashMethods">
-            <button class="co-pm-opt" data-pm="paypal">
-              <div class="co-pm-opt__icon" style="background:#003087;">
-                <svg viewBox="0 0 24 24" fill="#fff" width="16" height="16"><path d="M7.076 21.337H4.958a.641.641 0 01-.633-.74L6.29 3.617a.75.75 0 01.74-.633h6.264c2.089 0 3.572.493 4.383 1.466.78.932.997 2.304.644 4.075-.855 4.326-3.628 5.98-7.22 5.98H9.3a.75.75 0 00-.74.633l-.763 4.843a.641.641 0 01-.633.54H5.877z"/></svg>
-              </div>
-              <span class="co-pm-opt__label">PayPal</span>
-            </button>
-            <button class="co-pm-opt disabled" data-pm="card">
-              <div class="co-pm-opt__icon" style="background:#1e293b;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" width="16" height="16"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-              </div>
-              <span class="co-pm-opt__label">Card</span>
-            </button>
-            <button class="co-pm-opt disabled" data-pm="balance">
-              <div class="co-pm-opt__icon" style="background:#1e293b;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" width="16" height="16"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
-              </div>
-              <span class="co-pm-opt__label" id="balanceLbl">Balance<br><small style="font-size:10px;opacity:.5;">€0.00</small></span>
-            </button>
-          </div>
-
-          <div class="co-divider"></div>
-
           <!-- Crypto -->
           <div class="co-pm-section-lbl">CRYPTO</div>
           <div class="co-pm-grid" id="cryptoMethods">
@@ -712,20 +687,6 @@
 
   </div>
 
-  <!-- ════════════ STEP 2b: PAYPAL ════════════ -->
-  <div id="stepPaypal" style="display:none;max-width:480px;margin:0 auto;width:100%;">
-    <div class="co-card">
-      <div class="co-card__hdr">
-        <div class="co-card__title">Pay with PayPal</div>
-        <div class="co-card__sub" id="ppSub">—</div>
-      </div>
-      <div class="co-card__body">
-        <div id="paypalBtns" style="min-height:120px;background:#fff;border-radius:10px;padding:16px;"></div>
-        <div id="ppErr" class="co-err-msg" style="display:none;"></div>
-      </div>
-    </div>
-  </div>
-
   <!-- ════════════ STEP 3: SUCCESS ════════════ -->
   <div id="stepSuccess" style="display:none;max-width:500px;margin:0 auto;width:100%;">
     <div class="co-card">
@@ -873,19 +834,6 @@
   });
   if (!hasCrypto) document.getElementById('noWalletsMsg').style.display = '';
 
-  /* PayPal — only clickable if enabled + configured in admin panel */
-  var ppCfg = payments.paypal;
-  var paypalReady = !!(ppCfg && ppCfg.enabled && ppCfg.clientId);
-  if (!paypalReady) {
-    var ppBtnEl = document.querySelector('#cashMethods .co-pm-opt[data-pm="paypal"]');
-    if (ppBtnEl) ppBtnEl.classList.add('disabled');
-  }
-
-  /* Also bind cash methods */
-  document.querySelectorAll('#cashMethods .co-pm-opt:not(.disabled)').forEach(function(btn) {
-    btn.addEventListener('click', function() { selectPM(btn.dataset.pm); });
-  });
-
   function selectPM(key) {
     selectedPM = key;
     document.querySelectorAll('.co-pm-opt').forEach(function(b) { b.classList.remove('active'); });
@@ -947,72 +895,8 @@
     if (cryptoCoins.indexOf(selectedPM) !== -1) {
       /* Crypto payment */
       startCryptoPayment(email, invoiceId, selectedPM, fp);
-    } else if (selectedPM === 'paypal') {
-      if (!paypalReady) {
-        errEl.textContent = 'PayPal is not configured. Please select a crypto method.';
-        errEl.style.display = '';
-        return;
-      }
-      startPaypalPayment(email, invoiceId, fp);
     }
   });
-
-  /* ── PayPal payment flow (official PayPal JS SDK) ── */
-  function startPaypalPayment(email, invoiceId, fiatAmount) {
-    var currency = 'EUR'; /* paiements en euros */
-    var sym2 = '€'; /* tout le site en € */
-
-    /* Breadcrumb */
-    document.getElementById('bcCheckout').classList.remove('active');
-    document.getElementById('bcCheckout').classList.add('done');
-    document.getElementById('bcConfirm').classList.add('active');
-
-    document.getElementById('stepCheckout').style.display = 'none';
-    document.getElementById('stepPaypal').style.display = '';
-    document.getElementById('ppSub').textContent = product.name + ' — ' + sym2 + fiatAmount.toFixed(2);
-
-    function showPpErr(msg) {
-      var e = document.getElementById('ppErr');
-      e.textContent = msg; e.style.display = '';
-    }
-
-    function renderButtons() {
-      try {
-        window.paypal.Buttons({
-          style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'paypal' },
-          createOrder: function(data, actions) {
-            return actions.order.create({
-              purchase_units: [{
-                description: product.name + ' (' + invoiceId + ')',
-                amount: { value: fiatAmount.toFixed(2), currency_code: currency }
-              }]
-            });
-          },
-          onApprove: function(data, actions) {
-            return actions.order.capture().then(function(details) {
-              completeOrder({
-                invoiceId: invoiceId, email: email, fiatAmount: fiatAmount,
-                paymentMethod: 'paypal',
-                txHash: (details && details.id) || data.orderID || '—'
-              });
-            });
-          },
-          onError: function() {
-            showPpErr('PayPal error. Please try again or use a crypto method.');
-          }
-        }).render('#paypalBtns');
-      } catch(e) {
-        showPpErr('Could not load PayPal buttons.');
-      }
-    }
-
-    if (window.paypal && window.paypal.Buttons) { renderButtons(); return; }
-    var s = document.createElement('script');
-    s.src = 'https://www.paypal.com/sdk/js?client-id=' + encodeURIComponent(ppCfg.clientId) + '&currency=' + currency;
-    s.onload = renderButtons;
-    s.onerror = function() { showPpErr('Could not load PayPal SDK. Check the Client ID in the admin panel.'); };
-    document.head.appendChild(s);
-  }
 
   /* ── Crypto payment flow ── */
   function startCryptoPayment(email, invoiceId, coin, fiatAmount) {
@@ -1357,7 +1241,7 @@
       : '(Contact support — invoice: ' + invoiceId + ')';
   }
 
-  /* ── Shared order completion (crypto + PayPal) ── */
+  /* ── Order completion (crypto) ── */
   function completeOrder(o) {
     /* o: { invoiceId, email, fiatAmount, paymentMethod, txHash, deliverable? } */
     var deliverable = o.deliverable || takeDeliverable(o.invoiceId);
@@ -1411,7 +1295,6 @@
     /* Show success */
     setStep(4);
     document.getElementById('stepConfirm').style.display = 'none';
-    document.getElementById('stepPaypal').style.display = 'none';
     document.getElementById('stepSuccess').style.display = '';
 
     document.getElementById('successSub').textContent = 'Order confirmed. A copy was sent to ' + o.email + '.';
