@@ -147,10 +147,11 @@ window.NX_ICONS = function (name) {
   }
   if (sortSelect) sortSelect.addEventListener('change', filterAndSort);
 
-  /* Items de catégorie filtrables : lignes normales + en-têtes de catégorie sans sous-catégorie */
-  var CAT_FILTER_SELECTOR = '.sidebar__item[data-cat], .sidebar__section-header--leaf[data-cat]';
+  /* Items de catégorie filtrables : pills de la barre de filtres (+ anciens sélecteurs
+     de sidebar, conservés pour compat avec les pages qui l'utilisent encore) */
+  var CAT_FILTER_SELECTOR = '.cat-pill[data-cat], .sidebar__item[data-cat], .sidebar__section-header--leaf[data-cat]';
   function clearCatActive() {
-    document.querySelectorAll('.sidebar__item.active, .sidebar__section-header--leaf.active')
+    document.querySelectorAll('.cat-pill.active, .sidebar__item.active, .sidebar__section-header--leaf.active')
       .forEach(function (i) { i.classList.remove('active'); });
   }
   document.querySelectorAll(CAT_FILTER_SELECTOR).forEach(function (item) {
