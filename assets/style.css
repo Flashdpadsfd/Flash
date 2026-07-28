@@ -716,6 +716,26 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
 .shop-filterbar__search-input::placeholder { color: rgba(255,255,255,.30); }
 .shop-filterbar__search-input:focus { border-color: rgba(255,255,255,.40); }
 
+.shop-filterbar__stat {
+  display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0;
+  height: 38px; padding: 0 14px; border-radius: 8px;
+  background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.12);
+  color: #fff; font-size: 13px; font-weight: 600; font-family: Inter, sans-serif;
+  white-space: nowrap;
+}
+.shop-filterbar__stat-icon { display: inline-flex; color: #f59e0b; }
+.shop-filterbar__stat-icon svg { width: 14px; height: 14px; }
+.shop-filterbar__stat--stock {
+  background: rgba(74,222,128,.10); border-color: rgba(74,222,128,.25); color: #4ade80;
+}
+.shop-filterbar__stat-dot {
+  width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+  background: #4ade80; box-shadow: 0 0 6px rgba(74,222,128,.7);
+}
+@media (max-width: 640px) {
+  .shop-filterbar__stat { display: none; }
+}
+
 .cat-pills {
   display: flex; align-items: center; gap: 8px;
   margin-top: 14px; padding-top: 14px;

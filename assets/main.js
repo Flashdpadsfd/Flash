@@ -96,6 +96,7 @@ window.NX_ICONS = function (name) {
   var productGrid  = $('productGrid');
   var searchInput  = $('searchInput');
   var sortSelect   = $('sortSelect');
+  var priceSelect  = $('priceSelect');
   var resultsCount = $('resultsCount');
   var activeCat    = 'all';
   var activeSubcats = [];
@@ -105,14 +106,24 @@ window.NX_ICONS = function (name) {
   function filterAndSort() {
     if (!productGrid) return;
     var cards = Array.from(productGrid.querySelectorAll('.product-card'));
+    var priceVal = priceSelect ? priceSelect.value : 'any';
+    var priceMin = 0, priceMax = Infinity;
+    if (priceVal !== 'any') {
+      var bounds = priceVal.split('-');
+      priceMin = parseFloat(bounds[0]) || 0;
+      priceMax = parseFloat(bounds[1]);
+      if (!isFinite(priceMax)) priceMax = Infinity;
+    }
     var visible = [];
     cards.forEach(function (card) {
-      var name = (card.dataset.name || '').toLowerCase();
-      var cat  = (card.dataset.cat  || '').toLowerCase();
+      var name  = (card.dataset.name || '').toLowerCase();
+      var cat   = (card.dataset.cat  || '').toLowerCase();
+      var price = parseFloat(card.dataset.price || 0);
       var matchSel = activeProductId
         ? String(card.dataset.productId) === String(activeProductId)
         : (activeCat === 'all' || cat === activeCat || activeSubcats.indexOf(cat) !== -1);
-      var ok   = matchSel && (!searchQuery || name.indexOf(searchQuery) !== -1);
+      var matchPrice = price >= priceMin && price <= priceMax;
+      var ok = matchSel && matchPrice && (!searchQuery || name.indexOf(searchQuery) !== -1);
       card.classList[ok ? 'remove' : 'add']('hidden');
       if (ok) visible.push(card);
     });
@@ -145,7 +156,8 @@ window.NX_ICONS = function (name) {
       dbt = setTimeout(function () { searchQuery = searchInput.value.trim().toLowerCase(); filterAndSort(); }, 200);
     });
   }
-  if (sortSelect) sortSelect.addEventListener('change', filterAndSort);
+  if (sortSelect)  sortSelect.addEventListener('change', filterAndSort);
+  if (priceSelect) priceSelect.addEventListener('change', filterAndSort);
 
   /* Items de catégorie filtrables : pills de la barre de filtres (+ anciens sélecteurs
      de sidebar, conservés pour compat avec les pages qui l'utilisent encore) */

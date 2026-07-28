@@ -84,6 +84,19 @@
             <option value="price-desc">Price: High to Low</option>
             <option value="name">Name: A to Z</option>
           </select>
+          <select class="sort-select" id="priceSelect">
+            <option value="any">Any Price</option>
+            <option value="0-5">Under €5</option>
+            <option value="5-10">€5 – €10</option>
+            <option value="10-25">€10 – €25</option>
+            <option value="25-999999">€25+</option>
+          </select>
+          <div class="shop-filterbar__stat shop-filterbar__stat--deals" id="dealsStat" title="Products currently on sale">
+            <span class="shop-filterbar__stat-icon" id="dealsIcon"></span><span id="dealsCount">0</span>&nbsp;Deals
+          </div>
+          <div class="shop-filterbar__stat shop-filterbar__stat--stock" id="stockStat" title="Products currently in stock">
+            <span class="shop-filterbar__stat-dot"></span><span id="stockCount">0</span>&nbsp;In Stock
+          </div>
         </div>
 
         <!-- Catégorie « All Products » toujours présente + catégories créées dans l'admin -->
@@ -358,6 +371,17 @@
       var products = getProducts();
       grid.innerHTML = products.map(function(p, i) { return buildCard(p, i); }).join('');
       if (countEl) countEl.textContent = products.length;
+
+      // Barre de filtres : "X Deals" (produits en promo) et "X In Stock"
+      var dealsIcon = document.getElementById('dealsIcon');
+      if (dealsIcon && !dealsIcon.innerHTML) dealsIcon.innerHTML = NX_ICONS('flame');
+      var dealsCount = products.filter(function(p) { return p.origPrice && Number(p.origPrice) > Number(p.price); }).length;
+      var stockCount = products.filter(function(p) { return p.inStock !== false && p.stock !== 0; }).length;
+      var dealsEl = document.getElementById('dealsCount');
+      var stockEl = document.getElementById('stockCount');
+      if (dealsEl) dealsEl.textContent = dealsCount;
+      if (stockEl) stockEl.textContent = stockCount;
+
       if (window._nexusFilterAndSort) window._nexusFilterAndSort();
     }
 
