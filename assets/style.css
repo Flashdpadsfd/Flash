@@ -513,7 +513,7 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
 .shop-layout {
   display: flex; align-items: flex-start;
   width: 100%; max-width: 1440px; margin: 0 auto;
-  padding: 72px 48px 80px; gap: 0;
+  padding: 72px 32px 80px; gap: 0;
   min-height: 100vh;
 }
 
