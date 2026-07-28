@@ -77,6 +77,10 @@
           <div class="shop-filterbar__search">
             <svg class="shop-filterbar__search-icon" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
             <input class="shop-filterbar__search-input" id="searchInput" type="text" placeholder="Search products…" autocomplete="off" />
+            <button type="button" class="shop-filterbar__search-clear" id="searchClearBtn" aria-label="Clear search" style="display:none;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </button>
+            <kbd class="shop-filterbar__search-kbd" id="searchKbdHint">⌘K</kbd>
           </div>
           <!-- Tri : dropdown custom (bouton + panel) pour un style entierement maitrise -->
           <div class="sort-filter" id="sortFilter">
@@ -127,6 +131,11 @@
               <div class="price-filter__bounds"><span id="priceBoundMin">€0</span><span id="priceBoundMax">€100</span></div>
             </div>
           </div>
+
+          <button type="button" class="shop-filterbar__clear-btn" id="clearFiltersBtn" disabled>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            Clear filters
+          </button>
 
           <div class="shop-filterbar__stat shop-filterbar__stat--stock" id="stockStat" title="Total products in the catalog">
             <span class="shop-filterbar__stat-dot"></span><span id="stockCount">0</span>&nbsp;Products

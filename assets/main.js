@@ -142,14 +142,60 @@ window.NX_ICONS = function (name) {
         productGrid.appendChild(empty);
       }
     } else { if (empty) empty.parentNode.removeChild(empty); }
+    updateClearFiltersBtn();
+  }
+
+  /* ─── "Clear filters" : toujours affiché, actif seulement si un filtre (recherche,
+     catégorie, prix) est en cours. Reste visible plutôt que disparaître, pour ne pas
+     laisser un vide dans la barre quand aucun filtre n'est appliqué. ─── */
+  var clearFiltersBtn = $('clearFiltersBtn');
+  function updateClearFiltersBtn() {
+    if (!clearFiltersBtn) return;
+    var active = !!searchQuery || activeCat !== 'all' || !!activeProductId
+      || (priceMinInput && priceMinInput.value !== '') || (priceMaxInput && priceMaxInput.value !== '');
+    clearFiltersBtn.disabled = !active;
+  }
+  if (clearFiltersBtn) {
+    clearFiltersBtn.addEventListener('click', function () {
+      if (searchInput) { searchInput.value = ''; searchQuery = ''; updateSearchClearUI(); }
+      clearCatActive();
+      var allPill = document.querySelector('.cat-pill--all');
+      if (allPill) allPill.classList.add('active');
+      activeCat = 'all'; activeSubcats = []; activeProductId = null;
+      if (priceMinInput) priceMinInput.value = '';
+      if (priceMaxInput) priceMaxInput.value = '';
+      if (priceRangeMin && priceRangeMax) { priceRangeMin.value = priceRangeMin.min; priceRangeMax.value = priceRangeMax.max; updatePriceSliderRange(); }
+      updatePriceFilterBtnState();
+      filterAndSort();
+    });
+  }
+
+  /* ─── Recherche : indice ⌘K quand le champ est vide, croix pour l'effacer sinon ─── */
+  var searchClearBtn = $('searchClearBtn');
+  var searchKbdHint   = $('searchKbdHint');
+  function updateSearchClearUI() {
+    var hasText = !!(searchInput && searchInput.value);
+    if (searchClearBtn) searchClearBtn.style.display = hasText ? 'flex' : 'none';
+    if (searchKbdHint)  searchKbdHint.style.display  = hasText ? 'none' : 'block';
+  }
+  if (searchClearBtn) {
+    searchClearBtn.addEventListener('click', function () {
+      if (!searchInput) return;
+      searchInput.value = ''; searchQuery = '';
+      updateSearchClearUI();
+      searchInput.focus();
+      filterAndSort();
+    });
   }
 
   if (searchInput) {
     var dbt;
     searchInput.addEventListener('input', function () {
+      updateSearchClearUI();
       clearTimeout(dbt);
       dbt = setTimeout(function () { searchQuery = searchInput.value.trim().toLowerCase(); filterAndSort(); }, 200);
     });
+    updateSearchClearUI();
   }
   if (sortSelect) sortSelect.addEventListener('change', filterAndSort);
 
