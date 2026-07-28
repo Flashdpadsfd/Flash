@@ -695,11 +695,19 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
 
 /* ── Filter bar (search + sort + category pills, no sidebar) ── */
 .shop-filterbar {
-  background: rgba(255,255,255,.03);
+  position: relative; overflow: visible; /* visible : les popovers Price/Sort doivent pouvoir depasser */
+  background: linear-gradient(160deg, rgba(255,255,255,.045), rgba(255,255,255,.015) 60%);
   border: 1px solid rgba(255,255,255,.08); border-radius: 16px;
   padding: 16px; margin-top: 24px;
 }
-.shop-filterbar__row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+/* Lueur ambiante blanche en fond, façon glow décoratif (coin haut-gauche) */
+.shop-filterbar::before {
+  content: ''; position: absolute; z-index: 0; pointer-events: none;
+  top: -140px; left: -120px; width: 420px; height: 420px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,.07), transparent 70%);
+  filter: blur(30px);
+}
+.shop-filterbar__row { position: relative; z-index: 1; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .shop-filterbar__search { position: relative; flex: 1 1 280px; min-width: 200px; max-width: 900px; }
 .shop-filterbar__search-icon {
   position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
@@ -774,7 +782,7 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
   transition: background 200ms ease, color 200ms ease, border-color 200ms ease;
 }
 .sort-filter__btn:hover { background: rgba(255,255,255,.09); }
-.sort-filter.open .sort-filter__btn { background: #fff; color: #000; border-color: #fff; }
+.sort-filter.open .sort-filter__btn { background: linear-gradient(160deg, #fff, #dcdce2); color: #000; border-color: #fff; }
 .sort-filter__btn span { flex: 1; text-align: left; }
 .sort-filter__chevron { transition: transform 200ms ease; flex-shrink: 0; }
 .sort-filter.open .sort-filter__chevron { transform: rotate(180deg); }
@@ -806,7 +814,7 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
   transition: background 200ms ease, color 200ms ease, border-color 200ms ease;
 }
 .price-filter__btn:hover { background: rgba(255,255,255,.09); }
-.price-filter__btn.active { background: #fff; color: #000; border-color: #fff; }
+.price-filter__btn.active { background: linear-gradient(160deg, #fff, #dcdce2); color: #000; border-color: #fff; }
 .price-filter__chevron { transition: transform 200ms ease; flex-shrink: 0; }
 .price-filter.open .price-filter__chevron { transform: rotate(180deg); }
 
@@ -857,6 +865,7 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
 .price-filter__bounds { display: flex; justify-content: space-between; font-size: 11px; color: rgba(255,255,255,.4); font-family: Inter, sans-serif; }
 
 .cat-pills {
+  position: relative; z-index: 1;
   display: flex; align-items: center; gap: 8px;
   margin-top: 14px; padding-top: 14px;
   border-top: 1px solid rgba(255,255,255,.06);
@@ -874,7 +883,10 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
   transition: background 200ms ease, color 200ms ease, border-color 200ms ease;
 }
 .cat-pill:hover { background: rgba(255,255,255,.09); color: #fff; border-color: rgba(255,255,255,.20); }
-.cat-pill.active { background: #fff; color: #000; border-color: #fff; font-weight: 600; }
+.cat-pill.active {
+  background: linear-gradient(160deg, #fff, #dcdce2); color: #000; border-color: #fff; font-weight: 600;
+  box-shadow: 0 4px 16px rgba(255,255,255,.15);
+}
 .cat-pill__icon {
   width: 18px; height: 18px; border-radius: 5px; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
