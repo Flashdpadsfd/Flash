@@ -84,17 +84,42 @@
             <option value="price-desc">Price: High to Low</option>
             <option value="name">Name: A to Z</option>
           </select>
-          <select class="sort-select" id="priceSelect">
-            <option value="any">Any Price</option>
-            <option value="0-5">Under €5</option>
-            <option value="5-10">€5 – €10</option>
-            <option value="10-25">€10 – €25</option>
-            <option value="25-999999">€25+</option>
-          </select>
-          <div class="shop-filterbar__stat shop-filterbar__stat--deals" id="dealsStat" title="Products currently on sale">
-            <span class="shop-filterbar__stat-icon" id="dealsIcon"></span><span id="dealsCount">0</span>&nbsp;Deals
+
+          <!-- Filtre Prix : popover avec champs From/To + slider double-poignée -->
+          <div class="price-filter" id="priceFilter">
+            <button type="button" class="price-filter__btn" id="priceFilterBtn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M15.5 9.5c0-1.66-1.57-3-3.5-3s-3.5 1.34-3.5 3 1.57 2.5 3.5 2.5 3.5 1.34 3.5 3-1.57 3-3.5 3-3.5-1.34-3.5-3"/></svg>
+              Price
+              <svg class="price-filter__chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <div class="price-filter__panel" id="pricePanel">
+              <div class="price-filter__panel-header">
+                <span class="price-filter__panel-title">Price</span>
+                <button type="button" class="price-filter__panel-close" id="pricePanelClose" aria-label="Close">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                </button>
+              </div>
+              <div class="price-filter__fields">
+                <div class="price-filter__field">
+                  <label for="priceMin">From</label>
+                  <div class="price-filter__field-input"><span>€</span><input type="number" id="priceMin" min="0" step="1" inputmode="decimal" /></div>
+                </div>
+                <div class="price-filter__field">
+                  <label for="priceMax">To</label>
+                  <div class="price-filter__field-input"><span>€</span><input type="number" id="priceMax" min="0" step="1" inputmode="decimal" /></div>
+                </div>
+              </div>
+              <div class="price-slider">
+                <div class="price-slider__track"></div>
+                <div class="price-slider__range" id="priceSliderRange"></div>
+                <input type="range" id="priceRangeMin" min="0" max="100" value="0" step="1" />
+                <input type="range" id="priceRangeMax" min="0" max="100" value="100" step="1" />
+              </div>
+              <div class="price-filter__bounds"><span id="priceBoundMin">€0</span><span id="priceBoundMax">€100</span></div>
+            </div>
           </div>
-          <div class="shop-filterbar__stat shop-filterbar__stat--stock" id="stockStat" title="Products currently in stock">
+
+          <div class="shop-filterbar__stat shop-filterbar__stat--stock" id="stockStat" title="Available products">
             <span class="shop-filterbar__stat-dot"></span><span id="stockCount">0</span>&nbsp;In Stock
           </div>
         </div>
@@ -372,14 +397,9 @@
       grid.innerHTML = products.map(function(p, i) { return buildCard(p, i); }).join('');
       if (countEl) countEl.textContent = products.length;
 
-      // Barre de filtres : "X Deals" (produits en promo) et "X In Stock"
-      var dealsIcon = document.getElementById('dealsIcon');
-      if (dealsIcon && !dealsIcon.innerHTML) dealsIcon.innerHTML = NX_ICONS('flame');
-      var dealsCount = products.filter(function(p) { return p.origPrice && Number(p.origPrice) > Number(p.price); }).length;
+      // Barre de filtres : "X In Stock" — tous les produits actuellement disponibles
       var stockCount = products.filter(function(p) { return p.inStock !== false && p.stock !== 0; }).length;
-      var dealsEl = document.getElementById('dealsCount');
       var stockEl = document.getElementById('stockCount');
-      if (dealsEl) dealsEl.textContent = dealsCount;
       if (stockEl) stockEl.textContent = stockCount;
 
       if (window._nexusFilterAndSort) window._nexusFilterAndSort();

@@ -96,7 +96,8 @@ window.NX_ICONS = function (name) {
   var productGrid  = $('productGrid');
   var searchInput  = $('searchInput');
   var sortSelect   = $('sortSelect');
-  var priceSelect  = $('priceSelect');
+  var priceMinInput = $('priceMin');
+  var priceMaxInput = $('priceMax');
   var resultsCount = $('resultsCount');
   var activeCat    = 'all';
   var activeSubcats = [];
@@ -106,14 +107,8 @@ window.NX_ICONS = function (name) {
   function filterAndSort() {
     if (!productGrid) return;
     var cards = Array.from(productGrid.querySelectorAll('.product-card'));
-    var priceVal = priceSelect ? priceSelect.value : 'any';
-    var priceMin = 0, priceMax = Infinity;
-    if (priceVal !== 'any') {
-      var bounds = priceVal.split('-');
-      priceMin = parseFloat(bounds[0]) || 0;
-      priceMax = parseFloat(bounds[1]);
-      if (!isFinite(priceMax)) priceMax = Infinity;
-    }
+    var priceMin = (priceMinInput && priceMinInput.value !== '') ? parseFloat(priceMinInput.value) : -Infinity;
+    var priceMax = (priceMaxInput && priceMaxInput.value !== '') ? parseFloat(priceMaxInput.value) : Infinity;
     var visible = [];
     cards.forEach(function (card) {
       var name  = (card.dataset.name || '').toLowerCase();
@@ -156,8 +151,120 @@ window.NX_ICONS = function (name) {
       dbt = setTimeout(function () { searchQuery = searchInput.value.trim().toLowerCase(); filterAndSort(); }, 200);
     });
   }
-  if (sortSelect)  sortSelect.addEventListener('change', filterAndSort);
-  if (priceSelect) priceSelect.addEventListener('change', filterAndSort);
+  if (sortSelect) sortSelect.addEventListener('change', filterAndSort);
+
+  /* ─── Price filter popover : champs From/To + slider double-poignée ─── */
+  var priceFilter     = $('priceFilter');
+  var priceFilterBtn  = $('priceFilterBtn');
+  var pricePanel      = $('pricePanel');
+  var pricePanelClose = $('pricePanelClose');
+  var priceRangeMin   = $('priceRangeMin');
+  var priceRangeMax   = $('priceRangeMax');
+  var priceSliderRange = $('priceSliderRange');
+  var priceBoundMinEl = $('priceBoundMin');
+  var priceBoundMaxEl = $('priceBoundMax');
+
+  function computePriceBounds() {
+    var prices = Array.from(productGrid ? productGrid.querySelectorAll('.product-card') : [])
+      .map(function (c) { return parseFloat(c.dataset.price || 0); })
+      .filter(function (n) { return !isNaN(n); });
+    if (!prices.length) return { min: 0, max: 100 };
+    var lo = Math.floor(Math.min.apply(null, prices));
+    var hi = Math.ceil(Math.max.apply(null, prices));
+    if (hi <= lo) hi = lo + 1;
+    return { min: lo, max: hi };
+  }
+
+  function updatePriceSliderRange() {
+    if (!priceRangeMin || !priceRangeMax || !priceSliderRange) return;
+    var min = parseFloat(priceRangeMin.min), max = parseFloat(priceRangeMin.max);
+    var v1 = parseFloat(priceRangeMin.value), v2 = parseFloat(priceRangeMax.value);
+    var span = (max - min) || 1;
+    priceSliderRange.style.left  = (((v1 - min) / span) * 100) + '%';
+    priceSliderRange.style.right = (100 - ((v2 - min) / span) * 100) + '%';
+  }
+
+  function updatePriceFilterBtnState() {
+    if (!priceFilterBtn) return;
+    var active = (priceMinInput && priceMinInput.value !== '') || (priceMaxInput && priceMaxInput.value !== '');
+    priceFilterBtn.classList.toggle('active', !!active);
+  }
+
+  /* Recalcule les bornes du slider à partir du catalogue actuel à CHAQUE ouverture
+     du popover (un produit ajouté/modifié dans l'admin doit immédiatement se
+     refléter sur "From"/"To"). Une valeur déjà saisie par le visiteur est
+     conservée, simplement recalée dans les nouvelles bornes si besoin. */
+  function initPriceBounds() {
+    if (!priceRangeMin || !priceRangeMax) return;
+    var b = computePriceBounds();
+    priceRangeMin.min = priceRangeMax.min = b.min;
+    priceRangeMin.max = priceRangeMax.max = b.max;
+    if (priceBoundMinEl) priceBoundMinEl.textContent = '€' + b.min;
+    if (priceBoundMaxEl) priceBoundMaxEl.textContent = '€' + b.max;
+    if (priceMinInput) priceMinInput.placeholder = b.min;
+    if (priceMaxInput) priceMaxInput.placeholder = b.max;
+
+    var hasMin = priceMinInput && priceMinInput.value !== '';
+    var hasMax = priceMaxInput && priceMaxInput.value !== '';
+    var v1 = hasMin ? Math.max(b.min, Math.min(b.max, parseFloat(priceMinInput.value))) : b.min;
+    var v2 = hasMax ? Math.max(b.min, Math.min(b.max, parseFloat(priceMaxInput.value))) : b.max;
+    priceRangeMin.value = v1;
+    priceRangeMax.value = v2;
+    if (hasMin) priceMinInput.value = v1;
+    if (hasMax) priceMaxInput.value = v2;
+    updatePriceSliderRange();
+  }
+
+  var priceDbt;
+  function schedulePriceFilter() {
+    clearTimeout(priceDbt);
+    priceDbt = setTimeout(filterAndSort, 80);
+  }
+
+  if (priceFilterBtn && priceFilter && pricePanel) {
+    priceFilterBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var opening = !priceFilter.classList.contains('open');
+      if (opening) initPriceBounds();
+      priceFilter.classList.toggle('open', opening);
+    });
+    if (pricePanelClose) {
+      pricePanelClose.addEventListener('click', function () { priceFilter.classList.remove('open'); });
+    }
+    document.addEventListener('click', function (e) {
+      if (priceFilter.classList.contains('open') && !priceFilter.contains(e.target)) {
+        priceFilter.classList.remove('open');
+      }
+    });
+  }
+
+  if (priceRangeMin && priceRangeMax) {
+    [priceRangeMin, priceRangeMax].forEach(function (r) {
+      r.addEventListener('input', function () {
+        if (parseFloat(priceRangeMin.value) > parseFloat(priceRangeMax.value)) {
+          if (r === priceRangeMin) priceRangeMin.value = priceRangeMax.value;
+          else priceRangeMax.value = priceRangeMin.value;
+        }
+        if (priceMinInput) priceMinInput.value = priceRangeMin.value;
+        if (priceMaxInput) priceMaxInput.value = priceRangeMax.value;
+        updatePriceSliderRange();
+        updatePriceFilterBtnState();
+        schedulePriceFilter();
+      });
+    });
+  }
+  if (priceMinInput) {
+    priceMinInput.addEventListener('input', function () {
+      if (priceRangeMin && priceMinInput.value !== '') priceRangeMin.value = priceMinInput.value;
+      updatePriceSliderRange(); updatePriceFilterBtnState(); schedulePriceFilter();
+    });
+  }
+  if (priceMaxInput) {
+    priceMaxInput.addEventListener('input', function () {
+      if (priceRangeMax && priceMaxInput.value !== '') priceRangeMax.value = priceMaxInput.value;
+      updatePriceSliderRange(); updatePriceFilterBtnState(); schedulePriceFilter();
+    });
+  }
 
   /* Items de catégorie filtrables : pills de la barre de filtres (+ anciens sélecteurs
      de sidebar, conservés pour compat avec les pages qui l'utilisent encore) */
