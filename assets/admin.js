@@ -1546,6 +1546,36 @@
     }
   }
 
+  /* Création rapide d'une catégorie depuis le formulaire produit (sans quitter
+     la fiche produit ni ouvrir le modal Catégorie complet). */
+  window.toggleNewCatRow = function(show) {
+    var row = document.getElementById('fCatNewRow');
+    var toggle = document.getElementById('fCatNewToggle');
+    if (!row) return;
+    row.style.display = show ? 'flex' : 'none';
+    if (toggle) toggle.style.display = show ? 'none' : 'block';
+    if (show) {
+      var input = document.getElementById('fCatNewName');
+      if (input) { input.value = ''; setTimeout(function() { input.focus(); }, 50); }
+    }
+  };
+
+  window.createCategoryInline = function() {
+    var input = document.getElementById('fCatNewName');
+    var name = ((input && input.value) || '').trim();
+    if (!name) { toast('Category name required.'); return; }
+    var id = slugify(name);
+    if (!id) { toast('Invalid name.'); return; }
+    var cats = getCategories();
+    if (cats.find(function(c) { return c.id === id; })) { toast('Category already exists.'); return; }
+    cats.push({ id: id, name: name, slug: id, color: '#6495ed', parent: '' });
+    setCategories(cats);
+    renderCategories();
+    populateCatSelect(id);
+    toggleNewCatRow(false);
+    toast('Category created ✓');
+  };
+
   function renderCategories() {
     var cats = getCategories();
     var tbody = document.getElementById('categoriesTbody');
