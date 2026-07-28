@@ -119,8 +119,8 @@
             </div>
           </div>
 
-          <div class="shop-filterbar__stat shop-filterbar__stat--stock" id="stockStat" title="Available products">
-            <span class="shop-filterbar__stat-dot"></span><span id="stockCount">0</span>&nbsp;In Stock
+          <div class="shop-filterbar__stat shop-filterbar__stat--stock" id="stockStat" title="Total products in the catalog">
+            <span class="shop-filterbar__stat-dot"></span><span id="stockCount">0</span>&nbsp;Products
           </div>
         </div>
 
@@ -397,10 +397,9 @@
       grid.innerHTML = products.map(function(p, i) { return buildCard(p, i); }).join('');
       if (countEl) countEl.textContent = products.length;
 
-      // Barre de filtres : "X In Stock" — tous les produits actuellement disponibles
-      var stockCount = products.filter(function(p) { return p.inStock !== false && p.stock !== 0; }).length;
+      // Barre de filtres : "X Products" — nombre total de produits du catalogue
       var stockEl = document.getElementById('stockCount');
-      if (stockEl) stockEl.textContent = stockCount;
+      if (stockEl) stockEl.textContent = products.length;
 
       if (window._nexusFilterAndSort) window._nexusFilterAndSort();
     }
