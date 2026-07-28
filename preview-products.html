@@ -78,12 +78,21 @@
             <svg class="shop-filterbar__search-icon" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
             <input class="shop-filterbar__search-input" id="searchInput" type="text" placeholder="Search products…" autocomplete="off" />
           </div>
-          <select class="sort-select" id="sortSelect">
-            <option value="default">Recommended</option>
-            <option value="price-asc">Price: Low to High</option>
-            <option value="price-desc">Price: High to Low</option>
-            <option value="name">Name: A to Z</option>
-          </select>
+          <!-- Tri : dropdown custom (bouton + panel) pour un style entierement maitrise -->
+          <div class="sort-filter" id="sortFilter">
+            <input type="hidden" id="sortSelect" value="default" />
+            <button type="button" class="sort-filter__btn" id="sortFilterBtn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2" fill="currentColor" stroke="none"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="15" cy="12" r="2" fill="currentColor" stroke="none"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="7" cy="18" r="2" fill="currentColor" stroke="none"/></svg>
+              <span id="sortFilterLabel">Recommended</span>
+              <svg class="sort-filter__chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <div class="sort-filter__panel" id="sortPanel">
+              <button type="button" class="sort-filter__option selected" data-value="default">Recommended</button>
+              <button type="button" class="sort-filter__option" data-value="price-asc">Price: Low to High</button>
+              <button type="button" class="sort-filter__option" data-value="price-desc">Price: High to Low</button>
+              <button type="button" class="sort-filter__option" data-value="name">Name: A to Z</button>
+            </div>
+          </div>
 
           <!-- Filtre Prix : popover avec champs From/To + slider double-poignée -->
           <div class="price-filter" id="priceFilter">

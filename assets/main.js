@@ -153,6 +153,36 @@ window.NX_ICONS = function (name) {
   }
   if (sortSelect) sortSelect.addEventListener('change', filterAndSort);
 
+  /* ─── Tri : dropdown custom (bouton + panel), pilote le <input type="hidden"> #sortSelect ─── */
+  var sortFilter      = $('sortFilter');
+  var sortFilterBtn   = $('sortFilterBtn');
+  var sortFilterLabel = $('sortFilterLabel');
+  var sortPanel       = $('sortPanel');
+
+  if (sortFilterBtn && sortFilter && sortPanel) {
+    sortFilterBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      sortFilter.classList.toggle('open');
+    });
+    document.addEventListener('click', function (e) {
+      if (sortFilter.classList.contains('open') && !sortFilter.contains(e.target)) {
+        sortFilter.classList.remove('open');
+      }
+    });
+    sortPanel.querySelectorAll('.sort-filter__option').forEach(function (opt) {
+      opt.addEventListener('click', function () {
+        sortPanel.querySelectorAll('.sort-filter__option').forEach(function (o) { o.classList.remove('selected'); });
+        opt.classList.add('selected');
+        if (sortFilterLabel) sortFilterLabel.textContent = opt.textContent;
+        sortFilter.classList.remove('open');
+        if (sortSelect) {
+          sortSelect.value = opt.dataset.value;
+          sortSelect.dispatchEvent(new Event('change'));
+        }
+      });
+    });
+  }
+
   /* ─── Price filter popover : champs From/To + slider double-poignée ─── */
   var priceFilter     = $('priceFilter');
   var priceFilterBtn  = $('priceFilterBtn');

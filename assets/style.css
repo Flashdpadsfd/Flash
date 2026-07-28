@@ -734,6 +734,38 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
   .shop-filterbar__stat { display: none; }
 }
 
+/* ── Tri : bouton + panel custom (remplace le <select> natif) ── */
+.sort-filter { position: relative; flex-shrink: 0; min-width: 200px; }
+.sort-filter__btn {
+  display: flex; align-items: center; gap: 8px;
+  width: 100%; height: 40px; padding: 0 14px; border-radius: 6px;
+  background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.12);
+  color: #fff; font-size: 14px; font-weight: 500; font-family: Inter, sans-serif;
+  cursor: pointer; white-space: nowrap;
+  transition: background 200ms ease, color 200ms ease, border-color 200ms ease;
+}
+.sort-filter__btn:hover { background: rgba(255,255,255,.09); }
+.sort-filter.open .sort-filter__btn { background: #fff; color: #000; border-color: #fff; }
+.sort-filter__btn span { flex: 1; text-align: left; }
+.sort-filter__chevron { transition: transform 200ms ease; flex-shrink: 0; }
+.sort-filter.open .sort-filter__chevron { transform: rotate(180deg); }
+
+.sort-filter__panel {
+  position: absolute; top: calc(100% + 8px); left: 0; right: 0; z-index: 60;
+  background: #111114; border: 1px solid rgba(255,255,255,.12); border-radius: 10px;
+  box-shadow: 0 20px 50px rgba(0,0,0,.55);
+  padding: 6px; display: none;
+}
+.sort-filter.open .sort-filter__panel { display: block; }
+.sort-filter__option {
+  display: block; width: 100%; text-align: left;
+  padding: 9px 12px; border-radius: 6px; border: none; background: none;
+  color: rgba(255,255,255,.7); font-size: 13px; font-family: Inter, sans-serif; font-weight: 500;
+  cursor: pointer; transition: background 150ms ease, color 150ms ease;
+}
+.sort-filter__option:hover { background: rgba(255,255,255,.07); color: #fff; }
+.sort-filter__option.selected { background: rgba(255,255,255,.10); color: #fff; font-weight: 600; }
+
 /* ── Price filter : bouton + popover (From/To + slider double-poignée) ── */
 .price-filter { position: relative; flex-shrink: 0; }
 .price-filter__btn {
@@ -830,15 +862,6 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
 .shop-topbar__right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
 .results-count { font-size: 13px; color: rgba(255,255,255,.35); }
 
-.sort-select {
-  background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.12); border-radius: 6px;
-  color: #fff; font-size: 14px; font-family: Inter, sans-serif; font-weight: 500;
-  padding: 6px 34px 6px 16px; height: 40px; min-width: 200px; outline: none;
-  cursor: pointer; appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23ffffff' stroke-opacity='.4' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat; background-position: right 10px center;
-}
-.sort-select option { background: #111; color: #fff; }
 
 /*──────────────────────────────────────────────
   PAGINATION
