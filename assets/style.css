@@ -1,14 +1,16 @@
 /*──────────────────────────────────────────────
   TYPOGRAPHIE
-  Deux polices, pilotées ici et nulle part ailleurs : changer la typo du site
-  = changer ces deux lignes. Les <link> Google Fonts des pages doivent charger
-  la meme famille (voir le head des *.html).
+  Les polices sont pilotées ici et nulle part ailleurs : changer la typo du
+  site = changer ces trois lignes. Les <link> Google Fonts des pages doivent
+  charger les memes familles (voir le head des *.html).
   --font-ui      : tout le texte courant, boutons, prix, filtres…
-  --font-display : logo et gros titres (hero, banniere CTA, footer)
+  --font-display : gros titres (hero, banniere CTA, logo du menu mobile)
+  --font-logo    : logo du footer uniquement
 ──────────────────────────────────────────────*/
 :root {
-  --font-ui: Manrope, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --font-ui: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
   --font-display: Lancelot, 'Times New Roman', Georgia, serif;
+  --font-logo: 'Instrument Serif', 'Times New Roman', Georgia, serif;
 }
 
 /*──────────────────────────────────────────────
@@ -1016,7 +1018,7 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
   display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
   gap: 48px; margin-bottom: 48px;
 }
-.footer__logo { font-family: var(--font-display); font-size: 28px; margin-bottom: 16px; }
+.footer__logo { font-family: var(--font-logo); font-size: 28px; margin-bottom: 16px; }
 .footer__desc { font-size: 14px; line-height: 22px; color: rgba(255,255,255,.40); max-width: 280px; }
 .footer__col-title {
   font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
