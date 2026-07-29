@@ -363,6 +363,20 @@
           </div>
         </div>
         <div class="pm-grid" id="pmGrid"></div>
+
+        <!-- Moyens de paiement du compte SellAuth : lecture + activer/desactiver +
+             reordonner uniquement. Distinct des wallets crypto ci-dessus, que LE
+             CHECKOUT DE CE SITE utilise reellement (adresse de wallet en local) ;
+             cette liste reflete le compte SellAuth lui-meme. -->
+        <div class="page-header" style="margin-top:36px;">
+          <div>
+            <h2 style="font-size:16px;font-weight:700;color:#fff;">SellAuth Payment Methods</h2>
+            <p style="font-size:13px;color:var(--text-muted);margin-top:4px;font-weight:400;">Moyens de paiement de votre compte SellAuth — activer/desactiver et reordonner. La configuration fine (frais, identifiants) se fait sur dash.sellauth.com.</p>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <div id="saPmList"></div>
+        </div>
       </div>
 
       <!-- ─── FEEDBACKS ─── -->
@@ -2333,6 +2347,6 @@
   <div id="adminToast" class="admin-toast"></div>
 
   <script src="assets/email-config.js?v=00c5c095"></script>
-  <script src="assets/admin.js?v=edbaf95e"></script>
+  <script src="assets/admin.js?v=3d03638b"></script>
 </body>
 </html>

@@ -581,7 +581,7 @@
     if (name === 'promos') renderPromos();
     if (name === 'orders') renderOrders();
     if (name === 'customers') { renderLogins(); renderCustomers(); }
-    if (name === 'payments') renderPayments();
+    if (name === 'payments') { renderPayments(); renderSaPaymentMethods(); }
     if (name === 'content') loadContentForm();
     if (name === 'stats') loadStatsForm();
     if (name === 'links') loadLinksForm();
@@ -2129,6 +2129,121 @@
     });
     setPayments(saved);
     toast(method.name + ' settings saved.');
+  };
+
+  /* ── Moyens de paiement du compte SellAuth (lecture + toggle + reorder) ──
+     Distinct des wallets crypto ci-dessus (PM_METHODS/nexus_payments), que LE
+     CHECKOUT DE CE SITE utilise reellement. Cette liste reflete le compte
+     SellAuth lui-meme — meme secret admin, meme mecanique que les Coupons. */
+  var _saPmCache = [];
+
+  function saPmSecret(interactive) {
+    var s = localStorage.getItem('nexus_sa_secret') || '';
+    if (!s && interactive) s = getSaSecret(false);
+    return s;
+  }
+
+  window.renderSaPaymentMethods = function(interactive) {
+    var el = document.getElementById('saPmList');
+    if (!el) return;
+
+    var secret = saPmSecret(interactive);
+    if (!secret) {
+      el.innerHTML = promosEmptyState('tag', 'Verrouillé',
+        'Secret admin requis. <a onclick="renderSaPaymentMethods(true)" style="cursor:pointer;text-decoration:underline;">Déverrouiller</a>');
+      return;
+    }
+
+    el.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,.4);padding:32px 0;font-size:13px;">Chargement…</div>';
+
+    fetch(NX_API + '/api/admin-payment-methods', { headers: { 'x-admin-secret': secret } })
+      .then(function(r) { return r.json().then(function(j) { return { status: r.status, body: j }; }); })
+      .then(function(res) {
+        if (res.status === 401) {
+          localStorage.removeItem('nexus_sa_secret');
+          el.innerHTML = promosEmptyState('tag', 'Secret admin incorrect',
+            '<a onclick="renderSaPaymentMethods(true)" style="cursor:pointer;text-decoration:underline;">Réessayer</a>');
+          return;
+        }
+        if (res.status === 501) {
+          el.innerHTML = promosEmptyState('tag', 'SellAuth non configuré',
+            'Renseignez SELLAUTH_API_KEY et SELLAUTH_SHOP_ID côté serveur.');
+          return;
+        }
+        if (!res.body || !res.body.ok) {
+          el.innerHTML = promosEmptyState('tag', 'Impossible de charger',
+            '<a onclick="renderSaPaymentMethods(true)" style="cursor:pointer;text-decoration:underline;">Réessayer</a>');
+          return;
+        }
+
+        _saPmCache = res.body.methods || [];
+        if (!_saPmCache.length) {
+          el.innerHTML = promosEmptyState('tag', 'Aucun moyen de paiement', 'Configurez-en sur dash.sellauth.com.');
+          return;
+        }
+
+        el.innerHTML = '<table class="a-table"><thead><tr>' +
+          '<th>Name</th><th>Type</th><th>Fees</th><th>Status</th><th>Order</th>' +
+          '</tr></thead><tbody>' +
+          _saPmCache.map(function(m, i) {
+            var fees = (m.percentageFee ? m.percentageFee + '%' : '') + (m.percentageFee && m.fixedFee ? ' + ' : '') + (m.fixedFee ? '€' + m.fixedFee.toFixed(2) : '');
+            return '<tr>' +
+              '<td style="color:#fff;font-weight:600;">' + esc(m.name) + (m.checkoutName ? ' <span style="color:var(--text-muted);font-weight:400;">(' + esc(m.checkoutName) + ')</span>' : '') + '</td>' +
+              '<td><span style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);">' + esc(m.type) + '</span></td>' +
+              '<td style="color:var(--text-muted);">' + (fees || '—') + '</td>' +
+              '<td><label class="pm-toggle"><input type="checkbox"' + (m.isActive ? ' checked' : '') + ' onchange="toggleSaPaymentMethod(' + i + ')" /><span class="pm-toggle__track"></span><span class="pm-toggle__thumb"></span></label></td>' +
+              '<td><div class="action-group">' +
+                '<button class="a-btn a-btn--icon" onclick="moveSaPaymentMethod(' + i + ',-1)" title="Move up"' + (i === 0 ? ' disabled' : '') + '><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>' +
+                '<button class="a-btn a-btn--icon" onclick="moveSaPaymentMethod(' + i + ',1)" title="Move down"' + (i === _saPmCache.length - 1 ? ' disabled' : '') + '><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg></button>' +
+              '</div></td>' +
+            '</tr>';
+          }).join('') +
+          '</tbody></table>';
+      })
+      .catch(function() {
+        el.innerHTML = promosEmptyState('tag', 'Erreur réseau',
+          '<a onclick="renderSaPaymentMethods(true)" style="cursor:pointer;text-decoration:underline;">Réessayer</a>');
+      });
+  };
+
+  window.toggleSaPaymentMethod = function(idx) {
+    var m = _saPmCache[idx];
+    if (!m) return;
+    var secret = saPmSecret(true);
+    if (!secret) { toast('Secret admin requis.'); return; }
+    fetch(NX_API + '/api/admin-payment-methods?id=' + encodeURIComponent(m.id) + '&action=toggle', {
+      method: 'POST', headers: { 'x-admin-secret': secret }
+    })
+      .then(function(r) { return r.json().then(function(j) { return { ok: r.ok, status: r.status, body: j }; }); })
+      .then(function(res) {
+        if (res.status === 401) { localStorage.removeItem('nexus_sa_secret'); toast('Secret admin incorrect.'); renderSaPaymentMethods(true); return; }
+        if (!res.ok || !res.body || !res.body.ok) { toast('SellAuth a refusé.'); renderSaPaymentMethods(true); return; }
+        toast(m.name + (m.isActive ? ' desactive' : ' active') + ' ✓');
+        renderSaPaymentMethods(true);
+      })
+      .catch(function() { toast('Erreur réseau.'); renderSaPaymentMethods(true); });
+  };
+
+  window.moveSaPaymentMethod = function(idx, dir) {
+    var target = idx + dir;
+    if (target < 0 || target >= _saPmCache.length) return;
+    var reordered = _saPmCache.slice();
+    var tmp = reordered[idx]; reordered[idx] = reordered[target]; reordered[target] = tmp;
+    var order = reordered.map(function(m) { return m.id; });
+
+    var secret = saPmSecret(true);
+    if (!secret) { toast('Secret admin requis.'); return; }
+    fetch(NX_API + '/api/admin-payment-methods', {
+      method: 'PUT', headers: { 'Content-Type': 'application/json', 'x-admin-secret': secret },
+      body: JSON.stringify({ order: order })
+    })
+      .then(function(r) { return r.json().then(function(j) { return { ok: r.ok, status: r.status, body: j }; }); })
+      .then(function(res) {
+        if (res.status === 401) { localStorage.removeItem('nexus_sa_secret'); toast('Secret admin incorrect.'); return; }
+        if (!res.ok || !res.body || !res.body.ok) { toast('SellAuth a refusé le réordonnancement.'); return; }
+        renderSaPaymentMethods(true);
+      })
+      .catch(function() { toast('Erreur réseau.'); });
   };
 
   /* ── Content editor ── */
