@@ -10,10 +10,12 @@
   var NX_API = (window.NEXUS_API_BASE || '').replace(/\/+$/, '');
 
   /* Toutes les clés poussées vers la boutique. Doit refléter WRITABLE de
-     api/content.js : une clé absente ici ne serait jamais publiée. */
+     api/content.js : une clé absente ici ne serait jamais publiée.
+     Les coupons n'y figurent plus : SellAuth en est l'unique source de
+     vérité, via /api/admin-coupons (voir api/_sellauth-coupons.js). */
   var NX_KEYS = [
     'nexus_products', 'nexus_categories', 'nexus_content', 'nexus_links',
-    'nexus_reviews', 'nexus_text_overrides', 'nexus_payments', 'nexus_promos',
+    'nexus_reviews', 'nexus_text_overrides', 'nexus_payments',
     'nexus_webhooks', 'nexus_blacklist_emails', 'nexus_blacklist_ips',
     'nexus_security', 'nexus_email_config', 'nexus_stats', 'nexus_orders'
   ];
@@ -2965,11 +2967,13 @@
   };
 
   window.resetAll = function () {
-    if (!confirm('Supprimer toutes les données (produits, commandes, avis, webhooks, promos…) ? Cette action est irréversible.')) return;
+    /* Ne touche pas aux coupons : ils vivent chez SellAuth, pas en local (voir
+       le bouton Delete de la page Coupons pour en retirer un). */
+    if (!confirm('Supprimer toutes les données locales (produits, commandes, avis, webhooks…) ? Cette action est irréversible.')) return;
     [
       'nexus_products','nexus_stats','nexus_links','nexus_categories',
       'nexus_reviews','nexus_content','nexus_orders','nexus_webhooks',
-      'nexus_promos','nexus_login_log','nexus_login_fails',
+      'nexus_login_log','nexus_login_fails',
       'nexus_blacklist_emails','nexus_blacklist_ips','nexus_text_overrides'
     ].forEach(function(k) { localStorage.removeItem(k); });
     toast('Données réinitialisées.');
@@ -3570,42 +3574,122 @@
     initDeliverableTabs('stockDeliverableTabs', 'stockDeliverables', 'fStockDeliverableMode', 'stockExistingDeliverables', 'stockDeliverableLabel');
   }
 
-  /* ── Codes Promo ── */
-  function getPromos() { try { return JSON.parse(localStorage.getItem('nexus_promos')) || []; } catch(e) { return []; } }
-  function setPromos(p) { nxSave('nexus_promos', p); }
+  /* ── Codes Promo ──
+     SellAuth est l'UNIQUE source de vérité (voir api/_sellauth-coupons.js) :
+     aucun stockage local, chaque action passe par /api/admin-coupons. Le
+     secret admin sert ici aussi (même mécanisme que Reviews/Customers, voir
+     renderLogins/loginsSecret un peu plus haut dans ce fichier). */
+  var _promosCache = [];
 
-  function renderPromos() {
+  function promosSecret(interactive) {
+    var s = localStorage.getItem('nexus_sa_secret') || '';
+    if (!s && interactive) s = getSaSecret(false);
+    return s;
+  }
+
+  function promosEmptyState(icon, title, sub) {
+    return '<div class="empty-state">' + AICON(icon) +
+      '<div class="empty-state__title">' + title + '</div>' +
+      (sub ? '<div class="empty-state__sub">' + sub + '</div>' : '') +
+      '</div>';
+  }
+
+  window.renderPromos = function(interactive) {
     var el = document.getElementById('promosList');
     if (!el) return;
-    var promos = getPromos();
-    if (!promos.length) {
-      el.innerHTML = '<div style="padding:48px 0;text-align:center;color:var(--text-muted);font-size:13px;">No coupons yet. Click <strong>Create Coupon</strong> to add one.</div>';
+
+    var secret = promosSecret(interactive);
+    if (!secret) {
+      el.innerHTML = promosEmptyState('tag', 'Coupons verrouillés',
+        'Secret admin requis. <a onclick="renderPromos(true)" style="cursor:pointer;text-decoration:underline;">Déverrouiller</a>');
       return;
     }
-    el.innerHTML = '<table class="a-table"><thead><tr>' +
-      '<th>Code</th><th>Type</th><th>Discount</th><th>Uses</th><th>Max Uses</th><th>Expires</th><th>Actions</th>' +
-      '</tr></thead><tbody>' +
-      promos.map(function(p, i) {
-        var discLabel = p.type === 'fixed' ? ('€' + Number(p.discount||0).toFixed(2)) : ('-' + (p.discount||0) + '%');
-        var exp = p.expirationDate ? p.expirationDate.replace('T',' ').slice(0,16) : '—';
-        return '<tr>' +
-          '<td><span style="font-weight:700;font-family:monospace;color:#fff;letter-spacing:.04em;">' + esc(p.code) + '</span></td>' +
-          '<td><span style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);">' + (p.type||'percentage') + '</span></td>' +
-          '<td style="color:var(--accent);font-weight:600;">' + discLabel + '</td>' +
-          '<td style="color:var(--text-muted);">' + (p.uses||0) + '</td>' +
-          '<td style="color:var(--text-muted);">' + (p.maxUses > 0 ? p.maxUses : '∞') + '</td>' +
-          '<td style="color:var(--text-muted);font-size:12px;">' + esc(exp) + '</td>' +
-          '<td><div class="action-group">' +
-            '<button class="a-btn a-btn--icon" onclick="openPromoForm(' + i + ')" title="Edit"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>' +
-            '<button class="a-btn a-btn--icon" onclick="deletePromo(' + i + ')" title="Delete" style="color:var(--red);"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg></button>' +
-          '</div></td>' +
-        '</tr>';
-      }).join('') +
-      '</tbody></table>';
+
+    el.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,.4);padding:48px 0;font-size:13px;">Chargement…</div>';
+
+    fetch(NX_API + '/api/admin-coupons', { headers: { 'x-admin-secret': secret } })
+      .then(function(r) { return r.json().then(function(j) { return { status: r.status, body: j }; }); })
+      .then(function(res) {
+        if (res.status === 401) {
+          localStorage.removeItem('nexus_sa_secret');
+          el.innerHTML = promosEmptyState('tag', 'Secret admin incorrect',
+            '<a onclick="renderPromos(true)" style="cursor:pointer;text-decoration:underline;">Réessayer</a>');
+          return;
+        }
+        if (res.status === 501) {
+          el.innerHTML = promosEmptyState('tag', 'SellAuth non configuré',
+            'Renseignez SELLAUTH_API_KEY et SELLAUTH_SHOP_ID côté serveur.');
+          return;
+        }
+        if (!res.body || !res.body.ok) {
+          el.innerHTML = promosEmptyState('tag', 'Impossible de charger les coupons',
+            '<a onclick="renderPromos(true)" style="cursor:pointer;text-decoration:underline;">Réessayer</a>');
+          return;
+        }
+
+        _promosCache = res.body.coupons || [];
+        if (!_promosCache.length) {
+          el.innerHTML = promosEmptyState('tag', 'No coupons yet', 'Click <strong>Create Coupon</strong> to add one.');
+          return;
+        }
+
+        el.innerHTML = '<table class="a-table"><thead><tr>' +
+          '<th>Code</th><th>Type</th><th>Discount</th><th>Uses</th><th>Max Uses</th><th>Expires</th><th>Actions</th>' +
+          '</tr></thead><tbody>' +
+          _promosCache.map(function(p, i) {
+            var discLabel = p.type === 'fixed' ? ('€' + Number(p.discount||0).toFixed(2)) : ('-' + (p.discount||0) + '%');
+            var exp = p.expirationDate ? String(p.expirationDate).replace('T',' ').slice(0,16) : '—';
+            return '<tr>' +
+              '<td><span style="font-weight:700;font-family:monospace;color:#fff;letter-spacing:.04em;">' + esc(p.code) + '</span></td>' +
+              '<td><span style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);">' + (p.type||'percentage') + '</span></td>' +
+              '<td style="color:var(--accent);font-weight:600;">' + discLabel + '</td>' +
+              '<td style="color:var(--text-muted);">' + (p.uses||0) + '</td>' +
+              '<td style="color:var(--text-muted);">' + (p.maxUses > 0 ? p.maxUses : '∞') + '</td>' +
+              '<td style="color:var(--text-muted);font-size:12px;">' + esc(exp) + '</td>' +
+              '<td><div class="action-group">' +
+                '<button class="a-btn a-btn--icon" onclick="openPromoForm(' + i + ')" title="Edit"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>' +
+                '<button class="a-btn a-btn--icon" onclick="deletePromo(' + i + ')" title="Delete" style="color:var(--red);"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg></button>' +
+              '</div></td>' +
+            '</tr>';
+          }).join('') +
+          '</tbody></table>';
+      })
+      .catch(function() {
+        el.innerHTML = promosEmptyState('tag', 'Erreur réseau',
+          '<a onclick="renderPromos(true)" style="cursor:pointer;text-decoration:underline;">Réessayer</a>');
+      });
+  };
+
+  /* Coche/décoche la liste de produits selon "Apply to All Products", et la
+     peuple depuis le catalogue (getProducts vient de la section Produits
+     un peu plus haut dans ce fichier). */
+  window.toggleCouponProductsPicker = function() {
+    var picker = document.getElementById('promoProductsPicker');
+    var allChecked = document.getElementById('promoApplyAll').checked;
+    if (picker) picker.style.display = allChecked ? 'none' : '';
+  };
+
+  function renderCouponProductsList(selectedIds) {
+    var list = document.getElementById('promoProductsList');
+    if (!list) return;
+    var products = getProducts();
+    var selected = {};
+    (selectedIds || []).forEach(function(id) { selected[String(id)] = true; });
+    if (!products.length) {
+      list.innerHTML = '<div style="padding:12px;color:var(--text-muted);font-size:13px;">No products yet.</div>';
+      return;
+    }
+    list.innerHTML = products.map(function(p) {
+      var checked = selected[String(p.id)] ? ' checked' : '';
+      return '<label style="display:flex;align-items:center;gap:8px;padding:6px 4px;font-size:13px;cursor:pointer;">' +
+        '<input type="checkbox" class="promo-product-cb" value="' + esc(String(p.id)) + '"' + checked + ' /> ' +
+        esc(p.name || ('#' + p.id)) +
+        '</label>';
+    }).join('');
   }
 
   window.openPromoForm = function(idx) {
-    var p = (idx !== undefined) ? getPromos()[idx] : null;
+    var p = (idx !== undefined) ? _promosCache[idx] : null;
     document.getElementById('promoEditIndex').value = (idx !== undefined) ? idx : '';
     document.getElementById('promoFormTitle').textContent = p ? 'Edit Coupon' : 'Create Coupon';
 
@@ -3622,6 +3706,9 @@
     document.getElementById('promoDisableVolume').checked   = p ? !!p.disableVolume : false;
     document.getElementById('promoDisableBundle').checked   = p ? !!p.disableBundle : false;
     document.getElementById('promoDisableQty').checked      = p ? !!p.disableQty : false;
+
+    renderCouponProductsList(p ? p.items : []);
+    toggleCouponProductsPicker();
 
     var type = p ? (p.type || 'percentage') : 'percentage';
     selectCouponType(type, document.querySelector('.coupon-type-opt[data-val="' + type + '"]'));
@@ -3689,19 +3776,22 @@
   };
 
   window.savePromo = function(andExit) {
+    var secret = promosSecret(true);
+    if (!secret) { toast('Secret admin requis.'); return; }
+
     var code = (document.getElementById('promoCode').value || '').trim().toUpperCase();
     if (!code) { toast('Coupon code required.'); return; }
     var discount = parseFloat(document.getElementById('promoDiscount').value) || 0;
     if (discount <= 0) { toast('Discount must be greater than 0.'); return; }
 
-    var editIdx = document.getElementById('promoEditIndex').value;
-    var promos  = getPromos();
+    var applyAll = document.getElementById('promoApplyAll').checked;
+    var items = [];
+    if (!applyAll) {
+      items = Array.prototype.slice.call(document.querySelectorAll('.promo-product-cb:checked')).map(function(cb) { return cb.value; });
+      if (!items.length) { toast('Select at least one product, or enable "Apply to All Products".'); return; }
+    }
 
-    var existing = editIdx !== '' ? parseInt(editIdx) : -1;
-    var duplicate = promos.findIndex(function(p, i) { return p.code === code && i !== existing; });
-    if (duplicate !== -1) { toast('Code already exists.'); return; }
-
-    var promo = {
+    var form = {
       code:               code,
       type:               document.getElementById('promoType').value || 'percentage',
       discount:           discount,
@@ -3711,32 +3801,63 @@
       allowedEmails:      document.getElementById('promoAllowedEmails').value.trim(),
       startDate:          document.getElementById('promoStartDate').value,
       expirationDate:     document.getElementById('promoExpDate').value,
-      applyToAll:         document.getElementById('promoApplyAll').checked,
+      applyToAll:         applyAll,
+      items:              items,
       disableVolume:      document.getElementById('promoDisableVolume').checked,
       disableBundle:      document.getElementById('promoDisableBundle').checked,
-      disableQty:         document.getElementById('promoDisableQty').checked,
-      uses:               existing >= 0 ? (promos[existing].uses || 0) : 0
+      disableQty:         document.getElementById('promoDisableQty').checked
     };
 
-    if (existing >= 0) {
-      promos[existing] = promo;
-      toast('Coupon updated ✓');
-    } else {
-      promos.push(promo);
-      toast('Coupon created ✓');
-    }
-    setPromos(promos);
-    renderPromos();
-    if (andExit !== false) closePromoForm();
+    var editIdx = document.getElementById('promoEditIndex').value;
+    var existing = editIdx !== '' ? _promosCache[parseInt(editIdx, 10)] : null;
+    var url = NX_API + '/api/admin-coupons' + (existing ? ('?id=' + encodeURIComponent(existing.id)) : '');
+    var method = existing ? 'PUT' : 'POST';
+
+    var btns = document.querySelectorAll('.coupon-form-actions .a-btn--primary, .coupon-form-actions .a-btn--ghost:not(:first-child)');
+    btns.forEach(function(b) { b.disabled = true; });
+
+    fetch(url, {
+      method: method,
+      headers: { 'Content-Type': 'application/json', 'x-admin-secret': secret },
+      body: JSON.stringify(form)
+    })
+      .then(function(r) { return r.json().then(function(j) { return { ok: r.ok, status: r.status, body: j }; }); })
+      .then(function(res) {
+        btns.forEach(function(b) { b.disabled = false; });
+        if (res.status === 401) { localStorage.removeItem('nexus_sa_secret'); toast('Secret admin incorrect.'); return; }
+        if (!res.ok || !res.body || !res.body.ok) {
+          toast('SellAuth a refusé : ' + (res.body && res.body.detail ? res.body.detail : 'vérifiez les champs.'));
+          return;
+        }
+        toast(existing ? 'Coupon updated ✓' : 'Coupon created ✓');
+        renderPromos(true);
+        if (andExit !== false) closePromoForm();
+      })
+      .catch(function() {
+        btns.forEach(function(b) { b.disabled = false; });
+        toast('Erreur réseau — coupon non sauvegardé.');
+      });
   };
 
   window.deletePromo = function(index) {
-    if (!confirm('Delete this coupon?')) return;
-    var promos = getPromos();
-    promos.splice(index, 1);
-    setPromos(promos);
-    renderPromos();
-    toast('Coupon deleted.');
+    var p = _promosCache[index];
+    if (!p) return;
+    if (!confirm('Delete coupon "' + p.code + '"? This removes it from SellAuth — irreversible.')) return;
+    var secret = promosSecret(true);
+    if (!secret) { toast('Secret admin requis.'); return; }
+
+    fetch(NX_API + '/api/admin-coupons?id=' + encodeURIComponent(p.id), {
+      method: 'DELETE',
+      headers: { 'x-admin-secret': secret }
+    })
+      .then(function(r) { return r.json().then(function(j) { return { ok: r.ok, status: r.status, body: j }; }); })
+      .then(function(res) {
+        if (res.status === 401) { localStorage.removeItem('nexus_sa_secret'); toast('Secret admin incorrect.'); return; }
+        if (!res.ok || !res.body || !res.body.ok) { toast('Suppression refusée par SellAuth.'); return; }
+        toast('Coupon deleted.');
+        renderPromos(true);
+      })
+      .catch(function() { toast('Erreur réseau — coupon non supprimé.'); });
   };
 
   checkSession();

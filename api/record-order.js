@@ -10,10 +10,18 @@
 
    Écriture PUBLIQUE (le checkout n'a pas le secret admin) mais bornée : même
    origine seulement, champs sur liste blanche, tailles plafonnées, dédoublonnage
-   par id. Env : DB_* (via _store.js). */
+   par id. Env : DB_* (via _store.js).
+
+   Coupon : si la commande porte un couponCode, on incrémente son compteur
+   d'usage (api/_coupon-usage.js) — mais SEULEMENT quand la commande est
+   nouvelle (le dédoublonnage par id protège aussi contre un double-comptage
+   si le client réémet la même requête). C'est le SEUL endroit qui compte une
+   utilisation : appliquer un code au checkout (api/coupon-validate.js) ne
+   consomme rien tant que l'achat n'est pas allé au bout. */
 
 var origin = require('./_origin.js');
 var store = require('./_store.js');
+var couponUsage = require('./_coupon-usage.js');
 
 var MAX_ORDERS = 5000;          /* garde-fou : on ne garde que les plus récentes */
 var MAX_FIELD = 4000;           /* longueur max d'un champ texte (deliverable…) */
@@ -44,7 +52,8 @@ function sanitizeOrder(b) {
     deliverable:   str(b.deliverable, MAX_FIELD),
     status:        str(b.status, 24) || 'completed',
     paymentMethod: str(b.paymentMethod, 40),
-    txHash:        str(b.txHash, 190)
+    txHash:        str(b.txHash, 190),
+    couponCode:    str(b.couponCode, 40)
   };
 }
 
@@ -71,6 +80,10 @@ module.exports = async function (req, res) {
       arr.unshift(order);
       if (arr.length > MAX_ORDERS) arr = arr.slice(0, MAX_ORDERS);
       await store.setContent('nexus_orders', arr);
+      if (order.couponCode) {
+        try { await couponUsage.recordUse(order.couponCode, order.email); }
+        catch (e) { console.error('[FlashShp] coupon usage record failed:', e && e.message); }
+      }
     }
     res.setHeader('Cache-Control', 'no-store');
     res.status(200).json({ ok: true, recorded: !exists });

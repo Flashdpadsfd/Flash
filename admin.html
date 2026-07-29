@@ -945,10 +945,15 @@
                   Products
                 </div>
                 <label class="ls-toggle" style="width:100%;justify-content:flex-start;">
-                  <input type="checkbox" id="promoApplyAll" checked />
+                  <input type="checkbox" id="promoApplyAll" checked onchange="toggleCouponProductsPicker()" />
                   <span class="ls-toggle__track"></span>
                   <span class="ls-toggle__label">Apply to All Products</span>
                 </label>
+                <!-- SellAuth exige la liste des produits quand le coupon n'est pas global -->
+                <div id="promoProductsPicker" style="display:none;margin-top:12px;">
+                  <p class="field-hint" style="margin-bottom:8px;">Select which products this coupon applies to.</p>
+                  <div id="promoProductsList" style="max-height:220px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:6px 10px;"></div>
+                </div>
               </div>
             </div>
 

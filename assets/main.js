@@ -979,6 +979,17 @@ window.NX_ICONS = function (name) {
     var _appliedPromo = null;
     var _selectedPM = 'direct'; // 'direct' or 'crypto'
 
+    /* Reduction fixe OU pourcentage, jamais negative (un coupon "fixed" plus
+       cher que le prix ne doit pas faire passer la commande sous 0). */
+    function applyDiscount(price, promo) {
+      if (!promo) return price;
+      var out = promo.type === 'fixed' ? (price - Number(promo.discount)) : (price * (1 - Number(promo.discount) / 100));
+      return Math.max(0, out);
+    }
+    function discountLabel(promo) {
+      return promo.type === 'fixed' ? ('-€' + Number(promo.discount).toFixed(2)) : ('-' + promo.discount + '%');
+    }
+
     /* Payment method selector */
     document.getElementById('coPmDirect').addEventListener('click', function() {
       _selectedPM = 'direct';
@@ -1054,29 +1065,49 @@ window.NX_ICONS = function (name) {
       document.getElementById('coRevealBtn').innerHTML = shown ? ICON('eye-off')+' Hide' : ICON('eye')+' Click to reveal';
     });
 
+    /* Le code n'est jamais validé côté client : /api/coupon-validate seul
+       connaît la liste des coupons (via SellAuth), pour que la console d'un
+       visiteur ne puisse pas lister tous les codes existants — voir la note
+       dans api/_sellauth-coupons.js. */
     document.getElementById('coPromoBtn').addEventListener('click', function () {
       var code = (document.getElementById('coPromoInput').value || '').trim().toUpperCase();
       var msgEl = document.getElementById('coPromoMsg');
+      var email = (document.getElementById('coEmail').value || '').trim();
       var prods = getProds();
       var p = prods.find(function(x) { return x.id === _pid; });
       if (!code) { msgEl.textContent = 'Entrez un code promo.'; msgEl.style.color = '#ff5555'; return; }
-      try {
-        var promos = JSON.parse(localStorage.getItem('nexus_promos') || '[]');
-        var promo = promos.find(function(pr) { return pr.code === code; });
-        if (!promo) { msgEl.textContent = 'Code invalide.'; msgEl.style.color = '#ff5555'; _appliedPromo = null; return; }
-        if (promo.maxUses > 0 && promo.uses >= promo.maxUses) { msgEl.textContent = 'Code expiré.'; msgEl.style.color = '#ff5555'; _appliedPromo = null; return; }
-        _appliedPromo = promo;
-        msgEl.textContent = '✓ Code appliqué — -' + promo.discount + '%'; msgEl.style.color = '#3cd43c';
-        _whkPost('PROMO_USE', {
-          title: '🏷️ Code promo utilisé', color: 0x5865F2,
-          fields: [
-            { name: 'Code', value: promo.code, inline: true },
-            { name: 'Réduction', value: '-'+promo.discount+'%', inline: true },
-            { name: 'Produit', value: p ? (p.icon||'📦')+' '+p.name : '—', inline: true }
-          ],
-          footer: { text: 'FlashShp Store' }, timestamp: new Date().toISOString()
-        });
-      } catch(e) { msgEl.textContent = 'Erreur.'; msgEl.style.color = '#ff5555'; }
+      msgEl.textContent = 'Vérification…'; msgEl.style.color = 'rgba(255,255,255,.4)';
+      fetch('/api/coupon-validate', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: code, email: email, cartTotal: p ? Number(p.price) : 0, productId: p ? p.id : null })
+      })
+        .then(function (r) { return r.json(); })
+        .then(function (res) {
+          if (!res || !res.ok) { msgEl.textContent = 'Service indisponible.'; msgEl.style.color = '#ff5555'; _appliedPromo = null; return; }
+          if (!res.valid) {
+            var reasons = {
+              invalid: 'Code invalide.', expired: 'Code expiré.', not_started: 'Code pas encore actif.',
+              max_uses: 'Code épuisé.', max_uses_per_customer: 'Déjà utilisé au maximum.',
+              min_cart: 'Panier trop bas pour ce code.', email_not_allowed: 'Code réservé à un autre email.',
+              product_not_eligible: 'Code non valable sur ce produit.'
+            };
+            msgEl.textContent = reasons[res.reason] || 'Code invalide.'; msgEl.style.color = '#ff5555'; _appliedPromo = null;
+            return;
+          }
+          _appliedPromo = { code: code, discount: res.discount, type: res.type };
+          var discLabel = res.type === 'fixed' ? ('-€' + Number(res.discount).toFixed(2)) : ('-' + res.discount + '%');
+          msgEl.textContent = '✓ Code appliqué — ' + discLabel; msgEl.style.color = '#3cd43c';
+          _whkPost('PROMO_USE', {
+            title: '🏷️ Code promo utilisé', color: 0x5865F2,
+            fields: [
+              { name: 'Code', value: code, inline: true },
+              { name: 'Réduction', value: discLabel, inline: true },
+              { name: 'Produit', value: p ? (p.icon||'📦')+' '+p.name : '—', inline: true }
+            ],
+            footer: { text: 'FlashShp Store' }, timestamp: new Date().toISOString()
+          });
+        })
+        .catch(function () { msgEl.textContent = 'Erreur réseau.'; msgEl.style.color = '#ff5555'; _appliedPromo = null; });
     });
 
     document.getElementById('coSubmitBtn').addEventListener('click', function () {
@@ -1121,8 +1152,7 @@ window.NX_ICONS = function (name) {
       /* ── Crypto payment flow ── */
       if (_selectedPM === 'crypto') {
         var invoiceId = generateId();
-        var finalPriceForCrypto = Number(p.price);
-        if (_appliedPromo) finalPriceForCrypto = finalPriceForCrypto * (1 - _appliedPromo.discount / 100);
+        var finalPriceForCrypto = applyDiscount(Number(p.price), _appliedPromo);
         /* Prepare deliverable but don't deduct stock yet — wait for blockchain confirmation */
         var delivForCrypto = delivs.length > 0 ? delivs[0] : '(Contact support — invoice: ' + invoiceId + ')';
         closeModal();
@@ -1136,6 +1166,7 @@ window.NX_ICONS = function (name) {
             invoiceId: invoiceId,
             email: email,
             deliverable: delivForCrypto,
+            couponCode: _appliedPromo ? _appliedPromo.code : null,
             /* pass product ref so crypto system can deduct stock after confirmation */
             _deductStock: function() {
               var prods2 = getProds();
@@ -1177,16 +1208,18 @@ window.NX_ICONS = function (name) {
         saveProds(prods);
 
         var sym = '€'; /* tout le site en € */
-        var finalPrice = Number(p.price);
-        if (_appliedPromo) {
-          finalPrice = finalPrice * (1 - _appliedPromo.discount / 100);
-          try {
-            var promos = JSON.parse(localStorage.getItem('nexus_promos') || '[]');
-            var pi = promos.findIndex(function(pr) { return pr.code === _appliedPromo.code; });
-            if (pi !== -1) { promos[pi].uses = (promos[pi].uses || 0) + 1; localStorage.setItem('nexus_promos', JSON.stringify(promos)); }
-          } catch(e) {}
-        }
-        addOrder({ id: invoiceId, date: new Date().toISOString(), email: email, productId: p.id, productName: p.name, productIcon: p.icon || '📦', productDesc: p.desc || '', price: finalPrice, currency: 'EUR', deliverable: deliverable, status: 'completed', promoCode: _appliedPromo ? _appliedPromo.code : null, ip: geoD.ip || null, country: geoD.country_name || null, asn: geoD.org || null, browser: _uaParsed.browser, os: _uaParsed.os, userAgent: navigator.userAgent });
+        var finalPrice = applyDiscount(Number(p.price), _appliedPromo);
+        var orderRecord = { id: invoiceId, date: new Date().toISOString(), email: email, productId: p.id, productName: p.name, productIcon: p.icon || '📦', productDesc: p.desc || '', price: finalPrice, currency: 'EUR', deliverable: deliverable, status: 'completed', paymentMethod: 'direct', couponCode: _appliedPromo ? _appliedPromo.code : null, ip: geoD.ip || null, country: geoD.country_name || null, asn: geoD.org || null, browser: _uaParsed.browser, os: _uaParsed.os, userAgent: navigator.userAgent };
+        addOrder(orderRecord);
+        /* Egalement en base (l'admin vit sur un autre domaine, ne voit pas ce
+           localStorage) : c'est aussi ce qui incrémente l'usage du coupon
+           (voir api/record-order.js) — jamais fait au simple "Apply". */
+        try {
+          fetch('/api/record-order', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(orderRecord)
+          }).catch(function () {});
+        } catch (e) {}
 
         /* Emails : « commande reçue » (création) puis « commande prête » (paiement).
            En Quick Pay le paiement est instantané, donc les deux partent à la suite. */
@@ -1200,7 +1233,7 @@ window.NX_ICONS = function (name) {
             { name: 'Invoice ID', value: invoiceId, inline: true },
             { name: 'Produit', value: (p.icon||'📦')+' '+p.name, inline: true },
             { name: 'Email', value: email, inline: true },
-            { name: 'Montant', value: sym+finalPrice.toFixed(2) + (_appliedPromo ? ' (promo -'+_appliedPromo.discount+'%)' : ''), inline: true },
+            { name: 'Montant', value: sym+finalPrice.toFixed(2) + (_appliedPromo ? ' (promo '+discountLabel(_appliedPromo)+')' : ''), inline: true },
             { name: 'IP', value: geoD.ip || '—', inline: true },
             { name: 'Pays', value: geoD.country_name || '—', inline: true }
           ],

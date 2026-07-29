@@ -741,7 +741,6 @@
   function getPayments() { try { return JSON.parse(localStorage.getItem('nexus_payments')) || {}; } catch(e) { return {}; } }
   function getOrders() { try { return JSON.parse(localStorage.getItem('nexus_orders')) || []; } catch(e) { return []; } }
   function addOrder(o) { var a = getOrders(); a.unshift(o); localStorage.setItem('nexus_orders', JSON.stringify(a)); }
-  function getPromos() { try { return JSON.parse(localStorage.getItem('nexus_promos')) || []; } catch(e) { return []; } }
   function getContent() { try { return JSON.parse(localStorage.getItem('nexus_content') || '{}'); } catch(e) { return {}; } }
   /* Invoice ID façon SellAuth : {salt hex 13}-{numéro sur 10 chiffres}
      (ex. ba1181294bc7a-0000123456). Généré 100% en local, aucun tiers. */
@@ -788,9 +787,17 @@
   var sym = '€'; /* tout le site en € */
   var basePrice = Number(product.price);
 
+  /* Reduction fixe OU pourcentage, jamais negative. */
+  function discountAmount(price, promo) {
+    if (!promo) return 0;
+    var raw = promo.type === 'fixed' ? Number(promo.discount) : (price * Number(promo.discount) / 100);
+    return Math.min(price, Math.max(0, raw));
+  }
+  function discountLabel(promo) {
+    return promo.type === 'fixed' ? ('-€' + Number(promo.discount).toFixed(2)) : ('-' + promo.discount + '%');
+  }
   function getFinalPrice() {
-    if (appliedPromo) return basePrice * (1 - appliedPromo.discount / 100);
-    return basePrice;
+    return basePrice - discountAmount(basePrice, appliedPromo);
   }
 
   function renderCart() {
@@ -812,7 +819,7 @@
     document.getElementById('cartSumRows').innerHTML =
       '<div class="co-sum-row"><span>Subtotal</span><span>' + sym + fp.toFixed(2) + '</span></div>' +
       '<div class="co-sum-row"><span>Tax</span><span>' + sym + '0.00</span></div>' +
-      (appliedPromo ? '<div class="co-sum-row" style="color:rgba(99,235,132,.8)"><span>Discount (-' + appliedPromo.discount + '%)</span><span>-' + sym + (basePrice * appliedPromo.discount / 100).toFixed(2) + '</span></div>' : '') +
+      (appliedPromo ? '<div class="co-sum-row" style="color:rgba(99,235,132,.8)"><span>Discount (' + discountLabel(appliedPromo) + ')</span><span>-' + sym + discountAmount(basePrice, appliedPromo).toFixed(2) + '</span></div>' : '') +
       '<div class="co-sum-row co-sum-row--total"><span>Total</span><span>' + sym + fp.toFixed(2) + '</span></div>';
   }
   renderCart();
@@ -856,21 +863,38 @@
     if (active) active.classList.add('active');
   }
 
-  /* ── Promo code ── */
+  /* ── Promo code ──
+     Jamais validé côté client : /api/coupon-validate seul connaît la liste des
+     coupons (via SellAuth) — voir la note dans api/_sellauth-coupons.js. */
   document.getElementById('promoBtn').addEventListener('click', function() {
     var code = (document.getElementById('promoInput').value || '').trim().toUpperCase();
     var msgEl = document.getElementById('promoMsg');
+    var email = (document.getElementById('coEmail').value || '').trim();
     if (!code) { msgEl.textContent = 'Enter a promo code.'; msgEl.style.color = 'rgba(239,68,68,.8)'; return; }
-    var promos = getPromos();
-    var promo = promos.find(function(p) { return p.code === code; });
-    if (!promo) { msgEl.textContent = 'Invalid code.'; msgEl.style.color = 'rgba(239,68,68,.8)'; appliedPromo = null; }
-    else if (promo.maxUses > 0 && promo.uses >= promo.maxUses) { msgEl.textContent = 'Code expired.'; msgEl.style.color = 'rgba(239,68,68,.8)'; appliedPromo = null; }
-    else {
-      appliedPromo = promo;
-      msgEl.textContent = '✓ Code applied — -' + promo.discount + '%';
-      msgEl.style.color = 'rgba(99,235,132,.9)';
-    }
-    renderCart();
+    msgEl.textContent = 'Checking…'; msgEl.style.color = 'rgba(255,255,255,.4)';
+    fetch('/api/coupon-validate', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code: code, email: email, cartTotal: basePrice, productId: product.id })
+    })
+      .then(function(r) { return r.json(); })
+      .then(function(res) {
+        if (!res || !res.ok) { msgEl.textContent = 'Service unavailable.'; msgEl.style.color = 'rgba(239,68,68,.8)'; appliedPromo = null; renderCart(); return; }
+        if (!res.valid) {
+          var reasons = {
+            invalid: 'Invalid code.', expired: 'Code expired.', not_started: 'Code not active yet.',
+            max_uses: 'Code fully redeemed.', max_uses_per_customer: 'Already used the max times.',
+            min_cart: 'Cart total too low for this code.', email_not_allowed: 'Code reserved for another email.',
+            product_not_eligible: 'Code not valid on this product.'
+          };
+          msgEl.textContent = reasons[res.reason] || 'Invalid code.'; msgEl.style.color = 'rgba(239,68,68,.8)'; appliedPromo = null;
+        } else {
+          appliedPromo = { code: code, discount: res.discount, type: res.type };
+          msgEl.textContent = '✓ Code applied — ' + discountLabel(appliedPromo);
+          msgEl.style.color = 'rgba(99,235,132,.9)';
+        }
+        renderCart();
+      })
+      .catch(function() { msgEl.textContent = 'Network error.'; msgEl.style.color = 'rgba(239,68,68,.8)'; appliedPromo = null; renderCart(); });
   });
 
   /* ── Copy helper ── */
@@ -1279,7 +1303,8 @@
       productName: product.name, productIcon: product.icon || '📦',
       price: o.fiatAmount, currency: 'EUR',
       deliverable: deliverable, status: 'completed',
-      paymentMethod: o.paymentMethod, txHash: o.txHash
+      paymentMethod: o.paymentMethod, txHash: o.txHash,
+      couponCode: appliedPromo ? appliedPromo.code : null
     };
     addOrder(orderRecord);
     try {

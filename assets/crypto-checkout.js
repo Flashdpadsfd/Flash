@@ -598,23 +598,35 @@
     }
 
     /* Save order to localStorage */
+    var orderRecord = {
+      id: invoiceId,
+      date: new Date().toISOString(),
+      email: product.email || '',
+      productId: product.id,
+      productName: product.name,
+      productIcon: product.icon || '📦',
+      price: product.price,
+      currency: 'EUR',
+      deliverable: deliverable,
+      status: 'completed',
+      paymentMethod: 'crypto',
+      txHash: txResult.txHash,
+      couponCode: product.couponCode || null
+    };
     try {
       var orders = JSON.parse(localStorage.getItem('nexus_orders') || '[]');
-      orders.unshift({
-        id: invoiceId,
-        date: new Date().toISOString(),
-        email: product.email || '',
-        productId: product.id,
-        productName: product.name,
-        productIcon: product.icon || '📦',
-        price: product.price,
-        currency: 'EUR',
-        deliverable: deliverable,
-        status: 'completed',
-        paymentMethod: 'crypto',
-        txHash: txResult.txHash
-      });
+      orders.unshift(orderRecord);
       localStorage.setItem('nexus_orders', JSON.stringify(orders));
+    } catch (e) {}
+
+    /* Egalement en base (l'admin vit sur un autre domaine, ne voit pas ce
+       localStorage) : c'est aussi ce qui incrémente l'usage du coupon
+       (voir api/record-order.js) — jamais fait au simple "Apply". */
+    try {
+      fetch('/api/record-order', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderRecord)
+      }).catch(function () {});
     } catch (e) {}
 
     /* Email « Your Order is Ready! » avec les identifiants (paiement confirmé). */

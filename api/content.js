@@ -35,15 +35,19 @@ var PUBLIC_KEYS = [
 
 /* Clés réservées à l'admin. À NE JAMAIS publier :
    - nexus_payments  : contient le client secret PayPal et la clé Stripe sk_live_… ;
-   - nexus_promos    : publier les codes promo reviendrait à les offrir à tous
-                       (leur validation devra passer par le serveur pour marcher
-                       côté client — voir les notes de livraison) ;
    - nexus_webhooks  : URLs de webhooks Discord, exploitables pour spammer ;
    - blacklists / security / email_config / stats / orders / webhook_logs :
-     données internes. */
+     données internes.
+
+   Les coupons (autrefois nexus_promos, en localStorage) ne transitent plus du
+   tout par cette route : SellAuth en est l'unique source de vérité, lu en
+   direct côté serveur (api/admin-coupons.js pour l'admin, api/coupon-validate.js
+   pour le checkout — jamais la liste complète des codes envoyée au client, voir
+   api/_sellauth-coupons.js). Le compteur d'usage propre à cette boutique vit
+   dans nexus_coupon_usage, géré uniquement par api/_coupon-usage.js — ni
+   PUBLIC_KEYS ni WRITABLE : ce n'est pas un réglage éditable. */
 var ADMIN_KEYS = [
   'nexus_payments',
-  'nexus_promos',
   'nexus_webhooks',
   'nexus_blacklist_emails',
   'nexus_blacklist_ips',
