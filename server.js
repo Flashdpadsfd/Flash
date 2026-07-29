@@ -126,7 +126,7 @@ app.get(/^\/products-[^\/]+$/, function (req, res) {
    renvoyait 200, et les journaux de déploiement exposent l'arborescence du
    serveur. On bloque le dossier entier plutôt que fichier par fichier, et on
    couvre deploy.* quelle que soit l'extension (.ps1, .bat…). */
-var BLOCKED = /^\/(?:api|node_modules|scripts|logs|admin|\.git|\.claude)(?:\/|$)|^\/(?:server\.js|package(?:-lock)?\.json|deploy[^\/]*\.(?:ps1|bat|sh|cmd)|\.env.*|\.gitignore|admin(?:\.html)?|assets\/admin\.(?:js|css))$/i;
+var BLOCKED = /^\/(?:api|node_modules|scripts|logs|admin|\.git|\.claude|templates|sellauth|sellauth-theme|components|snippets)(?:\/|$)|^\/(?:server\.js|package(?:-lock)?\.json|deploy[^\/]*\.(?:ps1|bat|sh|cmd)|\.env.*|\.gitignore|admin(?:\.html)?|assets\/admin\.(?:js|css)|test-buttons\.html)$/i;
 app.use(function (req, res, next) {
   if (BLOCKED.test(req.path)) { res.status(404).send('Not found'); return; }
   next();

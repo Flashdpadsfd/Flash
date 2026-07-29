@@ -706,7 +706,7 @@
           <div style="font-size:14px;font-weight:700;color:#fff;font-family:monospace;" id="successInvId">—</div>
         </div>
 
-        <button class="conf-back-btn" onclick="window.location.href='preview-products.html'">
+        <button class="conf-back-btn" onclick="window.location.href='/products'">
           ← Back to Shop
         </button>
       </div>
@@ -759,7 +759,7 @@
   var pid = parseInt(params.get('id') || '0', 10);
   var allProds = getProds();
   var product = allProds.find(function(x) { return x.id === pid; });
-  if (!product) { window.location.href = 'preview-products.html'; return; }
+  if (!product) { window.location.href = '/products'; return; }
 
   /* ── Variante choisie (?variant=index) : surcharge le nom affiché + le prix unitaire ── */
   (function applyVariant() {

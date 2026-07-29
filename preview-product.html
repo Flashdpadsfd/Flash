@@ -771,8 +771,8 @@
 
   <script src="assets/content-sync.js?v=2"></script>
   <script src="assets/email-config.js?v=1"></script>
-  <script src="assets/main.js?v=18"></script>
-  <script src="assets/crypto-checkout.js?v=1"></script>
+  <script src="assets/main.js?v=19"></script>
+  <script src="assets/crypto-checkout.js?v=2"></script>
 
   <!-- ─── PRODUCT DETAIL SCRIPT ─── -->
   <script>
@@ -1335,7 +1335,12 @@
     buyBtn.addEventListener('click', function() {
       var vi = hasVariants ? selKey : null;
       if (vi === -1) vi = null;   /* produit de base → pas de paramètre variante */
-      window.location.href = 'checkout?id=' + pid + (vi != null ? '&variant=' + vi : '');
+      /* Passe par la modale de checkout (Quick Pay + Crypto), la meme que
+         "Ajouter au panier" -> "Proceed to Checkout". checkout.html en
+         plein page ne propose que la crypto ; window.location.href y menait
+         directement et privait Buy Now de l'option Quick Pay. */
+      if (window._nexusOpenCheckout) window._nexusOpenCheckout(pid, vi);
+      else window.location.href = 'checkout?id=' + pid + (vi != null ? '&variant=' + vi : '');
     });
 
     /* ── Add to Cart ── */
@@ -1455,6 +1460,6 @@
   })();
   </script>
 
-  <script src="assets/account-menu.js?v=3" defer></script>
+  <script src="assets/account-menu.js?v=4" defer></script>
 </body>
 </html>

@@ -56,6 +56,15 @@ window.NX_ICONS = function (name) {
     });
   });
 
+  /* Boutons Sign In / Create Account du drawer mobile : seule preview.html
+     avait l'onclick en dur, les autres pages en etaient depourvues. Delegue
+     ici plutot que de dupliquer l'attribut sur chaque page. */
+  document.querySelectorAll('[data-i18n="nav.login"], [data-i18n="nav.register"]').forEach(function (btn) {
+    if (btn.tagName === 'BUTTON' && !btn.hasAttribute('onclick')) {
+      btn.addEventListener('click', function () { location.href = '/login'; });
+    }
+  });
+
   /* ─── Nav scroll ─── */
   var navbar = document.querySelector('.nav');
   if (navbar) window.addEventListener('scroll', function () {
@@ -448,9 +457,8 @@ window.NX_ICONS = function (name) {
       'footer.nav':'Navigation','footer.home':'Home','footer.products':'Products',
       'footer.allProducts':'All Products','footer.feedback':'Feedback',
       'footer.legal':'Legal','footer.tos':'Terms of Service',
-      'footer.socials':'Socials',
       'footer.copy':'© 2026 FlashShp. All rights reserved.',
-      'footer.terms':'Terms','footer.privacy':'Privacy Policy'
+      'footer.privacy':'Privacy Policy'
     },
     FR: {
       'nav.shop':'Boutique','nav.home':'Accueil','nav.reviews':'Avis','nav.tutorials':'Tutorials',
@@ -464,9 +472,8 @@ window.NX_ICONS = function (name) {
       'footer.nav':'Navigation','footer.home':'Accueil','footer.products':'Produits',
       'footer.allProducts':'Tous les produits','footer.feedback':'Avis',
       'footer.legal':'Légal','footer.tos':'Conditions d\'utilisation',
-      'footer.socials':'Réseaux sociaux',
       'footer.copy':'© 2026 FlashShp. Tous droits réservés.',
-      'footer.terms':'CGU','footer.privacy':'Politique de confidentialité'
+      'footer.privacy':'Politique de confidentialité'
     },
     ES: {
       'nav.shop':'Tienda','nav.home':'Inicio','nav.reviews':'Reseñas','nav.tutorials':'Tutorials',
@@ -480,9 +487,8 @@ window.NX_ICONS = function (name) {
       'footer.nav':'Navegación','footer.home':'Inicio','footer.products':'Productos',
       'footer.allProducts':'Todos los productos','footer.feedback':'Reseñas',
       'footer.legal':'Legal','footer.tos':'Términos de servicio',
-      'footer.socials':'Redes sociales',
       'footer.copy':'© 2026 FlashShp. Todos los derechos reservados.',
-      'footer.terms':'Términos','footer.privacy':'Política de privacidad'
+      'footer.privacy':'Política de privacidad'
     },
     DE: {
       'nav.shop':'Shop','nav.home':'Startseite','nav.reviews':'Bewertungen','nav.tutorials':'Tutorials',
@@ -496,9 +502,8 @@ window.NX_ICONS = function (name) {
       'footer.nav':'Navigation','footer.home':'Startseite','footer.products':'Produkte',
       'footer.allProducts':'Alle Produkte','footer.feedback':'Bewertungen',
       'footer.legal':'Rechtliches','footer.tos':'Nutzungsbedingungen',
-      'footer.socials':'Soziale Netzwerke',
       'footer.copy':'© 2026 FlashShp. Alle Rechte vorbehalten.',
-      'footer.terms':'AGB','footer.privacy':'Datenschutzerklärung'
+      'footer.privacy':'Datenschutzerklärung'
     },
     IT: {
       'nav.shop':'Negozio','nav.home':'Home','nav.reviews':'Recensioni','nav.tutorials':'Tutorials',
@@ -512,9 +517,8 @@ window.NX_ICONS = function (name) {
       'footer.nav':'Navigazione','footer.home':'Home','footer.products':'Prodotti',
       'footer.allProducts':'Tutti i prodotti','footer.feedback':'Recensioni',
       'footer.legal':'Legale','footer.tos':'Termini di servizio',
-      'footer.socials':'Social',
       'footer.copy':'© 2026 FlashShp. Tutti i diritti riservati.',
-      'footer.terms':'Termini','footer.privacy':'Informativa sulla privacy'
+      'footer.privacy':'Informativa sulla privacy'
     },
     PT: {
       'nav.shop':'Loja','nav.home':'Início','nav.reviews':'Avaliações','nav.tutorials':'Tutorials',
@@ -528,9 +532,8 @@ window.NX_ICONS = function (name) {
       'footer.nav':'Navegação','footer.home':'Início','footer.products':'Produtos',
       'footer.allProducts':'Todos os produtos','footer.feedback':'Avaliações',
       'footer.legal':'Legal','footer.tos':'Termos de serviço',
-      'footer.socials':'Redes sociais',
       'footer.copy':'© 2026 FlashShp. Todos os direitos reservados.',
-      'footer.terms':'Termos','footer.privacy':'Política de privacidade'
+      'footer.privacy':'Política de privacidade'
     },
     AR: {
       'nav.shop':'المتجر','nav.home':'الرئيسية','nav.reviews':'التقييمات','nav.tutorials':'Tutorials',
@@ -544,9 +547,8 @@ window.NX_ICONS = function (name) {
       'footer.nav':'التنقل','footer.home':'الرئيسية','footer.products':'المنتجات',
       'footer.allProducts':'كل المنتجات','footer.feedback':'التقييمات',
       'footer.legal':'القانوني','footer.tos':'شروط الخدمة',
-      'footer.socials':'التواصل الاجتماعي',
       'footer.copy':'© 2026 FlashShp. جميع الحقوق محفوظة.',
-      'footer.terms':'الشروط','footer.privacy':'سياسة الخصوصية'
+      'footer.privacy':'سياسة الخصوصية'
     }
   };
 
@@ -1030,7 +1032,7 @@ window.NX_ICONS = function (name) {
     }
     document.getElementById('coXBtn').addEventListener('click', closeModal);
     document.getElementById('coOverlay').addEventListener('click', closeModal);
-    document.getElementById('coBackBtn').addEventListener('click', function () { window.location.href = 'preview-products.html'; });
+    document.getElementById('coBackBtn').addEventListener('click', function () { window.location.href = '/products'; });
 
     document.getElementById('coCopyBtn').addEventListener('click', function () {
       var id = document.getElementById('coInvId').textContent;

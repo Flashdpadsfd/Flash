@@ -18,7 +18,7 @@
   function injectStyles() {
     if (document.getElementById('fs-account-styles')) return;
     var css =
-      '.fs-acc{position:relative;display:inline-block;font-family:var(--font-ui,'Plus Jakarta Sans',sans-serif);}' +
+      '.fs-acc{position:relative;display:inline-block;font-family:var(--font-ui,\'Plus Jakarta Sans\',sans-serif);}' +
       '.fs-acc__btn{display:flex;align-items:center;gap:8px;height:36px;padding:0 10px 0 8px;border-radius:10px;cursor:pointer;' +
         'background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:#fff;font-size:14px;font-weight:600;}' +
       '.fs-acc__btn:hover{background:rgba(255,255,255,.09);}' +
@@ -33,7 +33,7 @@
       '.fs-acc__head-name{font-size:14px;font-weight:700;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}' +
       '.fs-acc__head-mail{font-size:12px;color:rgba(255,255,255,.45);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px;}' +
       '.fs-acc__item{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:9px 12px;border-radius:9px;cursor:pointer;' +
-        'background:none;border:none;color:rgba(255,255,255,.85);font-size:14px;font-family:var(--font-ui,'Plus Jakarta Sans',sans-serif);text-decoration:none;}' +
+        'background:none;border:none;color:rgba(255,255,255,.85);font-size:14px;font-family:var(--font-ui,\'Plus Jakarta Sans\',sans-serif);text-decoration:none;}' +
       '.fs-acc__item:hover{background:rgba(255,255,255,.06);color:#fff;}' +
       '.fs-acc__item svg{opacity:.7;flex:0 0 auto;}' +
       '.fs-acc__item--danger{color:#f87171;}' +

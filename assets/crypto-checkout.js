@@ -367,7 +367,7 @@
   document.getElementById('cryClose').addEventListener('click', closeCryptoModal);
   document.getElementById('cryOverlay').addEventListener('click', closeCryptoModal);
   document.getElementById('cryBackBtn').addEventListener('click', function () { showStep(1); stopPolling(); });
-  document.getElementById('cryShopBtn').addEventListener('click', function () { window.location.href = 'preview-products.html'; });
+  document.getElementById('cryShopBtn').addEventListener('click', function () { window.location.href = '/products'; });
 
   document.getElementById('cryInvCopy').addEventListener('click', function () {
     var v = document.getElementById('cryInvId').textContent;
