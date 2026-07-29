@@ -450,7 +450,7 @@ window.NX_ICONS = function (name) {
       'footer.legal':'Legal','footer.tos':'Terms of Service',
       'footer.socials':'Socials',
       'footer.copy':'© 2026 FlashShp. All rights reserved.',
-      'footer.terms':'Terms','footer.privacy':'Privacy'
+      'footer.terms':'Terms','footer.privacy':'Privacy Policy'
     },
     FR: {
       'nav.shop':'Boutique','nav.home':'Accueil','nav.reviews':'Avis','nav.tutorials':'Tutorials',
@@ -466,7 +466,7 @@ window.NX_ICONS = function (name) {
       'footer.legal':'Légal','footer.tos':'Conditions d\'utilisation',
       'footer.socials':'Réseaux sociaux',
       'footer.copy':'© 2026 FlashShp. Tous droits réservés.',
-      'footer.terms':'CGU','footer.privacy':'Confidentialité'
+      'footer.terms':'CGU','footer.privacy':'Politique de confidentialité'
     },
     ES: {
       'nav.shop':'Tienda','nav.home':'Inicio','nav.reviews':'Reseñas','nav.tutorials':'Tutorials',
@@ -482,7 +482,7 @@ window.NX_ICONS = function (name) {
       'footer.legal':'Legal','footer.tos':'Términos de servicio',
       'footer.socials':'Redes sociales',
       'footer.copy':'© 2026 FlashShp. Todos los derechos reservados.',
-      'footer.terms':'Términos','footer.privacy':'Privacidad'
+      'footer.terms':'Términos','footer.privacy':'Política de privacidad'
     },
     DE: {
       'nav.shop':'Shop','nav.home':'Startseite','nav.reviews':'Bewertungen','nav.tutorials':'Tutorials',
@@ -498,7 +498,7 @@ window.NX_ICONS = function (name) {
       'footer.legal':'Rechtliches','footer.tos':'Nutzungsbedingungen',
       'footer.socials':'Soziale Netzwerke',
       'footer.copy':'© 2026 FlashShp. Alle Rechte vorbehalten.',
-      'footer.terms':'AGB','footer.privacy':'Datenschutz'
+      'footer.terms':'AGB','footer.privacy':'Datenschutzerklärung'
     },
     IT: {
       'nav.shop':'Negozio','nav.home':'Home','nav.reviews':'Recensioni','nav.tutorials':'Tutorials',
@@ -514,7 +514,7 @@ window.NX_ICONS = function (name) {
       'footer.legal':'Legale','footer.tos':'Termini di servizio',
       'footer.socials':'Social',
       'footer.copy':'© 2026 FlashShp. Tutti i diritti riservati.',
-      'footer.terms':'Termini','footer.privacy':'Privacy'
+      'footer.terms':'Termini','footer.privacy':'Informativa sulla privacy'
     },
     PT: {
       'nav.shop':'Loja','nav.home':'Início','nav.reviews':'Avaliações','nav.tutorials':'Tutorials',
@@ -530,7 +530,7 @@ window.NX_ICONS = function (name) {
       'footer.legal':'Legal','footer.tos':'Termos de serviço',
       'footer.socials':'Redes sociais',
       'footer.copy':'© 2026 FlashShp. Todos os direitos reservados.',
-      'footer.terms':'Termos','footer.privacy':'Privacidade'
+      'footer.terms':'Termos','footer.privacy':'Política de privacidade'
     },
     AR: {
       'nav.shop':'المتجر','nav.home':'الرئيسية','nav.reviews':'التقييمات','nav.tutorials':'Tutorials',
@@ -546,7 +546,7 @@ window.NX_ICONS = function (name) {
       'footer.legal':'القانوني','footer.tos':'شروط الخدمة',
       'footer.socials':'التواصل الاجتماعي',
       'footer.copy':'© 2026 FlashShp. جميع الحقوق محفوظة.',
-      'footer.terms':'الشروط','footer.privacy':'الخصوصية'
+      'footer.terms':'الشروط','footer.privacy':'سياسة الخصوصية'
     }
   };
 
