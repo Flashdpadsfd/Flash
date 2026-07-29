@@ -1991,144 +1991,87 @@
       .catch(function() { toast('Erreur réseau lors de la suppression.'); });
   };
 
-  /* ── Payment Methods ── */
+  /* ── Payment Methods — wallets crypto locaux ──
+     Adresse BTC/ETH/LTC/SOL que LE CHECKOUT DE CE SITE utilise reellement
+     (sync serveur via nxSave, pas juste local au navigateur). Meme habillage
+     visuel que les cartes SellAuth ci-dessous (voir SA_PM_ICON_COLORS /
+     .sa-pm-card), avec un volet d'edition d'adresse en plus par carte. */
   var PM_METHODS = [
-    {
-      key: 'btc', name: 'Bitcoin (BTC)',
-      desc: 'Accept Bitcoin payments directly to your wallet.',
-      bg: '#f7931a',
-      icon: '<svg viewBox="0 0 24 24" fill="#fff" width="20" height="20"><path d="M23.638 14.904c-1.602 6.43-8.113 10.34-14.542 8.736C2.67 22.05-1.244 15.525.362 9.105 1.962 2.67 8.475-1.243 14.9.358c6.43 1.605 10.342 8.115 8.738 14.548v-.002zm-6.35-4.613c.24-1.59-.974-2.45-2.64-3.03l.54-2.153-1.315-.33-.525 2.107c-.345-.087-.705-.167-1.064-.25l.526-2.127-1.32-.33-.54 2.165c-.285-.067-.565-.132-.84-.2l-1.815-.45-.35 1.407s.974.225.955.236c.535.136.63.486.615.766l-1.477 5.92c-.075.166-.24.406-.614.314.015.02-.96-.24-.96-.24l-.66 1.51 1.71.426.93.242-.54 2.19 1.32.327.54-2.17c.36.1.705.19 1.05.273l-.51 2.154 1.32.33.545-2.19c2.24.427 3.93.257 4.64-1.774.57-1.637-.03-2.58-1.217-3.196.854-.193 1.5-.76 1.68-1.928l.001-.002z"/></svg>',
-      fields: [
-        { key: 'address', label: 'Bitcoin Wallet Address', type: 'text', ph: 'bc1q... or 1... or 3...', hint: 'Customers will send BTC directly to this address.' }
-      ]
-    },
-    {
-      key: 'eth', name: 'Ethereum (ETH)',
-      desc: 'Accept ETH and ERC-20 token payments to your wallet.',
-      bg: '#627eea',
-      icon: '<svg viewBox="0 0 24 24" fill="#fff" width="18" height="18"><path d="M11.944 17.97L4.58 13.62 11.943 24l7.37-10.38-7.37 4.35h.001zM12.056 0L4.69 12.223l7.365 4.354 7.365-4.35L12.056 0z"/></svg>',
-      fields: [
-        { key: 'address', label: 'Ethereum Address', type: 'text', ph: '0x...', hint: 'Your public Ethereum wallet address.' }
-      ]
-    },
-    {
-      key: 'ltc', name: 'Litecoin (LTC)',
-      desc: 'Fast, low-fee crypto payments via Litecoin.',
-      bg: '#a6a9aa',
-      icon: '<svg viewBox="0 0 24 24" fill="#fff" width="20" height="20"><path d="M12 0C5.374 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm-.793 15.875l-.504 1.844H15.4l-.467 1.75H8.118l1.313-4.913-1.511.41.418-1.594 1.519-.41L11.4 7.53h2.154l-1.294 4.862 1.51-.413-.41 1.594-2.152.302z"/></svg>',
-      fields: [
-        { key: 'address', label: 'Litecoin Wallet Address', type: 'text', ph: 'ltc1q... or L...', hint: 'Your Litecoin wallet address.' }
-      ]
-    },
-    {
-      key: 'sol', name: 'Solana (SOL)',
-      desc: 'Ultra-fast, near-zero fee crypto payments via Solana.',
-      bg: '#9945ff',
-      icon: '<svg viewBox="0 0 24 24" fill="#fff" width="20" height="20"><path d="M3.904 16.726a.49.49 0 01.347-.144h16.619a.245.245 0 01.173.418l-2.57 2.57a.49.49 0 01-.346.144H1.508a.245.245 0 01-.173-.418l2.569-2.57zm0-12.17a.49.49 0 01.347-.143h16.619a.245.245 0 01.173.418l-2.57 2.57a.49.49 0 01-.346.143H1.508a.245.245 0 01-.173-.418l2.569-2.57zM20.319 10.41a.49.49 0 01-.346.144H3.354a.245.245 0 01-.173-.419l2.57-2.57a.49.49 0 01.346-.143h16.619a.245.245 0 01.173.418l-2.57 2.57z"/></svg>',
-      fields: [
-        { key: 'address', label: 'Solana Wallet Address', type: 'text', ph: 'Your SOL address (base58)...', hint: 'Your Solana wallet address. Customers send SOL directly to it.' }
-      ]
-    }
+    { key: 'btc', name: 'Bitcoin (BTC)', ph: 'bc1q... or 1... or 3...' },
+    { key: 'eth', name: 'Ethereum (ETH)', ph: '0x...' },
+    { key: 'ltc', name: 'Litecoin (LTC)', ph: 'ltc1q... or L...' },
+    { key: 'sol', name: 'Solana (SOL)', ph: 'Your SOL address (base58)...' }
   ];
+
+  function walletStatusText(cfg) {
+    if (!cfg.address) return 'Adresse non configurée';
+    var a = cfg.address;
+    var short = a.length > 14 ? (a.slice(0, 6) + '…' + a.slice(-4)) : a;
+    return 'Adresse : ' + short;
+  }
+
+  function renderPaymentWalletCard(m) {
+    var saved = getPayments();
+    var cfg = saved[m.key] || {};
+    var enabled = !!cfg.enabled;
+    var typeKey = m.key.toUpperCase();
+    var statusOk = !!cfg.address;
+    return '<div class="sa-pm-card sa-pm-card--wallet" id="pm-card-' + m.key + '">' +
+      '<div class="sa-pm-card__head">' +
+        '<div class="sa-pm-card__icon" style="background:' + saPmIconColor(typeKey) + ';">' + esc(saPmIconLetter(m.name)) + '</div>' +
+        '<div class="sa-pm-card__info">' +
+          '<div class="sa-pm-card__name">' + esc(m.name) + '</div>' +
+          '<div class="sa-pm-card__desc' + (statusOk ? ' sa-pm-card__desc--ok' : '') + '" id="pm-desc-' + m.key + '">' + esc(walletStatusText(cfg)) + '</div>' +
+        '</div>' +
+        '<div class="sa-pm-card__actions">' +
+          '<button class="a-btn a-btn--icon" onclick="toggleWalletEdit(\'' + m.key + '\')" title="Configurer l\'adresse"><svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>' +
+          '<label class="pm-toggle sa-pm-toggle"><input type="checkbox" id="pm-enabled-' + m.key + '"' + (enabled ? ' checked' : '') + ' onchange="togglePayment(\'' + m.key + '\')" /><span class="pm-toggle__track sa-pm-toggle__track"></span><span class="pm-toggle__thumb"></span></label>' +
+        '</div>' +
+      '</div>' +
+      '<div class="sa-pm-card__edit" id="pm-edit-' + m.key + '" style="display:none;">' +
+        '<input type="text" id="pm_' + m.key + '_address" value="' + esc(cfg.address || '') + '" placeholder="' + esc(m.ph) + '" />' +
+        '<button class="a-btn a-btn--primary" onclick="savePayment(\'' + m.key + '\')" style="font-size:12.5px;flex-shrink:0;">Save</button>' +
+      '</div>' +
+    '</div>';
+  }
 
   function renderPayments() {
     var pmGrid = document.getElementById('pmGrid');
     if (!pmGrid) return;
-    var saved = getPayments();
-
-    pmGrid.innerHTML = PM_METHODS.map(function(m) {
-      var cfg     = saved[m.key] || {};
-      var enabled = !!cfg.enabled;
-
-      var fieldsHtml = m.fields.map(function(f) {
-        if (f.type === 'toggle') {
-          var chk = !!cfg[f.key];
-          return '<div class="pm-field-row">' +
-            '<div>' +
-              '<div class="pm-field-label">' + esc(f.label) + '</div>' +
-              (f.hint ? '<div class="pm-field-hint">' + esc(f.hint) + '</div>' : '') +
-            '</div>' +
-            '<label class="pm-toggle">' +
-              '<input type="checkbox" id="pm_' + m.key + '_' + f.key + '"' + (chk ? ' checked' : '') + ' />' +
-              '<span class="pm-toggle__track"></span>' +
-              '<span class="pm-toggle__thumb"></span>' +
-            '</label>' +
-          '</div>';
-        } else if (f.type === 'select') {
-          var opts = (f.options || []).map(function(o) {
-            return '<option value="' + esc(o) + '"' + (cfg[f.key] === o ? ' selected' : '') + '>' + esc(o) + '</option>';
-          }).join('');
-          return '<div class="field" style="margin-bottom:12px;">' +
-            '<label class="pm-field-label">' + esc(f.label) + '</label>' +
-            (f.hint ? '<p class="pm-field-hint" style="margin:3px 0 8px;">' + esc(f.hint) + '</p>' : '') +
-            '<select id="pm_' + m.key + '_' + f.key + '">' + opts + '</select>' +
-          '</div>';
-        } else {
-          var val = esc(cfg[f.key] || '');
-          return '<div class="field" style="margin-bottom:12px;">' +
-            '<label class="pm-field-label">' + esc(f.label) + '</label>' +
-            (f.hint ? '<p class="pm-field-hint" style="margin:3px 0 8px;">' + esc(f.hint) + '</p>' : '') +
-            '<input type="' + f.type + '" id="pm_' + m.key + '_' + f.key + '" value="' + val + '" placeholder="' + esc(f.ph || '') + '" />' +
-          '</div>';
-        }
-      }).join('');
-
-      var isCrypto = ['btc','eth','ltc','sol'].indexOf(m.key) !== -1;
-      return '<div class="pm-card' + (enabled ? ' pm-card--enabled' : '') + '" id="pm-card-' + m.key + '">' +
-        '<div class="pm-card__head">' +
-          '<div class="pm-card__logo" style="background:' + m.bg + ';">' + m.icon + '</div>' +
-          '<div class="pm-card__info">' +
-            '<div class="pm-card__name">' + esc(m.name) + (isCrypto ? ' <span style="font-size:10px;font-weight:700;background:rgba(99,235,132,.1);border:1px solid rgba(99,235,132,.2);color:#63eb84;padding:2px 6px;border-radius:4px;vertical-align:middle;letter-spacing:.04em;">AUTO-VERIFY</span>' : '') + '</div>' +
-            '<div class="pm-card__desc">' + esc(m.desc) + '</div>' +
-          '</div>' +
-          '<div class="pm-card__right">' +
-            '<span class="pm-badge ' + (enabled ? 'pm-badge--active' : 'pm-badge--inactive') + '" id="pm-badge-' + m.key + '">' +
-              (enabled ? 'Active' : 'Inactive') +
-            '</span>' +
-            '<label class="pm-toggle">' +
-              '<input type="checkbox" id="pm-enabled-' + m.key + '"' + (enabled ? ' checked' : '') + ' onchange="togglePayment(\'' + m.key + '\')" />' +
-              '<span class="pm-toggle__track"></span>' +
-              '<span class="pm-toggle__thumb"></span>' +
-            '</label>' +
-          '</div>' +
-        '</div>' +
-        '<div class="pm-card__body" id="pm-body-' + m.key + '">' +
-          fieldsHtml +
-          '<div class="pm-card__footer">' +
-            '<button class="a-btn a-btn--primary" onclick="savePayment(\'' + m.key + '\')" style="font-size:13px;">' +
-              '<svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>' +
-              ' Save Changes' +
-            '</button>' +
-          '</div>' +
-        '</div>' +
-      '</div>';
-    }).join('');
+    pmGrid.innerHTML = '<div class="sa-pm-group-label">Crypto Wallets</div>' +
+      '<div class="sa-pm-grid">' + PM_METHODS.map(renderPaymentWalletCard).join('') + '</div>';
   }
 
+  window.toggleWalletEdit = function(key) {
+    var row = document.getElementById('pm-edit-' + key);
+    if (!row) return;
+    var show = row.style.display === 'none' || !row.style.display;
+    row.style.display = show ? 'flex' : 'none';
+    if (show) {
+      var input = document.getElementById('pm_' + key + '_address');
+      if (input) input.focus();
+    }
+  };
+
   window.togglePayment = function(key) {
-    var enabled = document.getElementById('pm-enabled-' + key).checked;
+    var checkbox = document.getElementById('pm-enabled-' + key);
+    var enabled = checkbox ? checkbox.checked : false;
     var saved = getPayments();
     if (!saved[key]) saved[key] = {};
     saved[key].enabled = enabled;
     setPayments(saved);
-    var card  = document.getElementById('pm-card-' + key);
-    var badge = document.getElementById('pm-badge-' + key);
-    if (card)  { card.classList.toggle('pm-card--enabled', enabled); }
-    if (badge) { badge.className = 'pm-badge ' + (enabled ? 'pm-badge--active' : 'pm-badge--inactive'); badge.textContent = enabled ? 'Active' : 'Inactive'; }
   };
 
   window.savePayment = function(key) {
     var method = PM_METHODS.find(function(m) { return m.key === key; });
-    if (!method) return;
+    var input = document.getElementById('pm_' + key + '_address');
+    if (!method || !input) return;
     var saved = getPayments();
     if (!saved[key]) saved[key] = {};
-    method.fields.forEach(function(f) {
-      var el = document.getElementById('pm_' + key + '_' + f.key);
-      if (!el) return;
-      saved[key][f.key] = (f.type === 'toggle') ? el.checked : el.value.trim();
-    });
+    saved[key].address = input.value.trim();
     setPayments(saved);
-    toast(method.name + ' settings saved.');
+    toast(method.name + ' — adresse enregistrée.');
+    renderPayments();
   };
 
   /* ── Moyens de paiement du compte SellAuth (lecture + toggle + reorder) ──
@@ -2141,6 +2084,41 @@
     var s = localStorage.getItem('nexus_sa_secret') || '';
     if (!s && interactive) s = getSaSecret(false);
     return s;
+  }
+
+  /* Regroupement + icones : SellAuth ne renvoie pas de categorie, on la
+     deduit du type (memes valeurs crypto que nos wallets locaux). Couleurs
+     de marque usuelles, pas de logo hotlink vers l'assets SellAuth. */
+  var SA_PM_CRYPTO_TYPES = ['BTC', 'ETH', 'LTC', 'SOL'];
+  var SA_PM_ICON_COLORS = {
+    STRIPE: '#635bff', PAYPAL: '#0070ba', PAYPALFF: '#0070ba', SQUARE: '#000000',
+    CUSTOMERBALANCE: '#64748b', BTC: '#f7931a', ETH: '#627eea', LTC: '#a6a9aa', SOL: '#9945ff',
+    CASHAPP: '#00d632', VENMO: '#3d95ce', SHOPIFY: '#95bf47', LEMONSQUEEZY: '#fbca04'
+  };
+  function saPmIconColor(type) { return SA_PM_ICON_COLORS[type] || '#4b5563'; }
+  function saPmIconLetter(name) { return String(name || '?').trim().charAt(0).toUpperCase() || '?'; }
+
+  function renderSaPmGroup(label, methods) {
+    if (!methods.length) return '';
+    return '<div class="sa-pm-group-label">' + esc(label) + '</div>' +
+      '<div class="sa-pm-grid">' +
+      methods.map(function(m) {
+        var i = _saPmCache.indexOf(m);
+        var fees = (m.percentageFee ? m.percentageFee + '%' : '') + (m.percentageFee && m.fixedFee ? ' + ' : '') + (m.fixedFee ? '€' + m.fixedFee.toFixed(2) : '');
+        return '<div class="sa-pm-card">' +
+          '<div class="sa-pm-card__icon" style="background:' + saPmIconColor(m.type) + ';">' + esc(saPmIconLetter(m.name)) + '</div>' +
+          '<div class="sa-pm-card__info">' +
+            '<div class="sa-pm-card__name">' + esc(m.name) + '</div>' +
+            '<div class="sa-pm-card__desc">' + (fees || 'No extra fees') + '</div>' +
+          '</div>' +
+          '<div class="sa-pm-card__actions">' +
+            '<button class="a-btn a-btn--icon" onclick="moveSaPaymentMethod(' + i + ',-1)" title="Move up"' + (i === 0 ? ' disabled' : '') + '><svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>' +
+            '<button class="a-btn a-btn--icon" onclick="moveSaPaymentMethod(' + i + ',1)" title="Move down"' + (i === _saPmCache.length - 1 ? ' disabled' : '') + '><svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg></button>' +
+            '<label class="pm-toggle sa-pm-toggle" style="margin-left:4px;"><input type="checkbox"' + (m.isActive ? ' checked' : '') + ' onchange="toggleSaPaymentMethod(' + i + ')" /><span class="pm-toggle__track sa-pm-toggle__track"></span><span class="pm-toggle__thumb"></span></label>' +
+          '</div>' +
+        '</div>';
+      }).join('') +
+      '</div>';
   }
 
   window.renderSaPaymentMethods = function(interactive) {
@@ -2182,23 +2160,8 @@
           return;
         }
 
-        el.innerHTML = '<table class="a-table"><thead><tr>' +
-          '<th>Name</th><th>Type</th><th>Fees</th><th>Status</th><th>Order</th>' +
-          '</tr></thead><tbody>' +
-          _saPmCache.map(function(m, i) {
-            var fees = (m.percentageFee ? m.percentageFee + '%' : '') + (m.percentageFee && m.fixedFee ? ' + ' : '') + (m.fixedFee ? '€' + m.fixedFee.toFixed(2) : '');
-            return '<tr>' +
-              '<td style="color:#fff;font-weight:600;">' + esc(m.name) + (m.checkoutName ? ' <span style="color:var(--text-muted);font-weight:400;">(' + esc(m.checkoutName) + ')</span>' : '') + '</td>' +
-              '<td><span style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);">' + esc(m.type) + '</span></td>' +
-              '<td style="color:var(--text-muted);">' + (fees || '—') + '</td>' +
-              '<td><label class="pm-toggle"><input type="checkbox"' + (m.isActive ? ' checked' : '') + ' onchange="toggleSaPaymentMethod(' + i + ')" /><span class="pm-toggle__track"></span><span class="pm-toggle__thumb"></span></label></td>' +
-              '<td><div class="action-group">' +
-                '<button class="a-btn a-btn--icon" onclick="moveSaPaymentMethod(' + i + ',-1)" title="Move up"' + (i === 0 ? ' disabled' : '') + '><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>' +
-                '<button class="a-btn a-btn--icon" onclick="moveSaPaymentMethod(' + i + ',1)" title="Move down"' + (i === _saPmCache.length - 1 ? ' disabled' : '') + '><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg></button>' +
-              '</div></td>' +
-            '</tr>';
-          }).join('') +
-          '</tbody></table>';
+        el.innerHTML = renderSaPmGroup('Crypto', _saPmCache.filter(function(m) { return SA_PM_CRYPTO_TYPES.indexOf(m.type) !== -1; })) +
+          renderSaPmGroup('Payment Processors', _saPmCache.filter(function(m) { return SA_PM_CRYPTO_TYPES.indexOf(m.type) === -1; }));
       })
       .catch(function() {
         el.innerHTML = promosEmptyState('tag', 'Erreur réseau',

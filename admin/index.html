@@ -9,7 +9,7 @@
   <title>FlashShp — Admin</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/admin.css?v=dc0de7e1" />
+  <link rel="stylesheet" href="assets/admin.css?v=f948fe3f" />
 </head>
 <body>
 
@@ -359,24 +359,24 @@
         <div class="page-header">
           <div>
             <h1>Payment Methods</h1>
-            <p style="font-size:13px;color:var(--text-muted);margin-top:4px;font-weight:400;">Configure the payment gateways accepted in your store.</p>
+            <p style="font-size:13px;color:var(--text-muted);margin-top:4px;font-weight:400;">Configure the payment methods accepted in your store.</p>
           </div>
         </div>
-        <div class="pm-grid" id="pmGrid"></div>
+
+        <!-- Wallets crypto locaux (adresse BTC/ETH/LTC/SOL) : ce que LE
+             CHECKOUT DE CE SITE utilise reellement pour les paiements crypto.
+             Style repris du dashboard SellAuth (voir plus bas), avec un volet
+             d'edition d'adresse par carte. -->
+        <div id="pmGrid"></div>
 
         <!-- Moyens de paiement du compte SellAuth : lecture + activer/desactiver +
-             reordonner uniquement. Distinct des wallets crypto ci-dessus, que LE
-             CHECKOUT DE CE SITE utilise reellement (adresse de wallet en local) ;
-             cette liste reflete le compte SellAuth lui-meme. -->
-        <div class="page-header" style="margin-top:36px;">
-          <div>
-            <h2 style="font-size:16px;font-weight:700;color:#fff;">SellAuth Payment Methods</h2>
-            <p style="font-size:13px;color:var(--text-muted);margin-top:4px;font-weight:400;">Moyens de paiement de votre compte SellAuth — activer/desactiver et reordonner. La configuration fine (frais, identifiants) se fait sur dash.sellauth.com.</p>
-          </div>
-        </div>
-        <div class="table-wrap">
-          <div id="saPmList"></div>
-        </div>
+             reordonner uniquement. Informatif/gestion du compte SellAuth — distinct
+             des wallets crypto ci-dessus, aucune facture SellAuth n'est creee par
+             ce checkout. Style repris a l'identique du dashboard SellAuth reel
+             (dash.sellauth.com > Payment Methods), voir
+             sellauth.com/landing/payment-methods.jpg. -->
+        <div class="sa-pm-group-label" style="margin-top:28px;">Compte SellAuth</div>
+        <div id="saPmList"></div>
       </div>
 
       <!-- ─── FEEDBACKS ─── -->
@@ -2347,6 +2347,6 @@
   <div id="adminToast" class="admin-toast"></div>
 
   <script src="assets/email-config.js?v=00c5c095"></script>
-  <script src="assets/admin.js?v=3d03638b"></script>
+  <script src="assets/admin.js?v=00b850ac"></script>
 </body>
 </html>
