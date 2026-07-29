@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Lancelot&family=Instrument+Serif&family=Plus+Jakarta+Sans:wght@400..800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/style.css?v=20" />
+  <link rel="stylesheet" href="assets/style.css?v=23" />
 </head>
 <body>
 
@@ -131,6 +131,13 @@
         </div>
 
         <div>
+          <div class="footer__col-title" data-i18n="footer.products">Products</div>
+          <ul class="footer__col-links">
+            <li><a href="/products" data-i18n="footer.allProducts">All Products</a></li>
+          </ul>
+        </div>
+
+        <div>
           <div class="footer__col-title" data-i18n="footer.legal">Legal</div>
           <ul class="footer__col-links">
             <li><a href="#" data-i18n="footer.tos" data-link="tos">Terms of Service</a></li>
@@ -140,10 +147,19 @@
       </div>
       <div class="footer__bottom">
         <div class="footer__copy" data-i18n="footer.copy">© 2026 FlashShp. All rights reserved.</div>
-        <div style="display:flex;gap:16px;align-items:center;">
-          <a href="#" data-i18n="footer.terms" data-link="tos" class="footer__legal-link">Terms</a>
-          <span class="footer__legal-sep">/</span>
-          <a href="#" data-i18n="footer.privacy" data-link="privacy" class="footer__legal-link">Privacy</a>
+        <div class="footer__pay" aria-label="Accepted cryptocurrencies">
+          <span class="footer__pay-coin" style="color:#f7931a;" title="Bitcoin">
+            <svg viewBox="0 0 24 24" fill="currentColor" role="img" aria-label="Bitcoin"><path d="M23.638 14.904c-1.602 6.43-8.113 10.34-14.542 8.736C2.67 22.05-1.244 15.525.362 9.105 1.962 2.67 8.475-1.243 14.9.358c6.43 1.605 10.342 8.115 8.738 14.546zm-6.35-4.613c.24-1.59-.974-2.45-2.64-3.03l.54-2.153-1.315-.33-.525 2.107c-.345-.087-.705-.167-1.064-.25l.526-2.127-1.32-.33-.54 2.165c-.285-.067-.565-.132-.84-.2l-1.815-.45-.35 1.407s.975.225.955.238c.535.136.63.486.615.766l-1.477 5.92c-.075.166-.24.406-.614.314.015.02-.96-.24-.96-.24l-.66 1.51 1.71.426.93.242-.54 2.19 1.32.327.54-2.17c.36.1.705.19 1.05.273l-.51 2.154 1.32.33.545-2.19c2.24.427 3.93.257 4.64-1.774.57-1.637-.03-2.58-1.217-3.196.854-.193 1.5-.76 1.68-1.93zm-3.01 4.22c-.404 1.64-3.157.75-4.05.53l.72-2.9c.896.23 3.757.67 3.33 2.37zm.41-4.24c-.37 1.49-2.662.735-3.405.55l.654-2.64c.744.18 3.137.524 2.75 2.084z"/></svg>
+          </span>
+          <span class="footer__pay-coin" style="color:#627eea;" title="Ethereum">
+            <svg viewBox="0 0 24 24" fill="currentColor" role="img" aria-label="Ethereum"><path d="M11.944 17.97L4.58 13.62 11.943 24l7.37-10.38-7.372 4.35h.003zM12.056 0L4.69 12.223l7.365 4.354 7.365-4.35L12.056 0z"/></svg>
+          </span>
+          <span class="footer__pay-coin" style="color:#bfbbbb;" title="Litecoin">
+            <svg viewBox="0 0 24 24" fill="currentColor" role="img" aria-label="Litecoin"><path d="M12 0a12 12 0 1 0 12 12A12 12 0 0 0 12 0zm-.984 5.5h2.688l-1.406 5.203 2.156-.656-.469 1.734-2.156.656-.844 3.063h5.719l-.75 2.5H6.75l1.219-4.5-1.688.5.469-1.734 1.688-.5L11.016 5.5z"/></svg>
+          </span>
+          <span class="footer__pay-coin" style="color:#9945ff;" title="Solana">
+            <svg viewBox="0 0 24 24" fill="currentColor" role="img" aria-label="Solana"><path d="M4.1 17.7c.15-.15.35-.24.57-.24h17.02c.37 0 .55.45.29.71l-3.36 3.36c-.15.15-.35.24-.57.24H1.03c-.37 0-.55-.45-.29-.71l3.36-3.36zm0-12.55c.15-.15.35-.24.57-.24h17.02c.37 0 .55.45.29.71l-3.36 3.36c-.15.15-.35.24-.57.24H1.03c-.37 0-.55-.45-.29-.71l3.36-3.36zm14.51 6.24c-.15-.15-.35-.24-.57-.24H1.03c-.37 0-.55.45-.29.71l3.36 3.36c.15.15.35.24.57.24h17.02c.37 0 .55-.45.29-.71l-3.37-3.36z"/></svg>
+          </span>
         </div>
       </div>
     </div>
@@ -207,7 +223,7 @@
 
   <script src="assets/content-sync.js?v=2"></script>
   <script src="assets/email-config.js?v=1"></script>
-  <script src="assets/main.js?v=16"></script>
+  <script src="assets/main.js?v=17"></script>
   <script src="assets/crypto-checkout.js?v=1"></script>
   <script src="assets/account-menu.js?v=3" defer></script>
   <script>

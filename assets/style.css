@@ -1014,9 +1014,9 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
 ──────────────────────────────────────────────*/
 .footer-wrap { border-top: 1px solid rgba(255,255,255,.06); }
 .footer { max-width: 1440px; margin: 0 auto; padding: 56px 80px 40px; }
-/* 3 colonnes : marque (+ reseaux sociaux), Navigation, Legal */
+/* 4 colonnes : marque (+ reseaux sociaux), Navigation, Products, Legal */
 .footer__top {
-  display: grid; grid-template-columns: 2fr 1fr 1fr;
+  display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
   gap: 48px; margin-bottom: 48px;
 }
 .footer__logo { font-family: var(--font-logo); font-size: 28px; margin-bottom: 16px; }
@@ -1029,17 +1029,19 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
 .footer__col-links a { font-size: 14px; color: rgba(255,255,255,.50); transition: color 200ms ease; }
 .footer__col-links a:hover { color: #fff; }
 
-/* Liens sociaux : boutons carres a logo, sans bordure. Le libelle textuel
-   passe en aria-label/title puisque seule l'icone reste visible. */
-.footer__socials { display: flex; gap: 10px; margin-top: 20px; }
+/* Liens sociaux : logos seuls, sans fond ni bordure. Le libelle textuel
+   passe en aria-label/title puisque seule l'icone reste visible.
+   La boite de 40x40 est conservee sans etre visible : elle garde une cible
+   de clic correcte alors que les glyphes ne font qu'une vingtaine de pixels.
+   L'icone reprend la couleur des autres liens du footer. */
+.footer__socials { display: flex; gap: 0; margin-top: 20px; margin-left: -9px; }
 .footer__social {
-  width: 40px; height: 40px; border-radius: 8px; flex-shrink: 0;
+  width: 40px; height: 40px; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
-  background: rgba(255,255,255,.05);
-  color: rgba(255,255,255,.60);
-  transition: background 200ms ease, color 200ms ease;
+  color: rgba(255,255,255,.50);
+  transition: color 200ms ease;
 }
-.footer__social:hover { background: rgba(255,255,255,.10); color: #fff; }
+.footer__social:hover { color: #fff; }
 .footer__social svg { display: block; }
 
 .footer__bottom {
@@ -1047,6 +1049,17 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
   display: flex; align-items: center; justify-content: space-between; gap: 16px;
 }
 .footer__copy { font-size: 13px; color: rgba(255,255,255,.30); }
+
+/* Cryptos acceptees, en bas du footer. Purement informatif : ce ne sont pas
+   des liens. Couleurs de marque, reprises de crypto-checkout.js. */
+.footer__pay { display: flex; align-items: center; gap: 14px; }
+.footer__pay-coin {
+  display: flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; flex-shrink: 0;
+  opacity: .8; transition: opacity 200ms ease;
+}
+.footer__pay:hover .footer__pay-coin { opacity: 1; }
+.footer__pay-coin svg { display: block; width: 100%; height: 100%; }
 .footer__legal-link { font-size: 13px; color: rgba(255,255,255,.35); transition: color 200ms ease; }
 .footer__legal-link:hover { color: #fff; }
 .footer__legal-sep { color: rgba(255,255,255,.15); font-size: 13px; }
