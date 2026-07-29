@@ -138,20 +138,10 @@
           </button>
 
           <div class="shop-filterbar__stat shop-filterbar__stat--stock" id="stockStat" title="Total products in the catalog">
-            <span class="shop-filterbar__stat-dot"></span><span id="stockCount">0</span>&nbsp;Products
+            <span class="shop-filterbar__stat-dot"></span>
+            <span class="shop-filterbar__stat-text"><span class="shop-filterbar__stat-num" id="stockCount">0</span> <span id="stockLabel">Products</span></span>
           </div>
         </div>
-
-        <!-- Catégorie « All Products » toujours présente + catégories créées dans l'admin -->
-        <div class="cat-pills" id="catPills">
-          <button type="button" class="cat-pill cat-pill--all active" data-cat="all">All Products</button>
-          <div id="catSections" style="display:contents;"></div>
-        </div>
-      </div>
-
-      <div class="shop-topbar">
-        <h1 class="shop-topbar__title" id="pageTitle"><span id="resultsCount" style="color:rgba(255,255,255,.35);font-size:inherit;">6</span> <span id="productsTitleLabel">products</span></h1>
-        <div class="shop-topbar__right"></div>
       </div>
 
       <div class="product-grid" id="productGrid"></div>
@@ -215,56 +205,6 @@
   })();
   </script>
 
-  <script>
-  (function() {
-    /* Affiche uniquement les catégories créées dans l'admin, sous forme de pills
-       horizontales. Aucune catégorie → seule la pill "All Products" reste, tous
-       les produits restent visibles. */
-    function getCats() {
-      try { return JSON.parse(localStorage.getItem('nexus_categories')) || []; } catch(e) { return []; }
-    }
-    function esc(s) {
-      return String(s == null ? '' : s)
-        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    }
-    /* Icône/logo de la catégorie : son image si définie, sinon rien. */
-    function catIcon(cat) {
-      return cat.image
-        ? '<span class="cat-pill__icon"><img src="' + esc(cat.image) + '" alt="" loading="lazy"></span>'
-        : '';
-    }
-    /* IDs de toutes les sous-catégories descendantes (récursif, anti-boucle) :
-       une pill de catégorie racine filtre aussi sur les produits de ses enfants. */
-    function descendantCatIds(catId, cats) {
-      var out = [], seen = {};
-      (function rec(id) {
-        if (seen[id]) return; seen[id] = 1;
-        cats.forEach(function(s) { if (String(s.parent) === String(id) && !seen[s.id]) { out.push(s.id); rec(s.id); } });
-      })(catId);
-      return out;
-    }
-    /* Une pill par catégorie racine (les sous-catégories restent regroupées dans
-       le filtre de leur parent plutôt que d'ajouter des pills en cascade). */
-    function renderCats() {
-      var wrap = document.getElementById('catSections');
-      if (!wrap) return;
-      var cats = getCats();
-      var roots = cats.filter(function(c) {
-        return !c.parent || !cats.some(function(p) { return p.id === c.parent; });
-      });
-      wrap.innerHTML = roots.map(function(c) {
-        var subIds = descendantCatIds(c.id, cats);
-        return '<button type="button" class="cat-pill" data-cat="' + esc(c.id) + '"' +
-          (subIds.length ? ' data-subcats="' + esc(subIds.join(',')) + '"' : '') +
-          '>' + catIcon(c) + esc(c.name) + '</button>';
-      }).join('');
-    }
-    renderCats();
-    window.addEventListener('storage', function(e) {
-      if (e.key === 'nexus_categories' || e.key === 'nexus_products') renderCats();
-    });
-  })();
-  </script>
   <script src="assets/content-sync.js?v=2"></script>
   <script src="assets/email-config.js?v=1"></script>
   <script src="assets/main.js?v=15"></script>
@@ -409,11 +349,9 @@
 
     function renderGrid() {
       var grid = document.getElementById('productGrid');
-      var countEl = document.getElementById('resultsCount');
       if (!grid) return;
       var products = getProducts();
       grid.innerHTML = products.map(function(p, i) { return buildCard(p, i); }).join('');
-      if (countEl) countEl.textContent = products.length;
 
       // Barre de filtres : "X Products" — nombre total de produits du catalogue
       var stockEl = document.getElementById('stockCount');
@@ -436,7 +374,7 @@
     function applyContent(c) {
       if (!c) return;
       if (c.siteName)      document.querySelectorAll('.nav__logo, .drawer__logo, .footer__logo').forEach(function(el) { el.textContent = c.siteName; });
-      if (c.productsCountWord) { var e1 = document.getElementById('productsTitleLabel'); if (e1) e1.textContent = c.productsCountWord; }
+      if (c.productsCountWord) { var e1 = document.getElementById('stockLabel'); if (e1) e1.textContent = c.productsCountWord; }
       if (c.searchPlaceholder) { var e2 = document.getElementById('searchInput'); if (e2) e2.placeholder = c.searchPlaceholder; }
       if (c.footerDesc)    document.querySelectorAll('.footer__desc').forEach(function(el) { el.innerHTML  = c.footerDesc; });
       if (c.footerCopy)    document.querySelectorAll('.footer__copy').forEach(function(el) { el.textContent = c.footerCopy; });

@@ -159,8 +159,6 @@ window.NX_ICONS = function (name) {
     clearFiltersBtn.addEventListener('click', function () {
       if (searchInput) { searchInput.value = ''; searchQuery = ''; updateSearchClearUI(); }
       clearCatActive();
-      var allPill = document.querySelector('.cat-pill--all');
-      if (allPill) allPill.classList.add('active');
       activeCat = 'all'; activeSubcats = []; activeProductId = null;
       if (priceMinInput) priceMinInput.value = '';
       if (priceMaxInput) priceMaxInput.value = '';
@@ -342,11 +340,11 @@ window.NX_ICONS = function (name) {
     });
   }
 
-  /* Items de catégorie filtrables : pills de la barre de filtres (+ anciens sélecteurs
-     de sidebar, conservés pour compat avec les pages qui l'utilisent encore) */
-  var CAT_FILTER_SELECTOR = '.cat-pill[data-cat], .sidebar__item[data-cat], .sidebar__section-header--leaf[data-cat]';
+  /* Items de catégorie filtrables : sélecteurs de sidebar, conservés pour compat
+     avec les pages qui l'utilisent encore */
+  var CAT_FILTER_SELECTOR = '.sidebar__item[data-cat], .sidebar__section-header--leaf[data-cat]';
   function clearCatActive() {
-    document.querySelectorAll('.cat-pill.active, .sidebar__item.active, .sidebar__section-header--leaf.active')
+    document.querySelectorAll('.sidebar__item.active, .sidebar__section-header--leaf.active')
       .forEach(function (i) { i.classList.remove('active'); });
   }
   document.querySelectorAll(CAT_FILTER_SELECTOR).forEach(function (item) {
