@@ -30,8 +30,13 @@ function copyDir(src, dest) {
   fs.mkdirSync(dest, { recursive: true });
   var copied = 0;
   fs.readdirSync(src, { withFileTypes: true }).forEach(function (entry) {
+    /* entry.name vient de fs.readdirSync sur un dossier du dépôt (admin/), pas
+       d'une requête HTTP : ce ne peut être qu'un nom de fichier/dossier réel de
+       src, jamais une chaîne arbitraire. On vérifie quand même l'appartenance
+       à src/dest — ceinture-et-bretelles, coût nul. */
     var from = path.join(src, entry.name);
     var to = path.join(dest, entry.name);
+    if (path.dirname(from) !== src || path.dirname(to) !== dest) return;
     if (entry.isDirectory()) copied += copyDir(from, to);
     else if (entry.isFile()) { fs.copyFileSync(from, to); copied++; }
   });

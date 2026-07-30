@@ -11,6 +11,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 2
+          persist-credentials: false
 
       - name: Send Discord deploy notification
         env:

@@ -207,7 +207,7 @@
 
   <script src="assets/content-sync.js?v=2"></script>
   <script src="assets/email-config.js?v=1"></script>
-  <script src="assets/main.js?v=20"></script>
+  <script src="assets/main.js?v=21"></script>
   <script src="assets/crypto-checkout.js?v=3"></script>
   <script>
   (function() {
@@ -371,12 +371,18 @@
   </script>
   <script>
   (function() {
+    /* nexus_content vient de l'admin (Visual Editor) : on autorise un minimum
+       de mise en forme (<br>, <b>…) sans jamais poser du innerHTML brut. */
+    function richText(s) {
+      return window._nexusSanitizeRichText ? window._nexusSanitizeRichText(s)
+        : String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
     function applyContent(c) {
       if (!c) return;
       if (c.siteName)      document.querySelectorAll('.nav__logo, .drawer__logo, .footer__logo').forEach(function(el) { el.textContent = c.siteName; });
       if (c.productsCountWord) { var e1 = document.getElementById('stockLabel'); if (e1) e1.textContent = c.productsCountWord; }
       if (c.searchPlaceholder) { var e2 = document.getElementById('searchInput'); if (e2) e2.placeholder = c.searchPlaceholder; }
-      if (c.footerDesc)    document.querySelectorAll('.footer__desc').forEach(function(el) { el.innerHTML  = c.footerDesc; });
+      if (c.footerDesc)    document.querySelectorAll('.footer__desc').forEach(function(el) { el.innerHTML  = richText(c.footerDesc); });
       if (c.footerCopy)    document.querySelectorAll('.footer__copy').forEach(function(el) { el.textContent = c.footerCopy; });
     }
     try { applyContent(JSON.parse(localStorage.getItem('nexus_content'))); } catch(e) {}

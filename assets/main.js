@@ -552,6 +552,18 @@ window.NX_ICONS = function (name) {
     }
   };
 
+  /* Texte admin (Visual Editor, nexus_content) autorisé à contenir un minimum
+     de mise en forme (ex. <br> dans une description) : on échappe tout puis on
+     ne réautorise qu'une poignée de balises sans attributs, plutôt que de
+     poser du innerHTML brut. Un <script>, onerror=, javascript:… reste du texte
+     inerte affiché tel quel. */
+  function sanitizeRichText(html) {
+    var div = document.createElement('div');
+    div.textContent = String(html == null ? '' : html);
+    return div.innerHTML.replace(/&lt;(\/?)(br|b|strong|i|em)\s*\/?&gt;/gi, '<$1$2>');
+  }
+  window._nexusSanitizeRichText = sanitizeRichText;
+
   /* Surcharges de texte définies dans l'admin (Visual Editor) — prioritaires sur toutes les langues */
   function getTextOverrides() {
     try { return JSON.parse(localStorage.getItem('nexus_text_overrides')) || {}; } catch(e) { return {}; }
@@ -559,7 +571,7 @@ window.NX_ICONS = function (name) {
   function applyTextOverrides() {
     var o = getTextOverrides();
     document.querySelectorAll('[data-i18n]').forEach(function (el) { if (o[el.dataset.i18n]) el.textContent = o[el.dataset.i18n]; });
-    document.querySelectorAll('[data-i18n-html]').forEach(function (el) { if (o[el.dataset.i18nHtml]) el.innerHTML = o[el.dataset.i18nHtml]; });
+    document.querySelectorAll('[data-i18n-html]').forEach(function (el) { if (o[el.dataset.i18nHtml]) el.innerHTML = sanitizeRichText(o[el.dataset.i18nHtml]); });
   }
   window.addEventListener('storage', function (e) {
     if (e.key === 'nexus_text_overrides') applyTextOverrides();
@@ -775,7 +787,7 @@ window.NX_ICONS = function (name) {
     if (!tc) return;
     var t = document.createElement('div');
     t.className = 'toast';
-    t.innerHTML = '<span class="toast__icon">'+(icon||ICON('check'))+'</span><span>'+String(msg).replace(/</g,'&lt;')+'</span>';
+    t.innerHTML = '<span class="toast__icon">'+(icon||ICON('check'))+'</span><span>'+String(msg).replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</span>';
     tc.appendChild(t);
     setTimeout(function() { t.classList.add('hide'); setTimeout(function() { t.parentNode && t.parentNode.removeChild(t); }, 250); }, 3000);
   };

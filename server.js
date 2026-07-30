@@ -13,6 +13,7 @@
 try { require('dotenv').config(); } catch (e) { /* dotenv optionnel */ }
 
 var express = require('express');
+var helmet = require('helmet');
 var path = require('path');
 var fs = require('fs');
 
@@ -23,8 +24,25 @@ app.set('trust proxy', true); // derrière le proxy Hostinger : req.protocol/ip 
 /* Corps JSON (les handlers lisent req.body ; readBody gère aussi l'absence). */
 app.use(express.json({ limit: '1mb' }));
 
-/* ── En-têtes de sécurité ── */
-var CSP = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.sellauth.com https://cdn.jsdelivr.net https://www.paypal.com https://*.paypalobjects.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https:; frame-src 'self' https:; base-uri 'self'; form-action 'self'; object-src 'none'; frame-ancestors 'self'; upgrade-insecure-requests";
+/* Helmet pose une base d'en-têtes qu'on ne gérait pas encore soi-même
+   (X-DNS-Prefetch-Control, Cross-Origin-Resource-Policy, Origin-Agent-Cluster…).
+   Tout ce qu'on pose déjà à la main juste après (CSP, HSTS, X-Frame-Options,
+   Referrer-Policy, COOP) est désactivé ici pour éviter le doublon — la
+   middleware suivante reste la seule source de vérité pour ces en-têtes-là. */
+app.use(helmet({
+  contentSecurityPolicy: false,
+  hsts: false,
+  frameguard: false,
+  referrerPolicy: false,
+  crossOriginOpenerPolicy: false
+}));
+
+/* ── En-têtes de sécurité ──
+   img-src/connect-src/frame-src listent les hôtes externes réellement appelés
+   par le front (cours crypto, vérif blockchain, QR code, webhook Discord,
+   emailjs) plutôt qu'un wildcard https: — voir crypto-checkout.js/checkout.html
+   pour la liste des appels. */
+var CSP = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.sellauth.com https://cdn.jsdelivr.net https://www.paypal.com https://*.paypalobjects.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://api.qrserver.com; connect-src 'self' https://api.coingecko.com https://api.blockcypher.com https://eth.blockscout.com https://api.mainnet-beta.solana.com https://apilist.tronscanapi.com https://discord.com https://api.emailjs.com https://ipapi.co; frame-src 'self'; media-src 'self'; manifest-src 'self'; worker-src 'self'; base-uri 'self'; form-action 'self'; object-src 'none'; frame-ancestors 'self'; upgrade-insecure-requests";
 app.use(function (req, res, next) {
   res.setHeader('Content-Security-Policy', CSP);
   res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -51,6 +69,12 @@ var API_CACHE = {};
 function loadHandler(name) {
   if (Object.prototype.hasOwnProperty.call(API_CACHE, name)) return API_CACHE[name];
   var file = path.join(API_DIR, name + '.js');
+  /* name est déjà filtré en [a-z0-9-]+ par tous les appelants (route /api/:name
+     ligne ~81, préchargement ligne ~75 depuis un readdirSync) donc aucune
+     séquence '..' ne peut s'y glisser — cette vérification est une ceinture-
+     et-bretelles pour que loadHandler() reste sûr même si un futur appelant
+     oublie de valider en amont. */
+  if (path.dirname(file) !== API_DIR) { API_CACHE[name] = null; return null; }
   if (!fs.existsSync(file)) { API_CACHE[name] = null; return null; }
   var lastErr;
   for (var i = 0; i < 6; i++) {
