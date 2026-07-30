@@ -2000,7 +2000,8 @@
     { key: 'btc', name: 'Bitcoin (BTC)', ph: 'bc1q... or 1... or 3...' },
     { key: 'eth', name: 'Ethereum (ETH)', ph: '0x...' },
     { key: 'ltc', name: 'Litecoin (LTC)', ph: 'ltc1q... or L...' },
-    { key: 'sol', name: 'Solana (SOL)', ph: 'Your SOL address (base58)...' }
+    { key: 'sol', name: 'Solana (SOL)', ph: 'Your SOL address (base58)...' },
+    { key: 'usdt', name: 'Tether (USDT - TRC20)', ph: 'Your USDT TRC20 address (starts with T)...' }
   ];
 
   function walletStatusText(cfg) {

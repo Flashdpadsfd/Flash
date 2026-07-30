@@ -1,5 +1,5 @@
 /* FlashShp — Crypto Payment System
-   Blockchain polling for BTC, ETH, LTC, SOL
+   Blockchain polling for BTC, ETH, LTC, SOL, USDT (TRC20)
    No API keys required for basic use
 */
 (function () {
@@ -8,13 +8,15 @@
   /* ── Constants ── */
   var POLL_INTERVAL = 30000; // 30 seconds
   var PAYMENT_TIMEOUT = 1800000; // 30 minutes
-  var MIN_CONFIRMATIONS = { btc: 1, eth: 1, ltc: 1, sol: 1 };
+  var MIN_CONFIRMATIONS = { btc: 1, eth: 1, ltc: 1, sol: 1, usdt: 1 };
+  var USDT_TRC20_CONTRACT = 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t';
 
   var CRYPTO_INFO = {
     btc: { name: 'Bitcoin',  symbol: 'BTC', color: '#f7931a', icon: '₿', decimals: 8 },
     eth: { name: 'Ethereum', symbol: 'ETH', color: '#627eea', icon: 'Ξ', decimals: 18 },
     ltc: { name: 'Litecoin', symbol: 'LTC', color: '#bfbbbb', icon: 'Ł', decimals: 8 },
-    sol: { name: 'Solana',   symbol: 'SOL', color: '#9945ff', icon: '◎', decimals: 9 }
+    sol: { name: 'Solana',   symbol: 'SOL', color: '#9945ff', icon: '◎', decimals: 9 },
+    usdt: { name: 'Tether',  symbol: 'USDT', color: '#26a17b', icon: '₮', decimals: 6 }
   };
 
   /* ── Price conversion via CoinGecko (free, no key) ── */
@@ -27,14 +29,15 @@
       callback(null, _priceCache);
       return;
     }
-    fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,litecoin,solana&vs_currencies=eur,usd,gbp')
+    fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,litecoin,solana,tether&vs_currencies=eur,usd,gbp')
       .then(function (r) { return r.json(); })
       .then(function (data) {
         _priceCache = {
           btc: { eur: data.bitcoin.eur, usd: data.bitcoin.usd, gbp: data.bitcoin.gbp },
           eth: { eur: data.ethereum.eur, usd: data.ethereum.usd, gbp: data.ethereum.gbp },
           ltc: { eur: data.litecoin.eur, usd: data.litecoin.usd, gbp: data.litecoin.gbp },
-          sol: { eur: data.solana.eur, usd: data.solana.usd, gbp: data.solana.gbp }
+          sol: { eur: data.solana.eur, usd: data.solana.usd, gbp: data.solana.gbp },
+          usdt: { eur: data.tether.eur, usd: data.tether.usd, gbp: data.tether.gbp }
         };
         _priceCacheTime = Date.now();
         callback(null, _priceCache);
@@ -206,11 +209,37 @@
       .catch(function (e) { callback(e, null); });
   }
 
+  function checkUSDT(address, expectedAmount, afterMs, callback) {
+    /* Tronscan public API — free, no key needed. USDT on the TRC20 network. */
+    var url = 'https://apilist.tronscanapi.com/api/token_trc20/transfers?limit=20&start=0&sort=-timestamp&relatedAddress=' + encodeURIComponent(address) + '&contract_address=' + USDT_TRC20_CONTRACT;
+    fetch(url)
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        var txs = data.token_transfers || [];
+        for (var i = 0; i < txs.length; i++) {
+          var tx = txs[i];
+          if ((tx.block_ts || 0) < afterMs - 300000) continue;
+          if (tx.to_address !== address) continue;
+          var decimals = (tx.tokenInfo && tx.tokenInfo.tokenDecimal) || 6;
+          var amountUSDT = parseInt(tx.quant || '0', 10) / Math.pow(10, decimals);
+          var diff = Math.abs(amountUSDT - expectedAmount);
+          if (diff < expectedAmount * 0.005 || diff < 0.01) {
+            var confirmed = !!tx.confirmed;
+            callback(null, { confirmed: confirmed, txHash: tx.transaction_id, amount: amountUSDT, confirmations: confirmed ? 1 : 0 });
+            return;
+          }
+        }
+        callback(null, { confirmed: false });
+      })
+      .catch(function (e) { callback(e, null); });
+  }
+
   function pollBlockchain(cryptoKey, address, expectedAmount, afterMs, callback) {
     if (cryptoKey === 'btc') checkBTC(address, expectedAmount, afterMs, callback);
     else if (cryptoKey === 'eth') checkETH(address, expectedAmount, afterMs, callback);
     else if (cryptoKey === 'ltc') checkLTC(address, expectedAmount, afterMs, callback);
     else if (cryptoKey === 'sol') checkSOL(address, expectedAmount, afterMs, callback);
+    else if (cryptoKey === 'usdt') checkUSDT(address, expectedAmount, afterMs, callback);
     else callback(new Error('Unknown crypto'), null);
   }
 
@@ -269,6 +298,11 @@
             '<div class="cry-coin__icon" style="color:#9945ff;">◎</div>',
             '<div class="cry-coin__name">Solana</div>',
             '<div class="cry-coin__sym">SOL</div>',
+          '</button>',
+          '<button class="cry-coin" data-coin="usdt">',
+            '<div class="cry-coin__icon" style="color:#26a17b;">₮</div>',
+            '<div class="cry-coin__name">Tether</div>',
+            '<div class="cry-coin__sym">USDT</div>',
           '</button>',
         '</div>',
         '<div class="cry-unavail" id="cryUnavail" style="display:none;">',
@@ -418,7 +452,7 @@
 
     /* Disable coins that have no configured address */
     var payments = getConfiguredPayments();
-    ['btc', 'eth', 'ltc', 'sol'].forEach(function (coin) {
+    ['btc', 'eth', 'ltc', 'sol', 'usdt'].forEach(function (coin) {
       var hasAddr = payments[coin] && payments[coin].enabled && payments[coin].address;
       var btn = document.querySelector('.cry-coin[data-coin="' + coin + '"]');
       if (btn && !hasAddr) btn.classList.add('cry-coin--disabled');
@@ -500,6 +534,7 @@
       else if (coin === 'eth') uri = 'ethereum:' + address + '?value=' + Math.round(amount * 1e18);
       else if (coin === 'ltc') uri = 'litecoin:' + address + '?amount=' + amount;
       else if (coin === 'sol') uri = 'solana:' + address + '?amount=' + amount;
+      else if (coin === 'usdt') uri = address; /* no universal URI scheme for TRC20 wallets */
       else uri = address;
 
       showStep(2);

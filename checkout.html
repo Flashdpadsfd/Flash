@@ -728,8 +728,10 @@
     btc: { name: 'Bitcoin',  symbol: 'BTC', color: '#f7931a', bg: '#f7931a', icon: '₿',  decimals: 8 },
     eth: { name: 'Ethereum', symbol: 'ETH', color: '#627eea', bg: '#627eea', icon: 'Ξ',  decimals: 18 },
     ltc: { name: 'Litecoin', symbol: 'LTC', color: '#bfbbbb', bg: '#a6a9aa', icon: 'Ł',  decimals: 8 },
-    sol: { name: 'Solana',   symbol: 'SOL', color: '#9945ff', bg: '#9945ff', icon: '◎', decimals: 9 }
+    sol: { name: 'Solana',   symbol: 'SOL', color: '#9945ff', bg: '#9945ff', icon: '◎', decimals: 9 },
+    usdt: { name: 'Tether',  symbol: 'USDT', color: '#26a17b', bg: '#26a17b', icon: '₮', decimals: 6 }
   };
+  var USDT_TRC20_CONTRACT = 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t';
   var SYM = { EUR: '€', USD: '$', GBP: '£' };
 
   /* ── Storage helpers ── */
@@ -830,7 +832,7 @@
      au chargement PUIS à nouveau quand la synchro dépose la clé (event storage),
      sinon une visite directe à /checkout afficherait « no wallets » à tort. */
   var cryptoGrid = document.getElementById('cryptoMethods');
-  var cryptoCoins = ['btc', 'eth', 'ltc', 'sol'];
+  var cryptoCoins = ['btc', 'eth', 'ltc', 'sol', 'usdt'];
   function renderCryptoMethods() {
     var payments = getPayments();
     cryptoGrid.innerHTML = '';
@@ -947,7 +949,7 @@
     var cfg = getPayments()[coin];
 
     /* Fetch CoinGecko price */
-    var cgIds = { btc: 'bitcoin', eth: 'ethereum', ltc: 'litecoin', sol: 'solana' };
+    var cgIds = { btc: 'bitcoin', eth: 'ethereum', ltc: 'litecoin', sol: 'solana', usdt: 'tether' };
     fetch('https://api.coingecko.com/api/v3/simple/price?ids=' + cgIds[coin] + '&vs_currencies=' + currency.toLowerCase())
       .then(function(r) { return r.json(); })
       .then(function(data) {
@@ -1000,7 +1002,8 @@
     document.getElementById('confAddr').textContent = od.address;
 
     /* QR */
-    var uri = (od.coin === 'btc' ? 'bitcoin:' : od.coin === 'eth' ? 'ethereum:' : od.coin === 'ltc' ? 'litecoin:' : 'solana:') +
+    var uri = od.coin === 'usdt' ? od.address /* no universal URI scheme for TRC20 wallets */ :
+      (od.coin === 'btc' ? 'bitcoin:' : od.coin === 'eth' ? 'ethereum:' : od.coin === 'ltc' ? 'litecoin:' : 'solana:') +
       od.address + '?amount=' + od.amount;
     /* Standard black-on-white QR — inverted QR codes can't be scanned by most wallet apps */
     document.getElementById('confQR').src = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + encodeURIComponent(uri) + '&format=png&margin=0';
@@ -1186,6 +1189,28 @@
               })
               .catch(function() { pending--; if (!pending && !done) callback(null, { confirmed: false }); });
           });
+        })
+        .catch(function(e) { callback(e, null); });
+    } else if (coin === 'usdt') {
+      /* Tronscan public API — free, no key needed. USDT on the TRC20 network. */
+      var url = 'https://apilist.tronscanapi.com/api/token_trc20/transfers?limit=20&start=0&sort=-timestamp&relatedAddress=' + encodeURIComponent(address) + '&contract_address=' + USDT_TRC20_CONTRACT;
+      fetch(url)
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          var txs = data.token_transfers || [];
+          for (var i = 0; i < txs.length; i++) {
+            var tx = txs[i];
+            if ((tx.block_ts || 0) < afterMs - 300000) continue;
+            if (tx.to_address !== address) continue;
+            var decimals = (tx.tokenInfo && tx.tokenInfo.tokenDecimal) || 6;
+            var amt = parseInt(tx.quant || '0', 10) / Math.pow(10, decimals);
+            if (amt >= expectedAmount * 0.9) {
+              var confirmed = !!tx.confirmed;
+              callback(null, { confirmed: confirmed, txHash: tx.transaction_id, amount: amt, confirmations: confirmed ? 1 : 0 });
+              return;
+            }
+          }
+          callback(null, { confirmed: false });
         })
         .catch(function(e) { callback(e, null); });
     }
