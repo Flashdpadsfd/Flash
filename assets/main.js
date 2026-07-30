@@ -553,16 +553,40 @@ window.NX_ICONS = function (name) {
   };
 
   /* Texte admin (Visual Editor, nexus_content) autorisé à contenir un minimum
-     de mise en forme (ex. <br> dans une description) : on échappe tout puis on
-     ne réautorise qu'une poignée de balises sans attributs, plutôt que de
-     poser du innerHTML brut. Un <script>, onerror=, javascript:… reste du texte
-     inerte affiché tel quel. */
-  function sanitizeRichText(html) {
-    var div = document.createElement('div');
-    div.textContent = String(html == null ? '' : html);
-    return div.innerHTML.replace(/&lt;(\/?)(br|b|strong|i|em)\s*\/?&gt;/gi, '<$1$2>');
+     de mise en forme (ex. <br> dans une description). Construit directement en
+     noeuds DOM (createElement/createTextNode) — jamais de innerHTML/outerHTML,
+     donc aucune chaîne n'est jamais réinterprétée comme du HTML : un
+     <script>, onerror=, javascript:… reste toujours du texte inerte. */
+  var RICH_TEXT_TAGS = { br: 1, b: 1, strong: 1, i: 1, em: 1 };
+  var RICH_TEXT_RE = /<\/?\s*(br|b|strong|i|em)\s*\/?>/gi;
+  function buildRichTextFragment(html) {
+    var raw = String(html == null ? '' : html);
+    var frag = document.createDocumentFragment();
+    var stack = [frag];
+    var last = 0, m;
+    RICH_TEXT_RE.lastIndex = 0;
+    while ((m = RICH_TEXT_RE.exec(raw))) {
+      if (m.index > last) stack[stack.length - 1].appendChild(document.createTextNode(raw.slice(last, m.index)));
+      var tag = m[1].toLowerCase();
+      if (/^<\//.test(m[0])) {
+        if (stack.length > 1) stack.pop();
+      } else if (tag === 'br') {
+        stack[stack.length - 1].appendChild(document.createElement('br'));
+      } else {
+        var el = document.createElement(tag);
+        stack[stack.length - 1].appendChild(el);
+        stack.push(el);
+      }
+      last = RICH_TEXT_RE.lastIndex;
+    }
+    if (last < raw.length) stack[stack.length - 1].appendChild(document.createTextNode(raw.slice(last)));
+    return frag;
   }
-  window._nexusSanitizeRichText = sanitizeRichText;
+  function applyRichText(el, html) {
+    while (el.firstChild) el.removeChild(el.firstChild);
+    el.appendChild(buildRichTextFragment(html));
+  }
+  window._nexusApplyRichText = applyRichText;
 
   /* Surcharges de texte définies dans l'admin (Visual Editor) — prioritaires sur toutes les langues */
   function getTextOverrides() {
@@ -571,7 +595,7 @@ window.NX_ICONS = function (name) {
   function applyTextOverrides() {
     var o = getTextOverrides();
     document.querySelectorAll('[data-i18n]').forEach(function (el) { if (o[el.dataset.i18n]) el.textContent = o[el.dataset.i18n]; });
-    document.querySelectorAll('[data-i18n-html]').forEach(function (el) { if (o[el.dataset.i18nHtml]) el.innerHTML = sanitizeRichText(o[el.dataset.i18nHtml]); });
+    document.querySelectorAll('[data-i18n-html]').forEach(function (el) { if (o[el.dataset.i18nHtml]) applyRichText(el, o[el.dataset.i18nHtml]); });
   }
   window.addEventListener('storage', function (e) {
     if (e.key === 'nexus_text_overrides') applyTextOverrides();
@@ -580,7 +604,7 @@ window.NX_ICONS = function (name) {
   function applyLang(lang) {
     var t = TRANSLATIONS[lang] || TRANSLATIONS.EN;
     document.querySelectorAll('[data-i18n]').forEach(function (el) { if (t[el.dataset.i18n] !== undefined) el.textContent = t[el.dataset.i18n]; });
-    document.querySelectorAll('[data-i18n-html]').forEach(function (el) { if (t[el.dataset.i18nHtml] !== undefined) el.innerHTML = t[el.dataset.i18nHtml]; });
+    document.querySelectorAll('[data-i18n-html]').forEach(function (el) { if (t[el.dataset.i18nHtml] !== undefined) applyRichText(el, t[el.dataset.i18nHtml]); });
     document.documentElement.dir = lang === 'AR' ? 'rtl' : 'ltr';
     applyTextOverrides();
   }
@@ -787,7 +811,13 @@ window.NX_ICONS = function (name) {
     if (!tc) return;
     var t = document.createElement('div');
     t.className = 'toast';
-    t.innerHTML = '<span class="toast__icon">'+(icon||ICON('check'))+'</span><span>'+String(msg).replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</span>';
+    var iconSpan = document.createElement('span');
+    iconSpan.className = 'toast__icon';
+    iconSpan.innerHTML = icon || ICON('check'); /* toujours un nom d'icône interne fixe, jamais une entrée utilisateur */
+    var msgSpan = document.createElement('span');
+    msgSpan.textContent = String(msg == null ? '' : msg);
+    t.appendChild(iconSpan);
+    t.appendChild(msgSpan);
     tc.appendChild(t);
     setTimeout(function() { t.classList.add('hide'); setTimeout(function() { t.parentNode && t.parentNode.removeChild(t); }, 250); }, 3000);
   };

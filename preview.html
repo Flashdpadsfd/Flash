@@ -227,26 +227,27 @@
 
   <script src="assets/content-sync.js?v=2"></script>
   <script src="assets/email-config.js?v=1"></script>
-  <script src="assets/main.js?v=21"></script>
+  <script src="assets/main.js?v=22"></script>
   <script src="assets/crypto-checkout.js?v=3"></script>
   <script src="assets/account-menu.js?v=4" defer></script>
   <script>
   (function() {
     /* nexus_content vient de l'admin (Visual Editor) : on autorise un minimum
-       de mise en forme (<br>, <b>…) sans jamais poser du innerHTML brut. */
-    function richText(s) {
-      return window._nexusSanitizeRichText ? window._nexusSanitizeRichText(s)
-        : String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+       de mise en forme (<br>, <b>…) via applyRichText (assets/main.js), qui
+       construit des noeuds DOM directement — jamais de innerHTML brut. */
+    function richText(el, s) {
+      if (window._nexusApplyRichText) { window._nexusApplyRichText(el, s); return; }
+      el.textContent = String(s == null ? '' : s);
     }
     function applyContent(c) {
       if (!c) return;
       if (c.siteName) document.querySelectorAll('.nav__logo, .drawer__logo, .footer__logo').forEach(function(el) { el.textContent = c.siteName; });
       if (c.homeEyebrow) { var e = document.getElementById('heroEyebrow'); if (e) e.textContent = c.homeEyebrow; }
-      if (c.homeTitle)   { var e = document.getElementById('heroTitle');   if (e) e.innerHTML  = richText(c.homeTitle); }
+      if (c.homeTitle)   { var e = document.getElementById('heroTitle');   if (e) richText(e, c.homeTitle); }
       if (c.homeSub)     { var e = document.getElementById('heroSub');     if (e) e.textContent = c.homeSub; }
       if (c.homeCta1)    { var e = document.getElementById('heroCta1');    if (e) e.textContent = c.homeCta1; }
       if (c.homeCta2)    { var e = document.getElementById('heroCta2');    if (e) e.textContent = c.homeCta2; }
-      if (c.footerDesc)  document.querySelectorAll('.footer__desc').forEach(function(el) { el.innerHTML  = richText(c.footerDesc); });
+      if (c.footerDesc)  document.querySelectorAll('.footer__desc').forEach(function(el) { richText(el, c.footerDesc); });
       if (c.footerCopy)  document.querySelectorAll('.footer__copy').forEach(function(el) { el.textContent = c.footerCopy; });
     }
     try { applyContent(JSON.parse(localStorage.getItem('nexus_content'))); } catch(e) {}
