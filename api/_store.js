@@ -63,6 +63,9 @@ async function ensure() {
     ' first_seen DATETIME,' +
     ' last_seen DATETIME,' +
     ' login_count INT DEFAULT 0,' +
+    ' password_hash VARCHAR(255) NULL,' +      /* scrypt$<sel>$<hash> — voir _password.js. NULL = pas de mdp (compte email-only) */
+    ' login_attempts INT DEFAULT 0,' +         /* essais de connexion par mot de passe échoués d'affilée */
+    ' login_locked_until BIGINT NULL,' +       /* epoch ms — verrouillage temporaire anti-bruteforce */
     ' INDEX idx_email (email)' +
     ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4'
   );
@@ -72,9 +75,31 @@ async function ensure() {
     ' code VARCHAR(12),' +
     ' attempts INT DEFAULT 0,' +
     ' expires_at BIGINT NULL,' +          /* epoch ms (pas DATETIME : évite les bugs de fuseau) */
-    ' cooldown_until BIGINT NULL' +       /* epoch ms */
+    ' cooldown_until BIGINT NULL,' +      /* epoch ms */
+    ' pending_password_hash VARCHAR(255) NULL' +  /* inscription par mot de passe : le hash n'est activé qu'une fois le code vérifié (preuve de propriété de l'email) */
     ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4'
   );
+
+  /* Migration : bases existantes créées avant l'ajout du mot de passe — ajoute
+     les colonnes manquantes sans jamais toucher aux données déjà là. */
+  try {
+    var colC = await p.query(
+      "SELECT COLUMN_NAME FROM information_schema.COLUMNS" +
+      " WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'clients' AND COLUMN_NAME = 'password_hash'"
+    );
+    if (!colC[0].length) {
+      await p.query('ALTER TABLE clients ADD COLUMN password_hash VARCHAR(255) NULL, ADD COLUMN login_attempts INT DEFAULT 0, ADD COLUMN login_locked_until BIGINT NULL');
+    }
+  } catch (e) { console.error('[FlashShp] clients password migration skipped:', e && e.message); }
+  try {
+    var colO = await p.query(
+      "SELECT COLUMN_NAME FROM information_schema.COLUMNS" +
+      " WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'otp_codes' AND COLUMN_NAME = 'pending_password_hash'"
+    );
+    if (!colO[0].length) {
+      await p.query('ALTER TABLE otp_codes ADD COLUMN pending_password_hash VARCHAR(255) NULL');
+    }
+  } catch (e) { console.error('[FlashShp] otp_codes pending_password migration skipped:', e && e.message); }
 
   /* Migration des anciennes bases : expires_at/cooldown_until étaient en
      DATETIME. Le round-trip mysql2↔MySQL relisait la valeur comme « passée »,
@@ -191,27 +216,83 @@ async function getClient(id) {
   return (res[0] && res[0][0]) || null;
 }
 
-/* ── Codes de connexion par email (OTP) ── */
+/* ── Authentification par mot de passe ── */
 
-/* Enregistre un code (expire dans 600 s), en réinitialisant les essais. */
-async function saveOtp(email, code) {
+/* Client par email, avec les champs propres à l'auth par mot de passe (jamais
+   exposés via listClients/getClient — ceux-ci alimentent le panneau admin). */
+async function getClientByEmail(email) {
+  if (!available()) return null;
   await ensure();
-  var exp = Date.now() + 600 * 1000;   /* epoch ms */
+  var res = await getPool().query(
+    'SELECT id, username, avatar, email, provider, password_hash AS passwordHash,' +
+    ' login_attempts AS loginAttempts, login_locked_until AS loginLockedUntil' +
+    ' FROM clients WHERE email = ? LIMIT 1',
+    [String(email).toLowerCase()]
+  );
+  return (res[0] && res[0][0]) || null;
+}
+
+/* Active/replace le mot de passe d'un compte (email prouvé par code au
+   préalable — voir auth-email-verify.js). Crée la ligne client si besoin. */
+async function setClientPassword(email, passwordHash) {
+  if (!available()) return;
+  await ensure();
+  var lower = String(email).toLowerCase();
+  var id = 'email:' + lower;
+  var now = new Date();
   await getPool().query(
-    'INSERT INTO otp_codes (email, code, attempts, expires_at) VALUES (?, ?, 0, ?)' +
-    ' ON DUPLICATE KEY UPDATE code=VALUES(code), attempts=0, expires_at=VALUES(expires_at)',
-    [email, String(code), exp]
+    'INSERT INTO clients (id, username, avatar, email, provider, first_seen, last_seen, login_count, password_hash)' +
+    ' VALUES (?, ?, NULL, ?, ?, ?, ?, 0, ?)' +
+    ' ON DUPLICATE KEY UPDATE password_hash = VALUES(password_hash)',
+    [id, lower.split('@')[0] || 'Client', lower, 'email', now, now, passwordHash]
   );
 }
 
-/* Renvoie { code, attempts } si un code valide (non expiré) existe, sinon null. */
+/* Comptabilise une tentative de connexion par mot de passe : succès → remet
+   le compteur à zéro et met à jour last_seen/login_count (comme recordClient) ;
+   échec → incrémente, et verrouille 15 min au 5e essai raté d'affilée. */
+async function recordPasswordLoginResult(email, success) {
+  if (!available()) return;
+  await ensure();
+  var p = getPool();
+  var lower = String(email).toLowerCase();
+  if (success) {
+    await p.query(
+      'UPDATE clients SET login_attempts = 0, login_locked_until = NULL, last_seen = ?, login_count = login_count + 1 WHERE email = ?',
+      [new Date(), lower]
+    );
+  } else {
+    var res = await p.query('SELECT login_attempts FROM clients WHERE email = ? LIMIT 1', [lower]);
+    var attempts = ((res[0] && res[0][0] && res[0][0].login_attempts) || 0) + 1;
+    var lockUntil = attempts >= 5 ? (Date.now() + 15 * 60 * 1000) : null;
+    await p.query('UPDATE clients SET login_attempts = ?, login_locked_until = ? WHERE email = ?', [attempts, lockUntil, lower]);
+  }
+}
+
+/* ── Codes de connexion par email (OTP) ── */
+
+/* Enregistre un code (expire dans 600 s), en réinitialisant les essais.
+   pendingPasswordHash (optionnel) : inscription par mot de passe — n'est
+   activé sur le compte qu'une fois ce code vérifié (voir auth-email-verify.js). */
+async function saveOtp(email, code, pendingPasswordHash) {
+  await ensure();
+  var exp = Date.now() + 600 * 1000;   /* epoch ms */
+  await getPool().query(
+    'INSERT INTO otp_codes (email, code, attempts, expires_at, pending_password_hash) VALUES (?, ?, 0, ?, ?)' +
+    ' ON DUPLICATE KEY UPDATE code=VALUES(code), attempts=0, expires_at=VALUES(expires_at), pending_password_hash=VALUES(pending_password_hash)',
+    [email, String(code), exp, pendingPasswordHash || null]
+  );
+}
+
+/* Renvoie { code, attempts, pendingPasswordHash } si un code valide (non
+   expiré) existe, sinon null. */
 async function getOtp(email) {
   await ensure();
-  var res = await getPool().query('SELECT code, attempts, expires_at FROM otp_codes WHERE email = ? LIMIT 1', [email]);
+  var res = await getPool().query('SELECT code, attempts, expires_at, pending_password_hash FROM otp_codes WHERE email = ? LIMIT 1', [email]);
   var r = res[0] && res[0][0];
   if (!r || !r.code || !r.expires_at) return null;
   if (Number(r.expires_at) < Date.now()) { await deleteOtp(email); return null; }
-  return { code: r.code, attempts: r.attempts || 0 };
+  return { code: r.code, attempts: r.attempts || 0, pendingPasswordHash: r.pending_password_hash || null };
 }
 
 async function bumpOtpAttempts(email, attempts) {
@@ -247,6 +328,9 @@ module.exports = {
   recordClient: recordClient,
   listClients: listClients,
   getClient: getClient,
+  getClientByEmail: getClientByEmail,
+  setClientPassword: setClientPassword,
+  recordPasswordLoginResult: recordPasswordLoginResult,
   saveOtp: saveOtp,
   getOtp: getOtp,
   bumpOtpAttempts: bumpOtpAttempts,

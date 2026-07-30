@@ -62,6 +62,7 @@ module.exports = async function (req, res) {
     }
 
     /* Succès : on brûle le code, ouvre la session, enregistre le client. */
+    var pendingPasswordHash = rec.pendingPasswordHash;
     await store.deleteOtp(email);
     var username = email.split('@')[0] || 'Client';
     session.setSession(res, { sub: 'email:' + email, username: username, avatar: null, email: email });
@@ -69,6 +70,14 @@ module.exports = async function (req, res) {
     try {
       await store.recordClient({ id: 'email:' + email, username: username, avatar: null, email: email, provider: 'email' });
     } catch (e) { console.error('[FlashShp] record (email) failed:', e && e.message); }
+
+    /* Inscription par mot de passe : le code ne fait qu'être vérifié qu'une
+       fois la propriété de l'email prouvée — sans quoi n'importe qui pourrait
+       poser un mot de passe sur l'adresse de quelqu'un d'autre. */
+    if (pendingPasswordHash) {
+      try { await store.setClientPassword(email, pendingPasswordHash); }
+      catch (e) { console.error('[FlashShp] set password after verify failed:', e && e.message); }
+    }
 
     res.status(200).json({ ok: true });
   } catch (e) {

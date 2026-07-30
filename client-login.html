@@ -9,82 +9,76 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400..800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
   <style>
-    :root{
-      --cl-bg:#000104; --cl-card:#06091a; --cl-card-line:rgba(255,255,255,.08);
-      --cl-primary:#7257ff; --cl-primary-2:#6d4eff; --cl-primary-3:#5936e8; --cl-purple:#a855f7;
-      --cl-red:#f87171; --cl-ink:#fff; --cl-dim:rgba(255,255,255,.5); --cl-faint:#9ba0b0;
-    }
+    :root{ --bg:#08080a; --bd:rgba(255,255,255,.1); --bd2:rgba(255,255,255,.2); --mut:rgba(255,255,255,.5); --faint:rgba(255,255,255,.38); }
     *{box-sizing:border-box;}
-    body{margin:0;background:var(--cl-bg);color:#fff;font-family:'Plus Jakarta Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased;}
+    body{margin:0;background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased;}
 
     .cl-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;position:relative;overflow:hidden;}
     .cl-wrap::before{content:'';position:absolute;left:18%;top:12%;width:520px;height:520px;
-      background:radial-gradient(circle, rgba(114,87,255,.14), transparent 68%);pointer-events:none;filter:blur(10px);}
+      background:radial-gradient(circle, rgba(255,255,255,.05), transparent 68%);pointer-events:none;filter:blur(10px);}
     .cl-wrap::after{content:'';position:absolute;right:14%;bottom:8%;width:460px;height:460px;
-      background:radial-gradient(circle, rgba(168,85,247,.12), transparent 68%);pointer-events:none;filter:blur(10px);}
+      background:radial-gradient(circle, rgba(255,255,255,.035), transparent 68%);pointer-events:none;filter:blur(10px);}
 
-    .cl-card{position:relative;width:100%;max-width:440px;background:var(--cl-card);border:1px solid var(--cl-card-line);
+    .cl-card{position:relative;width:100%;max-width:440px;background:rgba(255,255,255,.02);border:1px solid var(--bd);
       border-radius:18px;box-shadow:0 30px 80px rgba(0,0,0,.6);overflow:hidden;backdrop-filter:blur(12px);}
     .cl-glow{position:absolute;width:160px;height:160px;border-radius:50%;filter:blur(46px);pointer-events:none;}
-    .cl-glow--a{top:-70px;left:-70px;background:rgba(114,87,255,.22);}
-    .cl-glow--b{bottom:-70px;right:-70px;background:rgba(168,85,247,.16);}
+    .cl-glow--a{top:-70px;left:-70px;background:rgba(255,255,255,.06);}
+    .cl-glow--b{bottom:-70px;right:-70px;background:rgba(255,255,255,.04);}
 
-    .cl-head{position:relative;z-index:1;border-bottom:1px solid rgba(255,255,255,.05);background:rgba(255,255,255,.012);padding:22px 24px;}
+    .cl-head{position:relative;z-index:1;border-bottom:1px solid rgba(255,255,255,.05);background:rgba(255,255,255,.012);padding:20px 24px;}
     .cl-close{position:absolute;top:16px;right:16px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;
       border-radius:8px;color:rgba(255,255,255,.4);text-decoration:none;transition:color .15s,background .15s;}
     .cl-close:hover{color:#fff;background:rgba(255,255,255,.08);}
-    .cl-brand{display:flex;align-items:center;justify-content:center;gap:10px;}
-    .cl-brand__badge{width:34px;height:34px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
-      background:linear-gradient(135deg,rgba(114,87,255,.28),rgba(114,87,255,.12));border:1.5px solid rgba(114,87,255,.55);color:#a99bff;}
-    .cl-brand__name{font-family:'Space Grotesk',sans-serif;font-size:19px;font-weight:700;letter-spacing:-.3px;color:var(--cl-primary);}
+    .cl-brand{display:flex;align-items:center;justify-content:center;}
+    .cl-brand__name{font-family:'Space Grotesk',sans-serif;font-size:21px;font-weight:700;letter-spacing:-.4px;}
+    .cl-brand__name span{background:linear-gradient(135deg,#8a909c,#fff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
 
     .cl-body{position:relative;z-index:1;padding:22px 24px 26px;}
 
     .cl-tabs{display:flex;gap:6px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:11px;padding:4px;margin-bottom:22px;}
     .cl-tab{flex:1;padding:9px 0;border-radius:8px;border:1px solid transparent;background:none;font-family:inherit;
-      font-size:13.5px;font-weight:600;color:var(--cl-faint);cursor:pointer;transition:all .15s;}
+      font-size:13.5px;font-weight:600;color:var(--mut);cursor:pointer;transition:all .15s;}
     .cl-tab:hover{color:#fff;}
-    .cl-tab.active{background:rgba(114,87,255,.15);border-color:rgba(114,87,255,.35);color:#fff;}
+    .cl-tab.active{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.14);color:#fff;}
 
     .cl-label{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:#fff;margin-bottom:8px;}
-    .cl-label svg{color:var(--cl-primary);flex-shrink:0;}
-    .cl-label .req{color:var(--cl-red);}
+    .cl-label svg{color:rgba(255,255,255,.55);flex-shrink:0;}
+    .cl-label .req{color:#f87171;}
 
     .cl-field{position:relative;margin-bottom:16px;}
     .cl-field svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.32);pointer-events:none;}
     .cl-input{width:100%;height:46px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);
       color:#fff;font-family:inherit;font-size:14.5px;padding:0 14px 0 40px;transition:border-color .15s,background .15s;}
-    .cl-input:focus{outline:none;border-color:rgba(114,87,255,.6);background:rgba(255,255,255,.06);}
+    .cl-input:focus{outline:none;border-color:var(--bd2);background:rgba(255,255,255,.06);}
     .cl-input::placeholder{color:rgba(255,255,255,.28);}
 
     .cl-title{font-family:'Space Grotesk','Plus Jakarta Sans',sans-serif;font-size:19px;font-weight:700;margin:0 0 6px;letter-spacing:-.3px;}
-    .cl-sub{font-size:13px;color:var(--cl-dim);line-height:1.55;margin:0 0 20px;}
+    .cl-sub{font-size:13px;color:var(--mut);line-height:1.55;margin:0 0 20px;}
     .cl-sub b{color:#fff;font-weight:600;}
 
     .cl-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:46px;border-radius:10px;
-      font-family:inherit;font-size:14.5px;font-weight:700;cursor:pointer;border:none;color:#fff;
-      background:linear-gradient(to right,var(--cl-primary-3),var(--cl-primary-2));
-      box-shadow:0 10px 26px rgba(114,87,255,.35);transition:transform .14s,box-shadow .2s,opacity .2s;}
-    .cl-btn:hover{transform:translateY(-1px);box-shadow:0 14px 30px rgba(114,87,255,.45);}
+      font-family:inherit;font-size:14.5px;font-weight:700;cursor:pointer;border:1px solid transparent;color:#15161a;
+      background:linear-gradient(135deg,#5b616e,#f6f7f9);
+      box-shadow:0 10px 26px rgba(0,0,0,.35);transition:transform .14s,box-shadow .2s,opacity .2s;}
+    .cl-btn:hover{transform:translateY(-1px);box-shadow:0 14px 30px rgba(0,0,0,.45);}
     .cl-btn[disabled]{opacity:.55;cursor:not-allowed;transform:none;}
 
     .cl-otp{display:flex;gap:8px;justify-content:center;margin:4px 0 20px;}
     .cl-otp input{width:44px;height:52px;border-radius:10px;background:rgba(255,255,255,.03);border:1.5px solid rgba(255,255,255,.1);
       color:#fff;font-family:'Space Grotesk',monospace;font-size:22px;font-weight:600;text-align:center;transition:border-color .12s,background .12s;}
-    .cl-otp input:focus{outline:none;border-color:var(--cl-primary);background:rgba(114,87,255,.08);}
-    .cl-otp input.filled{border-color:rgba(114,87,255,.5);}
+    .cl-otp input:focus{outline:none;border-color:#fff;background:rgba(255,255,255,.07);}
+    .cl-otp input.filled{border-color:var(--bd2);}
     @media (max-width:380px){ .cl-otp input{width:38px;height:48px;font-size:19px;} }
 
-    .cl-link{margin-top:14px;display:block;width:100%;text-align:center;background:none;border:none;color:var(--cl-faint);
+    .cl-link{margin-top:14px;display:block;width:100%;text-align:center;background:none;border:none;color:var(--mut);
       font-size:12.5px;cursor:pointer;font-family:inherit;}
     .cl-link:hover{color:#fff;}
-    .cl-foot{margin-top:18px;font-size:12px;color:rgba(255,255,255,.32);text-align:center;line-height:1.6;}
-    .cl-foot b{color:var(--cl-primary);font-weight:600;}
+    .cl-foot{margin-top:18px;font-size:12px;color:var(--faint);text-align:center;line-height:1.6;}
 
     .cl-msg{margin-bottom:16px;font-size:12.5px;padding:10px 13px;border-radius:9px;display:none;text-align:center;}
     .cl-msg.show{display:block;}
     .cl-msg--err{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.28);color:#fda4a4;}
-    .cl-msg--ok{background:rgba(114,87,255,.08);border:1px solid rgba(114,87,255,.25);color:#cabfff;}
+    .cl-msg--ok{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);color:rgba(255,255,255,.72);}
   </style>
 </head>
 <body>
@@ -98,10 +92,7 @@
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
         </a>
         <div class="cl-brand">
-          <span class="cl-brand__badge">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg>
-          </span>
-          <span class="cl-brand__name">FlashShp</span>
+          <span class="cl-brand__name">Flash<span>Shp</span></span>
         </div>
       </div>
 
@@ -117,7 +108,7 @@
           </div>
 
           <div class="cl-title" id="clStepTitle">Welcome back</div>
-          <div class="cl-sub" id="clStepSub">Enter your email and we'll send you a one-time code to continue.</div>
+          <div class="cl-sub" id="clStepSub">Enter your email and password to continue.</div>
 
           <form id="clEmailForm" autocomplete="on">
             <label class="cl-label" for="clEmail">
@@ -128,15 +119,28 @@
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
               <input class="cl-input" type="email" id="clEmail" placeholder="your@email.com" required autocomplete="email" />
             </div>
-            <button class="cl-btn" type="submit" id="clSendBtn">Send me a code</button>
+
+            <div id="clPasswordGroup">
+              <label class="cl-label" for="clPassword">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                Password <span class="req">*</span>
+              </label>
+              <div class="cl-field">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <input class="cl-input" type="password" id="clPassword" placeholder="Enter your password" autocomplete="current-password" />
+              </div>
+            </div>
+
+            <button class="cl-btn" type="submit" id="clSendBtn">Sign In</button>
           </form>
 
-          <div class="cl-foot">No password to remember — <b>just your inbox</b>.</div>
+          <button class="cl-link" type="button" id="clMethodToggle">Sign in with an email code instead</button>
+          <div class="cl-foot" id="clFoot">No account yet? Switch to <b>Register</b> above.</div>
         </div>
 
         <!-- Step 2 : verify code -->
         <div id="clStep2" style="display:none;">
-          <div class="cl-title">Enter your code</div>
+          <div class="cl-title" id="clStep2Title">Enter your code</div>
           <div class="cl-sub">We sent a 6-digit code to <b id="clVMail"></b></div>
 
           <form id="clCodeForm" autocomplete="off">
@@ -170,8 +174,13 @@
     var emailForm = document.getElementById('clEmailForm');
     var codeForm = document.getElementById('clCodeForm');
     var emailInput = document.getElementById('clEmail');
+    var passwordInput = document.getElementById('clPassword');
+    var passwordGroup = document.getElementById('clPasswordGroup');
     var sendBtn = document.getElementById('clSendBtn');
     var verifyBtn = document.getElementById('clVerifyBtn');
+    var methodToggle = document.getElementById('clMethodToggle');
+    var footEl = document.getElementById('clFoot');
+    var step2Title = document.getElementById('clStep2Title');
     var otp = Array.prototype.slice.call(document.querySelectorAll('#clOtp input'));
     var currentEmail = '';
     var verifying = false;   /* garde anti-double-envoi (évite un "Network error" fantôme) */
@@ -182,26 +191,53 @@
     function showErr(m){ okBox.classList.remove('show'); errBox.textContent=m; errBox.classList.add('show'); }
     function showOk(m){ errBox.classList.remove('show'); okBox.textContent=m; okBox.classList.add('show'); }
 
-    /* ── Sign In / Register : deux entrées cosmétiques vers le même flux email
-       + code (un compte est créé au premier code vérifié — pas de mot de
-       passe à gérer), comme le lien "Create Account" du menu le fait déjà. ── */
+    /* ── Tab (Sign In / Register) × Method (password / email code) ──
+       4 combinations, 2 real backends: password path hits
+       auth-password-login / auth-password-register ; code path always hits
+       auth-email-request + the shared OTP step (which also happens to be
+       how a pending password gets confirmed — see auth-email-verify.js). */
     var tabSignIn = document.getElementById('clTabSignIn');
     var tabRegister = document.getElementById('clTabRegister');
     var stepTitle = document.getElementById('clStepTitle');
     var stepSub = document.getElementById('clStepSub');
-    function setTab(mode) {
-      var isRegister = mode === 'register';
-      tabSignIn.classList.toggle('active', !isRegister);
-      tabRegister.classList.toggle('active', isRegister);
-      tabSignIn.setAttribute('aria-selected', String(!isRegister));
-      tabRegister.setAttribute('aria-selected', String(isRegister));
-      stepTitle.textContent = isRegister ? 'Create your account' : 'Welcome back';
-      stepSub.textContent = isRegister
-        ? "Enter your email and we'll send you a code to set up your account."
-        : "Enter your email and we'll send you a one-time code to continue.";
+    var tab = 'signin';     // 'signin' | 'register'
+    var method = 'password'; // 'password' | 'code'
+
+    function render() {
+      tabSignIn.classList.toggle('active', tab === 'signin');
+      tabRegister.classList.toggle('active', tab === 'register');
+      tabSignIn.setAttribute('aria-selected', String(tab === 'signin'));
+      tabRegister.setAttribute('aria-selected', String(tab === 'register'));
+
+      var usePw = method === 'password';
+      passwordGroup.style.display = usePw ? '' : 'none';
+      passwordInput.required = usePw;
+      passwordInput.autocomplete = tab === 'register' ? 'new-password' : 'current-password';
+
+      if (tab === 'signin') {
+        stepTitle.textContent = 'Welcome back';
+        stepSub.textContent = usePw ? "Enter your email and password to continue." : "Enter your email and we'll send you a one-time code.";
+        sendBtn.textContent = usePw ? 'Sign In' : 'Send me a code';
+        methodToggle.textContent = usePw ? 'Sign in with an email code instead' : '← Sign in with a password instead';
+        footEl.innerHTML = '';
+        footEl.appendChild(document.createTextNode('No account yet? Switch to '));
+        var b1 = document.createElement('b'); b1.textContent = 'Register'; footEl.appendChild(b1);
+        footEl.appendChild(document.createTextNode(' above.'));
+      } else {
+        stepTitle.textContent = 'Create your account';
+        stepSub.textContent = usePw ? "Choose a password — we'll email you a code to confirm it's really you." : "Enter your email and we'll send you a code to create your account.";
+        sendBtn.textContent = usePw ? 'Create Account' : 'Send me a code';
+        methodToggle.textContent = usePw ? 'Sign up with just an email code instead' : '← Set a password instead';
+        footEl.innerHTML = '';
+        footEl.appendChild(document.createTextNode('No password needed if you prefer — '));
+        var b2 = document.createElement('b'); b2.textContent = 'just your inbox'; footEl.appendChild(b2);
+        footEl.appendChild(document.createTextNode('.'));
+      }
     }
-    tabSignIn.addEventListener('click', function () { setTab('signin'); });
-    tabRegister.addEventListener('click', function () { setTab('register'); });
+    tabSignIn.addEventListener('click', function () { tab = 'signin'; method = 'password'; render(); });
+    tabRegister.addEventListener('click', function () { tab = 'register'; method = 'password'; render(); });
+    methodToggle.addEventListener('click', function () { method = method === 'password' ? 'code' : 'password'; render(); });
+    render();
 
     /* ── OTP boxes behaviour ── */
     function getCode(){ return otp.map(function(i){ return i.value; }).join(''); }
@@ -226,17 +262,17 @@
       });
     });
 
-    function toStep2(email){
+    function toStep2(email, title){
       currentEmail = email;
       document.getElementById('clVMail').textContent = email;
-      /* Step 2 explique déjà « We sent a code to… » : pas de bandeau redondant. */
+      step2Title.textContent = title || 'Enter your code';
       okBox.classList.remove('show'); errBox.classList.remove('show');
       step1.style.display = 'none';
       step2.style.display = 'block';
       setTimeout(function(){ otp[0].focus(); }, 60);
     }
 
-    function requestCode(email, btn, label){
+    function requestCode(email, purpose, btn, label){
       btn.disabled = true; btn.textContent = 'Sending…';
       return fetch('/api/auth-email-request', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email: email }) })
         .then(function(r){ return r.json().then(function(j){ return { ok:r.ok, status:r.status, body:j }; }); })
@@ -251,11 +287,53 @@
         .then(function(ok){ btn.disabled = false; btn.textContent = label; return ok; });
     }
 
+    /* Inscription par mot de passe : hachage + envoi du code côté serveur,
+       le mot de passe n'est activé qu'après vérification (même étape 2). */
+    function requestPasswordRegister(email, password, btn, label){
+      btn.disabled = true; btn.textContent = 'Sending…';
+      return fetch('/api/auth-password-register', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email: email, password: password }) })
+        .then(function(r){ return r.json().then(function(j){ return { ok:r.ok, status:r.status, body:j }; }); })
+        .then(function(res){
+          if (res.ok && res.body && res.body.ok) { showOk('Code sent to ' + email + '. Confirm it to finish creating your account.'); return true; }
+          showErr((res.body && res.body.error) || 'Could not create the account. Try again.');
+          return false;
+        })
+        .catch(function(){ showErr('Network error. Please try again.'); return false; })
+        .then(function(ok){ btn.disabled = false; btn.textContent = label; return ok; });
+    }
+
+    function submitPasswordLogin(email, password, btn, label){
+      btn.disabled = true; btn.textContent = 'Signing in…';
+      fetch('/api/auth-password-login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email: email, password: password }) })
+        .then(function(r){ return r.json().then(function(j){ return { ok:r.ok, status:r.status, body:j }; }); })
+        .then(function(res){
+          if (res.ok && res.body && res.body.ok) { showOk('Signed in! Redirecting…'); location.href = '/'; return; }
+          showErr((res.body && res.body.error) || 'Invalid email or password.');
+          btn.disabled = false; btn.textContent = label;
+        })
+        .catch(function(){ showErr('Network error. Please try again.'); btn.disabled = false; btn.textContent = label; });
+    }
+
     emailForm.addEventListener('submit', function (e) {
       e.preventDefault();
       var email = (emailInput.value || '').trim().toLowerCase();
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { showErr('Please enter a valid email.'); return; }
-      requestCode(email, sendBtn, 'Send me a code').then(function(ok){ if (ok) toStep2(email); });
+      var label = sendBtn.textContent;
+
+      if (method === 'code') {
+        requestCode(email).then(function(ok){ if (ok) toStep2(email, 'Enter your code'); });
+        return;
+      }
+
+      /* method === 'password' */
+      var password = passwordInput.value || '';
+      if (tab === 'signin') {
+        if (!password) { showErr('Please enter your password.'); return; }
+        submitPasswordLogin(email, password, sendBtn, label);
+      } else {
+        if (password.length < 8) { showErr('Password must be at least 8 characters.'); return; }
+        requestPasswordRegister(email, password, sendBtn, label).then(function(ok){ if (ok) toStep2(email, 'Confirm your account'); });
+      }
     });
 
     function submitCode(){
@@ -278,7 +356,7 @@
 
     document.getElementById('clResend').addEventListener('click', function () {
       if (!currentEmail) return;
-      requestCode(currentEmail, this, 'Resend code');
+      requestCode(currentEmail, null, this, 'Resend code');
     });
     document.getElementById('clReset').addEventListener('click', function () {
       step2.style.display = 'none'; step1.style.display = 'block';
