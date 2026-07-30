@@ -7,65 +7,57 @@
   <meta name="robots" content="noindex" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400..800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Lancelot&family=Instrument+Serif&family=Plus+Jakarta+Sans:wght@400..800&display=swap" rel="stylesheet" />
   <style>
-    :root{ --bg:#08080a; --bd:rgba(255,255,255,.1); --bd2:rgba(255,255,255,.2); --mut:rgba(255,255,255,.5); --faint:rgba(255,255,255,.38); }
+    :root{ --bg:#08080a; --bd:rgba(255,255,255,.09); --bd2:rgba(255,255,255,.22); --mut:rgba(255,255,255,.5); --faint:rgba(255,255,255,.35); }
     *{box-sizing:border-box;}
     body{margin:0;background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased;}
 
     .cl-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;position:relative;overflow:hidden;}
-    .cl-wrap::before{content:'';position:absolute;left:18%;top:12%;width:520px;height:520px;
-      background:radial-gradient(circle, rgba(255,255,255,.05), transparent 68%);pointer-events:none;filter:blur(10px);}
-    .cl-wrap::after{content:'';position:absolute;right:14%;bottom:8%;width:460px;height:460px;
-      background:radial-gradient(circle, rgba(255,255,255,.035), transparent 68%);pointer-events:none;filter:blur(10px);}
+    .cl-wrap::before{content:'';position:absolute;left:50%;top:-10%;width:820px;height:480px;transform:translateX(-50%);
+      background:radial-gradient(ellipse at center, rgba(255,255,255,.05), transparent 62%);pointer-events:none;}
 
-    .cl-card{position:relative;width:100%;max-width:440px;background:rgba(255,255,255,.02);border:1px solid var(--bd);
-      border-radius:18px;box-shadow:0 30px 80px rgba(0,0,0,.6);overflow:hidden;backdrop-filter:blur(12px);}
-    .cl-glow{position:absolute;width:160px;height:160px;border-radius:50%;filter:blur(46px);pointer-events:none;}
-    .cl-glow--a{top:-70px;left:-70px;background:rgba(255,255,255,.06);}
-    .cl-glow--b{bottom:-70px;right:-70px;background:rgba(255,255,255,.04);}
-
-    .cl-head{position:relative;z-index:1;border-bottom:1px solid rgba(255,255,255,.05);background:rgba(255,255,255,.012);padding:20px 24px;}
-    .cl-close{position:absolute;top:16px;right:16px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;
-      border-radius:8px;color:rgba(255,255,255,.4);text-decoration:none;transition:color .15s,background .15s;}
+    .cl-card{position:relative;width:100%;max-width:420px;background:rgba(255,255,255,.02);border:1px solid var(--bd);
+      border-radius:18px;padding:36px 32px 30px;box-shadow:0 30px 70px rgba(0,0,0,.5);}
+    .cl-close{position:absolute;top:16px;right:16px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;
+      border-radius:9px;color:rgba(255,255,255,.4);text-decoration:none;transition:color .15s,background .15s;}
     .cl-close:hover{color:#fff;background:rgba(255,255,255,.08);}
-    .cl-brand{display:flex;align-items:center;justify-content:center;}
-    .cl-brand__name{font-family:'Space Grotesk',sans-serif;font-size:21px;font-weight:700;letter-spacing:-.4px;}
-    .cl-brand__name span{background:linear-gradient(135deg,#8a909c,#fff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
 
-    .cl-body{position:relative;z-index:1;padding:22px 24px 26px;}
+    .cl-word{font-family:'Instrument Serif',Georgia,serif;font-size:27px;text-align:center;margin-bottom:14px;}
 
-    .cl-tabs{display:flex;gap:6px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:11px;padding:4px;margin-bottom:22px;}
-    .cl-tab{flex:1;padding:9px 0;border-radius:8px;border:1px solid transparent;background:none;font-family:inherit;
-      font-size:13.5px;font-weight:600;color:var(--mut);cursor:pointer;transition:all .15s;}
-    .cl-tab:hover{color:#fff;}
-    .cl-tab.active{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.14);color:#fff;}
+    .cl-eyebrow{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:22px;}
+    .cl-eyebrow-line{width:26px;height:1px;background:rgba(255,255,255,.28);}
+    .cl-eyebrow-text{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.42);}
 
-    .cl-label{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:#fff;margin-bottom:8px;}
-    .cl-label svg{color:rgba(255,255,255,.55);flex-shrink:0;}
-    .cl-label .req{color:#f87171;}
+    .cl-tabs{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:26px;}
+    .cl-tab{background:none;border:none;padding:0 0 3px;font-family:inherit;font-size:14px;font-weight:600;
+      color:rgba(255,255,255,.4);cursor:pointer;border-bottom:1.5px solid transparent;transition:color .15s,border-color .15s;}
+    .cl-tab:hover{color:rgba(255,255,255,.75);}
+    .cl-tab.active{color:#fff;border-bottom-color:#fff;}
+    .cl-tabs-dot{color:rgba(255,255,255,.2);font-size:13px;}
 
-    .cl-field{position:relative;margin-bottom:16px;}
-    .cl-field svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.32);pointer-events:none;}
-    .cl-input{width:100%;height:46px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);
-      color:#fff;font-family:inherit;font-size:14.5px;padding:0 14px 0 40px;transition:border-color .15s,background .15s;}
-    .cl-input:focus{outline:none;border-color:var(--bd2);background:rgba(255,255,255,.06);}
-    .cl-input::placeholder{color:rgba(255,255,255,.28);}
-
-    .cl-title{font-family:'Space Grotesk','Plus Jakarta Sans',sans-serif;font-size:19px;font-weight:700;margin:0 0 6px;letter-spacing:-.3px;}
-    .cl-sub{font-size:13px;color:var(--mut);line-height:1.55;margin:0 0 20px;}
+    .cl-title{font-family:'Lancelot','Times New Roman',Georgia,serif;font-weight:400;font-size:26px;line-height:1.2;margin:0 0 8px;text-align:center;}
+    .cl-sub{font-size:13px;color:var(--mut);line-height:1.55;margin:0 0 24px;text-align:center;}
     .cl-sub b{color:#fff;font-weight:600;}
 
-    .cl-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:46px;border-radius:10px;
-      font-family:inherit;font-size:14.5px;font-weight:700;cursor:pointer;border:1px solid transparent;color:#15161a;
-      background:linear-gradient(135deg,#5b616e,#f6f7f9);
-      box-shadow:0 10px 26px rgba(0,0,0,.35);transition:transform .14s,box-shadow .2s,opacity .2s;}
-    .cl-btn:hover{transform:translateY(-1px);box-shadow:0 14px 30px rgba(0,0,0,.45);}
-    .cl-btn[disabled]{opacity:.55;cursor:not-allowed;transform:none;}
+    .cl-field{margin-bottom:14px;}
+    .cl-field label{display:block;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+      color:rgba(255,255,255,.35);margin-bottom:7px;}
+    .cl-field label .req{color:#f87171;}
+    .cl-input{width:100%;height:44px;border-radius:9px;background:rgba(255,255,255,.04);border:1px solid var(--bd);
+      color:#fff;font-family:inherit;font-size:14px;padding:0 13px;transition:border-color .15s,background .15s;}
+    .cl-input:focus{outline:none;border-color:var(--bd2);background:rgba(255,255,255,.06);}
+    .cl-input::placeholder{color:rgba(255,255,255,.26);}
+
+    .cl-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:44px;border-radius:8px;
+      font-family:inherit;font-size:14px;font-weight:500;cursor:pointer;border:none;color:#000;background:#fff;
+      box-shadow:0 1px 3px rgba(0,0,0,.1),0 1px 2px -1px rgba(0,0,0,.1);transition:background .15s,box-shadow .2s;margin-top:6px;}
+    .cl-btn:hover{background:#f0f0f0;box-shadow:0 4px 6px rgba(0,0,0,.15);}
+    .cl-btn[disabled]{opacity:.5;cursor:not-allowed;}
 
     .cl-otp{display:flex;gap:8px;justify-content:center;margin:4px 0 20px;}
-    .cl-otp input{width:44px;height:52px;border-radius:10px;background:rgba(255,255,255,.03);border:1.5px solid rgba(255,255,255,.1);
-      color:#fff;font-family:'Space Grotesk',monospace;font-size:22px;font-weight:600;text-align:center;transition:border-color .12s,background .12s;}
+    .cl-otp input{width:44px;height:52px;border-radius:9px;background:rgba(255,255,255,.03);border:1.5px solid var(--bd);
+      color:#fff;font-family:'Plus Jakarta Sans',monospace;font-size:22px;font-weight:600;text-align:center;transition:border-color .12s,background .12s;}
     .cl-otp input:focus{outline:none;border-color:#fff;background:rgba(255,255,255,.07);}
     .cl-otp input.filled{border-color:var(--bd2);}
     @media (max-width:380px){ .cl-otp input{width:38px;height:48px;font-size:19px;} }
@@ -84,79 +76,67 @@
 <body>
   <div class="cl-wrap">
     <div class="cl-card">
-      <div class="cl-glow cl-glow--a"></div>
-      <div class="cl-glow cl-glow--b"></div>
+      <a class="cl-close" href="/" aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </a>
 
-      <div class="cl-head">
-        <a class="cl-close" href="/" aria-label="Close">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
-        </a>
-        <div class="cl-brand">
-          <span class="cl-brand__name">Flash<span>Shp</span></span>
-        </div>
+      <div class="cl-word">FlashShp</div>
+      <div class="cl-eyebrow">
+        <div class="cl-eyebrow-line"></div>
+        <span class="cl-eyebrow-text">Member Access</span>
+        <div class="cl-eyebrow-line"></div>
       </div>
 
-      <div class="cl-body">
-        <div class="cl-msg cl-msg--err" id="clErr"></div>
-        <div class="cl-msg cl-msg--ok" id="clOk">You have been signed out.</div>
+      <div class="cl-msg cl-msg--err" id="clErr"></div>
+      <div class="cl-msg cl-msg--ok" id="clOk">You have been signed out.</div>
 
-        <!-- Step 1 : choose method -->
-        <div id="clStep1">
-          <div class="cl-tabs" role="tablist">
-            <button type="button" class="cl-tab active" id="clTabSignIn" role="tab" aria-selected="true">Sign In</button>
-            <button type="button" class="cl-tab" id="clTabRegister" role="tab" aria-selected="false">Register</button>
+      <!-- Step 1 : choose method -->
+      <div id="clStep1">
+        <div class="cl-tabs" role="tablist">
+          <button type="button" class="cl-tab active" id="clTabSignIn" role="tab" aria-selected="true">Sign In</button>
+          <span class="cl-tabs-dot">&middot;</span>
+          <button type="button" class="cl-tab" id="clTabRegister" role="tab" aria-selected="false">Register</button>
+        </div>
+
+        <div class="cl-title" id="clStepTitle">Access your account</div>
+        <div class="cl-sub" id="clStepSub">Enter your password — we'll also email you a quick code to confirm it's you.</div>
+
+        <form id="clEmailForm" autocomplete="on">
+          <div class="cl-field">
+            <label for="clEmail">Email <span class="req">*</span></label>
+            <input class="cl-input" type="email" id="clEmail" placeholder="you@email.com" required autocomplete="email" />
           </div>
 
-          <div class="cl-title" id="clStepTitle">Welcome back</div>
-          <div class="cl-sub" id="clStepSub">Enter your email and password to continue.</div>
+          <div class="cl-field" id="clPasswordGroup">
+            <label for="clPassword">Password <span class="req">*</span></label>
+            <input class="cl-input" type="password" id="clPassword" placeholder="Enter your password" autocomplete="current-password" />
+          </div>
 
-          <form id="clEmailForm" autocomplete="on">
-            <label class="cl-label" for="clEmail">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-              Email <span class="req">*</span>
-            </label>
-            <div class="cl-field">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-              <input class="cl-input" type="email" id="clEmail" placeholder="your@email.com" required autocomplete="email" />
-            </div>
+          <button class="cl-btn" type="submit" id="clSendBtn">Sign In</button>
+        </form>
 
-            <div id="clPasswordGroup">
-              <label class="cl-label" for="clPassword">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                Password <span class="req">*</span>
-              </label>
-              <div class="cl-field">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                <input class="cl-input" type="password" id="clPassword" placeholder="Enter your password" autocomplete="current-password" />
-              </div>
-            </div>
+        <button class="cl-link" type="button" id="clMethodToggle">Use an email code instead</button>
+        <div class="cl-foot" id="clFoot">New here? <b>Register</b> above to get started.</div>
+      </div>
 
-            <button class="cl-btn" type="submit" id="clSendBtn">Sign In</button>
-          </form>
+      <!-- Step 2 : verify code -->
+      <div id="clStep2" style="display:none;">
+        <div class="cl-title" id="clStep2Title">Enter your code</div>
+        <div class="cl-sub">We sent a 6-digit code to <b id="clVMail"></b></div>
 
-          <button class="cl-link" type="button" id="clMethodToggle">Sign in with an email code instead</button>
-          <div class="cl-foot" id="clFoot">No account yet? Switch to <b>Register</b> above.</div>
-        </div>
-
-        <!-- Step 2 : verify code -->
-        <div id="clStep2" style="display:none;">
-          <div class="cl-title" id="clStep2Title">Enter your code</div>
-          <div class="cl-sub">We sent a 6-digit code to <b id="clVMail"></b></div>
-
-          <form id="clCodeForm" autocomplete="off">
-            <div class="cl-otp" id="clOtp">
-              <input type="text" inputmode="numeric" maxlength="1" autocomplete="one-time-code" aria-label="Digit 1" />
-              <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 2" />
-              <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 3" />
-              <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 4" />
-              <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 5" />
-              <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 6" />
-            </div>
-            <button class="cl-btn" type="submit" id="clVerifyBtn">Verify &amp; sign in</button>
-            <button class="cl-link" type="button" id="clResend">Resend code</button>
-            <button class="cl-link" type="button" id="clReset" style="margin-top:2px;">← Use a different email</button>
-          </form>
-        </div>
+        <form id="clCodeForm" autocomplete="off">
+          <div class="cl-otp" id="clOtp">
+            <input type="text" inputmode="numeric" maxlength="1" autocomplete="one-time-code" aria-label="Digit 1" />
+            <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 2" />
+            <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 3" />
+            <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 4" />
+            <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 5" />
+            <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 6" />
+          </div>
+          <button class="cl-btn" type="submit" id="clVerifyBtn">Verify &amp; sign in</button>
+          <button class="cl-link" type="button" id="clResend">Resend code</button>
+          <button class="cl-link" type="button" id="clReset" style="margin-top:2px;">← Use a different email</button>
+        </form>
       </div>
     </div>
   </div>
@@ -215,23 +195,23 @@
       passwordInput.autocomplete = tab === 'register' ? 'new-password' : 'current-password';
 
       if (tab === 'signin') {
-        stepTitle.textContent = 'Welcome back';
-        stepSub.textContent = usePw ? "Enter your email and password to continue." : "Enter your email and we'll send you a one-time code.";
+        stepTitle.textContent = 'Access your account';
+        stepSub.textContent = usePw ? "Enter your password — we'll also email you a quick code to confirm it's you." : "Enter your email and we'll send a one-time code to sign in.";
         sendBtn.textContent = usePw ? 'Sign In' : 'Send me a code';
-        methodToggle.textContent = usePw ? 'Sign in with an email code instead' : '← Sign in with a password instead';
+        methodToggle.textContent = usePw ? 'Use an email code instead' : '← Use a password instead';
         footEl.innerHTML = '';
-        footEl.appendChild(document.createTextNode('No account yet? Switch to '));
+        footEl.appendChild(document.createTextNode('New here? '));
         var b1 = document.createElement('b'); b1.textContent = 'Register'; footEl.appendChild(b1);
-        footEl.appendChild(document.createTextNode(' above.'));
+        footEl.appendChild(document.createTextNode(' above to get started.'));
       } else {
         stepTitle.textContent = 'Create your account';
-        stepSub.textContent = usePw ? "Choose a password — we'll email you a code to confirm it's really you." : "Enter your email and we'll send you a code to create your account.";
+        stepSub.textContent = usePw ? 'Set a password to save your orders and get faster support.' : "Enter your email and we'll send a code to get you started.";
         sendBtn.textContent = usePw ? 'Create Account' : 'Send me a code';
-        methodToggle.textContent = usePw ? 'Sign up with just an email code instead' : '← Set a password instead';
+        methodToggle.textContent = usePw ? 'Use just an email code instead' : '← Set a password instead';
         footEl.innerHTML = '';
-        footEl.appendChild(document.createTextNode('No password needed if you prefer — '));
-        var b2 = document.createElement('b'); b2.textContent = 'just your inbox'; footEl.appendChild(b2);
-        footEl.appendChild(document.createTextNode('.'));
+        footEl.appendChild(document.createTextNode('Prefer no password? '));
+        var b2 = document.createElement('b'); b2.textContent = 'Just your inbox'; footEl.appendChild(b2);
+        footEl.appendChild(document.createTextNode(' works too.'));
       }
     }
     tabSignIn.addEventListener('click', function () { tab = 'signin'; method = 'password'; render(); });
@@ -302,16 +282,20 @@
         .then(function(ok){ btn.disabled = false; btn.textContent = label; return ok; });
     }
 
+    /* Le mot de passe n'ouvre jamais la session à lui seul : s'il est correct,
+       le serveur envoie un code et on passe à l'étape 2, comme pour
+       l'inscription — voir auth-password-login.js. */
     function submitPasswordLogin(email, password, btn, label){
-      btn.disabled = true; btn.textContent = 'Signing in…';
-      fetch('/api/auth-password-login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email: email, password: password }) })
+      btn.disabled = true; btn.textContent = 'Verifying…';
+      return fetch('/api/auth-password-login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email: email, password: password }) })
         .then(function(r){ return r.json().then(function(j){ return { ok:r.ok, status:r.status, body:j }; }); })
         .then(function(res){
-          if (res.ok && res.body && res.body.ok) { showOk('Signed in! Redirecting…'); location.href = '/'; return; }
+          if (res.ok && res.body && res.body.ok) { showOk('Code sent to ' + email + '. Check your inbox (and spam).'); return true; }
           showErr((res.body && res.body.error) || 'Invalid email or password.');
-          btn.disabled = false; btn.textContent = label;
+          return false;
         })
-        .catch(function(){ showErr('Network error. Please try again.'); btn.disabled = false; btn.textContent = label; });
+        .catch(function(){ showErr('Network error. Please try again.'); return false; })
+        .then(function(ok){ btn.disabled = false; btn.textContent = label; return ok; });
     }
 
     emailForm.addEventListener('submit', function (e) {
@@ -325,11 +309,13 @@
         return;
       }
 
-      /* method === 'password' */
+      /* method === 'password' — dans les deux cas, un mot de passe correct ne
+         fait que déclencher l'envoi du code : l'étape 2 est toujours requise
+         pour ouvrir la session. */
       var password = passwordInput.value || '';
       if (tab === 'signin') {
         if (!password) { showErr('Please enter your password.'); return; }
-        submitPasswordLogin(email, password, sendBtn, label);
+        submitPasswordLogin(email, password, sendBtn, label).then(function(ok){ if (ok) toStep2(email, 'Confirm it’s you'); });
       } else {
         if (password.length < 8) { showErr('Password must be at least 8 characters.'); return; }
         requestPasswordRegister(email, password, sendBtn, label).then(function(ok){ if (ok) toStep2(email, 'Confirm your account'); });

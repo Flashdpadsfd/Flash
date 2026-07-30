@@ -88,4 +88,4 @@ async function sendCode(req, email, opts) {
   return { ok: true, code: code };
 }
 
-module.exports = { sendCode: sendCode };
+module.exports = { sendCode: sendCode, available: mailer.available };
