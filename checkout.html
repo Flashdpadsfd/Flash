@@ -375,11 +375,16 @@
       .catch(function() { msgEl.textContent = 'Network error.'; msgEl.style.color = 'rgba(239,68,68,.8)'; appliedPromo = null; renderCart(); });
   });
 
-  /* ── SellAuth embed checkout ──
-     Le paiement (email, méthode, facturation) est entièrement géré par
-     SellAuth dans sa propre fenêtre modale — voir _sellauth-invoice.js /
-     sellauth-webhook.js côté serveur pour la suite (email de livraison,
-     notification Discord, historique de commandes) une fois la facture payée. */
+  /* ── SellAuth checkout link ──
+     Redirection directe vers la page de paiement hébergée par SellAuth sur
+     son domaine (SELLAUTH_CHECKOUT_DOMAIN) — voir docs.sellauth.com/developers/
+     checkout-links. Remplace le widget JS embed (sellauth-embed-2.js) : celui-ci
+     échouait de façon systématique avec "Captcha timeout" avant même d'afficher
+     la moindre modale, alors qu'un lien direct fonctionne. Le paiement (email,
+     méthode, facturation) est entièrement géré par SellAuth sur sa propre page
+     — voir _sellauth-invoice.js / sellauth-webhook.js côté serveur pour la
+     suite (email de livraison, notification Discord, historique de commandes)
+     une fois la facture payée. */
   var payBtn = document.getElementById('payNowBtn');
   var payErr = document.getElementById('payErr');
   var payBtnDefaultHtml = payBtn.innerHTML;
@@ -387,21 +392,6 @@
   function showPayErr(msg) {
     payErr.textContent = msg;
     payErr.style.display = '';
-  }
-
-  var sellAuthScriptPromise = null;
-  function loadSellAuthScript() {
-    if (window.sellAuthEmbed) return Promise.resolve();
-    if (sellAuthScriptPromise) return sellAuthScriptPromise;
-    sellAuthScriptPromise = new Promise(function(resolve, reject) {
-      var s = document.createElement('script');
-      s.src = 'https://sellauth.com/assets/js/sellauth-embed-2.js';
-      s.async = true;
-      s.onload = function() { resolve(); };
-      s.onerror = function() { reject(new Error('SellAuth script failed to load')); };
-      document.head.appendChild(s);
-    });
-    return sellAuthScriptPromise;
   }
 
   payBtn.addEventListener('click', function() {
@@ -419,15 +409,12 @@
     fetch('/api/sellauth-shop')
       .then(function(r) { return r.json(); })
       .then(function(cfg) {
-        if (!cfg || !cfg.ok || !cfg.shopId) throw new Error('Shop not configured');
-        return loadSellAuthScript().then(function() { return cfg.shopId; });
-      })
-      .then(function(shopId) {
-        payBtn.disabled = false; payBtn.innerHTML = payBtnDefaultHtml;
-        if (!window.sellAuthEmbed) { showPayErr('Payment is temporarily unavailable. Please try again shortly.'); return; }
-        var cartItem = { productId: productId, quantity: 1 };
-        if (variantId) cartItem.variantId = variantId;
-        window.sellAuthEmbed.checkout(payBtn, { cart: [cartItem], shopId: shopId, modal: true });
+        if (!cfg || !cfg.ok || !cfg.checkoutDomain) throw new Error('Checkout not configured');
+        var url = 'https://' + cfg.checkoutDomain + '/checkout-link?' +
+          'cart[0][productId]=' + encodeURIComponent(productId) +
+          (variantId ? '&cart[0][variantId]=' + encodeURIComponent(variantId) : '') +
+          '&cart[0][quantity]=1';
+        window.location.href = url;
       })
       .catch(function() {
         payBtn.disabled = false; payBtn.innerHTML = payBtnDefaultHtml;
