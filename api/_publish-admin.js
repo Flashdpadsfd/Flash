@@ -11,6 +11,16 @@
    L'application, elle, redémarre à chaque déploiement : c'est le seul moment
    automatique où l'on peut recopier les fichiers au bon endroit.
 
+   Déploiement atomique versionné : Hostinger exécute désormais l'app depuis
+   « <domaine>/.builds/versions/<uuid>/… » plutôt que directement depuis
+   « <domaine>/nodejs/ ». Un simple appRoot/.. atterrit donc DANS ce dossier de
+   build éphémère (…/.builds/versions/<uuid>/public_html/admin) au lieu du vrai
+   « <domaine>/public_html/admin » — la copie « réussissait » (fichiers bien
+   écrits, log de succès) mais dans un dossier qui n'est jamais servi et qui
+   disparaît au déploiement suivant. On retrouve donc la racine du domaine en
+   coupant le chemin avant « .builds », qui fonctionne aussi bien avec
+   l'ancienne disposition (pas de « .builds » → simple appRoot/..).
+
    Sécurité : on n'écrit QUE dans public_html/admin, uniquement les fichiers
    présents dans admin/, et on ne supprime jamais rien d'autre. Toute erreur est
    journalisée sans interrompre le démarrage du serveur : mieux vaut une
@@ -21,9 +31,17 @@
 var fs = require('fs');
 var path = require('path');
 
-/* Depuis <domaine>/nodejs/, la cible est ../public_html/admin. */
+/* Racine du domaine : tout ce qui précède « .builds » dans le chemin de
+   déploiement versionné, sinon appRoot/.. (ancienne disposition, ou local). */
+function domainRoot(appRoot) {
+  var marker = path.sep + '.builds' + path.sep;
+  var idx = appRoot.indexOf(marker);
+  if (idx !== -1) return appRoot.slice(0, idx);
+  return path.join(appRoot, '..');
+}
+
 function targetDir(appRoot) {
-  return path.join(appRoot, '..', 'public_html', 'admin');
+  return path.join(domainRoot(appRoot), 'public_html', 'admin');
 }
 
 function copyDir(src, dest) {
