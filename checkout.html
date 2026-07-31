@@ -274,23 +274,39 @@
   /* ── State ── */
   var params = new URLSearchParams(window.location.search);
   var pid = parseInt(params.get('id') || '0', 10);
-  var allProds = getProds();
-  var product = allProds.find(function(x) { return x.id === pid; });
-  if (!product) { window.location.href = '/products'; return; }
 
-  /* ── Variante choisie (?variant=index) : surcharge le nom affiché + le prix unitaire ── */
-  (function applyVariant() {
+  /* Applique la variante choisie (?variant=index) au produit brut : surcharge
+     le nom affiché + le prix unitaire. Copie locale pour ne pas muter le
+     produit stocké ; tout l'aval lit product.name/price. */
+  function withVariant(p) {
     var vi = params.get('variant');
-    if (vi == null || vi === '') return;
+    if (vi == null || vi === '') return p;
     var idx = parseInt(vi, 10);
-    var vlist = Array.isArray(product.variants) ? product.variants : [];
-    if (!vlist[idx]) return;
-    /* Copie locale pour ne pas muter le produit stocké ; tout l'aval lit product.name/price */
-    product = Object.assign({}, product, {
-      name: product.name + ' — ' + vlist[idx].name,
+    var vlist = Array.isArray(p.variants) ? p.variants : [];
+    if (!vlist[idx]) return p;
+    return Object.assign({}, p, {
+      name: p.name + ' — ' + vlist[idx].name,
       price: Number(vlist[idx].price)
     });
-  })();
+  }
+
+  var product = withVariant(getProds().find(function(x) { return x.id === pid; }) || null);
+  if (!product) { window.location.href = '/products'; return; }
+
+  /* content-sync.js dépose les données produit de façon ASYNCHRONE (fetch vers
+     /api/content) : au premier chargement, `product` peut donc être capturé
+     avant que la synchro n'ait eu le temps de tourner (ex. un client_id/variant
+     SellAuth ajouté depuis l'admin n'apparaîtrait qu'après ce lecture initiale).
+     On se réaligne donc sur l'événement "storage" que content-sync émet déjà à
+     chaque mise à jour de nexus_products, comme le font les autres pages. */
+  window.addEventListener('storage', function(e) {
+    if (e.key !== 'nexus_products') return;
+    var fresh = getProds().find(function(x) { return x.id === pid; });
+    if (!fresh) return;
+    product = withVariant(fresh);
+    basePrice = Number(product.price);
+    renderCart();
+  });
 
   var appliedPromo = null;
 
