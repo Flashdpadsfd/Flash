@@ -95,6 +95,37 @@
       margin: 20px 0;
     }
 
+    /* ── Payment method sections ── */
+    .co-pm-section-lbl {
+      font-size: 10px; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: rgba(255,255,255,.28);
+      margin-bottom: 10px;
+    }
+    .co-pm-grid {
+      display: flex; gap: 8px; flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .co-pm-opt {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 16px; border-radius: 9px;
+      background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.09);
+      color: rgba(255,255,255,.6); font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: all 150ms;
+      min-width: 110px;
+    }
+    .co-pm-opt:hover { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.18); color: #fff; }
+    .co-pm-opt.active {
+      background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.3);
+      color: #fff;
+      box-shadow: 0 0 0 3px rgba(255,255,255,.05);
+    }
+    .co-pm-opt__icon {
+      width: 28px; height: 28px; border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; font-weight: 700; flex-shrink: 0;
+    }
+    .co-pm-opt__label { font-size: 13px; }
+
     /* ── Promo code ── */
     .co-promo-row {
       display: flex; gap: 8px; margin-top: 4px;
@@ -117,7 +148,19 @@
     .co-promo-msg { font-size: 12px; margin-top: 6px; }
     .co-err-msg { font-size: 12px; color: rgba(239,68,68,.85); margin-top: 6px; }
 
-    /* ── Pay button ── */
+    /* ── Progress bar ── */
+    .co-progress-bar {
+      height: 3px; background: rgba(255,255,255,.07);
+      margin: 20px 0 0; border-radius: 2px; overflow: hidden;
+    }
+    .co-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #f4f5f7, #93969f);
+      border-radius: 2px; width: 50%;
+      transition: width .3s ease;
+    }
+
+    /* ── Continue button ── */
     .co-continue-btn {
       display: flex; align-items: center; justify-content: center; gap: 8px;
       width: 100%; padding: 13px;
@@ -170,6 +213,195 @@
     }
     .co-warranty a { color: rgba(99,102,241,.7); text-decoration: underline; }
 
+    /* ═══════════════════════════════
+       CONFIRMATION PAGE STYLES
+    ═══════════════════════════════ */
+    .conf-timer-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 20px;
+      background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08);
+      border-radius: 10px; margin-bottom: 16px;
+      font-size: 13px;
+    }
+    .conf-timer-lbl { display: flex; align-items: center; gap: 7px; color: rgba(255,255,255,.45); font-weight: 500; }
+    .conf-timer-val { font-size: 14px; font-weight: 700; color: #fff; font-variant-numeric: tabular-nums; }
+
+    .conf-warning {
+      padding: 14px 18px; margin-bottom: 18px;
+      background: rgba(251,146,60,.06); border: 1px solid rgba(251,146,60,.2);
+      border-radius: 10px;
+    }
+    .conf-warning__title {
+      font-size: 13px; font-weight: 700; color: rgba(251,146,60,.9);
+      margin-bottom: 8px;
+    }
+    .conf-warning__list {
+      list-style: none; display: flex; flex-direction: column; gap: 5px;
+    }
+    .conf-warning__list li {
+      display: flex; align-items: center; gap: 7px;
+      font-size: 12px; color: rgba(251,146,60,.7);
+    }
+    .conf-warning__list li::before {
+      content: '•'; font-size: 16px; line-height: 1; flex-shrink: 0;
+    }
+
+    .conf-copy-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+    .conf-copy-lbl {
+      font-size: 10px; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; color: rgba(255,255,255,.3);
+    }
+    .conf-copy-row {
+      display: flex; align-items: center; gap: 0;
+      background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.09);
+      border-radius: 9px; overflow: hidden;
+    }
+    .conf-copy-val {
+      flex: 1; padding: 11px 14px;
+      font-size: 13px; font-weight: 600; color: #fff;
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      word-break: break-all;
+    }
+    .conf-copy-btn {
+      flex-shrink: 0; width: 42px;
+      display: flex; align-items: center; justify-content: center;
+      border-left: 1px solid rgba(255,255,255,.09);
+      color: rgba(255,255,255,.4); font-size: 13px;
+      height: 100%; min-height: 42px;
+      transition: background 150ms, color 150ms;
+    }
+    .conf-copy-btn:hover { background: rgba(255,255,255,.07); color: #fff; }
+
+    .conf-qr-wrap {
+      display: flex; justify-content: center;
+      padding: 20px 0 6px;
+    }
+    .conf-qr {
+      width: 170px; height: 170px; border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.09);
+      background: #fff; padding: 8px;
+    }
+
+    .conf-sent-btn {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 13px;
+      background: rgba(255,255,255,.06); color: rgba(255,255,255,.8);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 9px; font-size: 14px; font-weight: 600;
+      margin-top: 20px; transition: background 150ms, color 150ms;
+    }
+    .conf-sent-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+
+    /* ── Order Progress (right side on confirmation) ── */
+    .op-card__title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+    .op-card__sub   { font-size: 12px; color: rgba(255,255,255,.35); }
+    .op-timeline { display: flex; flex-direction: column; gap: 0; padding: 20px 24px; }
+    .op-step {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding-bottom: 20px; position: relative;
+    }
+    .op-step:not(:last-child)::after {
+      content: ''; position: absolute;
+      left: 17px; top: 36px;
+      width: 2px; height: calc(100% - 20px);
+      background: rgba(255,255,255,.08);
+    }
+    .op-step.done::after   { background: rgba(34,197,94,.3); }
+    .op-step.active::after { background: rgba(99,102,241,.3); }
+    .op-step__icon {
+      width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+      border: 2px solid rgba(255,255,255,.1);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; z-index: 1; position: relative;
+      background: #0d0d0d;
+    }
+    .op-step.done   .op-step__icon { border-color: rgba(34,197,94,.5); background: rgba(34,197,94,.1); color: #22c55e; }
+    .op-step.active .op-step__icon { border-color: rgba(99,102,241,.6); background: rgba(99,102,241,.12); color: #818cf8; }
+    .op-step__info { padding-top: 5px; }
+    .op-step__name {
+      font-size: 13px; font-weight: 700;
+      color: rgba(255,255,255,.35);
+    }
+    .op-step.done   .op-step__name { color: #22c55e; }
+    .op-step.active .op-step__name { color: #818cf8; }
+    .op-step__desc { font-size: 12px; color: rgba(255,255,255,.28); margin-top: 2px; }
+
+    .op-details {
+      padding: 16px 24px;
+      border-top: 1px solid rgba(255,255,255,.06);
+      display: flex; flex-direction: column; gap: 0;
+    }
+    .op-detail-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 9px 0; font-size: 13px;
+      border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+    .op-detail-row:last-child { border-bottom: none; }
+    .op-detail-lbl { color: rgba(255,255,255,.38); }
+    .op-detail-val { font-weight: 600; color: rgba(255,255,255,.8); font-size: 12px; font-family: monospace; }
+    .op-detail-val.normal { font-family: inherit; font-size: 13px; }
+    .op-status-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px; border-radius: 999px;
+      font-size: 11px; font-weight: 700;
+    }
+    .op-status-badge--waiting {
+      background: rgba(251,191,36,.1); border: 1px solid rgba(251,191,36,.25);
+      color: rgba(251,191,36,.9);
+    }
+    .op-status-badge--confirmed {
+      background: rgba(34,197,94,.1); border: 1px solid rgba(34,197,94,.25);
+      color: rgba(34,197,94,.9);
+    }
+    .op-status-pulse {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: currentColor;
+      animation: op-pulse 1.6s ease-in-out infinite;
+    }
+    @keyframes op-pulse {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: .4; transform: scale(.7); }
+    }
+
+    /* ── Success state ── */
+    .conf-success {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 14px; padding: 32px 24px; text-align: center;
+    }
+    .conf-success__check {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: rgba(34,197,94,.1); border: 1px solid rgba(34,197,94,.25);
+      color: #22c55e; font-size: 24px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .conf-success__title { font-size: 20px; font-weight: 700; }
+    .conf-success__sub   { font-size: 13px; color: rgba(255,255,255,.4); }
+    .conf-deliv-box {
+      width: 100%;
+      background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.09);
+      border-radius: 10px; padding: 14px 16px; text-align: left;
+    }
+    .conf-deliv-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.3); margin-bottom: 6px; }
+    .conf-deliv-val { font-size: 14px; color: #fff; filter: blur(5px); user-select: none; transition: filter 200ms; }
+    .conf-deliv-val.shown { filter: none; user-select: text; }
+    .conf-reveal-btn {
+      margin-top: 8px; padding: 6px 12px;
+      display: inline-flex; align-items: center; gap: 5px;
+      background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+      border-radius: 6px; font-size: 11px; color: rgba(255,255,255,.6);
+      transition: background 150ms;
+    }
+    .conf-reveal-btn:hover { background: rgba(255,255,255,.12); color: #fff; }
+    .nx-ico { display: inline-block; vertical-align: -0.125em; flex-shrink: 0; }
+    .conf-back-btn {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 11px 24px; border-radius: 9px;
+      background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+      color: rgba(255,255,255,.65); font-size: 13px; font-weight: 600;
+      transition: background 150ms, color 150ms;
+    }
+    .conf-back-btn:hover { background: rgba(255,255,255,.11); color: #fff; }
+
     /* ── Responsive ── */
     @media (max-width: 768px) {
       .co-grid { grid-template-columns: 1fr; }
@@ -188,22 +420,52 @@
       <span class="co-breadcrumb__step done" id="bcCart">Cart</span>
       <span class="co-breadcrumb__arrow">›</span>
       <span class="co-breadcrumb__step active" id="bcCheckout">Checkout</span>
+      <span class="co-breadcrumb__arrow">›</span>
+      <span class="co-breadcrumb__step" id="bcConfirm">Confirmation</span>
+      <span class="co-breadcrumb__arrow">›</span>
+      <span class="co-breadcrumb__step" id="bcDone">Done</span>
     </div>
   </div>
 
-  <!-- ════════════ CHECKOUT ════════════ -->
-  <div class="co-grid">
+  <!-- ════════════ STEP 1: CHECKOUT ════════════ -->
+  <div id="stepCheckout" class="co-grid">
 
     <!-- Left -->
     <div style="display:flex;flex-direction:column;gap:16px;">
 
-      <!-- Payment -->
+      <!-- Delivery Details -->
       <div class="co-card">
         <div class="co-card__hdr">
-          <div class="co-card__title">Payment</div>
-          <div class="co-card__sub">You'll enter your email and choose a payment method in the secure checkout window.</div>
+          <div class="co-card__title">Delivery Details</div>
+          <div class="co-card__sub">Provide your email address so we can send you the receipt and order updates.</div>
         </div>
         <div class="co-card__body">
+          <div class="co-field">
+            <div class="co-field-label">Email Address</div>
+            <input type="email" id="coEmail" placeholder="you@example.com" autocomplete="email" />
+          </div>
+          <div class="co-err-msg" id="emailErr" style="display:none;"></div>
+        </div>
+      </div>
+
+      <!-- Payment Details -->
+      <div class="co-card">
+        <div class="co-card__hdr">
+          <div class="co-card__title">Payment Details</div>
+          <div class="co-card__sub">Select your preferred payment method.</div>
+        </div>
+        <div class="co-card__body">
+
+          <!-- Crypto -->
+          <div class="co-pm-section-lbl">CRYPTO</div>
+          <div class="co-pm-grid" id="cryptoMethods">
+            <!-- Rendered dynamically based on configured wallets -->
+          </div>
+          <div id="noWalletsMsg" style="display:none;font-size:12px;color:rgba(255,255,255,.3);padding:4px 0 8px;">
+            No crypto wallets configured. Enable them in the admin panel.
+          </div>
+
+          <div class="co-divider"></div>
 
           <!-- Promo -->
           <div style="margin-bottom:4px;">
@@ -218,10 +480,10 @@
             <div class="co-promo-msg" id="promoMsg"></div>
           </div>
 
-          <div class="co-err-msg" id="payErr" style="display:none;"></div>
+          <div class="co-progress-bar"><div class="co-progress-fill" id="checkoutProgress" style="width:33%"></div></div>
 
-          <button class="co-continue-btn" id="payNowBtn">
-            Pay Now
+          <button class="co-continue-btn" id="continueBtn">
+            Continue
             <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </button>
 
@@ -257,6 +519,172 @@
 
   </div>
 
+  <!-- ════════════ STEP 2: CONFIRMATION ════════════ -->
+  <div id="stepConfirm" class="co-grid" style="display:none;">
+
+    <!-- Left: Payment instructions -->
+    <div style="display:flex;flex-direction:column;gap:16px;">
+
+      <!-- Timer bar -->
+      <div class="conf-timer-bar">
+        <div class="conf-timer-lbl">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Pay before
+        </div>
+        <div class="conf-timer-val" id="confTimerVal">30:00</div>
+      </div>
+
+      <div class="co-card">
+        <div class="co-card__body">
+
+          <!-- Warning -->
+          <div class="conf-warning" id="confWarning">
+            <div class="conf-warning__title">Important:</div>
+            <ul class="conf-warning__list" id="confWarningList">
+              <!-- filled by JS -->
+            </ul>
+          </div>
+
+          <!-- Amount -->
+          <div class="conf-copy-field">
+            <div class="conf-copy-lbl">Amount to Send</div>
+            <div class="conf-copy-row">
+              <div class="conf-copy-val" id="confAmount"></div>
+              <button class="conf-copy-btn" id="confAmtCopy" title="Copy">
+                <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Address -->
+          <div class="conf-copy-field">
+            <div class="conf-copy-lbl" id="confAddrLbl">Address</div>
+            <div class="conf-copy-row">
+              <div class="conf-copy-val" id="confAddr" style="font-size:11px;"></div>
+              <button class="conf-copy-btn" id="confAddrCopy" title="Copy">
+                <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- QR -->
+          <div class="conf-qr-wrap">
+            <img class="conf-qr" id="confQR" src="" alt="QR Code" />
+          </div>
+
+          <!-- Polling status -->
+          <div style="display:flex;align-items:center;gap:8px;margin-top:16px;padding:10px 14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:9px;">
+            <div class="op-status-pulse" id="confPulse" style="color:#fbbf24;"></div>
+            <span id="confStatusTxt" style="font-size:12px;color:rgba(255,255,255,.45);">Waiting for payment on blockchain…</span>
+          </div>
+
+          <button class="conf-sent-btn" id="confSentBtn">
+            I Have Sent The Payment
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right: Order progress -->
+    <div style="display:flex;flex-direction:column;gap:16px;">
+
+      <div class="co-card">
+        <div class="co-card__hdr">
+          <div class="op-card__title">Order Progress</div>
+          <div class="op-card__sub">Track your order status in real-time</div>
+        </div>
+        <div class="op-timeline">
+          <div class="op-step done" id="opStep1">
+            <div class="op-step__icon">✓</div>
+            <div class="op-step__info">
+              <div class="op-step__name">Order Created</div>
+              <div class="op-step__desc">Your order has been placed successfully</div>
+            </div>
+          </div>
+          <div class="op-step active" id="opStep2">
+            <div class="op-step__icon">
+              <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+            </div>
+            <div class="op-step__info">
+              <div class="op-step__name">Awaiting Payment</div>
+              <div class="op-step__desc">Send payment using the instructions provided</div>
+            </div>
+          </div>
+          <div class="op-step" id="opStep3">
+            <div class="op-step__icon">
+              <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div class="op-step__info">
+              <div class="op-step__name">Verifying Payment</div>
+              <div class="op-step__desc">We'll verify your payment once received</div>
+            </div>
+          </div>
+          <div class="op-step" id="opStep4">
+            <div class="op-step__icon">✓</div>
+            <div class="op-step__info">
+              <div class="op-step__name">Order Complete</div>
+              <div class="op-step__desc">Credentials delivered to your email</div>
+            </div>
+          </div>
+        </div>
+        <div class="op-details">
+          <div class="op-detail-row">
+            <span class="op-detail-lbl">Order ID</span>
+            <span class="op-detail-val" id="opOrderId">—</span>
+          </div>
+          <div class="op-detail-row">
+            <span class="op-detail-lbl">Total</span>
+            <span class="op-detail-val normal" id="opTotal">—</span>
+          </div>
+          <div class="op-detail-row">
+            <span class="op-detail-lbl">Method</span>
+            <span class="op-detail-val normal" id="opMethod">—</span>
+          </div>
+          <div class="op-detail-row">
+            <span class="op-detail-lbl">Status</span>
+            <span>
+              <span class="op-status-badge op-status-badge--waiting" id="opStatus">
+                <span class="op-status-pulse"></span>
+                Awaiting Payment
+              </span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ════════════ STEP 3: SUCCESS ════════════ -->
+  <div id="stepSuccess" style="display:none;max-width:500px;margin:0 auto;width:100%;">
+    <div class="co-card">
+      <div class="conf-success">
+        <div class="conf-success__check">✓</div>
+        <div class="conf-success__title">Payment Confirmed!</div>
+        <div class="conf-success__sub" id="successSub">Your product is ready below.</div>
+
+        <div class="conf-deliv-box" style="width:100%;">
+          <div class="conf-deliv-lbl">Your Product</div>
+          <div class="conf-deliv-val" id="successDeliv">—</div>
+          <button class="conf-reveal-btn" id="successRevealBtn"><svg class="nx-ico" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.06 12.35a1 1 0 0 1 0-.7 10.75 10.75 0 0 1 19.88 0 1 1 0 0 1 0 .7 10.75 10.75 0 0 1-19.88 0"/><circle cx="12" cy="12" r="3"/></svg> Click to reveal</button>
+        </div>
+
+        <div class="conf-deliv-box" style="width:100%;background:rgba(34,197,94,.04);border-color:rgba(34,197,94,.12);">
+          <div class="conf-deliv-lbl">Invoice ID</div>
+          <div style="font-size:14px;font-weight:700;color:#fff;font-family:monospace;" id="successInvId">—</div>
+        </div>
+
+        <button class="conf-back-btn" onclick="window.location.href='/products'">
+          ← Back to Shop
+        </button>
+      </div>
+    </div>
+  </div>
+
 </div>
 
   <script src="assets/content-sync.js?v=2"></script>
@@ -264,10 +692,21 @@
 (function() {
   'use strict';
 
+  /* ── Constants ── */
+  var POLL_INTERVAL = 30000;
+  var CRYPTO_INFO = {
+    btc: { name: 'Bitcoin',  symbol: 'BTC', bg: '#f7931a', icon: '₿' },
+    eth: { name: 'Ethereum', symbol: 'ETH', bg: '#627eea', icon: 'Ξ' },
+    ltc: { name: 'Litecoin', symbol: 'LTC', bg: '#a6a9aa', icon: 'Ł' },
+    sol: { name: 'Solana',   symbol: 'SOL', bg: '#9945ff', icon: '◎' }
+  };
+  var SYM = { EUR: '€', USD: '$', GBP: '£' };
+
   /* ── Storage helpers ── */
   function getProds() {
     try { return JSON.parse(localStorage.getItem('nexus_products')) || []; } catch(e) { return []; }
   }
+  function getPayments() { try { return JSON.parse(localStorage.getItem('nexus_payments')) || {}; } catch(e) { return {}; } }
   function getContent() { try { return JSON.parse(localStorage.getItem('nexus_content') || '{}'); } catch(e) { return {}; } }
   function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
@@ -275,9 +714,6 @@
   var params = new URLSearchParams(window.location.search);
   var pid = parseInt(params.get('id') || '0', 10);
 
-  /* Applique la variante choisie (?variant=index) au produit brut : surcharge
-     le nom affiché + le prix unitaire. Copie locale pour ne pas muter le
-     produit stocké ; tout l'aval lit product.name/price. */
   function withVariant(p) {
     var vi = params.get('variant');
     if (vi == null || vi === '') return p;
@@ -293,22 +729,21 @@
   var product = withVariant(getProds().find(function(x) { return x.id === pid; }) || null);
   if (!product) { window.location.href = '/products'; return; }
 
-  /* content-sync.js dépose les données produit de façon ASYNCHRONE (fetch vers
-     /api/content) : au premier chargement, `product` peut donc être capturé
-     avant que la synchro n'ait eu le temps de tourner (ex. un client_id/variant
-     SellAuth ajouté depuis l'admin n'apparaîtrait qu'après ce lecture initiale).
-     On se réaligne donc sur l'événement "storage" que content-sync émet déjà à
-     chaque mise à jour de nexus_products, comme le font les autres pages. */
+  /* content-sync.js dépose les données de façon ASYNCHRONE : on se réaligne
+     sur l'événement "storage" qu'il émet déjà à chaque mise à jour, comme les
+     autres pages du site. */
   window.addEventListener('storage', function(e) {
-    if (e.key !== 'nexus_products') return;
-    var fresh = getProds().find(function(x) { return x.id === pid; });
-    if (!fresh) return;
-    product = withVariant(fresh);
-    basePrice = Number(product.price);
-    renderCart();
+    if (e.key === 'nexus_products') {
+      var fresh = getProds().find(function(x) { return x.id === pid; });
+      if (fresh) { product = withVariant(fresh); basePrice = Number(product.price); renderCart(); }
+    }
+    if (e.key === 'nexus_payments') renderCryptoMethods();
   });
 
+  var selectedPM = null;
   var appliedPromo = null;
+  var orderData = null;               /* { invoiceId, address, amountStr, expiresAt, coin } — renvoyé par le serveur */
+  var pollTimer = null, timeoutTimer = null, timerInterval = null;
 
   /* ── Apply site name ── */
   var c = getContent();
@@ -318,7 +753,6 @@
   var sym = '€'; /* tout le site en € */
   var basePrice = Number(product.price);
 
-  /* Reduction fixe OU pourcentage, jamais negative. */
   function discountAmount(price, promo) {
     if (!promo) return 0;
     var raw = promo.type === 'fixed' ? Number(promo.discount) : (price * Number(promo.discount) / 100);
@@ -355,20 +789,52 @@
   }
   renderCart();
 
+  /* ── Render crypto payment methods ── */
+  var cryptoGrid = document.getElementById('cryptoMethods');
+  var cryptoCoins = ['btc', 'eth', 'ltc', 'sol'];
+  function renderCryptoMethods() {
+    var payments = getPayments();
+    cryptoGrid.innerHTML = '';
+    var hasCrypto = false;
+    cryptoCoins.forEach(function(coin) {
+      var cfg = payments[coin];
+      if (!cfg || !cfg.enabled || !cfg.address) return;
+      hasCrypto = true;
+      var info = CRYPTO_INFO[coin];
+      var btn = document.createElement('button');
+      btn.className = 'co-pm-opt';
+      btn.dataset.pm = coin;
+      btn.innerHTML =
+        '<div class="co-pm-opt__icon" style="background:' + info.bg + ';color:#fff;font-size:16px;font-weight:800;">' + info.icon + '</div>' +
+        '<span class="co-pm-opt__label">' + info.name + '</span>';
+      btn.addEventListener('click', function() { selectPM(coin); });
+      cryptoGrid.appendChild(btn);
+    });
+    document.getElementById('noWalletsMsg').style.display = hasCrypto ? 'none' : '';
+  }
+  renderCryptoMethods();
+
+  function selectPM(key) {
+    selectedPM = key;
+    document.querySelectorAll('.co-pm-opt').forEach(function(b) { b.classList.remove('active'); });
+    var active = document.querySelector('.co-pm-opt[data-pm="' + key + '"]');
+    if (active) active.classList.add('active');
+  }
+
   /* ── Promo code ──
-     Jamais validé côté client : /api/coupon-validate seul connaît la liste des
-     coupons (via SellAuth) — voir la note dans api/_sellauth-coupons.js. Ce
-     code est une prévisualisation ; le client SellAuth a son propre champ
-     coupon dans la fenêtre de paiement, qui reste la validation qui compte
-     réellement pour la remise appliquée à la facture. */
+     Prévisualisation seule : /api/coupon-validate ne connaît que le verdict du
+     code demandé (jamais la liste complète). La réduction réellement
+     appliquée est recalculée par le serveur dans /api/crypto-invoice-create —
+     ce qui s'affiche ici ne fait jamais foi pour le montant à payer. */
   document.getElementById('promoBtn').addEventListener('click', function() {
     var code = (document.getElementById('promoInput').value || '').trim().toUpperCase();
     var msgEl = document.getElementById('promoMsg');
+    var email = (document.getElementById('coEmail').value || '').trim();
     if (!code) { msgEl.textContent = 'Enter a promo code.'; msgEl.style.color = 'rgba(239,68,68,.8)'; return; }
     msgEl.textContent = 'Checking…'; msgEl.style.color = 'rgba(255,255,255,.4)';
     fetch('/api/coupon-validate', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code: code, email: '', cartTotal: basePrice, productId: product.id })
+      body: JSON.stringify({ code: code, email: email, cartTotal: basePrice, productId: product.id })
     })
       .then(function(r) { return r.json(); })
       .then(function(res) {
@@ -383,7 +849,7 @@
           msgEl.textContent = reasons[res.reason] || 'Invalid code.'; msgEl.style.color = 'rgba(239,68,68,.8)'; appliedPromo = null;
         } else {
           appliedPromo = { code: code, discount: res.discount, type: res.type };
-          msgEl.textContent = '✓ Code applied — ' + discountLabel(appliedPromo) + '. Enter it again in the payment window to redeem it.';
+          msgEl.textContent = '✓ Code applied — ' + discountLabel(appliedPromo);
           msgEl.style.color = 'rgba(99,235,132,.9)';
         }
         renderCart();
@@ -391,52 +857,200 @@
       .catch(function() { msgEl.textContent = 'Network error.'; msgEl.style.color = 'rgba(239,68,68,.8)'; appliedPromo = null; renderCart(); });
   });
 
-  /* ── SellAuth checkout link ──
-     Redirection directe vers la page de paiement hébergée par SellAuth sur
-     son domaine (SELLAUTH_CHECKOUT_DOMAIN) — voir docs.sellauth.com/developers/
-     checkout-links. Remplace le widget JS embed (sellauth-embed-2.js) : celui-ci
-     échouait de façon systématique avec "Captcha timeout" avant même d'afficher
-     la moindre modale, alors qu'un lien direct fonctionne. Le paiement (email,
-     méthode, facturation) est entièrement géré par SellAuth sur sa propre page
-     — voir _sellauth-invoice.js / sellauth-webhook.js côté serveur pour la
-     suite (email de livraison, notification Discord, historique de commandes)
-     une fois la facture payée. */
-  var payBtn = document.getElementById('payNowBtn');
-  var payErr = document.getElementById('payErr');
-  var payBtnDefaultHtml = payBtn.innerHTML;
-
-  function showPayErr(msg) {
-    payErr.textContent = msg;
-    payErr.style.display = '';
+  /* ── Copy helper ── */
+  function copyText(text, btn) {
+    try {
+      navigator.clipboard.writeText(text).then(function() {
+        var orig = btn.innerHTML;
+        btn.innerHTML = '✓';
+        setTimeout(function() { btn.innerHTML = orig; }, 2000);
+      });
+    } catch(e) {}
   }
 
-  payBtn.addEventListener('click', function() {
-    payErr.style.display = 'none';
+  /* ── Continue button — crée la facture côté serveur ── */
+  document.getElementById('continueBtn').addEventListener('click', function() {
+    var email = document.getElementById('coEmail').value.trim();
+    var errEl = document.getElementById('emailErr');
 
-    var productId = product.sellauthProductId;
-    var variantId = product.sellauthVariantId;
-    if (!productId) {
-      showPayErr('This product isn\'t linked to payments yet — please contact support.');
+    errEl.style.display = 'none';
+    document.getElementById('coEmail').classList.remove('err');
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      document.getElementById('coEmail').classList.add('err');
+      errEl.textContent = 'Please enter a valid email address.';
+      errEl.style.display = '';
+      return;
+    }
+    if (!selectedPM) {
+      errEl.textContent = 'Please select a payment method.';
+      errEl.style.display = '';
       return;
     }
 
-    payBtn.disabled = true; payBtn.textContent = 'Loading…';
+    var btn = document.getElementById('continueBtn');
+    btn.disabled = true; btn.textContent = 'Creating invoice…';
 
-    fetch('/api/sellauth-shop')
-      .then(function(r) { return r.json(); })
-      .then(function(cfg) {
-        if (!cfg || !cfg.ok || !cfg.checkoutDomain) throw new Error('Checkout not configured');
-        var url = 'https://' + cfg.checkoutDomain + '/checkout-link?' +
-          'cart[0][productId]=' + encodeURIComponent(productId) +
-          (variantId ? '&cart[0][variantId]=' + encodeURIComponent(variantId) : '') +
-          '&cart[0][quantity]=1';
-        window.location.href = url;
+    fetch('/api/crypto-invoice-create', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        productId: product.id, email: email, coin: selectedPM,
+        couponCode: appliedPromo ? appliedPromo.code : null
+      })
+    })
+      .then(function(r) { return r.json().then(function(j) { return { ok: r.ok, status: r.status, body: j }; }); })
+      .then(function(res) {
+        btn.disabled = false;
+        btn.innerHTML = 'Continue <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+        if (!res.ok || !res.body || !res.body.ok) {
+          errEl.textContent = (res.body && res.body.error) || 'Could not create the invoice. Please try again.';
+          errEl.style.display = '';
+          return;
+        }
+        orderData = {
+          invoiceId: res.body.invoiceId, address: res.body.address, amountStr: res.body.amountStr,
+          fiatAmount: res.body.fiatAmount, currency: res.body.currency, expiresAt: res.body.expiresAt,
+          coin: res.body.coin, email: email
+        };
+        showConfirmationStep(orderData);
       })
       .catch(function() {
-        payBtn.disabled = false; payBtn.innerHTML = payBtnDefaultHtml;
-        showPayErr('Payment is temporarily unavailable. Please try again shortly.');
+        btn.disabled = false;
+        btn.innerHTML = 'Continue <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+        errEl.textContent = 'Network error. Please try again.';
+        errEl.style.display = '';
       });
   });
+
+  function showConfirmationStep(od) {
+    var info = CRYPTO_INFO[od.coin];
+    var sym2 = SYM[od.currency] || '€';
+
+    document.getElementById('bcCheckout').classList.remove('active');
+    document.getElementById('bcCheckout').classList.add('done');
+    document.getElementById('bcConfirm').classList.add('active');
+
+    document.getElementById('stepCheckout').style.display = 'none';
+    document.getElementById('stepConfirm').style.display = '';
+
+    document.getElementById('confAmount').textContent = od.amountStr;
+    document.getElementById('confAddrLbl').textContent = info.name + ' Address';
+    document.getElementById('confAddr').textContent = od.address;
+
+    var uri = (od.coin === 'btc' ? 'bitcoin:' : od.coin === 'eth' ? 'ethereum:' : od.coin === 'ltc' ? 'litecoin:' : 'solana:') + od.address;
+    document.getElementById('confQR').src = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + encodeURIComponent(uri) + '&format=png&margin=0';
+
+    document.getElementById('confWarningList').innerHTML = [
+      '<li>Send exactly <strong>' + od.amountStr + '</strong> (≈ ' + sym2 + Number(od.fiatAmount).toFixed(2) + ')</li>',
+      '<li>Send only ' + info.name + ' to this address</li>',
+      '<li>Takes 1 network confirmation</li>'
+    ].join('');
+
+    document.getElementById('opOrderId').textContent = od.invoiceId;
+    document.getElementById('opTotal').textContent = sym2 + Number(od.fiatAmount).toFixed(2);
+    document.getElementById('opMethod').textContent = info.name;
+
+    document.getElementById('confAmtCopy').onclick = function() { copyText(od.amountStr.split(' ')[0], this); };
+    document.getElementById('confAddrCopy').onclick = function() { copyText(od.address, this); };
+
+    startTimer(od.expiresAt);
+    startPolling(od.invoiceId);
+
+    document.getElementById('confSentBtn').addEventListener('click', function() {
+      document.getElementById('confStatusTxt').textContent = 'Checking blockchain now…';
+      checkStatus(od.invoiceId);
+    });
+  }
+
+  /* ── Timer (purement visuel — le serveur est seul juge de l'expiration) ── */
+  function formatTimerTarget(end) {
+    var endDate = new Date(end);
+    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var h = endDate.getHours(); var m = endDate.getMinutes();
+    return endDate.getDate() + ' ' + months[endDate.getMonth()] + ', ' + (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
+  }
+  function startTimer(expiresAt) {
+    document.getElementById('confTimerVal').textContent = formatTimerTarget(expiresAt);
+    timerInterval = setInterval(function() {
+      if (Date.now() >= expiresAt) {
+        clearInterval(timerInterval);
+        document.getElementById('confTimerVal').textContent = 'Expired';
+        document.getElementById('confStatusTxt').textContent = 'Payment window expired. Please restart.';
+        document.getElementById('confPulse').style.color = '#ef4444';
+        stopPolling();
+      }
+    }, 1000);
+  }
+
+  /* ── Statut de la facture (vérifié par LE SERVEUR, jamais par ce script) ── */
+  function startPolling(invoiceId) {
+    checkStatus(invoiceId);
+    pollTimer = setInterval(function() { checkStatus(invoiceId); }, POLL_INTERVAL);
+  }
+  function stopPolling() {
+    if (pollTimer) clearInterval(pollTimer);
+    if (timerInterval) clearInterval(timerInterval);
+    pollTimer = timerInterval = null;
+  }
+
+  function checkStatus(invoiceId) {
+    fetch('/api/crypto-invoice-status?id=' + encodeURIComponent(invoiceId))
+      .then(function(r) { return r.json(); })
+      .then(function(res) {
+        if (!res || !res.ok) { document.getElementById('confStatusTxt').textContent = 'Network error — retrying…'; return; }
+        if (res.status === 'awaiting_confirmation') {
+          document.getElementById('confStatusTxt').textContent = 'Transaction found — awaiting confirmation (' + (res.confirmations || 0) + ' conf)…';
+          document.getElementById('confPulse').style.color = '#60a5fa';
+          setStep(3);
+          return;
+        }
+        if (res.status === 'expired') {
+          stopPolling();
+          document.getElementById('confTimerVal').textContent = 'Expired';
+          document.getElementById('confStatusTxt').textContent = 'Payment window expired. Please restart.';
+          document.getElementById('confPulse').style.color = '#ef4444';
+          return;
+        }
+        if (res.status === 'completed') {
+          stopPolling();
+          completeOrder(res.deliverable);
+        }
+      })
+      .catch(function() { document.getElementById('confStatusTxt').textContent = 'Network error — retrying…'; });
+  }
+
+  function setStep(n) {
+    for (var i = 1; i <= 4; i++) {
+      var el = document.getElementById('opStep' + i);
+      el.classList.remove('done', 'active');
+      if (i < n) el.classList.add('done');
+      else if (i === n) el.classList.add('active');
+    }
+  }
+
+  /* ── Succès : le serveur a déjà tout enregistré (commande, email, Discord)
+     avant de répondre "completed" — cette fonction n'affiche que le résultat. ── */
+  function completeOrder(deliverable) {
+    document.getElementById('bcConfirm').classList.remove('active');
+    document.getElementById('bcConfirm').classList.add('done');
+    document.getElementById('bcDone').classList.add('active');
+
+    setStep(4);
+    document.getElementById('stepConfirm').style.display = 'none';
+    document.getElementById('stepSuccess').style.display = '';
+
+    document.getElementById('successSub').textContent = 'Order confirmed. A copy was sent to ' + orderData.email + '.';
+    document.getElementById('successInvId').textContent = orderData.invoiceId;
+    document.getElementById('successDeliv').textContent = deliverable || '';
+
+    var _eyeSvg = '<svg class="nx-ico" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.06 12.35a1 1 0 0 1 0-.7 10.75 10.75 0 0 1 19.88 0 1 1 0 0 1 0 .7 10.75 10.75 0 0 1-19.88 0"/><circle cx="12" cy="12" r="3"/></svg>';
+    var _eyeOffSvg = '<svg class="nx-ico" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.73 5.08a10.74 10.74 0 0 1 11.2 6.57 1 1 0 0 1 0 .7 10.75 10.75 0 0 1-1.44 2.49"/><path d="M14.08 14.16a3 3 0 0 1-4.24-4.24"/><path d="M17.48 17.5A10.75 10.75 0 0 1 2.06 12.35a1 1 0 0 1 0-.7 10.75 10.75 0 0 1 4.45-5.14"/><path d="m2 2 20 20"/></svg>';
+    document.getElementById('successRevealBtn').addEventListener('click', function() {
+      var el = document.getElementById('successDeliv');
+      var shown = el.classList.toggle('shown');
+      this.innerHTML = shown ? _eyeOffSvg + ' Hide' : _eyeSvg + ' Click to reveal';
+    });
+  }
 
 }());
 </script>

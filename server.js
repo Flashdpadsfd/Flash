@@ -45,12 +45,13 @@ app.use(helmet({
 
 /* ── En-têtes de sécurité ──
    img-src/connect-src/frame-src listent les hôtes externes réellement appelés
-   par le front (webhook Discord) plutôt qu'un wildcard https: — voir
-   checkout.html / assets/main.js pour la liste des appels. Le paiement
-   (crypto, carte…) est un simple lien direct vers la page de paiement hébergée
-   par SellAuth (checkout-link, sur son propre domaine) : le site quitte
-   entièrement la page, donc aucun script/frame SellAuth n'est chargé ici. */
-var CSP = "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.paypal.com https://*.paypalobjects.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://discord.com; frame-src 'self'; media-src 'self'; manifest-src 'self'; worker-src 'self'; base-uri 'self'; form-action 'self'; object-src 'none'; frame-ancestors 'self'; upgrade-insecure-requests";
+   par le front (QR code du checkout crypto, webhook Discord) plutôt qu'un
+   wildcard https: — voir checkout.html / assets/main.js pour la liste des
+   appels. Le taux de change et la vérification blockchain sont désormais
+   appelés par le SERVEUR (api/crypto-invoice-create.js, api/crypto-invoice-
+   status.js), pas par le navigateur : pas besoin de les autoriser ici, la CSP
+   ne s'applique qu'aux requêtes faites depuis la page. */
+var CSP = "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.paypal.com https://*.paypalobjects.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://api.qrserver.com; connect-src 'self' https://discord.com; frame-src 'self'; media-src 'self'; manifest-src 'self'; worker-src 'self'; base-uri 'self'; form-action 'self'; object-src 'none'; frame-ancestors 'self'; upgrade-insecure-requests";
 app.use(function (req, res, next) {
   res.setHeader('Content-Security-Policy', CSP);
   res.setHeader('X-Content-Type-Options', 'nosniff');
