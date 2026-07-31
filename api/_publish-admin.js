@@ -44,16 +44,27 @@ function copyDir(src, dest) {
 }
 
 function publish(appRoot) {
-  if (String(process.env.PUBLISH_ADMIN || '') === '0') return;
+  if (String(process.env.PUBLISH_ADMIN || '') === '0') {
+    console.log('[FlashShp] publication du panneau admin désactivée (PUBLISH_ADMIN=0)');
+    return;
+  }
 
   var src = path.join(appRoot, 'admin');
-  if (!fs.existsSync(src)) return;                 /* rien à publier */
+  if (!fs.existsSync(src)) {
+    console.log('[FlashShp] publication du panneau admin ignorée : dossier admin/ introuvable (' + src + ')');
+    return;
+  }
 
   var dest = targetDir(appRoot);
   var parent = path.dirname(dest);
   /* public_html absent = on n'est pas sur cet hébergement (dev local) : on sort
-     sans bruit plutôt que de créer une arborescence parasite. */
-  if (!fs.existsSync(parent)) return;
+     sans bruit dans le cas normal, mais on journalise quand même — ce chemin
+     silencieux est justement celui qui masquait un vrai souci en production
+     (arborescence différente de ce qui était attendu). */
+  if (!fs.existsSync(parent)) {
+    console.log('[FlashShp] publication du panneau admin ignorée : ' + parent + ' introuvable (appRoot=' + appRoot + ')');
+    return;
+  }
 
   try {
     var n = copyDir(src, dest);
