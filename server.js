@@ -21,8 +21,14 @@ var app = express();
 app.disable('x-powered-by');
 app.set('trust proxy', true); // derrière le proxy Hostinger : req.protocol/ip corrects
 
-/* Corps JSON (les handlers lisent req.body ; readBody gère aussi l'absence). */
-app.use(express.json({ limit: '1mb' }));
+/* Corps JSON (les handlers lisent req.body ; readBody gère aussi l'absence).
+   verify() garde aussi les octets bruts (req.rawBody) : api/sellauth-webhook.js
+   en a besoin pour vérifier la signature HMAC de SellAuth — un JSON.stringify()
+   du corps re-parsé ne reproduit pas forcément exactement ce qui a été signé. */
+app.use(express.json({
+  limit: '1mb',
+  verify: function (req, res, buf) { req.rawBody = buf; }
+}));
 
 /* Helmet pose une base d'en-têtes qu'on ne gérait pas encore soi-même
    (X-DNS-Prefetch-Control, Cross-Origin-Resource-Policy, Origin-Agent-Cluster…).
@@ -39,10 +45,12 @@ app.use(helmet({
 
 /* ── En-têtes de sécurité ──
    img-src/connect-src/frame-src listent les hôtes externes réellement appelés
-   par le front (cours crypto, vérif blockchain, QR code, webhook Discord,
-   emailjs) plutôt qu'un wildcard https: — voir crypto-checkout.js/checkout.html
-   pour la liste des appels. */
-var CSP = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.sellauth.com https://cdn.jsdelivr.net https://www.paypal.com https://*.paypalobjects.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://api.qrserver.com; connect-src 'self' https://api.coingecko.com https://api.blockcypher.com https://eth.blockscout.com https://api.mainnet-beta.solana.com https://apilist.tronscanapi.com https://discord.com https://api.emailjs.com https://ipapi.co; frame-src 'self'; media-src 'self'; manifest-src 'self'; worker-src 'self'; base-uri 'self'; form-action 'self'; object-src 'none'; frame-ancestors 'self'; upgrade-insecure-requests";
+   par le front (widget de paiement SellAuth, webhook Discord) plutôt qu'un
+   wildcard https: — voir checkout.html / assets/main.js pour la liste des
+   appels. Le paiement (crypto, carte…) est entièrement géré par SellAuth
+   depuis sa propre fenêtre modale — plus de cours crypto/vérif blockchain/QR
+   code générés par ce site. */
+var CSP = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.sellauth.com https://sellauth.com https://www.paypal.com https://*.paypalobjects.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://sellauth.com https://api.sellauth.com https://discord.com; frame-src 'self' https://sellauth.com; media-src 'self'; manifest-src 'self'; worker-src 'self'; base-uri 'self'; form-action 'self'; object-src 'none'; frame-ancestors 'self'; upgrade-insecure-requests";
 app.use(function (req, res, next) {
   res.setHeader('Content-Security-Policy', CSP);
   res.setHeader('X-Content-Type-Options', 'nosniff');

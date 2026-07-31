@@ -57,6 +57,30 @@ function sanitizeOrder(b) {
   };
 }
 
+/* Enregistre une commande déjà sanitizée si elle est nouvelle (dédoublonnage
+   par id) et compte l'utilisation du coupon le cas échéant. Réutilisable en
+   interne (ex. api/sellauth-webhook.js) sans passer par une requête HTTP.
+   Renvoie { recorded } : false si l'id existait déjà (idempotent). */
+async function recordOrder(order) {
+  if (!store.available()) throw new Error('Store not configured');
+  if (!order || !order.id) throw new Error('Missing order id');
+
+  var cur = await store.getContent(['nexus_orders']);
+  var arr = Array.isArray(cur.nexus_orders) ? cur.nexus_orders : [];
+
+  var exists = arr.some(function (o) { return o && String(o.id) === String(order.id); });
+  if (!exists) {
+    arr.unshift(order);
+    if (arr.length > MAX_ORDERS) arr = arr.slice(0, MAX_ORDERS);
+    await store.setContent('nexus_orders', arr);
+    if (order.couponCode) {
+      try { await couponUsage.recordUse(order.couponCode, order.email); }
+      catch (e) { console.error('[FlashShp] coupon usage record failed:', e && e.message); }
+    }
+  }
+  return { recorded: !exists };
+}
+
 module.exports = async function (req, res) {
   if (origin.handlePreflight(req, res)) return;
   origin.applyCors(req, res);
@@ -71,24 +95,14 @@ module.exports = async function (req, res) {
   if (!order.id) { res.status(400).json({ error: 'Missing order id' }); return; }
 
   try {
-    var cur = await store.getContent(['nexus_orders']);
-    var arr = Array.isArray(cur.nexus_orders) ? cur.nexus_orders : [];
-
-    /* Idempotent : le checkout peut ré-émettre — on ne double pas une commande. */
-    var exists = arr.some(function (o) { return o && String(o.id) === String(order.id); });
-    if (!exists) {
-      arr.unshift(order);
-      if (arr.length > MAX_ORDERS) arr = arr.slice(0, MAX_ORDERS);
-      await store.setContent('nexus_orders', arr);
-      if (order.couponCode) {
-        try { await couponUsage.recordUse(order.couponCode, order.email); }
-        catch (e) { console.error('[FlashShp] coupon usage record failed:', e && e.message); }
-      }
-    }
+    var result = await recordOrder(order);
     res.setHeader('Cache-Control', 'no-store');
-    res.status(200).json({ ok: true, recorded: !exists });
+    res.status(200).json({ ok: true, recorded: result.recorded });
   } catch (e) {
     console.error('[FlashShp] /api/record-order failed:', e && e.message);
     res.status(502).json({ error: 'Could not record order' });
   }
 };
+
+module.exports.recordOrder = recordOrder;
+module.exports.sanitizeOrder = sanitizeOrder;

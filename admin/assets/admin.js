@@ -1110,6 +1110,8 @@
     document.getElementById('fGradient').value    = p ? (p.gradient || 'linear-gradient(135deg,#1a1a2e,#16213e)') : 'linear-gradient(135deg,#1a1a2e,#16213e)';
     document.getElementById('fCurrency').value    = p ? (p.currency || 'EUR') : 'EUR';
     document.getElementById('fStatusLabel').value = p ? (p.statusLabel || '') : '';
+    document.getElementById('fSellauthProductId').value = p && p.sellauthProductId ? p.sellauthProductId : '';
+    document.getElementById('fSellauthVariantId').value  = p && p.sellauthVariantId  ? p.sellauthVariantId  : '';
 
     /* New fields */
     var vis = p ? (p.visibility || 'public') : 'public';
@@ -1381,6 +1383,8 @@
       category: document.getElementById('fCat').value,
       price: price,
       origPrice: parseFloat(document.getElementById('fOrigPrice').value) || null,
+      sellauthProductId: parseInt(document.getElementById('fSellauthProductId').value, 10) || null,
+      sellauthVariantId: parseInt(document.getElementById('fSellauthVariantId').value, 10) || null,
       deliverables: deliverables,
       stock: deliverables.length,
       desc: document.getElementById('fDesc').value.trim(),

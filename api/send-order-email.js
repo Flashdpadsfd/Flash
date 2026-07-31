@@ -51,31 +51,16 @@ function oneLine(s) {
    any host listed in the ALLOWED_ORIGINS env var. */
 /* Règle d'origine partagée par toutes les routes : voir api/_origin.js. */
 
-module.exports = function (req, res) {
-  if (origin.handlePreflight(req, res)) return;
-  origin.applyCors(req, res);
+/* Construit et envoie l'email de commande. Réutilisable en interne (ex.
+   api/sellauth-webhook.js) sans passer par une requête HTTP — mêmes règles
+   d'échappement/troncature que le handler HTTP ci-dessous. Lance si SMTP non
+   configuré ou destinataire invalide (à l'appelant de gérer). */
+function sendOrderEmail(body) {
+  body = body || {};
+  if (!mailer.available()) return Promise.reject(new Error('SMTP not configured'));
 
-  if (req.method !== 'POST') {
-    res.status(405).json({ error: 'Method not allowed' });
-    return;
-  }
-
-  if (!origin.isAllowedOrigin(req)) {
-    res.status(403).json({ error: 'Forbidden' });
-    return;
-  }
-
-  if (!mailer.available()) {
-    res.status(501).json({ error: 'SMTP not configured' });
-    return;
-  }
-
-  var body = (req.body && typeof req.body === 'object') ? req.body : {};
   var to = String(body.to || '').trim().slice(0, 254);
-  if (!EMAIL_RE.test(to)) {
-    res.status(400).json({ error: 'Invalid recipient' });
-    return;
-  }
+  if (!EMAIL_RE.test(to)) return Promise.reject(new Error('Invalid recipient'));
 
   /* Contenu borne et echappe : le template HTML reste cote serveur, le client
      ne fournit que des valeurs. Toutes les valeurs injectees dans le HTML
@@ -109,14 +94,37 @@ module.exports = function (req, res) {
   var html = tpl.replace(/\{\{(invoice_id|product_name|deliverable|customer_email|store_name|store_url)\}\}/g,
     function (_m, key) { return fields[key]; });
 
-  mailer.send({
-    to: to,
-    subject: subject,
-    html: html
-  }).then(function () {
+  return mailer.send({ to: to, subject: subject, html: html });
+}
+
+module.exports = function (req, res) {
+  if (origin.handlePreflight(req, res)) return;
+  origin.applyCors(req, res);
+
+  if (req.method !== 'POST') {
+    res.status(405).json({ error: 'Method not allowed' });
+    return;
+  }
+
+  if (!origin.isAllowedOrigin(req)) {
+    res.status(403).json({ error: 'Forbidden' });
+    return;
+  }
+
+  if (!mailer.available()) {
+    res.status(501).json({ error: 'SMTP not configured' });
+    return;
+  }
+
+  var body = (req.body && typeof req.body === 'object') ? req.body : {};
+  sendOrderEmail(body).then(function () {
     res.status(200).json({ ok: true });
   }).catch(function (err) {
-    console.error('[FlashShp] SMTP send failed:', err && err.message);
+    var msg = err && err.message;
+    if (msg === 'Invalid recipient') { res.status(400).json({ error: 'Invalid recipient' }); return; }
+    console.error('[FlashShp] SMTP send failed:', msg);
     res.status(502).json({ error: 'Send failed' });
   });
 };
+
+module.exports.sendOrderEmail = sendOrderEmail;

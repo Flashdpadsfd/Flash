@@ -11,14 +11,19 @@
   <style>
     :root{ --bg:#08080a; --bd:rgba(255,255,255,.09); --bd2:rgba(255,255,255,.22); --mut:rgba(255,255,255,.5); --faint:rgba(255,255,255,.35); }
     *{box-sizing:border-box;}
-    body{margin:0;background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased;}
+    html,body{margin:0;background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased;}
 
-    .cl-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;position:relative;overflow:hidden;}
+    .cl-bg{position:fixed;inset:0;width:100%;height:100%;border:0;filter:blur(6px) brightness(.5) saturate(1.1);
+      transform:scale(1.03);pointer-events:none;z-index:0;}
+    .cl-dim{position:fixed;inset:0;background:rgba(4,4,6,.55);z-index:1;pointer-events:none;}
+
+    .cl-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;position:relative;overflow:hidden;z-index:2;}
     .cl-wrap::before{content:'';position:absolute;left:50%;top:-10%;width:820px;height:480px;transform:translateX(-50%);
       background:radial-gradient(ellipse at center, rgba(255,255,255,.05), transparent 62%);pointer-events:none;}
 
-    .cl-card{position:relative;width:100%;max-width:420px;background:rgba(255,255,255,.02);border:1px solid var(--bd);
-      border-radius:18px;padding:36px 32px 30px;box-shadow:0 30px 70px rgba(0,0,0,.5);}
+    .cl-card{position:relative;width:100%;max-width:420px;background:rgba(20,20,24,.55);backdrop-filter:blur(22px) saturate(1.3);
+      -webkit-backdrop-filter:blur(22px) saturate(1.3);border:1px solid var(--bd);
+      border-radius:18px;padding:36px 32px 30px;box-shadow:0 30px 70px rgba(0,0,0,.55);}
     .cl-close{position:absolute;top:16px;right:16px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;
       border-radius:9px;color:rgba(255,255,255,.4);text-decoration:none;transition:color .15s,background .15s;}
     .cl-close:hover{color:#fff;background:rgba(255,255,255,.08);}
@@ -40,6 +45,8 @@
     .cl-sub{font-size:13px;color:var(--mut);line-height:1.55;margin:0 0 24px;text-align:center;}
     .cl-sub b{color:#fff;font-weight:600;}
 
+    .cl-pw-row{display:grid;grid-template-columns:1fr;gap:10px;}
+    .cl-pw-row.cl-pw-row--split{grid-template-columns:1fr 1fr;}
     .cl-field{margin-bottom:14px;}
     .cl-field label{display:block;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
       color:rgba(255,255,255,.35);margin-bottom:7px;}
@@ -74,6 +81,8 @@
   </style>
 </head>
 <body>
+  <iframe class="cl-bg" src="/" tabindex="-1" aria-hidden="true"></iframe>
+  <div class="cl-dim"></div>
   <div class="cl-wrap">
     <div class="cl-card">
       <a class="cl-close" href="/" aria-label="Close">
@@ -107,9 +116,16 @@
             <input class="cl-input" type="email" id="clEmail" placeholder="you@email.com" required autocomplete="email" />
           </div>
 
-          <div class="cl-field" id="clPasswordGroup">
-            <label for="clPassword">Password <span class="req">*</span></label>
-            <input class="cl-input" type="password" id="clPassword" placeholder="Enter your password" autocomplete="current-password" />
+          <div class="cl-pw-row" id="clPwRow">
+            <div class="cl-field" id="clPasswordGroup">
+              <label for="clPassword">Password <span class="req">*</span></label>
+              <input class="cl-input" type="password" id="clPassword" placeholder="Enter your password" autocomplete="current-password" />
+            </div>
+
+            <div class="cl-field" id="clConfirmGroup" style="display:none;">
+              <label for="clConfirm">Confirm <span class="req">*</span></label>
+              <input class="cl-input" type="password" id="clConfirm" placeholder="Confirm password" autocomplete="new-password" />
+            </div>
           </div>
 
           <button class="cl-btn" type="submit" id="clSendBtn">Sign In</button>
@@ -156,6 +172,9 @@
     var emailInput = document.getElementById('clEmail');
     var passwordInput = document.getElementById('clPassword');
     var passwordGroup = document.getElementById('clPasswordGroup');
+    var pwRow = document.getElementById('clPwRow');
+    var confirmGroup = document.getElementById('clConfirmGroup');
+    var confirmInput = document.getElementById('clConfirm');
     var sendBtn = document.getElementById('clSendBtn');
     var verifyBtn = document.getElementById('clVerifyBtn');
     var methodToggle = document.getElementById('clMethodToggle');
@@ -193,6 +212,12 @@
       passwordGroup.style.display = usePw ? '' : 'none';
       passwordInput.required = usePw;
       passwordInput.autocomplete = tab === 'register' ? 'new-password' : 'current-password';
+
+      var showConfirm = usePw && tab === 'register';
+      confirmGroup.style.display = showConfirm ? '' : 'none';
+      confirmInput.required = showConfirm;
+      pwRow.classList.toggle('cl-pw-row--split', showConfirm);
+      if (!showConfirm) { confirmInput.value = ''; }
 
       if (tab === 'signin') {
         stepTitle.textContent = 'Access your account';
@@ -318,6 +343,7 @@
         submitPasswordLogin(email, password, sendBtn, label).then(function(ok){ if (ok) toStep2(email, 'Confirm it’s you'); });
       } else {
         if (password.length < 8) { showErr('Password must be at least 8 characters.'); return; }
+        if (password !== (confirmInput.value || '')) { showErr('Passwords do not match.'); return; }
         requestPasswordRegister(email, password, sendBtn, label).then(function(ok){ if (ok) toStep2(email, 'Confirm your account'); });
       }
     });
